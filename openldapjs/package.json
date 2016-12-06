@@ -1,0 +1,32 @@
+{
+  "name": "openldapjs",
+  "version": "0.0.1",
+  "description": "Node.js wrapper for open ldap client libraries",
+  "main": "index.js",
+  "scripts": {
+    "gulp": "./node_modules/.bin/gulp --",
+    "test": "npm run-script gulp test",
+    "coverage": "npm run-script gulp coverage",
+    "style": "npm run-script gulp jscs_jshint",
+    "doc": "npm run-script gulp doc",
+    "jenkins": "npm run-script gulp jenkins"
+  },
+  "keywords": [
+    "ldap"
+  ],
+  "contributors ": [
+    {
+      "name": "Michael de Paly",
+      "email": "michael.depaly@huf-group.com"
+    }
+  ],
+  "author": "Huf Secure Mobile GmbH",
+  "license": "TBD",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "mocha": "^2.5.3",
+    "should": "^10.0.0"
+  },
+  "dependencies": {
+  }
+}
