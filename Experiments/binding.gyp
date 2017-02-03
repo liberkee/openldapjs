@@ -5,10 +5,10 @@
       'defines': [ 'V8_DEPRECATION_WARNINGS=1' ],
       'include_dirs' : [
         "<!(node -e \"require('nan')\")",
-				"/usr/local/include"
+        "/usr/local/include"
       ],
-      'sources': [ 'binding.cc' ],
-			"ldflags": [
+      'sources': [ 'binding.cc'],
+      "ldflags": [
             "-Wl,-z,defs"
       ],
       'libraries': [
@@ -27,4 +27,5 @@
     }
   ]
 }
+
 
