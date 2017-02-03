@@ -16,10 +16,10 @@ class LDAPClient : public Nan::ObjectWrap {
 
     Nan::SetPrototypeMethod(tpl, "initialize", initialize);
     Nan::SetPrototypeMethod(tpl, "getState", getState);
-    //Nan::SetPrototypeMethod(tpl, "bind", bind);
-    //Nan::SetPrototypeMethod(tpl, "search", search);
-    //Nan::SetPrototypeMethod(tpl, "compare", compare);
-    //Nan::SetPrototypeMethod(tpl, "unbind", unbind);
+    Nan::SetPrototypeMethod(tpl, "bind", bind);
+    Nan::SetPrototypeMethod(tpl, "search", search);
+    Nan::SetPrototypeMethod(tpl, "compare", compare);
+    Nan::SetPrototypeMethod(tpl, "unbind", unbind);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -27,17 +27,11 @@ class LDAPClient : public Nan::ObjectWrap {
   }
 
  protected:
-   /*virtual void Unref()
-   {
-	   std::cout << "Unref" << value_ << std::endl;
-   }*/ 
  private:
   LDAP *ld;
   unsigned int stateClient = 0;
   explicit LDAPClient(){};
-  ~LDAPClient() {
-	  //std::cout << "Destruct" << value_ << std::endl;
-  }
+  ~LDAPClient(){};
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
@@ -51,11 +45,6 @@ class LDAPClient : public Nan::ObjectWrap {
     }
   }
 
-  /*static NAN_METHOD(GetHandle) {
-    MyObject* obj = Nan::ObjectWrap::Unwrap<MyObject>(info.Holder());
-    info.GetReturnValue().Set(obj->handle());
-  }*/
-
   static NAN_METHOD(getState) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     info.GetReturnValue().Set(obj->stateClient);
@@ -64,19 +53,19 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(initialize) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String hostArg(info[0]);
-    LDAP *ld = obj->ld;
+    //LDAP *ld = obj->ld;
 
     char *hostAddress = *hostArg;
     int state;
     int protocol_version = LDAP_VERSION3;
 
-    state = ldap_initialize(&ld, hostAddress);
+    state = ldap_initialize(&obj->ld, hostAddress);
     if(state != LDAP_SUCCESS) {
       info.GetReturnValue().Set(obj->stateClient);
       return;
     }
 
-    state = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
+    state = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if(state != LDAP_SUCCESS) {
       info.GetReturnValue().Set(obj->stateClient);
       return;
@@ -86,69 +75,28 @@ class LDAPClient : public Nan::ObjectWrap {
     return;
   }
 
-  static inline Nan::Persistent<v8::Function> & constructor() {
-    static Nan::Persistent<v8::Function> my_constructor;
-    return my_constructor;
-  }
+  static NAN_METHOD(bind) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+    Nan::Utf8String userArg(info[0]);
+    Nan::Utf8String passArg(info[1]);
 
-  //double value_;
-};
-
-NODE_MODULE(objectwrapper, LDAPClient::Init)
-
-
-//-----------------------------------------------------------------------------//
-
-// initialize the LDAP library without opening a connection to a server
-/*void initialize(const Nan::FunctionCallbackInfo<Value>& info) {
-  Nan::Utf8String hostArg(info[0]);
-
-  char *hostAddress = *hostArg;
-  int state;
-  bool result = true;
-  int protocol_version = LDAP_VERSION3;
-
-  state = ldap_initialize(&ld, hostAddress);
-  if(state != LDAP_SUCCESS) {
-    result = false;
-    info.GetReturnValue().Set(result);
+    char *username = *userArg;
+    char *password = *passArg;
+    int status;
+    
+    status = ldap_simple_bind_s(obj->ld, username, password);
+    if(status != LDAP_SUCCESS) {
+      info.GetReturnValue().Set(obj->stateClient);
+      return;
+    }
+    cout << LDAP_SCOPE_SUBTREE << endl << endl;
+    obj->stateClient = 2;
+    info.GetReturnValue().Set(obj->stateClient);
     return;
   }
 
-  state = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
-  if(state != LDAP_SUCCESS) {
-    result = false;
-    info.GetReturnValue().Set(result);
-    return;
-  }
-  info.GetReturnValue().Set(result);
-  return;
-}
-
-// This function will take two arguments (DN and password) and bind to server if the creadentials are not corect will return an error message
-void bind(const Nan::FunctionCallbackInfo<Value>& info) {
-  Nan::Utf8String userArg(info[0]);
-  Nan::Utf8String passArg(info[1]);
-
-  char *username = *userArg;
-  char *password = *passArg;
-  int status;
-  bool result = true;
-  
-  status = ldap_simple_bind_s(ld, username, password);
-  if(status != LDAP_SUCCESS) {
-    result = false;
-    info.GetReturnValue().Set(result);
-    return;
-  }
-  cout << LDAP_SCOPE_SUBTREE << endl << endl;
-  info.GetReturnValue().Set(result);
-  return;
-}
-
-//The search make a request to a LDAP server for specific information
-void search(const Nan::FunctionCallbackInfo<Value>& info) {
-
+  static NAN_METHOD(search) {
+  LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
   //Takes the argument given by nodeJS and make it string
   Nan::Utf8String baseArg(info[0]);
   Nan::Utf8String filterArg(info[2]);
@@ -176,7 +124,7 @@ void search(const Nan::FunctionCallbackInfo<Value>& info) {
   }
 
   // request a search to LDAP server
-  status = ldap_search_ext_s(ld, 
+  status = ldap_search_ext_s(obj->ld, 
                             DNbase, 
                             scopeSearch, 
                             filterSearch, 
@@ -195,21 +143,21 @@ void search(const Nan::FunctionCallbackInfo<Value>& info) {
   }
 
   //take every node from result and print it
-  for (entry = ldap_first_entry(ld, searchResult);
+  for (entry = ldap_first_entry(obj->ld, searchResult);
       entry != NULL;
-      entry = ldap_next_entry(ld, entry)) {
+      entry = ldap_next_entry(obj->ld, entry)) {
         //print the dn
-        if((dn = ldap_get_dn(ld, entry)) != NULL) {
+        if((dn = ldap_get_dn(obj->ld, entry)) != NULL) {
           returnValue += "dn:";
           returnValue += dn;
           returnValue += "\n";
           ldap_memfree(dn);
         }
         //print the attribute of specific entry
-      for(attribute = ldap_first_attribute (ld, entry, &ber);
+      for(attribute = ldap_first_attribute (obj->ld, entry, &ber);
           attribute != NULL;
-          attribute = ldap_next_attribute(ld, entry, ber) ) {
-            if((values = (char **)(intptr_t)ldap_get_values(ld,entry,attribute)) != NULL) {
+          attribute = ldap_next_attribute(obj->ld, entry, ber) ) {
+            if((values = (char **)(intptr_t)ldap_get_values(obj->ld,entry,attribute)) != NULL) {
               for(i=0; values[i] != NULL; i++) {
                 returnValue += attribute;
                 returnValue += ":";
@@ -225,59 +173,51 @@ void search(const Nan::FunctionCallbackInfo<Value>& info) {
     ldap_msgfree(searchResult);
     info.GetReturnValue().Set(Nan::New(returnValue).ToLocalChecked());
     return;
-}
+  }
 
-// synchronously compare to a directory entry
-void compare(const Nan::FunctionCallbackInfo<Value>& info) {
-  
-  Nan::Utf8String DNArg(info[0]);
-  Nan::Utf8String attrArg(info[1]);
-  Nan::Utf8String valueArg(info[2]);
+  static NAN_METHOD(compare) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-  char *DNEntry = *DNArg;
-  char *attribute = *attrArg;
-  char *value = *valueArg;
-  int status;
-  bool result = true;
+    Nan::Utf8String DNArg(info[0]);
+    Nan::Utf8String attrArg(info[1]);
+    Nan::Utf8String valueArg(info[2]);
 
-  struct berval bvalue;
+    char *DNEntry = *DNArg;
+    char *attribute = *attrArg;
+    char *value = *valueArg;
+    int status;
+    bool result = true;
 
-  bvalue.bv_val = value;
-  bvalue.bv_len = strlen(value);
+    struct berval bvalue;
 
-  status = ldap_compare_ext_s(ld,
-                    DNEntry,
-                    attribute,
-                    &bvalue,
-                    NULL,
-                    NULL);
-  if(status != LDAP_COMPARE_TRUE && status == LDAP_NO_SUCH_ATTRIBUTE && status == LDAP_NO_SUCH_OBJECT) {
-    result = false;
+    bvalue.bv_val = value;
+    bvalue.bv_len = strlen(value);
+
+    status = ldap_compare_ext_s(obj->ld,
+                      DNEntry,
+                      attribute,
+                      &bvalue,
+                      NULL,
+                      NULL);
+    if(status != LDAP_COMPARE_TRUE && status == LDAP_NO_SUCH_ATTRIBUTE && status == LDAP_NO_SUCH_OBJECT) {
+      result = false;
+      info.GetReturnValue().Set(result);
+      return;
+    }
     info.GetReturnValue().Set(result);
     return;
   }
-  info.GetReturnValue().Set(result);
-  return;
-}
 
-//Unbind from server information and free the ld structure
-void unbind(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  ldap_unbind_s(ld);
-}
+  static NAN_METHOD(unbind) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+    ldap_unbind_s(obj->ld);
+  }
 
- //Define the functions that will be transfered to nodeJS
-void Init(Local<Object> exports, Local<Object> module) {
-  exports->Set(Nan::New("initialize").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(initialize)->GetFunction());
-  exports->Set(Nan::New("bind").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(bind)->GetFunction());
-  exports->Set(Nan::New("search").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(search)->GetFunction());
-  exports->Set(Nan::New("unbind").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(unbind)->GetFunction());
-  exports->Set(Nan::New("compare").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(compare)->GetFunction());
-}
+  static inline Nan::Persistent<v8::Function> & constructor() {
+    static Nan::Persistent<v8::Function> my_constructor;
+    return my_constructor;
+  }
 
-NODE_MODULE(function, Init)
-*/
+};
+
+NODE_MODULE(objectwrapper, LDAPClient::Init)
