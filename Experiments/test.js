@@ -1,5 +1,9 @@
 'use strict';
 
-const binding = require(`./build/Release/binding`);
+const objectwrapper = require('./build/Release/binding');
 
-console.log('binding.hello() =', binding.hello());
+let i = 0;
+for (i = 0; i < 2000; i++) {
+  console.log(i);
+  const obj = new objectwrapper.MyObject(i);
+}

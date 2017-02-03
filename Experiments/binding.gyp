@@ -11,9 +11,7 @@
       "ldflags": [
             "-Wl,-z,defs"
       ],
-      'libraries': [
-         "-lldap"
-      ],
+      'libraries': [],
       "defines": [
           "LDAP_DEPRECATED"
       ],
