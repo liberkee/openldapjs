@@ -1,7 +1,7 @@
 'use strict';
 
 /* Import the addon function and openLdap libraries */
-const client = require('./Experiments/addonFile/build/Release/binding');
+const client = require('./addonFile/build/Release/binding');
 
 class LDAPWrap {
 
