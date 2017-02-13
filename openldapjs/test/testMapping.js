@@ -1,0 +1,85 @@
+'use strict';
+
+const should = require('should');
+
+// Require the library that is used for the test
+const client = require('../addonFile/build/Release/binding');
+const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
+
+// Define the parameters for the search function
+const host = 'ldap://10.16.0.194:389';
+
+const bindDN = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
+const passwordUser = 'secret';
+
+const searchBase = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const searchFilter = '(objectclass=*)';
+const scope = 2;
+
+describe('String to JSON#searchTest', () => {
+  const testClient = new client.LDAPClient();
+  const JSONStruct = new JSONmap();
+  let searchResult;
+
+  beforeEach((next) => {
+    // Create a connection to LDAP server and require to performe a search
+    testClient.initialize(host);
+    testClient.bind(bindDN, passwordUser);
+    searchResult = testClient.search(searchBase, scope, searchFilter);
+    next();
+  });
+
+  afterEach(() => {
+    testClient.unbind();
+  });
+
+  it('should return the string as JSON', (next) => {
+    JSONStruct.stringToJSONwithNewInstance(searchResult)
+    .then((result) => {
+      const JSONobject = JSONStruct.JSONobject.entry;
+      should.deepEqual(result, JSONobject);
+      next();
+    });
+  });
+
+  it('should return an error if there is a number', (next) => {
+    JSONStruct.stringToJSONwithNewInstance(1234)
+    .catch((err) => {
+      should.deepEqual(err.message, 'Must be a string');
+      next();
+    });
+  });
+
+  it('should return an error if string is null', (next) => {
+    JSONStruct.stringToJSONwithNewInstance(null)
+    .catch((err) => {
+      should.deepEqual(err.message, 'The string is null');
+      next();
+    });
+  });
+
+  it('should return an error if string is undefined', (next) => {
+    JSONStruct.stringToJSONwithNewInstance(undefined)
+    .catch((err) => {
+      should.deepEqual(err.message, 'The string is undefined');
+      next();
+    });
+  });
+
+  it('should return an error if string is empty', (next) => {
+    JSONStruct.stringToJSONwithNewInstance('')
+    .catch((err) => {
+      should.deepEqual(err.message, 'The string is empty');
+      next();
+    });
+  });
+
+  it('should return an error if is not a LDIF structure', (next) => {
+    JSONStruct.stringToJSONwithNewInstance('A string')
+    .catch((err) => {
+      should.deepEqual(err.message, 'The string is not a LDAP structure');
+      next();
+    });
+  });
+
+});
