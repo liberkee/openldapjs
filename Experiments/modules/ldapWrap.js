@@ -1,57 +1,67 @@
 'use strict';
 
-//Import the addon function and openLdap libraries
-const client = require('../addonFile/build/Release/binding');
+/* Import the addon function and openLdap libraries */
+const client = require('./Experiments/addonFile/build/Release/binding');
 
-const myClient = new client.LDAPClient();
-const myClient2 = new client.LDAPClient();
+class LDAPWrap {
 
-const hostAddress = '10.16.0.194';
-const portAddress = 389;
-const Host = `ldap://${hostAddress}:${portAddress}`;
-let bindDN = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
-const passwordUser = 'secret';
-const searchBase = 'ou=users,o=myhost,dc=demoApp,dc=com';
-const searchFilter = '(objectclass=*)';
-const scope = 2;
-const cnValue = `bandrei`;
-const NewUser = `cn=${cnValue},ou=users,o=myhost,dc=demoApp,dc=com`;
-const snValue = 'Belei Andrei';
-const email = 'beleiandrei@yahoo.com';
-const password = 'secret';
+  constructor(host, dn, password) {
+    this._hostAdress = host;
+    this._bindDN = dn;
+    this._userPassword = password;
+    this._clientState = '';
 
+    this._E_STATES = {
+      CREATED: 0,
+      INITIALIZED: 1,
+      BOUND: 2,
+      UNBOUND: 5,
+    };
 
-const initialization = myClient.initialize(Host);
-const initialization2 = myClient2.initialize(Host);
-  if (initialization === 0 || initialization2 === 0) {
-    console.log('The initialization was not ok');
-    return;
+    this._myClient = new client.LDAPClient();
+    this._stateClient = this._E_STATES.CREATED;
+  }
+
+  initialize() {
+    return new Promise((resolve, reject) => {
+      if (this._clientState === this._E_STATES.CREATED) {
+        this._stateClient = this._myClient.initialize(this._hostAdress);
+
+        if (this._stateClient !== this._E_STATES.INITIALIZED) {
+          reject(new Error('The initialization failed'));
+        } else {
+          resolve(this._clientState);
+        }
+      }
+    });
+  }
+
+  bind() {
+    return new Promise((resolve, reject) => {
+      if (this._clientState === this._E_STATES.INITIALIZED) {
+        this._stateClient = this._myClient.bind(this._bindDN, this._userPassword);
+
+        if (this._stateClient !== this._E_STATES.BOUND) {
+          reject(new Error('The binding failed'));
+        } else {
+          resolve(this._clientState);
+        }
+      }
+    });
+  }
+
+  unbind() {
+    return new Promise((resolve, reject) => {
+      if (this._clientState === this._E_STATES.BOUND) {
+        this._stateClient = this._myClient.unbind();
+
+        if (this._stateClient !== this._E_STATES.UNBOUND) {
+          reject(new Error('The unbinding failed'));
+        } else {
+          resolve(this._clientState);
+        }
+      }
+    });
+  }
+
 }
-else {
-    const binding = myClient.bind(bindDN,passwordUser);
-    if (binding === 0 || binding === false) {
-      console.log('The binding was not ok');
-      return;
-    }
-   const addEntry = myClient.addEntry(NewUser,cnValue,snValue,email,password);
-   if(addEntry === 0) {
-     console.log('ERROR: ENTRY');
-     return;
-   }
-   console.log('Entry was added');
-   /*const search = myClient.search(searchBase,scope,searchFilter);
-   console.log(search);
-   console.log('\n\n\n\n\n\n');
-   let bindDN2 = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
-   const binding2 = myClient2.bind(bindDN2,passwordUser);
-   if (binding2 === 0 || binding2 === false) {
-      console.log('The binding was not ok');
-      return;
-    }
-   const search2 = myClient2.search(searchBase,scope,searchFilter);
-   const searchMax = myClient.search(searchBase,scope,searchFilter);
-   console.log(search2);
-   console.log('\n\n\n\n\n\n');
-   console.log(searchMax);*/
-}
-

@@ -1,0 +1,30 @@
+{
+  "name": "openldapjs",
+  "version": "1.0.0",
+  "description": "This repository contains all software components related to the node.js openldap client wrapper.",
+  "main": "index.js",
+  "dependencies": {
+    "addict-ioc": "^1.0.6",
+    "bluebird": "^3.4.3",
+    "enum": "^2.3.0",
+    "html-pdf": "^2.1.0",
+    "nodemon": "^1.10.2",
+    "nunjucks": "^2.4.2",
+    "promise": "^7.1.1"
+  },
+  "scripts": {
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" --",
+    "start": "nodemon index.js",
+    "lint": "eslint ./Experiments/modules"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hufsm/openldapjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hufsm/openldapjs/issues"
+  },
+  "homepage": "https://github.com/hufsm/openldapjs#readme"
+}
