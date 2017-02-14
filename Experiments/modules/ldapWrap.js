@@ -22,6 +22,14 @@ class LDAPWrap {
     this._stateClient = this._E_STATES.CREATED;
   }
 
+  set config(value) {
+    this._clientState = value;
+  } 
+
+  get config() {
+    return this._clientState;
+  }
+
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._clientState === this._E_STATES.CREATED) {
