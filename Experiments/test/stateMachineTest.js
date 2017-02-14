@@ -22,7 +22,6 @@ describe('Testing the State Machine of the Client', () => {
   });
 
   afterEach(() => {
-    next();
   });
 
   it('should be the state = CREATED', (next) => {
@@ -36,7 +35,7 @@ describe('Testing the State Machine of the Client', () => {
     const ldapWrap = new LDAPWrap(host, dn, password);
 
     ldapWrap.initialize()
-    .then((state) => {
+    .then(() => {
       should.deepEqual(ldapWrap.config, E_STATES.INITIALIZED);
       next();
     });
@@ -60,7 +59,7 @@ describe('Testing the State Machine of the Client', () => {
     ldapWrap.initialize()
     .then(() => {
       ldapWrap.bind()
-      .then((result) => {
+      .then(() => {
         should.deepEqual(ldapWrap.config, E_STATES.BOUND);
         next();
       })
@@ -72,10 +71,11 @@ describe('Testing the State Machine of the Client', () => {
 
     ldapWrap.bind()
     .catch((error) => {
-      should.deepEqual(error.message, 'The binding failed');
+      should.deepEqual(error.message, 'Initialization shall be done before binding');
       should.notDeepEqual(ldapWrap.config, E_STATES.BOUND);
       next();
     })
+
   });
 
   it('should not bind if the dn is wrong', (next) => {
@@ -134,7 +134,7 @@ describe('Testing the State Machine of the Client', () => {
       ldapWrap.unbind()
       .catch((error) => {
         should.notDeepEqual(ldapWrap.config, E_STATES.UNBOUND);
-        should.deepEqual(error.message, 'The unbinding failed');
+        should.deepEqual(error.message, 'Binding shall be done before unbinding');
         next();
       })
     })

@@ -1,15 +1,14 @@
 'use strict';
 
 /* Import the addon function and openLdap libraries */
-const client = require('./addonFile/build/Release/binding');
+const client = require('../addonFile/build/Release/binding');
 
-class LDAPWrap {
+module.exports = class LDAPWrap {
 
   constructor(host, dn, password) {
     this._hostAdress = host;
     this._bindDN = dn;
     this._userPassword = password;
-    this._clientState = '';
 
     this._E_STATES = {
       CREATED: 0,
@@ -23,22 +22,22 @@ class LDAPWrap {
   }
 
   set config(value) {
-    this._clientState = value;
+    this._stateClient = value;
   } 
 
   get config() {
-    return this._clientState;
+    return this._stateClient;
   }
 
   initialize() {
     return new Promise((resolve, reject) => {
-      if (this._clientState === this._E_STATES.CREATED) {
+      if (this._stateClient === this._E_STATES.CREATED) {
         this._stateClient = this._myClient.initialize(this._hostAdress);
 
         if (this._stateClient !== this._E_STATES.INITIALIZED) {
           reject(new Error('The initialization failed'));
         } else {
-          resolve(this._clientState);
+          resolve(this._stateClient);
         }
       }
     });
@@ -46,28 +45,32 @@ class LDAPWrap {
 
   bind() {
     return new Promise((resolve, reject) => {
-      if (this._clientState === this._E_STATES.INITIALIZED) {
+      if (this._stateClient === this._E_STATES.INITIALIZED) {
         this._stateClient = this._myClient.bind(this._bindDN, this._userPassword);
 
         if (this._stateClient !== this._E_STATES.BOUND) {
           reject(new Error('The binding failed'));
         } else {
-          resolve(this._clientState);
+          resolve(this._stateClient);
         }
+      } else {
+        reject(new Error('Initialization shall be done before binding'));
       }
     });
   }
 
   unbind() {
     return new Promise((resolve, reject) => {
-      if (this._clientState === this._E_STATES.BOUND) {
+      if (this._stateClient === this._E_STATES.BOUND) {
         this._stateClient = this._myClient.unbind();
 
         if (this._stateClient !== this._E_STATES.UNBOUND) {
           reject(new Error('The unbinding failed'));
         } else {
-          resolve(this._clientState);
+          resolve(this._stateClient);
         }
+      } else {
+        reject(new Error('Binding shall be done before unbinding'));
       }
     });
   }
