@@ -7,7 +7,7 @@ const client = require('../addonFile/build/Release/binding');
 const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 // Define the parameters for the search function
-const host = 'ldap://10.16.0.194:389';
+const host = 'ldap://localhost:389';
 
 const bindDN = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
 const passwordUser = 'secret';
@@ -36,8 +36,18 @@ describe('String to JSON#searchTest', () => {
   it('should return the string as JSON', (next) => {
     JSONStruct.stringToJSONwithNewInstance(searchResult)
     .then((result) => {
-      const JSONobject = JSONStruct.JSONobject.entry;
-      should.deepEqual(result, JSONobject);
+      var i;
+      const JSONobjecttest = [{
+        dn: 'ou=users,o=myhost,dc=demoApp,dc=com',
+        attribute: [
+          { type: 'objectClass', value: ['organizationalUnit'] },
+          { type: 'ou', value: ['users'] }
+        ]
+      }];
+      const shouldString = JSON.stringify(JSONobjecttest[0]);
+      const resultString = JSON.stringify(result.entry[0]);
+      
+      should.equal(shouldString, resultString);
       next();
     });
   });

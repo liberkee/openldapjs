@@ -2,7 +2,21 @@
 
 const Promise = require('bluebird');
 
+/**
+ * @module LDAPtranzition
+ * @class stringJSON
+ */
+
 class stringJSON {
+
+ /**
+   * Transform a string message from LDAP search operation to JSON.
+   *
+   * @method stringToJSONwithNewInstance
+   * @param {string} stringReturn
+   * @return {Promise} That resolves if the stringToJSONwithNewInstance was successful.
+   * Rejects if is not a string and don't have the LDIF structure.
+   */
 
   stringToJSONwithNewInstance(stringReturn) {
     return new Promise((resolve, reject) => {
@@ -39,7 +53,6 @@ class stringJSON {
       if (isNaN(stringReturn) === false) {
         reject(new Error('Must be a string'));
       }
-
       // define the array of the mesage
       const searchSplitArray = stringReturn.split('\n');
       const lengthSearchSplitArray = searchSplitArray.length;
@@ -55,14 +68,13 @@ class stringJSON {
 
           // Register the entry object in JSON
           // The last row is always empty
-          entryObject.attribute.push(attributesObject);
           this.JSONobject.entry.push(entryObject);
-          resolve(this.JSONobject.entry);
+          resolve(this.JSONobject);
         }
 
         // Verify if the array have null string and ignore it
         if (searchSplitArray[i] === '') {
-          continue;
+          // do nothing continue the verification in the loop
         }
         // First element of the arraySplitOperation is the type and the second is value
         if (arraySplitOperation[0] === 'dn') {
@@ -72,37 +84,32 @@ class stringJSON {
               // Register the entry object in JSON
             entryObject.attribute.push(attributesObject);
             this.JSONobject.entry.push(entryObject);
-
           }
           // create new instance of entryObject
-          entryObject = new Object({
+          entryObject = ({
             dn: '',
             attribute: [],
           });
           entryObject.dn = arraySplitOperation[1];
-        // If is attribute
+        // If is attribute. Verify if the attribute have multiple values
+        } else if (attributesObject.type === arraySplitOperation[0]) {
+          attributesObject.value.push(arraySplitOperation[1]);
         } else {
-
-          // verify if the attribute have multiple values
-          if (attributesObject.type === arraySplitOperation[0]) {
-            attributesObject.value.push(arraySplitOperation[1]);
-          } else {
-            // Push the attributesObject if new attribute
-            if (attributesObject.type !== arraySplitOperation[0] &&
-                attributesObject.type !== '' &&
-                flagLastAttributeCatch === false) {
-              entryObject.attribute.push(attributesObject); // I have to asignet
-            }
-            // create new object of attributesObject
-            attributesObject = new Object({
-              type: '',
-              value: [],
-            });
-            // set the parameters
-            attributesObject.type = arraySplitOperation[0];
-            attributesObject.value.push(arraySplitOperation[1]);
-            flagLastAttributeCatch = false;
+          // Push the attributesObject if new attribute
+          if (attributesObject.type !== arraySplitOperation[0] &&
+              attributesObject.type !== '' &&
+              flagLastAttributeCatch === false) {
+            entryObject.attribute.push(attributesObject); // I have to asignet
           }
+          // create new object of attributesObject
+          attributesObject = ({
+            type: '',
+            value: [],
+          });
+          // set the parameters
+          attributesObject.type = arraySplitOperation[0];
+          attributesObject.value.push(arraySplitOperation[1]);
+          flagLastAttributeCatch = false;
         }
       }
     });
