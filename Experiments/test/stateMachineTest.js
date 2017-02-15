@@ -1,5 +1,6 @@
 'use strict';
 
+console.log(process.cwd());
 const client = require('../addonFile/build/Release/binding');
 const should = require('should');
 const LDAPWrap = require('../modules/ldapWrap');
@@ -74,8 +75,7 @@ describe('Testing the State Machine of the Client', () => {
       should.deepEqual(error.message, 'Initialization shall be done before binding');
       should.notDeepEqual(ldapWrap.config, E_STATES.BOUND);
       next();
-    })
-
+    });
   });
 
   it('should not bind if the dn is wrong', (next) => {
@@ -138,6 +138,16 @@ describe('Testing the State Machine of the Client', () => {
         next();
       })
     })
+  });  
+
+  it('should set the value for the config', (next) => {
+    const ldapWrap = new LDAPWrap(host, dn, password);
+    const dummyState = 'state';
+
+    ldapWrap.config = dummyState;
+    should.deepEqual(ldapWrap.config, dummyState);
+
+    next();
   });  
 
 });

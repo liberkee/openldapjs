@@ -3,6 +3,7 @@
 /* Import the addon function and openLdap libraries */
 const client = require('../addonFile/build/Release/binding');
 
+
 module.exports = class LDAPWrap {
 
   constructor(host, dn, password) {
@@ -23,7 +24,7 @@ module.exports = class LDAPWrap {
 
   set config(value) {
     this._stateClient = value;
-  } 
+  }
 
   get config() {
     return this._stateClient;
@@ -75,4 +76,4 @@ module.exports = class LDAPWrap {
     });
   }
 
-}
+};
