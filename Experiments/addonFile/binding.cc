@@ -30,6 +30,13 @@ class LDAPClient : public Nan::ObjectWrap {
  private:
   LDAP *ld;
   unsigned int stateClient = 0;
+  enum STATECLIENT 
+  {
+    ERROR = 0,
+    INITIALIZE = 1,
+    BIND = 2,
+    UNBIND = 5
+  };
   explicit LDAPClient(){};
   ~LDAPClient(){};
 
@@ -53,6 +60,7 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(initialize) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String hostArg(info[0]);
+    LDAPClient::STATECLIENT stateClient;
     //LDAP *ld = obj->ld;
 
     char *hostAddress = *hostArg;
@@ -60,19 +68,19 @@ class LDAPClient : public Nan::ObjectWrap {
     int protocol_version = LDAP_VERSION3;
     state = ldap_initialize(&obj->ld, hostAddress);
     if(state != LDAP_SUCCESS || obj->ld == 0) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      stateClient = ERROR;
+      info.GetReturnValue().Set(stateClient);
       return;
     }
 
     state = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if(state != LDAP_SUCCESS) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      stateClient = ERROR;
+      info.GetReturnValue().Set(stateClient);
       return;
     }
-    obj->stateClient = 1;
-    info.GetReturnValue().Set(obj->stateClient);
+    stateClient = INITIALIZE;
+    info.GetReturnValue().Set(stateClient);
     return;
   }
 
@@ -80,25 +88,26 @@ class LDAPClient : public Nan::ObjectWrap {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
+    LDAPClient::STATECLIENT stateClient;
 
     char *username = *userArg;
     char *password = *passArg;
     int status;
     
     if(obj->ld == 0) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      stateClient = ERROR;
+      info.GetReturnValue().Set(stateClient);
       return;
     }
 
     status = ldap_simple_bind_s(obj->ld, username, password);
     if(status != LDAP_SUCCESS) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      stateClient = ERROR;
+      info.GetReturnValue().Set(stateClient);
       return;
     }
-    obj->stateClient = 2;
-    info.GetReturnValue().Set(obj->stateClient);
+    stateClient = BIND;
+    info.GetReturnValue().Set(stateClient);
     return;
   }
 
@@ -232,14 +241,16 @@ class LDAPClient : public Nan::ObjectWrap {
 
   static NAN_METHOD(unbind) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+    LDAPClient::STATECLIENT stateClient;
+
     if (obj->ld == 0) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      stateClient = ERROR;
+      info.GetReturnValue().Set(stateClient);
       return;
     }
     ldap_unbind_s(obj->ld);
-    obj->stateClient = 5;
-    info.GetReturnValue().Set(obj->stateClient);
+    stateClient = UNBIND;
+    info.GetReturnValue().Set(stateClient);
     return;
   }
 
