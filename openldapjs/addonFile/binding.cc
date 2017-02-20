@@ -11,16 +11,17 @@ LDAP *ld;
 
 class LDAPInitialization : public AsyncWorker {
   public:
-    LDAPInitialization(Callback * callback, char *hostArg)
-    : AsyncWorker(callback), hostArgClass(hostArg){}
+    LDAPInitialization(Callback * callback, std::string hostArg)
+    : AsyncWorker(callback), hostArg(hostArg), result(0){
+    }
 
     void Execute() {
-      result = ldap_initialize(&ld, hostArgClass);
+      const char *host = hostArg.c_str();
+      result = ldap_initialize(&ld, host);
     }
 
     void HandleOKCallback() {
-      Isolate * isolate;
-      v8::Local<v8::Value> stateClient[2] = {Null(), Null()};
+      Local<Value> stateClient[2] = {Null(), Null()};
       int protocol_version = LDAP_VERSION3;
       if (result != LDAP_SUCCESS) {
         stateClient[0] = Nan::New("The host is incorect").ToLocalChecked();
@@ -32,12 +33,12 @@ class LDAPInitialization : public AsyncWorker {
           stateClient[0] = Nan::New("Option incorect").ToLocalChecked();
           callback->Call(1, stateClient);
         }
-        stateClient[0] = Nan::New("Initialization").ToLocalChecked();
+        stateClient[1] = Nan::New("Initialization").ToLocalChecked();
         callback->Call(2, stateClient);
       }
     }
   private:
-    char *hostArgClass;
+    std::string hostArg;
     int result;
     
 };
@@ -56,7 +57,7 @@ NAN_METHOD(initialize) {
   Nan::HandleScope scope;
 
   Nan::Utf8String hostArg(info[0]);
-  char *hostAddress = *hostArg;
+  std::string hostAddress(*hostArg);
   Callback *callback = new Callback(info[1].As<Function>());
 
   AsyncQueueWorker(new LDAPInitialization(callback, hostAddress));

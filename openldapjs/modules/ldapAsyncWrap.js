@@ -10,8 +10,9 @@ module.exports = class LDAPWrap {
       client.initialize(host, function(err, result) {
         if(err) {
           reject(err);
-        }
+        } else {
           resolve(result);
+        }
       });
     });
   }
