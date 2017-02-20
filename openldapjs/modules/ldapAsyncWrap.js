@@ -16,4 +16,15 @@ module.exports = class LDAPWrap {
       });
     });
   }
+  bind(username, password) {
+    return new Promise((resolve, reject) => {
+      client.authentification(username, password, function(err, result) {
+       if(err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
 }

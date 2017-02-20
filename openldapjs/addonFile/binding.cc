@@ -8,6 +8,7 @@ using namespace v8;
 using namespace std;
 
 LDAP *ld;
+int msgID;
 
 class LDAPInitialization : public AsyncWorker {
   public:
@@ -43,15 +44,44 @@ class LDAPInitialization : public AsyncWorker {
     
 };
 
-/*class LDAPBind : public AsyncWorker {
-  LDAPBind(Callback * callback, char *bindDN, char *password)
-  : AsyncWorker(callback), bindDN(bindDN), password(password){}
-  
+class LDAPBind : public AsyncWorker {
+  public:
+    LDAPBind(Callback * callback)
+    : AsyncWorker(callback) {}
+
+    void Execute() {
+      struct timeval timeOut;
+      timeOut.tv_sec = timeOut.tv_usec = 0L;
+      result = ldap_result(ld, msgID, NULL, &timeOut, &resultMsg);
+    }
+
+    void HandleOKCallback() {
+      Local<Value> stateClient[2] = {Null(), Null()};
+      if (result == -1) {
+        stateClient[0] = Nan::New("ERROR: Result").ToLocalChecked();
+        callback->Call(1, stateClient);
+      }
+      if (result == 0) {
+        stateClient[1] = Nan::New("On Progress").ToLocalChecked();
+        callback->Call(2, stateClient);
+      }
+      if (result != 0 && result != -1) {
+        int status = ldap_result2error(ld, resultMsg, 0);
+        if (status != LDAP_SUCCESS) {
+            stateClient[0] = Nan::New<Number>(status);
+            callback->Call(1, stateClient);
+          }
+          stateClient[1] = Nan::New("Bind succesfuly").ToLocalChecked();
+          callback->Call(2, stateClient);
+      }
+    }
   private:
-  char *bindDN;
-  char *password;
-  int result;
-};*/
+    std::string bindDN;
+    std::string password;
+    int result;
+    LDAPMessage *resultMsg;
+    
+};
 
 NAN_METHOD(initialize) {
   Nan::HandleScope scope;
@@ -63,22 +93,28 @@ NAN_METHOD(initialize) {
   AsyncQueueWorker(new LDAPInitialization(callback, hostAddress));
 }
 
-/*NAN_METHOD(bind) {
+
+NAN_METHOD(authentification) {
   Nan::HandleScope scope;
 
-  Nan::Utf8String bindDN(info[0]);
-  Nan::Utf8String password(info[0]);
-  //char *hostAddress = *hostArg;
-  Callback *callback = new Callback(info[1].As<Function>());
+  Utf8String bindDN(info[0]);
+  Utf8String password(info[1]);
 
-  AsyncQueueWorker(new LDAPBind(callback, *bindDN, *password));
-}*/
+  char *bind = *bindDN;
+  char *pass = *password;
+
+  Callback *callback = new Callback(info[2].As<Function>());
+  msgID = ldap_simple_bind(ld, bind, pass);
+
+  AsyncQueueWorker(new LDAPBind(callback));
+}
+
 
 NAN_MODULE_INIT(Init) {
   Nan::Set(target, New<String>("initialize").ToLocalChecked(),
        GetFunction(New<FunctionTemplate>(initialize)).ToLocalChecked());
-  /*Nan::Set(target, New<String>("bind").ToLocalChecked(),
-       GetFunction(New<FunctionTemplate>(bind)).ToLocalChecked());*/
+  Nan::Set(target, New<String>("authentification").ToLocalChecked(),
+       GetFunction(New<FunctionTemplate>(authentification)).ToLocalChecked());
 }
 
-NODE_MODULE(initialize, Init)
+NODE_MODULE(Initialization, Init)
