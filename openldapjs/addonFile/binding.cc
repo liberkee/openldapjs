@@ -2,6 +2,8 @@
 #include <ldap.h>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
 
 using namespace Nan;
 using namespace v8;
@@ -83,6 +85,57 @@ class LDAPBind : public AsyncWorker {
     
 };
 
+class LDAPBindProgress : public AsyncProgressWorker {
+    public:
+    LDAPBindProgress(Callback * callback, Callback * progress) 
+        : AsyncProgressWorker(callback), progress(progress) {
+        
+    }
+    // Executes in worker thread
+    void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
+      struct timeval timeOut;
+      timeOut.tv_sec = timeOut.tv_usec = 0L;
+      while(result == 0) {
+        result = ldap_result(ld, msgID, NULL, &timeOut, &resultMsg);
+        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
+        // Set 1 milliseconds for catch the second callback
+        std::this_thread::sleep_for(chrono::milliseconds(1));
+      }
+    }
+    // Executes in event loop
+    void HandleOKCallback () {
+      Local<Value> stateClient[2] = {Null(), Null()};
+      if (result == -1) {
+        stateClient[0] = Nan::New("ERROR: Result").ToLocalChecked();
+        callback->Call(1, stateClient);
+      }
+      else {
+        int status = ldap_result2error(ld, resultMsg, 0);
+        if(status != LDAP_SUCCESS) {
+          stateClient[0] = Nan::New<Number>(status);
+          callback->Call(1, stateClient);
+        }
+        stateClient[1] = Nan::New("Bind succesfuly").ToLocalChecked();
+        callback->Call(2, stateClient);
+      }
+
+    }
+    
+    void HandleProgressCallback(const char *data, size_t size) {
+        // Required, this is not created automatically 
+        Nan::HandleScope scope; 
+        Local<Value> argv[] = {
+            New<v8::Number>(*reinterpret_cast<int*>(const_cast<char*>(data)))
+        };
+        progress->Call(1, argv);
+    }
+    private:
+    Callback *progress;
+    int result = 0;
+    LDAPMessage *resultMsg;
+};
+
+
 NAN_METHOD(initialize) {
   Nan::HandleScope scope;
 
@@ -95,18 +148,20 @@ NAN_METHOD(initialize) {
 
 
 NAN_METHOD(authentification) {
-  Nan::HandleScope scope;
+    Nan::HandleScope scope;
 
-  Utf8String bindDN(info[0]);
-  Utf8String password(info[1]);
+    Utf8String bindDN(info[0]);
+    Utf8String password(info[1]);
 
-  char *bind = *bindDN;
-  char *pass = *password;
+    char *bind = *bindDN;
+    char *pass = *password;
 
-  Callback *callback = new Callback(info[2].As<Function>());
-  msgID = ldap_simple_bind(ld, bind, pass);
+    msgID = ldap_simple_bind(ld, bind, pass);
 
-  AsyncQueueWorker(new LDAPBind(callback));
+    Callback *callback = new Callback(info[2].As<Function>());
+    Callback *progress = new Callback(info[3].As<v8::Function>());
+    
+    AsyncQueueWorker(new LDAPBindProgress(callback, progress));
 }
 
 
@@ -114,7 +169,7 @@ NAN_MODULE_INIT(Init) {
   Nan::Set(target, New<String>("initialize").ToLocalChecked(),
        GetFunction(New<FunctionTemplate>(initialize)).ToLocalChecked());
   Nan::Set(target, New<String>("authentification").ToLocalChecked(),
-       GetFunction(New<FunctionTemplate>(authentification)).ToLocalChecked());
+        GetFunction(New<FunctionTemplate>(authentification)).ToLocalChecked());
 }
 
 NODE_MODULE(Initialization, Init)

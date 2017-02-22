@@ -22,7 +22,7 @@ describe('Testing the async initialization', () => {
     });
   });
 
-   it('should be not INITIALIZED', (next) => {
+  it('should be not INITIALIZED', (next) => {
     const host = 'lp://10.16.0.194:389';
 
     ldapWrap.initialize(host)
