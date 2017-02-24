@@ -23,12 +23,13 @@ module.exports = class LDAPWrapAsync {
 
   initialize(host) {
     return new Promise((resolve, reject) => {
-      const status = newClient.initialize(host);
-      if(status == 0) {
-        reject('ERROR:Initialization');
-      } else {
-        resolve('Initialized');
-      }
+      newClient.initialize(host, (err, result) => {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      })
     });
   }
 

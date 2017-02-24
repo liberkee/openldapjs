@@ -10,7 +10,7 @@ using namespace v8;
 using namespace std;
 
 
-/*class LDAPInitialization : public AsyncWorker {
+class LDAPInitialization : public AsyncWorker {
   public:
     LDAPInitialization(Callback * callback, std::string hostArg, LDAP *clientLD)
     : AsyncWorker(callback), hostArg(hostArg), ld(clientLD), result(0){
@@ -43,7 +43,7 @@ using namespace std;
     int result;
     LDAP *ld;
     
-};*/
+};
 
 /*class LDAPBind : public AsyncWorker {
   public:
@@ -85,17 +85,21 @@ using namespace std;
 };*/
 
 class LDAPBindProgress : public AsyncProgressWorker {
+    private:
+      LDAP *ld;
+      Callback *progress;
+      int result = 0;
+      LDAPMessage *resultMsg;
+      int msgID;
     public:
-    LDAPBindProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
-        : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {
-        
-    }
+      LDAPBindProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
+          : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {    
+      }
     // Executes in worker thread
     void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
-      struct timeval timeOut;
-      timeOut.tv_sec = timeOut.tv_usec = 0L;
+      struct timeval timeOut = {0, 10000};
       while(result == 0) {
-        result = ldap_result(ld, msgID, NULL, &timeOut, &resultMsg);
+        result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
         progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
         // Set 1 milliseconds for catch the second callback
         std::this_thread::sleep_for(chrono::milliseconds(1));
@@ -105,7 +109,7 @@ class LDAPBindProgress : public AsyncProgressWorker {
     void HandleOKCallback () {
       Local<Value> stateClient[2] = {Null(), Null()};
       if (result == -1) {
-        stateClient[0] = Nan::New("ERROR: Result").ToLocalChecked();
+        stateClient[0] = Nan::New<Number>(0);
         callback->Call(1, stateClient);
       }
       else {
@@ -114,10 +118,9 @@ class LDAPBindProgress : public AsyncProgressWorker {
           stateClient[0] = Nan::New<Number>(status);
           callback->Call(1, stateClient);
         }
-        stateClient[1] = Nan::New("Bind succesfuly").ToLocalChecked();
+        stateClient[1] = Nan::New<Number>(2);
         callback->Call(2, stateClient);
       }
-
     }
     
     void HandleProgressCallback(const char *data, size_t size) {
@@ -128,12 +131,6 @@ class LDAPBindProgress : public AsyncProgressWorker {
         };
         progress->Call(1, argv);
     }
-    private:
-    LDAP *ld;
-    Callback *progress;
-    int result = 0;
-    LDAPMessage *resultMsg;
-    int msgID;
 };
 
 
@@ -209,6 +206,8 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(initialize) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String hostArg(info[0]);
+    Local<Value> stateClient[2] = {Null(), Null()};
+    Callback *callback = new Callback(info[1].As<Function>());
     //LDAP *ld = obj->ld;
 
     char *hostAddress = *hostArg;
@@ -216,19 +215,26 @@ class LDAPClient : public Nan::ObjectWrap {
     int protocol_version = LDAP_VERSION3;
     state = ldap_initialize(&obj->ld, hostAddress);
     if(state != LDAP_SUCCESS || obj->ld == 0) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      // info.GetReturnValue().Set(obj->stateClient);
       return;
     }
 
     state = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if(state != LDAP_SUCCESS) {
-      obj->stateClient = 0;
-      info.GetReturnValue().Set(obj->stateClient);
+      //obj->stateClient = 0;
+      //info.GetReturnValue().Set(obj->stateClient);
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
       return;
     }
-    obj->stateClient = 1;
-    info.GetReturnValue().Set(obj->stateClient);
+    //obj->stateClient = 1;
+    //info.GetReturnValue().Set(obj->stateClient);
+
+    stateClient[1] = Nan::New<Number>(1);
+    callback->Call(2, stateClient);
     return;
   }
 
@@ -260,7 +266,7 @@ class LDAPClient : public Nan::ObjectWrap {
     timeOut.tv_sec = timeOut.tv_usec = 0L;
     int status = 0;
 
-    status = ldap_result(obj->ld, obj->msgid, NULL, &timeOut, &obj->result);
+    status = ldap_result(obj->ld, obj->msgid, 1, &timeOut, &obj->result);
     info.GetReturnValue().Set(status);
     return;
   }
