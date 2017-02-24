@@ -10,7 +10,7 @@ using namespace v8;
 using namespace std;
 
 
-class LDAPInitialization : public AsyncWorker {
+/*class LDAPInitialization : public AsyncWorker {
   public:
     LDAPInitialization(Callback * callback, std::string hostArg, LDAP *clientLD)
     : AsyncWorker(callback), hostArg(hostArg), ld(clientLD), result(0){
@@ -43,7 +43,7 @@ class LDAPInitialization : public AsyncWorker {
     int result;
     LDAP *ld;
     
-};
+};*/
 
 /*class LDAPBind : public AsyncWorker {
   public:
