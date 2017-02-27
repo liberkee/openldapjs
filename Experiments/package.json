@@ -1,0 +1,33 @@
+{
+  "name": "ldapclientwrapper",
+  "version": "0.0.1",
+  "description": "A ldap client nodejs",
+  "main": "ldapwrapper.js",
+  "dependencies": {
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "nan": "^2.5.0",
+    "addict-ioc": "^1.0.6",
+    "bluebird": "^3.4.3",
+    "enum": "^2.3.0",
+    "html-pdf": "^2.1.0",
+    "nodemon": "^1.10.2",
+    "nunjucks": "^2.4.2",
+    "promise": "^7.1.1"
+  },
+  "scripts": {
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/stateMachineTest",
+    "start": "nodemon ldapwrapper.js",
+    "lint": "eslint ./modules",
+    "install": "node-gyp rebuild"
+  },
+  "author": "",
+  "license": "ISC",
+  "gypfile": true,
+  "directories": {
+    "test": "test"
+  }
+}
