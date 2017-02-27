@@ -23,7 +23,8 @@ const password = 'secret';
 
 const initialization = myClient.initialize(Host);
 const initialization2 = myClient2.initialize(Host);
-  if (initialization === 0 || initialization2 === 0) {
+
+if (initialization === 0 || initialization2 === 0) {
     console.log('The initialization was not ok');
     return;
 }
@@ -33,13 +34,7 @@ else {
       console.log('The binding was not ok');
       return;
     }
-   const addEntry = myClient.addEntry(NewUser,cnValue,snValue,email,password);
-   if(addEntry === 0) {
-     console.log('ERROR: ENTRY');
-     return;
-   }
-   console.log('Entry was added');
-   /*const search = myClient.search(searchBase,scope,searchFilter);
+   const search = myClient.search(searchBase,scope,searchFilter);
    console.log(search);
    console.log('\n\n\n\n\n\n');
    let bindDN2 = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
@@ -52,6 +47,6 @@ else {
    const searchMax = myClient.search(searchBase,scope,searchFilter);
    console.log(search2);
    console.log('\n\n\n\n\n\n');
-   console.log(searchMax);*/
+   console.log(searchMax);
 }
 

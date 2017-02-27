@@ -53,7 +53,6 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(initialize) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String hostArg(info[0]);
-    //LDAP *ld = obj->ld;
 
     char *hostAddress = *hostArg;
     int state;
