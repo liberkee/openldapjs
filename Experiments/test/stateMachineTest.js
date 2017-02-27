@@ -1,6 +1,5 @@
 'use strict';
 
-console.log(process.cwd());
 const client = require('../addonFile/build/Release/binding');
 const should = require('should');
 const LDAPWrap = require('../modules/ldapWrap');
@@ -72,7 +71,7 @@ describe('Testing the State Machine of the Client', () => {
 
     ldapWrap.bind()
     .catch((error) => {
-      should.deepEqual(error.message, 'Initialization shall be done before binding');
+      should.deepEqual(error.message, 'The bind operation failed. It could be done if the state of the client is Initialized');
       should.notDeepEqual(ldapWrap.config, E_STATES.BOUND);
       next();
     });

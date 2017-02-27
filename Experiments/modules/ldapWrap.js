@@ -55,7 +55,7 @@ module.exports = class LDAPWrap {
           resolve(this._stateClient);
         }
       } else {
-        reject(new Error('Initialization shall be done before binding'));
+        reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
       }
     });
   }
