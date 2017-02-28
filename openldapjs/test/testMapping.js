@@ -3,7 +3,7 @@
 const should = require('should');
 
 // Require the library that is used for the test
-const client = require('../addonFile/build/Release/binding');
+const client = require('../addonFile/build/Release/binding.node');
 const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 // Define the parameters for the search function
@@ -36,17 +36,16 @@ describe('String to JSON#searchTest', () => {
   it('should return the string as JSON', (next) => {
     JSONStruct.stringToJSONwithNewInstance(searchResult)
     .then((result) => {
-      var i;
       const JSONobjecttest = [{
         dn: 'ou=users,o=myhost,dc=demoApp,dc=com',
         attribute: [
-          { type: 'objectClass', value: ['organizationalUnit'] },
-          { type: 'ou', value: ['users'] }
-        ]
+          {type: 'objectClass', value: ['organizationalUnit']},
+          {type: 'ou', value: ['users']},
+        ],
       }];
       const shouldString = JSON.stringify(JSONobjecttest[0]);
       const resultString = JSON.stringify(result.entry[0]);
-      
+
       should.equal(shouldString, resultString);
       next();
     });

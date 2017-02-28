@@ -1,32 +1,34 @@
 {
-  "name": "openldapjs",
+  "name": "ldapclientwrapper",
   "version": "0.0.1",
-  "description": "Node.js wrapper for open ldap client libraries",
-  "main": "index.js",
-  "scripts": {
-    "gulp": "./node_modules/.bin/gulp --",
-    "test": "npm run-script gulp test",
-    "coverage": "npm run-script gulp coverage",
-    "style": "npm run-script gulp jscs_jshint",
-    "doc": "npm run-script gulp doc",
-    "jenkins": "npm run-script gulp jenkins"
-  },
-  "keywords": [
-    "ldap"
-  ],
-  "contributors ": [
-    {
-      "name": "Michael de Paly",
-      "email": "michael.depaly@huf-group.com"
-    }
-  ],
-  "author": "Huf Secure Mobile GmbH",
-  "license": "TBD",
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "mocha": "^2.5.3",
-    "should": "^10.0.0"
-  },
+  "description": "A ldap client nodejs",
+  "main": "ldapwrapper.js",
   "dependencies": {
+    "addict-ioc": "^1.0.6",
+    "bluebird": "^3.4.3",
+    "enum": "^2.3.0",
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "html-pdf": "^2.1.0",
+    "nan": "^2.5.0",
+    "nodemon": "^1.10.2",
+    "nunjucks": "^2.4.2",
+    "promise": "^7.1.1",
+    "should": "^11.2.0"
+  },
+  "scripts": {
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" --",
+    "start": "nodemon ldapwrapper.js",
+    "lint": "eslint ./modules",
+    "install": "node-gyp rebuild"
+  },
+  "author": "",
+  "license": "ISC",
+  "gypfile": true,
+  "directories": {
+    "test": "test"
   }
 }

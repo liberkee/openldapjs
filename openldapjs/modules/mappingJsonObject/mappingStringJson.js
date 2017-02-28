@@ -3,6 +3,83 @@
 const Promise = require('bluebird');
 
 /**
+   * Interogate an array by his type to see if exist
+   *
+   * @function alreadyExist
+   * @param {object} array
+   * @param {type} string
+   * @return {int} The function will return the index of the array if the type was already set.
+   * If the type don't exist in the array will return 0 or false
+   */
+function alreadyExist(array, type) {
+  const lengthArray = array.length;
+  for (let j = 0; j < lengthArray; j += 1) {
+    if (array[j].type === type) {
+      return j;
+    }
+  }
+  return false;
+}
+
+/**
+   * Take an entry of LDAP and put it into an object.
+   *
+   * @function stringToJSONwithNewInstance
+   * @param {string} entry
+   * @return {object} The function will return an object of given entry
+   */
+
+function objectEntry(entry) {
+  // Make an Array of the entry
+  const entrySplit = entry.split('\n');
+  // Flag for the type attribute
+  let exist = false;
+
+  const entryObject = ({
+    dn: '',
+    attribute: [],
+  });
+
+  let attributesObject = ({
+    type: '',
+    value: [],
+  });
+  // Interogate the entry
+  for (let i = 0; i < entrySplit.length; i += 1) {
+    // Define the value and the type of an attribute
+    const attributeSplit = entrySplit[i].split(':');
+    const type = attributeSplit[0];
+    const value = attributeSplit[1];
+    // Execute the function for verification
+    exist = alreadyExist(entryObject.attribute, type);
+    // Verifi if the type is entry or not
+    if (type !== '' && type !== undefined) {
+      attributesObject = ({
+        type: '',
+        value: [],
+      });
+
+      attributesObject.type = type;
+      attributesObject.value.push(value);
+
+      if (exist) {
+        const index = exist;
+        const attributePozition = entryObject.attribute[index].value;
+        attributePozition.push(value);
+        exist = false;
+      } else if (attributesObject.type !== '' && attributesObject.value !== []) {
+        entryObject.attribute.push(attributesObject);
+      }
+    } else if (type !== undefined && value !== undefined) {
+      entryObject.dn = value;
+    }
+
+  }
+  return entryObject;
+
+}
+
+/**
  * @module LDAPtranzition
  * @class stringJSON
  */
@@ -25,18 +102,6 @@ class stringJSON {
         entry: [],
       };
 
-      let entryObject = {
-        dn: '',
-        attribute: [],
-      };
-
-      let attributesObject = {
-        type: '',
-        value: [],
-      };
-
-      let i;
-      let flagLastAttributeCatch = false;
       // String first verification
       if (stringReturn === null) {
         reject(new Error('The string is null'));
@@ -54,64 +119,17 @@ class stringJSON {
         reject(new Error('Must be a string'));
       }
       // define the array of the mesage
-      const searchSplitArray = stringReturn.split('\n');
+      const searchSplitArray = stringReturn.split('\ndn');
       const lengthSearchSplitArray = searchSplitArray.length;
       if (lengthSearchSplitArray <= 1) {
         reject(new Error('The string is not a LDAP structure'));
       }
       // Interogate the Search Array
-      for (i = 0; i < lengthSearchSplitArray; i += 1) {
-        // Split the message in two
-        const arraySplitOperation = searchSplitArray[i].split(':');
-        // Verify if is end of the search
-        if (i + 1 === lengthSearchSplitArray) {
-
-          // Register the entry object in JSON
-          // The last row is always empty
-          this.JSONobject.entry.push(entryObject);
-          resolve(this.JSONobject);
-        }
-
-        // Verify if the array have null string and ignore it
-        if (searchSplitArray[i] === '') {
-          // do nothing continue the verification in the loop
-        }
-        // First element of the arraySplitOperation is the type and the second is value
-        if (arraySplitOperation[0] === 'dn') {
-          // Verify if new entry
-          if (entryObject.dn !== '') {
-            flagLastAttributeCatch = true;
-              // Register the entry object in JSON
-            entryObject.attribute.push(attributesObject);
-            this.JSONobject.entry.push(entryObject);
-          }
-          // create new instance of entryObject
-          entryObject = ({
-            dn: '',
-            attribute: [],
-          });
-          entryObject.dn = arraySplitOperation[1];
-        // If is attribute. Verify if the attribute have multiple values
-        } else if (attributesObject.type === arraySplitOperation[0]) {
-          attributesObject.value.push(arraySplitOperation[1]);
-        } else {
-          // Push the attributesObject if new attribute
-          if (attributesObject.type !== arraySplitOperation[0] &&
-              attributesObject.type !== '' &&
-              flagLastAttributeCatch === false) {
-            entryObject.attribute.push(attributesObject); // I have to asignet
-          }
-          // create new object of attributesObject
-          attributesObject = ({
-            type: '',
-            value: [],
-          });
-          // set the parameters
-          attributesObject.type = arraySplitOperation[0];
-          attributesObject.value.push(arraySplitOperation[1]);
-          flagLastAttributeCatch = false;
-        }
+      for (let i = 1; i < lengthSearchSplitArray; i += 1) {
+        const result = objectEntry(searchSplitArray[i]);
+        this.JSONobject.entry.push(result);
       }
+      resolve(this.JSONobject);
     });
   }
 
