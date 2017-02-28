@@ -1,6 +1,6 @@
 'use strict';
 
-const client = require('../addonFile/build/Release/binding');
+const client = require('../addonFile/build/Release/binding.node');
 const Promise = require('bluebird');
 
 const newClient = new client.LDAPClient();
@@ -24,12 +24,12 @@ module.exports = class LDAPWrapAsync {
   initialize(host) {
     return new Promise((resolve, reject) => {
       newClient.initialize(host, (err, result) => {
-        if(err) {
-          reject(err);
-        } else {
+        if (result) {
           resolve(result);
+        } else {
+          reject(err);
         }
-      })
+      });
     });
   }
 
@@ -45,14 +45,33 @@ module.exports = class LDAPWrapAsync {
 
   bind(username, password) {
     return new Promise((resolve, reject) => {
-      const status = newClient.bind(username, password, (err, result) => {
+      newClient.bind(username, password, (err, result) => {
         if (err) {
           reject(err);
         } else {
           resolve(result);
         }
       }, (progress) => {
-        console.log('Bind in progress');
+        console.log('In progress');
+      });
+    });
+  }
+
+ /**
+   * Unbind from a LDAP server.
+   *
+   * @method unbind
+   * @return {Promise} That resolves if the LDAP structure was initialized.
+   * Reject if the LDAP structure was not set or initialized.
+   */
+  unbind() {
+    return new Promise((resolve, reject) => {
+      newClient.unbind((err, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
       });
     });
   }
