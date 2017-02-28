@@ -2,6 +2,8 @@
 
 //Import the addon function and openLdap libraries
 const client = require('../addonFile/build/Release/binding');
+/* Just for Testing ErrorHandling */
+const ErrorHandling = require('./ErrorHandling');
 
 const myClient = new client.LDAPClient();
 const myClient2 = new client.LDAPClient();
@@ -49,4 +51,7 @@ else {
    console.log('\n\n\n\n\n\n');
    console.log(searchMax);
 }
+
+const testVar = new ErrorHandling(7);
+console.log(testVar.errorClassName);
 
