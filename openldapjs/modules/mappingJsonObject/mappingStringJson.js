@@ -3,18 +3,18 @@
 const Promise = require('bluebird');
 
 /**
-   * Interogate an array by his type to see if exist
+   * Interogate the attribute array by his type to see if exist
    *
    * @function alreadyExist
-   * @param {object} array
-   * @param {type} string
+   * @param {array} attributeObjectArray
+   * @param {string} type
    * @return {int} The function will return the index of the array if the type was already set.
    * If the type don't exist in the array will return 0 or false
    */
-function alreadyExist(array, type) {
-  const lengthArray = array.length;
+function alreadyExist(attributeObjectArray, type) {
+  const lengthArray = attributeObjectArray.length;
   for (let j = 0; j < lengthArray; j += 1) {
-    if (array[j].type === type) {
+    if (attributeObjectArray[j].type === type) {
       return j;
     }
   }
@@ -22,53 +22,70 @@ function alreadyExist(array, type) {
 }
 
 /**
+   * Interogate an attribute by his type and value.
+   *
+   * @function objectLDAPAttribute
+   * @param {string} type
+   * @param {string} value
+   * @param {int} typeExist
+   * @return {object} The function will return an object of attribute
+   * if the type is non-existent in entryObject or the index
+   */
+
+function objectLDAPAttribute(type, value, typeExist) {
+  const attributeObject = ({
+    type: '',
+    value: [],
+  });
+
+  attributeObject.type = type;
+  attributeObject.value.push(value);
+
+  if (typeExist) {
+    const indexOfType = typeExist;
+    return indexOfType;
+  }
+
+  return attributeObject;
+}
+
+/**
    * Take an entry of LDAP and put it into an object.
    *
-   * @function stringToJSONwithNewInstance
-   * @param {string} entry
+   * @function objectLDAPEntry
+   * @param {string} LDAPentry
    * @return {object} The function will return an object of given entry
    */
 
-function objectEntry(entry) {
-  // Make an Array of the entry
-  const entrySplit = entry.split('\n');
-  // Flag for the type attribute
-  let exist = false;
+function objectLDAPEntry(LDAPentry) {
+  const entryElementArray = LDAPentry.split('\n');
+  const entryElementArrayLenght = entryElementArray.length;
+  let i;
 
   const entryObject = ({
     dn: '',
     attribute: [],
   });
 
-  let attributesObject = ({
-    type: '',
-    value: [],
-  });
-  // Interogate the entry
-  for (let i = 0; i < entrySplit.length; i += 1) {
-    // Define the value and the type of an attribute
-    const attributeSplit = entrySplit[i].split(':');
-    const type = attributeSplit[0];
-    const value = attributeSplit[1];
-    // Execute the function for verification
-    exist = alreadyExist(entryObject.attribute, type);
-    // Verifi if the type is entry or not
+  for (i = 0; i < entryElementArrayLenght; i += 1) {
+
+    const attributeArray = entryElementArray[i].split(':');
+
+    const type = attributeArray[0];
+    const value = attributeArray[1];
+
+    // Verify if is an attribute or the DN
     if (type !== '' && type !== undefined) {
-      attributesObject = ({
-        type: '',
-        value: [],
-      });
 
-      attributesObject.type = type;
-      attributesObject.value.push(value);
+      const typeInterogation = alreadyExist(entryObject.attribute, type);
+      const attributeResult = objectLDAPAttribute(type, value, typeInterogation);
 
-      if (exist) {
-        const index = exist;
-        const attributePozition = entryObject.attribute[index].value;
-        attributePozition.push(value);
-        exist = false;
-      } else if (attributesObject.type !== '' && attributesObject.value !== []) {
-        entryObject.attribute.push(attributesObject);
+      // If the attributeResult is not an object then will
+      // return the index of the pozition for the entry
+      if (!isNaN(attributeResult)) {
+        entryObject.attribute[attributeResult].value.push(value);
+      } else {
+        entryObject.attribute.push(attributeResult);
       }
     } else if (type !== undefined && value !== undefined) {
       entryObject.dn = value;
@@ -89,46 +106,49 @@ class stringJSON {
  /**
    * Transform a string message from LDAP search operation to JSON.
    *
-   * @method stringToJSONwithNewInstance
-   * @param {string} stringReturn
-   * @return {Promise} That resolves if the stringToJSONwithNewInstance was successful.
+   * @method stringLDAPtoJSON
+   * @param {string} LDAPstring
+   * @return {Promise} That resolves if the stringLDAPtoJSON was successful.
    * Rejects if is not a string and don't have the LDIF structure.
    */
 
-  stringToJSONwithNewInstance(stringReturn) {
+  stringLDAPtoJSON(LDAPstring) {
     return new Promise((resolve, reject) => {
-    // Define the global object
+
       this.JSONobject = {
         entry: [],
       };
 
-      // String first verification
-      if (stringReturn === null) {
+      // Test to interogate the given string
+      if (LDAPstring === null) {
         reject(new Error('The string is null'));
       }
 
-      if (stringReturn === '') {
+      if (LDAPstring === '') {
         reject(new Error('The string is empty'));
       }
 
-      if (stringReturn === undefined) {
+      if (LDAPstring === undefined) {
         reject(new Error('The string is undefined'));
       }
 
-      if (isNaN(stringReturn) === false) {
+      if (isNaN(LDAPstring) === false) {
         reject(new Error('Must be a string'));
       }
-      // define the array of the mesage
-      const searchSplitArray = stringReturn.split('\ndn');
-      const lengthSearchSplitArray = searchSplitArray.length;
-      if (lengthSearchSplitArray <= 1) {
+
+      // If basic test are past interogate to see if is an Ldap structure
+      const entryArray = LDAPstring.split('\ndn');
+      const lengthEntryArray = entryArray.length;
+
+      if (lengthEntryArray <= 1) {
         reject(new Error('The string is not a LDAP structure'));
       }
-      // Interogate the Search Array
-      for (let i = 1; i < lengthSearchSplitArray; i += 1) {
-        const result = objectEntry(searchSplitArray[i]);
-        this.JSONobject.entry.push(result);
+
+      for (let i = 1; i < lengthEntryArray; i += 1) {
+        const entryObject = objectLDAPEntry(entryArray[i]);
+        this.JSONobject.entry.push(entryObject);
       }
+
       resolve(this.JSONobject);
     });
   }

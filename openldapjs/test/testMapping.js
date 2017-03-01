@@ -34,7 +34,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return the string as JSON', (next) => {
-    JSONStruct.stringToJSONwithNewInstance(searchResult)
+    JSONStruct.stringLDAPtoJSON(searchResult)
     .then((result) => {
       const JSONobjecttest = [{
         dn: 'ou=users,o=myhost,dc=demoApp,dc=com',
@@ -52,7 +52,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return an error if there is a number', (next) => {
-    JSONStruct.stringToJSONwithNewInstance(1234)
+    JSONStruct.stringLDAPtoJSON(1234)
     .catch((err) => {
       should.deepEqual(err.message, 'Must be a string');
       next();
@@ -60,7 +60,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return an error if string is null', (next) => {
-    JSONStruct.stringToJSONwithNewInstance(null)
+    JSONStruct.stringLDAPtoJSON(null)
     .catch((err) => {
       should.deepEqual(err.message, 'The string is null');
       next();
@@ -68,7 +68,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return an error if string is undefined', (next) => {
-    JSONStruct.stringToJSONwithNewInstance(undefined)
+    JSONStruct.stringLDAPtoJSON(undefined)
     .catch((err) => {
       should.deepEqual(err.message, 'The string is undefined');
       next();
@@ -76,7 +76,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return an error if string is empty', (next) => {
-    JSONStruct.stringToJSONwithNewInstance('')
+    JSONStruct.stringLDAPtoJSON('')
     .catch((err) => {
       should.deepEqual(err.message, 'The string is empty');
       next();
@@ -84,7 +84,7 @@ describe('String to JSON#searchTest', () => {
   });
 
   it('should return an error if is not a LDIF structure', (next) => {
-    JSONStruct.stringToJSONwithNewInstance('A string')
+    JSONStruct.stringLDAPtoJSON('A string')
     .catch((err) => {
       should.deepEqual(err.message, 'The string is not a LDAP structure');
       next();

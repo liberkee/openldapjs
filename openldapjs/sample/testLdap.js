@@ -27,11 +27,10 @@ else {
       console.log('The binding was not ok');
       return;
     }
-   const search = myClient.search(searchBase,scope,searchFilter);
-   //console.log(search);
-   JSONStruct.stringToJSONwithNewInstance(search)
+   let search = myClient.search(searchBase,scope,searchFilter);
+   JSONStruct.stringLDAPtoJSON(search)
    .then((result) => {
-       console.log(result.entry[1].attribute);
+       console.log(JSON.stringify(result.entry));
    })
    .catch((err) => {
        console.log(err);
