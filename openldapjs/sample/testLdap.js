@@ -7,7 +7,7 @@ const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
 const myClient = new client.LDAPClient();
 const JSONStruct = new JSONmap();
 
-const hostAddress = '10.16.0.194';
+const hostAddress = 'localhost';
 const portAddress = 389;
 const Host = `ldap://${hostAddress}:${portAddress}`;
 let bindDN = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
@@ -15,7 +15,7 @@ const passwordUser = 'secret';
 const searchBase = 'ou=users,o=myhost,dc=demoApp,dc=com';
 const searchFilter = '(objectclass=*)';
 const scope = 2;
-
+const ldapSearch = '\ndn:cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:person\ncn:cghitea\nsn:Ghitea Cosmin\ndescription:cghitea@gmail.com\nseeAlso:cn=T1\nseeAlso:cn=T3\nseeAlso:cn=HTML\ncn:Nimsoc\n\n';
 const initialization = myClient.initialize(Host);
 if (initialization === 0) {
     console.log('The initialization was not ok');
@@ -28,12 +28,11 @@ else {
       return;
     }
    let search = myClient.search(searchBase,scope,searchFilter);
-   JSONStruct.stringLDAPtoJSON(search)
+   JSONStruct.stringLDAPtoJSON(ldapSearch)
    .then((result) => {
-       console.log(JSON.stringify(result.entry));
+       console.log(JSON.stringify(result));
    })
    .catch((err) => {
        console.log(err);
    })
 }
-

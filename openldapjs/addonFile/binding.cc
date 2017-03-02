@@ -70,6 +70,16 @@ class LDAPClient : public Nan::ObjectWrap {
       info.GetReturnValue().Set(obj->stateClient);
       return;
     }
+    
+    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+
+    if(state != LDAP_SUCCESS) {
+      obj->stateClient = 0;
+      cout << "TLS ERROR: " << state << endl;
+      info.GetReturnValue().Set(obj->stateClient);
+      return;
+    }
+
     obj->stateClient = 1;
     info.GetReturnValue().Set(obj->stateClient);
     return;
@@ -93,6 +103,7 @@ class LDAPClient : public Nan::ObjectWrap {
     status = ldap_simple_bind_s(obj->ld, username, password);
     if(status != LDAP_SUCCESS) {
       obj->stateClient = 0;
+      cout << status << endl;
       info.GetReturnValue().Set(obj->stateClient);
       return;
     }

@@ -22,17 +22,15 @@ function alreadyExist(attributeObjectArray, type) {
 }
 
 /**
-   * Interogate an attribute by his type and value.
+   * Return the object of an Attribute.
    *
    * @function objectLDAPAttribute
    * @param {string} type
    * @param {string} value
-   * @param {int} typeExist
    * @return {object} The function will return an object of attribute
-   * if the type is non-existent in entryObject or the index
    */
 
-function objectLDAPAttribute(type, value, typeExist) {
+function objectLDAPAttribute(type, value) {
   const attributeObject = ({
     type: '',
     value: [],
@@ -40,11 +38,6 @@ function objectLDAPAttribute(type, value, typeExist) {
 
   attributeObject.type = type;
   attributeObject.value.push(value);
-
-  if (typeExist) {
-    const indexOfType = typeExist;
-    return indexOfType;
-  }
 
   return attributeObject;
 }
@@ -78,15 +71,15 @@ function objectLDAPEntry(LDAPentry) {
     if (type !== '' && type !== undefined) {
 
       const typeInterogation = alreadyExist(entryObject.attribute, type);
-      const attributeResult = objectLDAPAttribute(type, value, typeInterogation);
 
-      // If the attributeResult is not an object then will
-      // return the index of the pozition for the entry
-      if (!isNaN(attributeResult)) {
-        entryObject.attribute[attributeResult].value.push(value);
+      // Verify if the type alreadyExist
+      if (typeInterogation) {
+        entryObject.attribute[typeInterogation].value.push(value);
       } else {
+        const attributeResult = objectLDAPAttribute(type, value);
         entryObject.attribute.push(attributeResult);
       }
+
     } else if (type !== undefined && value !== undefined) {
       entryObject.dn = value;
     }
@@ -148,7 +141,6 @@ class stringJSON {
         const entryObject = objectLDAPEntry(entryArray[i]);
         this.JSONobject.entry.push(entryObject);
       }
-
       resolve(this.JSONobject);
     });
   }
