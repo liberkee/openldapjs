@@ -22,6 +22,11 @@ const snValue = 'Belei Andrei';
 const email = 'beleiandrei@yahoo.com';
 const password = 'secret';
 
+const testVar = new ErrorHandling(52);
+
+console.log(testVar.errorObject.errorClassName);
+console.log(testVar.errorObject.errorName);
+console.log(testVar.errorObject.errorText);
 
 const initialization = myClient.initialize(Host);
 const initialization2 = myClient2.initialize(Host);
@@ -52,6 +57,5 @@ else {
    console.log(searchMax);
 }
 
-const testVar = new ErrorHandling(7);
-console.log(testVar.errorClassName);
+
 
