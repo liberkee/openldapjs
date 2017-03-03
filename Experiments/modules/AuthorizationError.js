@@ -1,7 +1,18 @@
 'use strict'
 
-module.exports = class AuthorizationError {
+/**
+ * @module ErrorHandling
+ * @class AuthorizationError
+ */
 
+
+module.exports = class AuthorizationError {
+  /**
+   * Creates a new instance of the class AuthorizationError
+   * 
+   * @constructor
+   * @param {int} errorId The id of the error
+   */
   constructor(errorId) {
     const IdToErrorDictionary = {
       7: 'Authentication Method Not Supported',

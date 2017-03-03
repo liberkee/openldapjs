@@ -1,7 +1,17 @@
 'use strict'
 
-module.exports = class ConnectionHandlingError {
+/**
+ * @module ErrorHandling
+ * @class ConnectionHandlingError
+ */
 
+module.exports = class ConnectionHandlingError {
+  /**
+   * Creates a new instance of the class ConnectionHandlingError
+   * 
+   * @constructor
+   * @param {int} errorId The id of the error
+   */
   constructor(errorId) {
     const IdToErrorDictionary = {
       10: 'Referral',

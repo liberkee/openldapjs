@@ -1,7 +1,18 @@
 'use strict'
 
-module.exports = class AttributeHandingError {
+/**
+ * @module ErrorHandling
+ * @class AttributeHandingError
+ */
 
+
+module.exports = class AttributeHandingError {
+  /**
+   * Creates a new instance of the class AttributeHandingError
+   * 
+   * @constructor
+   * @param {int} errorId The id of the error
+   */
   constructor(errorId) {
     const IdToErrorDictionary = {
       16: 'No Such Attribute',

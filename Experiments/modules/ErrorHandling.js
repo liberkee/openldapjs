@@ -1,12 +1,22 @@
 'use strict'
 
+/**
+ * @module ErrorHandling
+ * @class ErrorHandling
+ */
+
 const ConnectionHandlingError = require('./ConnectionHandlingError.js');
 const AuthorizationError = require('./AuthorizationError.js');
 const ObjectHandlingError = require('./ObjectHandlingError.js');
 const AttributeHandlingError = require('./AttributeHandlingError.js');
 
 module.exports = class ErrorHandling {
-
+  /**
+   * Creates a new instance of the class ErrorHandling
+   * 
+   * @constructor
+   * @param {int} errorId The id of the error
+   */
   constructor(errorId) {
     
     const IdToErrorClassDictionary = {

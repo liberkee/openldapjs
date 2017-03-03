@@ -1,7 +1,18 @@
 'use strict'
 
-module.exports = class ObjectHandlingError {
+/**
+ * @module ErrorHandling
+ * @class ObjectHandlingError
+ */
 
+
+module.exports = class ObjectHandlingError {
+  /**
+   * Creates a new instance of the class ObjectHandlingError
+   * 
+   * @constructor
+   * @param {int} errorId The id of the error
+   */
   constructor(errorId) {
     const IdToErrorDictionary = {
       32: 'No Such Object',
