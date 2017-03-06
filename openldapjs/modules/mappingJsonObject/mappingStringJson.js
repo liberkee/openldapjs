@@ -8,17 +8,17 @@ const Promise = require('bluebird');
    * @function alreadyExist
    * @param {array} attributeObjectArray
    * @param {string} type
-   * @return {int} The function will return the index of the array if the type was already set.
-   * If the type don't exist in the array will return 0 or false
+   * @return {object} The function will return an object if the type exist.
+   * Undefined otherwise
    */
 function alreadyExist(attributeObjectArray, type) {
   const lengthArray = attributeObjectArray.length;
   for (let j = 0; j < lengthArray; j += 1) {
     if (attributeObjectArray[j].type === type) {
-      return j;
+      return attributeObjectArray[j];
     }
   }
-  return false;
+  return undefined;
 }
 
 /**
@@ -70,11 +70,11 @@ function objectLDAPEntry(LDAPentry) {
     // Verify if is an attribute or the DN
     if (type !== '' && type !== undefined) {
 
-      const typeInterogation = alreadyExist(entryObject.attribute, type);
+      const currentType = alreadyExist(entryObject.attribute, type);
 
       // Verify if the type alreadyExist
-      if (typeInterogation) {
-        entryObject.attribute[typeInterogation].value.push(value);
+      if (currentType) {
+        currentType.value.push(value);
       } else {
         const attributeResult = objectLDAPAttribute(type, value);
         entryObject.attribute.push(attributeResult);
