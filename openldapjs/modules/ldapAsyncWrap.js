@@ -46,13 +46,38 @@ module.exports = class LDAPWrapAsync {
   bind(username, password) {
     return new Promise((resolve, reject) => {
       newClient.bind(username, password, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
+        if (result) {
           resolve(result);
+        } else {
+          reject(err);
         }
       }, (progress) => {
         console.log('In progress');
+      });
+    });
+  }
+
+  /**
+   * Search operation.
+   *
+   * @method search
+   * @param {string} base The base node where the search to start.
+   * @param {int} scope The mod how the search will return the entrys.
+   * @param {string} filter The specification for specific element.
+   * @return {Promise} That resolve and return the entry of attribute.
+   * Reject if an error will occure.
+   */
+
+  search(base, scope, filter) {
+    return new Promise((resolve, reject) => {
+      newClient.search(base, scope, filter, (err, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
+      }, (progress) => {
+        //console.log(progress);
       });
     });
   }
