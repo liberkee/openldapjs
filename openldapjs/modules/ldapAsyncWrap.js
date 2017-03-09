@@ -64,7 +64,7 @@ module.exports = class LDAPWrapAsync {
    * @param {string} base The base node where the search to start.
    * @param {int} scope The mod how the search will return the entrys.
    * @param {string} filter The specification for specific element.
-   * @return {Promise} That resolve and return the entry of attribute.
+   * @return {Promise} That resolve and return the a string with search result.
    * Reject if an error will occure.
    */
 
@@ -77,7 +77,32 @@ module.exports = class LDAPWrapAsync {
           reject(err);
         }
       }, (progress) => {
-        //console.log(progress);
+        //console.log('Still in progress');
+      });
+    });
+  }
+
+  /**
+   * Compare operation.
+   *
+   * @method search
+   * @param {string} dn The dn of the entry to compare.
+   * @param {string} attr The attribute given for interogation.
+   * @param {string} value Value send to verify.
+   * @return {Promise} That resolve and return True if the element are equal or False otherwise.
+   * Reject if an error will occure.
+   */
+
+  compare(dn, attr, value) {
+    return new Promise((resolve, reject) => {
+      newClient.compare(dn, attr, value, (err, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
+      }, (progress) => {
+        console.log('Still in progress');
       });
     });
   }

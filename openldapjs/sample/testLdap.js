@@ -1,14 +1,19 @@
 'use strict';
 
-const LDAPCLIENT = require('./modules/ldapAsyncWrap.js');
+const LDAPCLIENT = require('../modules/ldapAsyncWrap.js');
 const newClient = new LDAPCLIENT();
  
 const host = 'ldap://localhost:389';
-const dn = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
+const dn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 const password = 'secret';
 const base = 'ou=users,o=myhost,dc=demoApp,dc=com';
 const scope = 2;
 const filter = '(objectclass=*)';
+const dnCompare = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
+const filterCompare = 'description';
+const value = 'cghitea@gmail.com';
+
+
 
 newClient.initialize(host)
 .then((result) => {
@@ -17,6 +22,14 @@ newClient.initialize(host)
   .then((result) => {
     console.log(result);
     newClient.search(base, scope, filter)
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+    newClient.compare(dnCompare, filterCompare, value)
     .then((result) => {
       console.log(result);
     })
