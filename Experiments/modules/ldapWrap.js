@@ -3,8 +3,9 @@
 //Import the addon function and openLdap libraries
 const client = require('../addonFile/build/Release/binding');
 /* Just for Testing ErrorHandling */
-const ErrorHandling = require('./ErrorHandling');
-const LdapError = require('./LdapError');
+//const ErrorHandling = require('./ErrorHandling');
+//const LdapError = require('./LdapError');
+const newError = require('./NewErrorHandler/ErrorHandler');
 
 const myClient = new client.LDAPClient();
 const myClient2 = new client.LDAPClient();
@@ -23,8 +24,26 @@ const snValue = 'Belei Andrei';
 const email = 'beleiandrei@yahoo.com';
 const password = 'secret';
 
-const x1 = new LdapError();
-x1.handleLdapError(10);
+
+function testError() {
+  return new Promise((resolve, reject) => {
+    reject (new newError(7));
+  })
+}
+
+function callError() {
+  testError()
+  .then(() => {
+    console.log('success');
+  })
+  .catch((err) => {
+    console.log('Error: ' + err._message);
+    console.log('Error: ' + err._errorClass);
+  })
+}
+
+callError();
+
 
 const initialization = myClient.initialize(Host);
 const initialization2 = myClient2.initialize(Host);

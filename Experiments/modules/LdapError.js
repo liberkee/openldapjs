@@ -2,7 +2,6 @@
 
 //const ConnectionHandlingError = require('./ConnectionHandlingError_2')
 
-const Error = require('./Error');
 module.exports = class LdapError extends Error {
   /**
    * Creates a new instance of the class ErrorHandling
@@ -15,7 +14,7 @@ module.exports = class LdapError extends Error {
 
     //this._errorId = 0;
     const IdToErrorClassDictionary = {
-      7: 'ConnectionHandlingError',
+      7: ConnectionHandlingError,
       /*8: new AuthorizationError(errorId),
       14: new AuthorizationError(errorId),
       48: new AuthorizationError(errorId),
@@ -39,10 +38,10 @@ module.exports = class LdapError extends Error {
     
   }
 
-  handleLdapError(errorId) {
+  /*handleLdapError(errorId) {
     this._errorId = errorId;
     const errorObject = new IdToErrorClassDictionary[this._errorId];
-  }
+  }*/
 }
 
 
