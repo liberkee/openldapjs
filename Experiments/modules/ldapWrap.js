@@ -4,6 +4,7 @@
 const client = require('../addonFile/build/Release/binding');
 /* Just for Testing ErrorHandling */
 const ErrorHandling = require('./ErrorHandling');
+const LdapError = require('./LdapError');
 
 const myClient = new client.LDAPClient();
 const myClient2 = new client.LDAPClient();
@@ -22,11 +23,8 @@ const snValue = 'Belei Andrei';
 const email = 'beleiandrei@yahoo.com';
 const password = 'secret';
 
-const testVar = new ErrorHandling(52);
-
-console.log(testVar.errorObject.errorClassName);
-console.log(testVar.errorObject.errorName);
-console.log(testVar.errorObject.errorText);
+const x1 = new LdapError();
+x1.handleLdapError(10);
 
 const initialization = myClient.initialize(Host);
 const initialization2 = myClient2.initialize(Host);
