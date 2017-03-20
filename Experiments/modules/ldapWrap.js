@@ -5,7 +5,7 @@ const client = require('../addonFile/build/Release/binding');
 /* Just for Testing ErrorHandling */
 //const ErrorHandling = require('./ErrorHandling');
 //const LdapError = require('./LdapError');
-const newError = require('./NewErrorHandler/ErrorHandler');
+const ErrorHandler = require('./NewErrorHandler/ErrorHandler');
 
 const myClient = new client.LDAPClient();
 const myClient2 = new client.LDAPClient();
@@ -27,7 +27,7 @@ const password = 'secret';
 
 function testError() {
   return new Promise((resolve, reject) => {
-    reject (new newError(7));
+    reject (new ErrorHandler(53));
   })
 }
 
@@ -37,8 +37,9 @@ function callError() {
     console.log('success');
   })
   .catch((err) => {
-    console.log('Error: ' + err._message);
+    console.log('Error: ' + err._errorText);
     console.log('Error: ' + err._errorClass);
+    console.log('Error: ' + err._error);
   })
 }
 
