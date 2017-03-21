@@ -1,14 +1,17 @@
 'use strict';
 
 const LdapError = class LdapError extends Error {
+
   constructor() {
     super();
     this._errorClass = 'LdapErrors';
 
   }
-}
+
+};
 
 const AuthorizationError = class AuthorizationError extends LdapError {
+
   constructor(id) {
     super();
     const idToErrorDictionary = {
@@ -27,14 +30,16 @@ const AuthorizationError = class AuthorizationError extends LdapError {
       48: 'This indicates that the client attempted to bind as a user that does not exist, attempted to bind as a user that is not allowed to bind (e.g., because it has expired, because it has been locked because of too many failed authentication attempts, etc.), or attempted to bind with credentials that were not correct for the target user.',
       50: 'This indicates that the client does not have permission to perform the requested operation.',
       123: 'This indicates that the requested operation could not be processed because the request included a proxied authorization request control (or some similar control intended to specify an alternate authorization identity for the operation), but the client was not allowed to request the use of that alternate authorization identity.',
-    }
-    
+    };
+
     this._error = idToErrorDictionary[id];
     this._errorText = idToErrorTextDictionary[id];
   }
-}
+
+};
 
 const ConnectionHandlingError = class ConnectionHandlingError extends LdapError {
+
   constructor(id) {
     super();
     const idToErrorDictionary = {
@@ -51,15 +56,17 @@ const ConnectionHandlingError = class ConnectionHandlingError extends LdapError 
       51: 'This indicates that the server is currently too busy to process the requested operation.',
       52: 'This indicates that the server is currently unavailable (e.g., because it is being shut down or is in a maintenance state).',
       53: 'This indicates that the server is unwilling to process the requested operation for some reason.',
-    }
-    
+    };
+
     this._error = idToErrorDictionary[id];
     this._errorText = idToErrorTextDictionary[id];
   }
-}
+
+};
 
 
 const ObjectHandlingError = class ObjectHandlingError extends LdapError {
+
   constructor(id) {
     super();
     const idToErrorDictionary = {
@@ -68,14 +75,16 @@ const ObjectHandlingError = class ObjectHandlingError extends LdapError {
 
     const idToErrorTextDictionary = {
       32: 'This indicates that the client request targeted an entry that does not exist. Note that some servers use this result for a bind request that targets a nonexistent user, even though "invalid credentials" is a more appropriate result for that case.',
-    }
-    
+    };
+
     this._error = idToErrorDictionary[id];
     this._errorText = idToErrorTextDictionary[id];
   }
-}
+
+};
 
 const AttributeHandlingError = class AttributeHandlingError extends LdapError {
+
   constructor(id) {
     super();
     const idToErrorDictionary = {
@@ -90,15 +99,16 @@ const AttributeHandlingError = class AttributeHandlingError extends LdapError {
       17: 'This indicates that the client request included an attribute type that is not defined in the server schema.',
       18: 'This indicates that the client request attempted to perform an unsupported type of matching against an attribute. For example, this may be used if the attribute type does not have an appropriate matching rule for the type of matching requested for that attribute.',
       21: 'This indicates that the client request would have resulted in an attribute value that did not conform to the syntax for that attribute type.',
-    }
-    
+    };
+
     this._error = idToErrorDictionary[id];
     this._errorText = idToErrorTextDictionary[id];
   }
-}
+
+};
 
 const ErrorHandler = class ErrorHandler {
-  
+
   constructor(errorId) {
     const idToErrorClassDictionary = {
       7: new AuthorizationError(errorId),
@@ -126,6 +136,6 @@ const ErrorHandler = class ErrorHandler {
     return (errorObject);
   }
 
-}
+};
 
 module.exports = ErrorHandler;
