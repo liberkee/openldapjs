@@ -3,34 +3,17 @@
 const should = require('should');
 
 // Require the library that is used for the test
-const client = require('../addonFile/build/Release/binding.node');
 const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
-// Define the parameters for the search function
-const host = 'ldap://localhost:389';
-
-const bindDN = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
-const passwordUser = 'secret';
-
-const searchBase = 'ou=users,o=myhost,dc=demoApp,dc=com';
-const searchFilter = '(objectclass=*)';
-const scope = 2;
-
 describe('String to JSON#searchTest', () => {
-  const testClient = new client.LDAPClient();
   const JSONStruct = new JSONmap();
-  let searchResult;
+  let searchResult = '\ndn:ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:organizationalUnit\nou:users';
 
   beforeEach((next) => {
-    // Create a connection to LDAP server and require to performe a search
-    testClient.initialize(host);
-    testClient.bind(bindDN, passwordUser);
-    searchResult = testClient.search(searchBase, scope, searchFilter);
     next();
   });
 
   afterEach(() => {
-    testClient.unbind();
   });
 
   it('should return the string as JSON', (next) => {
