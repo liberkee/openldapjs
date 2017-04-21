@@ -1,6 +1,6 @@
 'use strict';
 
-const client = require('../addonFile/build/Release/binding.node');
+const client = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 
 const newClient = new client.LDAPClient();
