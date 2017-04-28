@@ -270,11 +270,12 @@ class LDAPClient : public Nan::ObjectWrap {
     char *hostAddress = *hostArg;
     int state;
     int protocol_version = LDAP_VERSION3;
+
+    stateClient[0] = Nan::New<Number>(0);
     state = ldap_initialize(&obj->ld, hostAddress);
     if(state != LDAP_SUCCESS || obj->ld == 0) {
-
       stateClient[0] = Nan::New<Number>(0);
-      callback->Call(2, stateClient);
+      callback->Call(1, stateClient);
       // Needed for catch a specific error
       obj->initializedFlag = false;
       return;
@@ -283,19 +284,12 @@ class LDAPClient : public Nan::ObjectWrap {
     state = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if(state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(0);
-      callback->Call(2, stateClient);
+      callback->Call(1, stateClient);
       obj->initializedFlag = false;
       return;
     }
 
-    state = ldap_start_tls_s(obj->ld, NULL, NULL);
-    if(state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(state);
-      callback->Call(1, stateClient);
-      return;
-    }
-
-    stateClient[1] = Nan::New<Number>(1);
+    stateClient[1] = Nan::New<Number>(1);    
     callback->Call(2, stateClient);
     return;
   }
