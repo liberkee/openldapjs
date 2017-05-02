@@ -10,7 +10,7 @@ const Promise = require('bluebird');
 
 module.exports = class LDAPWrapAsync {
 
-  constructor(host, dn, password) {
+  constructor(host, password) {
     this._hostAdress = host;
     this._E_STATES = {
       CREATED: 0,
