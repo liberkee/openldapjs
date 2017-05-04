@@ -95,6 +95,42 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
+  /**
+   * test case with multiple results on the same level( scope argument 1?)
+   * unfinished
+   */
+  it('should return multiple results located on the same level', (next) => {
+    clientLDAP.search('dc=demoApp,dc=com', 1, 'objectClass=*')
+      .then((result) => {
+        console.log('multiple bla bla' + result);
+      }).then(() => {
+        next();
+      });
+  });
+
+  /**
+   * test case with sequential identical searches
+   */
+
+  it('should return the same result', (next) => {
+    let firstResult;
+    let secondResult;
+    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectClass=person')
+      .then((result) => {
+        firstResult = result;
+
+      });
+    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectClass=person')
+      .then((result) => {
+        secondResult = result;
+        should.deepEqual(firstResult, secondResult);
+      }).then(() => {
+        next();
+      });
+
+  });
+
+
 
 
 
