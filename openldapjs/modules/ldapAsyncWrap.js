@@ -68,6 +68,7 @@ module.exports = class LDAPWrapAsync {
       if (this._stateClient === this._E_STATES.INITIALIZED) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (state !== this._E_STATES.BOUND) {
+            this._stateClient = this._E_STATES.INITIALIZED;
             reject(new Error(err));
           } else {
             this._stateClient = state;
@@ -94,17 +95,16 @@ module.exports = class LDAPWrapAsync {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
-        this._binding.search(searchBase, scope, searchFilter, (err, state) => {
+        this._binding.search(searchBase, scope, searchFilter, (err, result) => {
           if (err) {
             reject(new Error(err));
           } else {
-            this._stateClient = state;
-            resolve(this._stateClient);
+            console.log('In SEARCH. RESULT  = ' + result);
+            resolve(result);
           }
         });
       } else {
-        reject(new Error('Wrong state'));
-
+        reject(new Error('The Search operation can be done just in BOUND state'));
       }
 
     });
@@ -123,15 +123,19 @@ module.exports = class LDAPWrapAsync {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
+      //console.log()
       if (this._stateClient === this._E_STATES.BOUND) {
-        binding.compare(dn, attr, value, (err, state) => {
+        this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
+            //console.log()
             reject(new Error(err));
           } else {
-            this._stateClient = state;
-            resolve(this._stateClient);
+            console.log('In COMPARE. RESULT  = ' + result);
+            resolve(result);
           }
         });
+      } else {
+        reject (new Error('The Compare operation can be done just in BOUND state'));
       }
     });
   }
