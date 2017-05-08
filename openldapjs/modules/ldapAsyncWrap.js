@@ -99,7 +99,6 @@ module.exports = class LDAPWrapAsync {
           if (err) {
             reject(new Error(err));
           } else {
-            console.log('In SEARCH. RESULT  = ' + result);
             resolve(result);
           }
         });
@@ -123,19 +122,16 @@ module.exports = class LDAPWrapAsync {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
-      //console.log()
       if (this._stateClient === this._E_STATES.BOUND) {
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
-            //console.log()
             reject(new Error(err));
           } else {
-            console.log('In COMPARE. RESULT  = ' + result);
             resolve(result);
           }
         });
       } else {
-        reject (new Error('The Compare operation can be done just in BOUND state'));
+        reject(new Error('The Compare operation can be done just in BOUND state'));
       }
     });
   }
@@ -149,7 +145,7 @@ module.exports = class LDAPWrapAsync {
     */
   unbind() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
+      if (this._stateClient !== this._E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
           if (state !== this._E_STATES.UNBOUND) {
             reject(new Error(err));
@@ -159,7 +155,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('Binding shall be done before unbinding'));
+        resolve(this._stateClient);
       }
     });
   }
