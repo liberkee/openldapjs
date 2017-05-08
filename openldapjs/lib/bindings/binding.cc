@@ -196,17 +196,13 @@ class LDAPCompareProgress : public AsyncProgressWorker {
     void HandleOKCallback () {
       Local<Value> stateClient[2] = {Null(), Null()};
       if (result == -1) {
-        cout<<"C++.IF -1. RES = "<<result<<endl;
         stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
         callback->Call(2, stateClient);
       }
       else {
-        cout<<"C++.IF NOT -1. RES = "<<result<<endl;
         int status = ldap_result2error(ld, resultMsg, 0);
-        cout<<"C++. STATUS = "<<status<<endl;
         if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE)
         {
-          cout<<"C++. NOT ERROR"<<endl;
           if(status == LDAP_COMPARE_TRUE)
           {
             stateClient[1] = Nan::New("The Comparison Result: true").ToLocalChecked();
@@ -416,12 +412,7 @@ class LDAPClient : public Nan::ObjectWrap {
                       &bvalue,
                       NULL,
                       NULL,
-                      &message);
-    /*if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }*/                         
+                      &message);                         
 
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));   
   }
