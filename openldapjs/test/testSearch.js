@@ -8,6 +8,7 @@ describe('Testing the async LDAP search ', () => {
   const host = 'ldap://localhost:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
+  const searchBase = 'dc=demoApp,dc=com';
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
@@ -33,9 +34,9 @@ describe('Testing the async LDAP search ', () => {
   });
 
   it('should return an empty search', (next) => {
-    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectclass=aliens')
+    clientLDAP.search(searchBase, 2, 'objectclass=aliens')
       .then((result) => {
-        console.log(result);
+        console.log('the result is: ' + result);
         //should.deepEqual(result,undefined);
         //next();
         should.deepEqual(result, undefined);
@@ -47,11 +48,12 @@ describe('Testing the async LDAP search ', () => {
    * case for search with non existing search base
    */
   it('should return the root node', (next) => {
+    console.log('Test 2 entry point');
     clientLDAP.search('', 0, 'objectclass=*')
       .then((result) => {
         //console.log('result is : '+ result);
         const baseDN = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
-        console.log(baseDN);
+        //console.log(baseDN);
         should.deepEqual(result, baseDN);
 
       }).then(() => {
@@ -68,7 +70,7 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         clientLDAP.bind(dnUser, password)
           .then(() => {
-            clientLdap.search('dc=demoApp,cn=com', 2, 'objectClass=*')
+            clientLdap.search(searchBase, 2, 'objectClass=*')
               .then((result) => {
                 console.log('the result is : ' + result);
                 should.deepEqual(result, undefined);
@@ -85,7 +87,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return a single result', (next) => {
-    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectClass=simpleSecurityObject')
+    clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((result) => {
         //console.log('single result is: ' +result);
         const singleResult = '\ndn:cn=admin,dc=demoApp,dc=com\nobjectClass:simpleSecurityObject\nobjectClass:organizationalRole\ncn:admin\ndescription:LDAP administrator\nuserPassword:{SSHA}UU9JBg/X7r6HK/ARkYnmRTLTCNNisZFA\n\n';
@@ -100,9 +102,9 @@ describe('Testing the async LDAP search ', () => {
    * unfinished
    */
   it('should return multiple results located on the same level', (next) => {
-    clientLDAP.search('dc=demoApp,dc=com', 1, 'objectClass=*')
+    clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
-        console.log('multiple bla bla' + result);
+        should.notDeepEqual(result, undefined); //unclear on what to compare it with
       }).then(() => {
         next();
       });
@@ -113,21 +115,29 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return the same result', (next) => {
-    let firstResult;
-    let secondResult;
-    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectClass=person')
+    let firstResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    let secondResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    /*
+    clientLDAP.search(searchBase, 2, 'objectClass=person')
       .then((result) => {
         firstResult = result;
 
       });
-    clientLDAP.search('dc=demoApp,dc=com', 2, 'objectClass=person')
+    clientLDAP.search(searchBase, 2, 'objectClass=person')
       .then((result) => {
         secondResult = result;
         should.deepEqual(firstResult, secondResult);
       }).then(() => {
         next();
       });
-
+*/
+    Promise.all(firstResult, secondResult)
+      .then((values) => {
+        should.deepEqual(values[0], values[1]);
+      })
+      .then(() => {
+        next();
+      });
   });
 
 
