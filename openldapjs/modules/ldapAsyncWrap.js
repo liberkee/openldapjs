@@ -75,6 +75,17 @@ module.exports = class LDAPWrapAsync {
             resolve(this._stateClient);
           }
         });
+      } else if (this._stateClient === this._E_STATES.UNBOUND) {
+        this.initialize()
+          .then(() => {
+            this.bind(bindDN, passwordUser)
+              .then((result) => {
+                resolve(result);
+              })
+              .catch((err) => {
+                reject(new Error(err.message));
+              });
+          });
       } else {
         reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
       }
