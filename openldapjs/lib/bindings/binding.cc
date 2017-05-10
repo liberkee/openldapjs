@@ -68,6 +68,9 @@ class LDAPSearchProgress : public AsyncProgressWorker {
       bool flagVerification = false;
       string resultSearch;
       int i = 0, msgID;
+      LDAPMessage *testVar = 0;
+      int status = 0;
+      //int LDAP_NO_SUCH_OBJECT = 32;
     public:
       LDAPSearchProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
           : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {    
@@ -83,8 +86,13 @@ class LDAPSearchProgress : public AsyncProgressWorker {
     }
     // Executes in event loop
     void HandleOKCallback () {
+
+      
+      
+
       Local<Value> stateClient[2] = {Null(), Null()};
-      if (flagVerification != false) {
+
+      if (status != LDAP_INVALID_DN_SYNTAX) {
         stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
         callback->Call(2, stateClient);
       } else {
@@ -148,6 +156,9 @@ class LDAPSearchProgress : public AsyncProgressWorker {
 
         case LDAP_RES_SEARCH_RESULT:
           finished = 1;
+          //testVar = *resultMsg;
+          status = ldap_result2error(ld, resultMsg, 0);
+
           prc = ldap_parse_result(ld,
                                   resultMsg,
                                   &errorCode,
