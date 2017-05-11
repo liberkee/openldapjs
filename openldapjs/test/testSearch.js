@@ -66,7 +66,7 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         clientLDAP.bind(dnUser, password)
           .then(() => {
-            clientLdap.search(searchBase, 2, 'objectClass=*')
+            clientLDAP.search(searchBase, 2, 'objectClass=*')
               .then((result) => {
                 should.deepEqual(result, undefined);
               });
@@ -112,98 +112,66 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return the same result', (next) => {
-    const firstResult;
-    const secondResult;
-
 
     clientLDAP.search(searchBase, 2, 'objectClass=person')
-      .then ( (res1) => {
-        firstResult = res1;
+      .then((res1) => {
         clientLDAP.search(searchBase, 2, 'objectClass=person')
-          .then( (res2) => {
-            secondResult = res2;
-            should.deepEqual(res1,res2);
+          .then((res2) => {
+            should.deepEqual(res1, res2);
             next();
           });
 
       });
-      /*
-    
-    Promise.all([firstResult, secondResult])
-      .then((values) => {
-        should.deepEqual(values[0], values[1]);
-      })
-      .then(() => {
-        next();
-      });*/
   });
 
   /**
    * case with sequential different searches(including error cases)
    */
   it('should return sequential different results and errors', (next) => {
-     
-    clientLDAP.search(searchBase,2,'objectClass=person')
-      .then( (result1) => {
-        clientLDAP.search(searchBase,2,'objectClass=aliens')
-          .then( (result2) => {
-            should.notDeepEqual(result1,result2);
-            clientLDAP.search(searchBase,1,'objectClass=*')
-              .then( (result3) => {
-                should.notDeepEqual(result1,result3);
-                should.notDeepEqual(result2,result3);
-                clientLDAP.search('dc=wrongBase,dc=err',2,'objectClass=errors')
-                .then ( (result) => {
-                  console.log('got a result with a wrong searchBase...');
-                })
-                  .catch( (err) => {
-                    should.deepEqual(error,'The Search Operation Failed');
+
+    clientLDAP.search(searchBase, 2, 'objectClass=person')
+      .then((result1) => {
+        clientLDAP.search(searchBase, 2, 'objectClass=aliens')
+          .then((result2) => {
+            should.notDeepEqual(result1, result2);
+            clientLDAP.search(searchBase, 1, 'objectClass=*')
+              .then((result3) => {
+                should.notDeepEqual(result1, result3);
+                should.notDeepEqual(result2, result3);
+                clientLDAP.search('dc=wrongBase,dc=err', 2, 'objectClass=errors')
+                  .catch((err) => {
+
+                    should.deepEqual(err.message, 'The Search Operation Failed');
                     next();
-                  })
+                  });
 
               });
 
 
           });
-        
+
 
       });
-      /*
-    const secondResult = clientLDAP.search(searchBase,2,'objectClass=aliens');
-    const thirdResult = clientLDAP.search(searchBase,1,'objectClass=*');
-    const errorResult = clientLDAP.search('dc=wrongBase,dc=err',2,'objectClass=errors')
-      .then( (result) => {
-        console.log('Got a result with a wrong searchBase...');
-      })
-        .catch( (error) => {
-          should.deepEqual(error,'The Search Operation Failed');
-        });
 
-    Promise.all([firstResult,secondResult,thirdResult])
-      .then( (values) => {
-        should.notDeepEqual(values[0],values[1],values[2]);
-      })
-        .then( () => {
-          next();
-        });
-*/
   });
 
   /**
    * test cases for parallel searches
    */
 
-  it('should return search results done in parallel',(next) => {
-    const firstResult = clientLDAP.search(searchBase,2,'objectClass=person');
-    const secondResult = clientLDAP.search(searchBase,1,'objectClass=person');
-    const thirdResult = clientLDAP.search(searchBase,2,'objectClass=*')
+  it('should return search results done in parallel', (next) => {
+    const firstResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    const secondResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    const thirdResult = clientLDAP.search(searchBase, 2, 'objectClass=aliens');
 
-    Promise.all([firstResult,secondResult,thirdResult])
-      .then( (values) => {
-        should.deepEqual(values[0],values[1]);
-        should.notDeepEqual(values[0],values[2]);
-        should.notDeepEqual(values[1],values[2]);
-      }); 
-
+    Promise.all([firstResult, secondResult, thirdResult])
+      .then((values) => {
+        should.deepEqual(values[0], values[1]);
+        should.notDeepEqual(values[0], values[2]);
+        should.notDeepEqual(values[1], values[2]);
+      })
+      .then(() => {
+        next();
+      });
   });
 });
