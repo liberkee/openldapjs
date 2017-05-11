@@ -85,19 +85,16 @@ class LDAPSearchProgress : public AsyncProgressWorker {
       }
     }
     // Executes in event loop
-    void HandleOKCallback () {
-
-      
-      
+    void HandleOKCallback () {    
 
       Local<Value> stateClient[2] = {Null(), Null()};
 
-      if (status != LDAP_INVALID_DN_SYNTAX) {
-        stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
-        callback->Call(2, stateClient);
-      } else {
+      if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT) {
         stateClient[0] = Nan::New("The Search Operation Failed").ToLocalChecked();
         callback->Call(1, stateClient);
+      } else {
+        stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
+        callback->Call(2, stateClient);
       }
     }
     
