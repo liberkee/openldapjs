@@ -171,5 +171,15 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
+  add() {
+    return new Promise((resolve, reject) => {
+      const dn = 'cn=admin,dc=demoApp,dc=com';
+      this._binding.add(dn, (err, result) => {
+        console.log('ERR = ' + err);
+        console.log('RESULT = ' + result);
+      })
+    })
+  }
+
 };
 
