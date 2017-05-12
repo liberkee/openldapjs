@@ -113,9 +113,9 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return the same result', (next) => {
 
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
+    clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((res1) => {
-        clientLDAP.search(searchBase, 2, 'objectClass=person')
+        clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
           .then((res2) => {
             should.deepEqual(res1, res2);
             next();
@@ -129,7 +129,7 @@ describe('Testing the async LDAP search ', () => {
    */
   it('should return sequential different results and errors', (next) => {
 
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
+    clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((result1) => {
         clientLDAP.search(searchBase, 2, 'objectClass=aliens')
           .then((result2) => {
@@ -160,8 +160,8 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return search results done in parallel', (next) => {
-    const firstResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
-    const secondResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    const firstResult = clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
+    const secondResult = clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
     const thirdResult = clientLDAP.search(searchBase, 2, 'objectClass=aliens');
 
     Promise.all([firstResult, secondResult, thirdResult])
