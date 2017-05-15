@@ -15,14 +15,14 @@ const DNCompare = 'ou=users,o=myhost,dc=demoApp,dc=com';
 const attributeCompare = 'ou';
 const valueToCompare = 'users';
 
-const stateMachine = {
+/*const stateMachine = {
   failTest: 0,
   init: 1,
   binded: 2,
   search: 3,
   compare: 4,
   unbinded: 5,
-};
+};*/
 
 describe('LdapConnection#client', () => {
   // Create two client to verify the connection
