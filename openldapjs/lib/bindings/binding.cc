@@ -231,6 +231,8 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
+    Nan::SetPrototypeMethod(tpl, "startTls", startTls);
+
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -288,15 +290,38 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    /*state = ldap_start_tls_s(obj->ld, NULL, NULL);
     if(state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(state);
       callback->Call(1, stateClient);
       return;
-    }
+    }*/
 
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    return;
+  }
+
+    static NAN_METHOD(startTls) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Local<Value> stateClient[2] = {Null(), Null()};
+    Callback *callback = new Callback(info[1].As<Function>());
+    int state;
+    cout<<"STATE000 = "<<state<<endl;
+
+    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    if(state != LDAP_SUCCESS) {
+      cout<<"STATE = "<<state<<endl;
+      stateClient[1] = Nan::New<Number>(state);
+      callback->Call(2, stateClient);
+      return;
+    }
+
+    cout<<"STATE222 = "<<state<<endl;
+
+    stateClient[0] = Nan::New<Number>(1);
+    callback->Call(1, stateClient);
     return;
   }
 
