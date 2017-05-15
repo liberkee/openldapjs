@@ -252,7 +252,6 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
-    Nan::SetPrototypeMethod(tpl, "add", add);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -267,6 +266,7 @@ class LDAPClient : public Nan::ObjectWrap {
   int msgid;
   bool initializedFlag = false;
   explicit LDAPClient(){};
+  //LDAPMod *attrs[4];
   
   ~LDAPClient(){};
 
@@ -280,46 +280,6 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::Local<v8::Function> cons = Nan::New(constructor());
       info.GetReturnValue().Set(cons->NewInstance(argc, argv));
     }
-  }
-
-  static NAN_METHOD(add)
-  {
-    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-    Nan::Utf8String dnArg(info[0]);
-    //Nan::Utf8String attrArg(info[1]);
-
-    Local<Value> stateClient[2] = {Null(), Null()};
-    Callback *callback = new Callback(info[1].As<Function>());
-
-    
-
-    LDAPMod *attr;
-
-    cout<<"DEFINE"<<LDAP_MOD_ADD<<endl;
-
-    char *dn = *dnArg;
-    //char *attr = *attrArg;
-    cout<<"HERE1"<<endl;
-    char *cn_values[] = {"John Smith", NULL};
-    attr->mod_type = "cn";
-     cout<<"HERE3"<<endl;
-    attr->mod_op = LDAP_MOD_ADD;
-    cout<<"HERE4"<<endl;
-    
-    cout<<"HERE2"<<endl;
-    attr->mod_values = cn_values;
-
-
-
-    int state;
-    
-    state = ldap_add(obj->ld, dn, &attr);
-    cout<<"STATE = "<<state<<endl;
-
-    stateClient[1] = Nan::New<Number>(1);    
-    callback->Call(2, stateClient);
-    return;
-
   }
 
   static NAN_METHOD(initialize) {
