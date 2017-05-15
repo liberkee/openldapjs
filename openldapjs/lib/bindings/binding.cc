@@ -42,10 +42,10 @@ class LDAPBindProgress : public AsyncProgressWorker {
           callback->Call(1, stateClient);
         }
         else {
-          stateClient[1] = Nan::New<Number>(2);
-          callback->Call(2, stateClient);
-        }
+        stateClient[1] = Nan::New<Number>(2);
+        callback->Call(2, stateClient);
       }
+    }
     }
     
     void HandleProgressCallback(const char *data, size_t size) {
@@ -214,19 +214,19 @@ class LDAPCompareProgress : public AsyncProgressWorker {
           if(status == LDAP_COMPARE_TRUE)
           {
             stateClient[1] = Nan::New("The Comparison Result: true").ToLocalChecked();
-          }
+        }
           else
           {
             stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
           }
-          callback->Call(2, stateClient);
-        }
+        callback->Call(2, stateClient);
+      }
         else
         {
           // Return ERROR
           stateClient[0] = Nan::New(status);
           callback->Call(1, stateClient);
-        }
+    }
       }
     }
     
@@ -252,6 +252,8 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
+    Nan::SetPrototypeMethod(tpl, "startTls", startTls);
+
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -312,8 +314,38 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::New<Number>(1);    
+    /*state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    if(state != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<Number>(state);
+      callback->Call(1, stateClient);
+      return;
+    }*/
+
+    stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    return;
+  }
+
+    static NAN_METHOD(startTls) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Local<Value> stateClient[2] = {Null(), Null()};
+    Callback *callback = new Callback(info[1].As<Function>());
+    int state;
+    cout<<"STATE000 = "<<state<<endl;
+
+    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    if(state != LDAP_SUCCESS) {
+      cout<<"STATE = "<<state<<endl;
+      stateClient[1] = Nan::New<Number>(state);
+      callback->Call(2, stateClient);
+      return;
+    }
+
+    cout<<"STATE222 = "<<state<<endl;
+
+    stateClient[0] = Nan::New<Number>(1);
+    callback->Call(1, stateClient);
     return;
   }
 

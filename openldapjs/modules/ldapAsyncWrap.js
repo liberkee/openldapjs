@@ -3,11 +3,11 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 
+
 /**
  * @module LDAPtranzition
  * @class LDAPWrapAsync
  */
-
 module.exports = class LDAPWrapAsync {
 
   constructor(host, password) {
@@ -30,26 +30,31 @@ module.exports = class LDAPWrapAsync {
     return this._hostAdress;
   }
 
-  /**
-    * Initialize to an LDAP server.
-    *
-    * @method initialize
-    * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
-    * Reject if the address is incorect.
-    */
-
+ /**
+   * Initialize to an LDAP server.
+   *
+   * @method initialize
+   * @param {string} host The host address of server LDAP.
+   * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
+   * Reject if the address is incorect.
+   */
   initialize() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.CREATED) {
-        this._binding.initialize(this._hostAdress, (err, state) => {
-          if (state !== this._E_STATES.INITIALIZED) {
-            reject(new Error(err));
-          } else {
-            this._stateClient = state;
-            resolve(this._stateClient);
-          }
-        });
-      }
+      newClient.initialize(host, (err, result) => {
+        if (result) {
+          newClient.startTls()
+          .then((tlsResult) => {
+            console.log(tlsResult);
+            resolve(tlsResult);
+          })
+          .catch((err) => {
+            console.log('FAIL START TLS');
+          })
+        } else {
+          console.log('FAIL INTIT');
+          reject(err);
+        }
+      });
     });
   }
 
@@ -57,8 +62,8 @@ module.exports = class LDAPWrapAsync {
    * Authentificate to LDAP server.
    *
    * @method bind
-   * @param {string} bindDN The username of specific client.
-   * @param {string} passwordUser The password for authentification.
+   * @param {string} username The username of specific client.
+   * @param {string} password The password for authentification.
    * @return {Promise} That resolves if the credentials are correct.
    * Reject dn or password are incorect.
    */
@@ -70,11 +75,11 @@ module.exports = class LDAPWrapAsync {
           if (state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
             reject(new Error(err));
-          } else {
+        } else {
             this._stateClient = state;
             resolve(this._stateClient);
-          }
-        });
+        }
+      });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
         this.initialize()
           .then(() => {
@@ -84,11 +89,11 @@ module.exports = class LDAPWrapAsync {
               })
               .catch((err) => {
                 reject(new Error(err.message));
-              });
+    });
           });
       } else {
         reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
-      }
+  }
     });
   }
 
@@ -96,9 +101,9 @@ module.exports = class LDAPWrapAsync {
    * Search operation.
    *
    * @method search
-   * @param {string} searchBase The base node where the search to start.
+   * @param {string} base The base node where the search to start.
    * @param {int} scope The mod how the search will return the entrys.
-   * @param {string} searchFilter The specification for specific element.
+   * @param {string} filter The specification for specific element.
    * @return {Promise} That resolve and return the a string with search result.
    * Reject if an error will occure.
    */
@@ -110,14 +115,14 @@ module.exports = class LDAPWrapAsync {
           if (err) {
             reject(new Error(err));
           } else {
-            resolve(result);
+          resolve(result);
           }
         });
-      } else {
+        } else {
         reject(new Error('The Search operation can be done just in BOUND state'));
-      }
+        }
 
-    });
+      });
   }
 
   /**
@@ -138,33 +143,33 @@ module.exports = class LDAPWrapAsync {
           if (err) {
             reject(new Error(err));
           } else {
-            resolve(result);
+          resolve(result);
           }
         });
-      } else {
+        } else {
         reject(new Error('The Compare operation can be done just in BOUND state'));
-      }
-    });
+        }
+      });
   }
 
-  /**
-    * Unbind from a LDAP server.
-    *
-    * @method unbind
-    * @return {Promise} That resolves if the LDAP structure was initialized.
-    * Reject if the LDAP structure was not set or initialized.
-    */
+ /**
+   * Unbind from a LDAP server.
+   *
+   * @method unbind
+   * @return {Promise} That resolves if the LDAP structure was initialized.
+   * Reject if the LDAP structure was not set or initialized.
+   */
   unbind() {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== this._E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
           if (state !== this._E_STATES.UNBOUND) {
             reject(new Error(err));
-          } else {
+        } else {
             this._stateClient = state;
             resolve(this._stateClient);
-          }
-        });
+        }
+      });
       } else {
         resolve(this._stateClient);
       }
