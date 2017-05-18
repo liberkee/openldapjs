@@ -4,9 +4,6 @@
       "ecmaVersion": 6,
       "sourceType": "script"
   },
-  "plugins": [
-        "import"
-    ],
   "rules": {
     "object-shorthand": ["error", "never"],
     "no-unused-vars": ["off", { "vars": "local", "args": "after-used" }],
@@ -20,10 +17,6 @@
     "no-bitwise": [ "error", { "allow": ["~", "^", "|", "&", "|=", "&=", "^="]} ],
     "padded-blocks": ["error", { "classes": "always" }],
     "strict": ["error", "safe"]
-  },
-  "env": {
-    "node": true,
-    "mocha": true
   }
 }
 
