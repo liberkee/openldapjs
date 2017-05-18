@@ -1,5 +1,5 @@
 {
-    "extends": "airbnb",
+  "extends": "airbnb",
   "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "script"
@@ -18,4 +18,4 @@
     "padded-blocks": ["error", { "classes": "always" }],
     "strict": ["error", "safe"]
   }
- }
+}

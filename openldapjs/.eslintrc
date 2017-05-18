@@ -17,6 +17,9 @@
     "no-bitwise": [ "error", { "allow": ["~", "^", "|", "&", "|=", "&=", "^="]} ],
     "padded-blocks": ["error", { "classes": "always" }],
     "strict": ["error", "safe"]
+  },
+  "env": {
+    "node": true,
+    "mocha": true
   }
 }
-
