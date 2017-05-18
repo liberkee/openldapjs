@@ -1,0 +1,21 @@
+{
+  "name": "ldapclientwrapper",
+  "version": "0.0.1",
+  "description": "A ldap client nodejs",
+  "main": "ldapwrapper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ldapwrapper.js",
+    "lint": "eslint ./modules/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "nan": "^2.5.0"
+  }
+}
