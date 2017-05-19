@@ -266,6 +266,8 @@ class LDAPClient : public Nan::ObjectWrap {
   int msgid;
   bool initializedFlag = false;
   explicit LDAPClient(){};
+  //LDAPMod *attrs[4];
+  
   ~LDAPClient(){};
 
   static NAN_METHOD(New) {
