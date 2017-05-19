@@ -42,10 +42,10 @@ class LDAPBindProgress : public AsyncProgressWorker {
           callback->Call(1, stateClient);
         }
         else {
-        stateClient[1] = Nan::New<Number>(2);
-        callback->Call(2, stateClient);
+          stateClient[1] = Nan::New<Number>(2);
+          callback->Call(2, stateClient);
+        }
       }
-    }
     }
     
     void HandleProgressCallback(const char *data, size_t size) {
@@ -248,12 +248,12 @@ class LDAPClient : public Nan::ObjectWrap {
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
     Nan::SetPrototypeMethod(tpl, "initialize", initialize);
+    Nan::SetPrototypeMethod(tpl, "startTls", startTls);
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
-    Nan::SetPrototypeMethod(tpl, "startTls", startTls);
-
+    
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -330,22 +330,21 @@ class LDAPClient : public Nan::ObjectWrap {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     Local<Value> stateClient[2] = {Null(), Null()};
-    Callback *callback = new Callback(info[1].As<Function>());
+    Callback *callback = new Callback(info[0].As<Function>());
+
     int state;
-    cout<<"STATE000 = "<<state<<endl;
+    int msgId;
+
+    stateClient[0] = Nan::New<Number>(0);
 
     state = ldap_start_tls_s(obj->ld, NULL, NULL);
     if(state != LDAP_SUCCESS) {
-      cout<<"STATE = "<<state<<endl;
-      stateClient[1] = Nan::New<Number>(state);
-      callback->Call(2, stateClient);
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
       return;
     }
-
-    cout<<"STATE222 = "<<state<<endl;
-
-    stateClient[0] = Nan::New<Number>(1);
-    callback->Call(1, stateClient);
+    stateClient[1] = Nan::New<Number>(1);    
+    callback->Call(2, stateClient);
     return;
   }
 
