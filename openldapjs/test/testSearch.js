@@ -174,4 +174,16 @@ describe('Testing the async LDAP search ', () => {
         next();
       });
   });
+
+  /**
+   * blabla
+   */
+  /*it('should crash and burn',(next) => {
+    clientLDAP.search(searchBase,2,'objectClass=person')
+      .then( (result) => {
+        result.should.not.be.ok();
+      });
+  });
+*/
+
 });
