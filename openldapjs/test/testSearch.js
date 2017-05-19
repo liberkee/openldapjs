@@ -2,13 +2,14 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
-//  const clientLDAP = new LDAPWrap();
+const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 describe('Testing the async LDAP search ', () => {
   const host = 'ldap://localhost:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
+  
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
@@ -176,14 +177,27 @@ describe('Testing the async LDAP search ', () => {
   });
 
   /**
-   * blabla
+   * Test case with a large number of results (>10k)
    */
-  /*it('should crash and burn',(next) => {
+  it('should return 10k entries',(next) => {
+   // setTimeout(next,30000);
+
     clientLDAP.search(searchBase,2,'objectClass=person')
       .then( (result) => {
-        result.should.not.be.ok();
-      });
+       let json = jsonMap.stringLDAPtoJSON(result);
+       let size = Object.keys(json).length;
+       console.log(size);
+       size.should.be.approximately(10000,100);
+      })
+        .then(() => {
+          next();
+        })
+          .catch( () => {
+            console.log("bad news!");
+          })
   });
-*/
+
+ 
+
 
 });
