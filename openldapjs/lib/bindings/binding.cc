@@ -41,8 +41,10 @@ class LDAPBindProgress : public AsyncProgressWorker {
           stateClient[0] = Nan::New<Number>(status);
           callback->Call(1, stateClient);
         }
-        stateClient[1] = Nan::New<Number>(2);
-        callback->Call(2, stateClient);
+        else {
+          stateClient[1] = Nan::New<Number>(2);
+          callback->Call(2, stateClient);
+        }
       }
     }
     
@@ -66,6 +68,9 @@ class LDAPSearchProgress : public AsyncProgressWorker {
       bool flagVerification = false;
       string resultSearch;
       int i = 0, msgID;
+      LDAPMessage *testVar = 0;
+      int status = 0;
+      //int LDAP_NO_SUCH_OBJECT = 32;
     public:
       LDAPSearchProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
           : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {    
@@ -80,14 +85,16 @@ class LDAPSearchProgress : public AsyncProgressWorker {
       }
     }
     // Executes in event loop
-    void HandleOKCallback () {
+    void HandleOKCallback () {    
+
       Local<Value> stateClient[2] = {Null(), Null()};
-      if (flagVerification != false) {
+
+      if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT) {
+        stateClient[0] = Nan::New("The Search Operation Failed").ToLocalChecked();
+        callback->Call(1, stateClient);
+      } else {
         stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
         callback->Call(2, stateClient);
-      } else {
-        stateClient[0] = Nan::New<Number>(0);
-        callback->Call(1, stateClient);
       }
     }
     
@@ -146,6 +153,9 @@ class LDAPSearchProgress : public AsyncProgressWorker {
 
         case LDAP_RES_SEARCH_RESULT:
           finished = 1;
+          //testVar = *resultMsg;
+          status = ldap_result2error(ld, resultMsg, 0);
+
           prc = ldap_parse_result(ld,
                                   resultMsg,
                                   &errorCode,
@@ -194,18 +204,29 @@ class LDAPCompareProgress : public AsyncProgressWorker {
     void HandleOKCallback () {
       Local<Value> stateClient[2] = {Null(), Null()};
       if (result == -1) {
-        stateClient[0] = Nan::New<Number>(0);
-        callback->Call(1, stateClient);
+        stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
+        callback->Call(2, stateClient);
       }
       else {
         int status = ldap_result2error(ld, resultMsg, 0);
-        if(status != LDAP_COMPARE_TRUE) {
-          stateClient[0] = Nan::New("The comparation is false").ToLocalChecked();
-          callback->Call(1, stateClient);
-          return;
+        if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE)
+        {
+          if(status == LDAP_COMPARE_TRUE)
+          {
+            stateClient[1] = Nan::New("The Comparison Result: true").ToLocalChecked();
+          }
+          else
+          {
+            stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
+          }
+          callback->Call(2, stateClient);
         }
-        stateClient[1] = Nan::New("The comparation is true").ToLocalChecked();
-        callback->Call(2, stateClient);
+        else
+        {
+          // Return ERROR
+          stateClient[0] = Nan::New(status);
+          callback->Call(1, stateClient);
+        }
       }
     }
     
@@ -245,6 +266,8 @@ class LDAPClient : public Nan::ObjectWrap {
   int msgid;
   bool initializedFlag = false;
   explicit LDAPClient(){};
+  //LDAPMod *attrs[4];
+  
   ~LDAPClient(){};
 
   static NAN_METHOD(New) {
@@ -270,11 +293,12 @@ class LDAPClient : public Nan::ObjectWrap {
     char *hostAddress = *hostArg;
     int state;
     int protocol_version = LDAP_VERSION3;
+
+    stateClient[0] = Nan::New<Number>(0);
     state = ldap_initialize(&obj->ld, hostAddress);
     if(state != LDAP_SUCCESS || obj->ld == 0) {
-
       stateClient[0] = Nan::New<Number>(0);
-      callback->Call(2, stateClient);
+      callback->Call(1, stateClient);
       // Needed for catch a specific error
       obj->initializedFlag = false;
       return;
@@ -283,19 +307,12 @@ class LDAPClient : public Nan::ObjectWrap {
     state = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if(state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(0);
-      callback->Call(2, stateClient);
+      callback->Call(1, stateClient);
       obj->initializedFlag = false;
       return;
     }
 
-    state = ldap_start_tls_s(obj->ld, NULL, NULL);
-    if(state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(state);
-      callback->Call(1, stateClient);
-      return;
-    }
-
-    stateClient[1] = Nan::New<Number>(1);
+    stateClient[1] = Nan::New<Number>(1);    
     callback->Call(2, stateClient);
     return;
   }
@@ -317,7 +334,6 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
-
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld, obj->msgid));
   }
 
@@ -406,12 +422,7 @@ class LDAPClient : public Nan::ObjectWrap {
                       &bvalue,
                       NULL,
                       NULL,
-                      &message);
-    if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }                         
+                      &message);                         
 
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));   
   }
