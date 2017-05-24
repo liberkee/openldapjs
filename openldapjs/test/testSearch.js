@@ -2,13 +2,14 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
-//  const clientLDAP = new LDAPWrap();
+const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 describe('Testing the async LDAP search ', () => {
   const host = 'ldap://localhost:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
+  
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
@@ -113,9 +114,9 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return the same result', (next) => {
 
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
+    clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((res1) => {
-        clientLDAP.search(searchBase, 2, 'objectClass=person')
+        clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
           .then((res2) => {
             should.deepEqual(res1, res2);
             next();
@@ -129,7 +130,7 @@ describe('Testing the async LDAP search ', () => {
    */
   it('should return sequential different results and errors', (next) => {
 
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
+    clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((result1) => {
         clientLDAP.search(searchBase, 2, 'objectClass=aliens')
           .then((result2) => {
@@ -160,8 +161,8 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return search results done in parallel', (next) => {
-    const firstResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
-    const secondResult = clientLDAP.search(searchBase, 2, 'objectClass=person');
+    const firstResult = clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
+    const secondResult = clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
     const thirdResult = clientLDAP.search(searchBase, 2, 'objectClass=aliens');
 
     Promise.all([firstResult, secondResult, thirdResult])
@@ -174,4 +175,29 @@ describe('Testing the async LDAP search ', () => {
         next();
       });
   });
+
+  /**
+   * Test case with a large number of results (>10k)
+   */
+  it('should return 10k entries',(next) => {
+   // setTimeout(next,30000);
+
+    clientLDAP.search(searchBase,2,'objectClass=person')
+      .then( (result) => {
+       let json = jsonMap.stringLDAPtoJSON(result);
+       let size = Object.keys(json).length;
+       console.log(size);
+       size.should.be.approximately(10000,100);
+      })
+        .then(() => {
+          next();
+        })
+          .catch( () => {
+            console.log("bad news!");
+          })
+  });
+
+ 
+
+
 });
