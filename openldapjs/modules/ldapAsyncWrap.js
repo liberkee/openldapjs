@@ -74,19 +74,23 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.INITIALIZED) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
-          if (state !== this._E_STATES.BOUND) {
+          if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
+            console.log('JS. IN BIND. ERR = ' + err);
             reject(new Error(err));
         } else {
+            console.log('JS. IN BIND. BIND SUCCESS. STATE = ' + state);
             this._stateClient = state;
             resolve(this._stateClient);
         }
       });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
+        console.log('JS. IN BIND. STATE = UNBOUND');
         this.initialize()
           .then(() => {
             this.bind(bindDN, passwordUser)
               .then((result) => {
+                console.log('JS. IN BIND. AFTER INIT -> BIND. STATE = ' + this._stateClient);
                 resolve(result);
               })
               .catch((err) => {
@@ -120,9 +124,10 @@ module.exports = class LDAPWrapAsync {
           resolve(result);
           }
         });
-        } else {
+      } else {
+        console.log('JS. IN SEARCH. STATE = ' + this._stateClient);
         reject(new Error('The Search operation can be done just in BOUND state'));
-        }
+      }
 
       });
   }

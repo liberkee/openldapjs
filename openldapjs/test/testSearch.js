@@ -61,7 +61,7 @@ describe('Testing the async LDAP search ', () => {
    * test case for search with access denied
    */
 
-  it('should return nothing', (next) => {
+  /*it('should return nothing', (next) => {
     clientLDAP.unbind()
       .then(() => {
         clientLDAP.bind(dnUser, password)
@@ -76,7 +76,7 @@ describe('Testing the async LDAP search ', () => {
         next();
       });
 
-  });
+  });*/
 
   /**
    * test case with a single result
@@ -85,6 +85,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return a single result', (next) => {
     clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((result) => {
+        console.log('TEST. IN SINGLE RESULT = ' + result);
         const singleResult = '\ndn:cn=admin,dc=demoApp,dc=com\nobjectClass:simpleSecurityObject\nobjectClass:organizationalRole\ncn:admin\ndescription:LDAP administrator\nuserPassword:{SSHA}UU9JBg/X7r6HK/ARkYnmRTLTCNNisZFA\n\n';
         should.deepEqual(result, singleResult);
       })
