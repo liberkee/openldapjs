@@ -40,15 +40,17 @@ module.exports = class LDAPWrapAsync {
    */
   initialize() {
     return new Promise((resolve, reject) => {
-      newClient.initialize(host, (err, result) => {
+      this._binding.initialize(this._hostAdress, (err, result) => {
         if (result) {
-          newClient.startTls()
-          .then((tlsResult) => {
-            console.log(tlsResult);
-            resolve(tlsResult);
-          })
-          .catch((err) => {
-            console.log('FAIL START TLS');
+          this._binding.startTls((errTls, stateTls) => {
+            if (errTls) {
+              console.log('JS. TLS. ERROR = ' + errTls);
+              reject(new Error(errTls));
+            } else {
+              console.log('JS. TLS. SUCCESS = ' + stateTls);
+              this._stateClient = this._E_STATES.INITIALIZED;
+              resolve(stateTls);
+            }
           })
         } else {
           console.log('FAIL INTIT');
