@@ -59,7 +59,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        
+
       }
     });
   }
@@ -122,6 +122,8 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
         this._binding.search(searchBase, scope, searchFilter, (err, result) => {
+          console.log('JS. SEARCH. ERR = ' + err);
+          console.log('JS. SEARCH. RESULT = ' + result);
           if (err) {
             reject(new Error(err));
           } else {
