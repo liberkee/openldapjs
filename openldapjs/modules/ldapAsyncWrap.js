@@ -30,14 +30,14 @@ module.exports = class LDAPWrapAsync {
     return this._hostAdress;
   }
 
- /**
-   * Initialize to an LDAP server.
-   *
-   * @method initialize
-   * @param {string} host The host address of server LDAP.
-   * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
-   * Reject if the address is incorect.
-   */
+  /**
+    * Initialize to an LDAP server.
+    *
+    * @method initialize
+    * @param {string} host The host address of server LDAP.
+    * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
+    * Reject if the address is incorect.
+    */
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.CREATED) {
@@ -45,21 +45,16 @@ module.exports = class LDAPWrapAsync {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
-                console.log('JS. TLS. ERROR = ' + errTls);
                 reject(new Error(errTls));
               } else {
-                console.log('JS. TLS. SUCCESS = ' + stateTls);
                 this._stateClient = this._E_STATES.INITIALIZED;
                 resolve(stateTls);
               }
-            })
+            });
           } else {
-            console.log('FAIL INTIT');
             reject(err);
           }
         });
-      } else {
-
       }
     });
   }
@@ -80,30 +75,26 @@ module.exports = class LDAPWrapAsync {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
-            console.log('JS. IN BIND. ERR = ' + err);
             reject(new Error(err));
-        } else {
-            console.log('JS. IN BIND. BIND SUCCESS. STATE = ' + state);
+          } else {
             this._stateClient = state;
             resolve(this._stateClient);
-        }
-      });
+          }
+        });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
-        console.log('JS. IN BIND. STATE = UNBOUND');
         this.initialize()
           .then(() => {
             this.bind(bindDN, passwordUser)
               .then((result) => {
-                console.log('JS. IN BIND. AFTER INIT -> BIND. STATE = ' + this._stateClient);
                 resolve(result);
               })
               .catch((err) => {
                 reject(new Error(err.message));
-    });
+              });
           });
       } else {
         reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
-  }
+      }
     });
   }
 
@@ -122,20 +113,17 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
         this._binding.search(searchBase, scope, searchFilter, (err, result) => {
-          console.log('JS. SEARCH. ERR = ' + err);
-          console.log('JS. SEARCH. RESULT = ' + result);
           if (err) {
             reject(new Error(err));
           } else {
-          resolve(result);
+            resolve(result);
           }
         });
       } else {
-        console.log('JS. IN SEARCH. STATE = ' + this._stateClient);
         reject(new Error('The Search operation can be done just in BOUND state'));
       }
 
-      });
+    });
   }
 
   /**
@@ -156,33 +144,33 @@ module.exports = class LDAPWrapAsync {
           if (err) {
             reject(new Error(err));
           } else {
-          resolve(result);
+            resolve(result);
           }
         });
-        } else {
+      } else {
         reject(new Error('The Compare operation can be done just in BOUND state'));
-        }
-      });
+      }
+    });
   }
 
- /**
-   * Unbind from a LDAP server.
-   *
-   * @method unbind
-   * @return {Promise} That resolves if the LDAP structure was initialized.
-   * Reject if the LDAP structure was not set or initialized.
-   */
+  /**
+    * Unbind from a LDAP server.
+    *
+    * @method unbind
+    * @return {Promise} That resolves if the LDAP structure was initialized.
+    * Reject if the LDAP structure was not set or initialized.
+    */
   unbind() {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== this._E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
           if (state !== this._E_STATES.UNBOUND) {
             reject(new Error(err));
-        } else {
+          } else {
             this._stateClient = state;
             resolve(this._stateClient);
-        }
-      });
+          }
+        });
       } else {
         resolve(this._stateClient);
       }
