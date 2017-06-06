@@ -187,7 +187,7 @@ describe('Testing the async LDAP search ', () => {
     clientLDAP.search(searchBase, 2, 'objectClass=person')
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.approximately(10000, 100);
+        count.should.be.above(10000);
       })
       .then(() => {
         next();
@@ -195,5 +195,17 @@ describe('Testing the async LDAP search ', () => {
 
       });
 
-  });
+  }); 
+
+    it('should return results in entire subtree',  (next) => {
+
+      clientLDAP.search(searchBase,2, 'objectClass=inetOrgPerson')
+        .then( (result) => {
+          console.log(result);
+
+        })
+          .then( () => {
+            next();
+          });
+    });
 });
