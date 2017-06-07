@@ -1,46 +1,24 @@
 'use strict';
 
-const LDAPCLIENT = require('../modules/ldapAsyncWrap.js');
-const newClient = new LDAPCLIENT();
- 
+const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+
 const host = 'ldap://localhost:389';
-const dn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
+const dnUser = 'cn=admin,dc=demoApp,dc=com';
+const searchBase = 'dc=demoApp,dc=com';
 const password = 'secret';
-const base = 'ou=users,o=myhost,dc=demoApp,dc=com';
-const scope = 2;
-const filter = '(objectclass=*)';
-const dnCompare = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
-const filterCompare = 'description';
-const value = 'cghitea@gmail.com';
+const searchFilter = process.argv[2];
 
+const clientLDAP = new LDAPWrap(host);
 
-
-newClient.initialize(host)
-.then((result) => {
-  console.log(result);
-  newClient.bind(dn,password)
-  .then((result) => {
-    console.log(result);
-    newClient.search(base, scope, filter)
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((err) => {
-      console.log(err);
+clientLDAP.initialize()
+  .then( () => {
+    clientLDAP.bind(dnUser,password)
+    .then( () =>{
+      clientLDAP.search(searchBase,2,searchFilter)
+        .then( (result) => {
+          console.log(result);
+        });
     });
-
-    newClient.compare(dnCompare, filterCompare, value)
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
+      
   });
-})
-.catch((err) => {
-  console.log(err);
-});
+
