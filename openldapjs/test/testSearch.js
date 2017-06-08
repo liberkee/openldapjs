@@ -103,7 +103,8 @@ describe('Testing the async LDAP search ', () => {
   it('should return multiple results located on the same level', (next) => {
     clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
-        should.notDeepEqual(result, undefined); //  unclear on what to compare it with
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(1);
       })
       .then(() => {
         next();
@@ -191,21 +192,18 @@ describe('Testing the async LDAP search ', () => {
       })
       .then(() => {
         next();
-
-
       });
+  });
 
-  }); 
+  it('should return results in entire subtree', (next) => {
 
-    it('should return results in entire subtree',  (next) => {
-
-      clientLDAP.search(searchBase,2, 'objectClass=inetOrgPerson')
-        .then( (result) => {
-          console.log(result);
-
-        })
-          .then( () => {
-            next();
-          });
-    });
+    clientLDAP.search(searchBase, 2, 'objectClass=inetOrgPerson')
+      .then((result) => {
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(1);
+      })
+      .then(() => {
+        next();
+      });
+  });
 });
