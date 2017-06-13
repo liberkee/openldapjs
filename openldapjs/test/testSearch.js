@@ -11,6 +11,7 @@ describe('Testing the async LDAP search ', () => {
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
+  
 
 
   const password = 'secret';
