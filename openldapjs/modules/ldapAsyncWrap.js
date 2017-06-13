@@ -3,11 +3,11 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 
+
 /**
  * @module LDAPtranzition
  * @class LDAPWrapAsync
  */
-
 module.exports = class LDAPWrapAsync {
 
   constructor(host, password) {
@@ -34,19 +34,25 @@ module.exports = class LDAPWrapAsync {
     * Initialize to an LDAP server.
     *
     * @method initialize
+    * @param {string} host The host address of server LDAP.
     * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
     * Reject if the address is incorect.
     */
-
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.CREATED) {
-        this._binding.initialize(this._hostAdress, (err, state) => {
-          if (state !== this._E_STATES.INITIALIZED) {
-            reject(new Error(err));
+        this._binding.initialize(this._hostAdress, (err, result) => {
+          if (result) {
+            this._binding.startTls((errTls, stateTls) => {
+              if (errTls) {
+                reject(new Error(errTls));
+              } else {
+                this._stateClient = this._E_STATES.INITIALIZED;
+                resolve(stateTls);
+              }
+            });
           } else {
-            this._stateClient = state;
-            resolve(this._stateClient);
+            reject(err);
           }
         });
       }
@@ -57,8 +63,8 @@ module.exports = class LDAPWrapAsync {
    * Authentificate to LDAP server.
    *
    * @method bind
-   * @param {string} bindDN The username of specific client.
-   * @param {string} passwordUser The password for authentification.
+   * @param {string} username The username of specific client.
+   * @param {string} password The password for authentification.
    * @return {Promise} That resolves if the credentials are correct.
    * Reject dn or password are incorect.
    */
@@ -67,7 +73,7 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.INITIALIZED) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
-          if (state !== this._E_STATES.BOUND) {
+          if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
             reject(new Error(err));
           } else {
@@ -96,9 +102,9 @@ module.exports = class LDAPWrapAsync {
    * Search operation.
    *
    * @method search
-   * @param {string} searchBase The base node where the search to start.
+   * @param {string} base The base node where the search to start.
    * @param {int} scope The mod how the search will return the entrys.
-   * @param {string} searchFilter The specification for specific element.
+   * @param {string} filter The specification for specific element.
    * @return {Promise} That resolve and return the a string with search result.
    * Reject if an error will occure.
    */

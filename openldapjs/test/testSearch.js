@@ -5,11 +5,14 @@ const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 describe('Testing the async LDAP search ', () => {
+
+
   const host = 'ldap://localhost:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
   
+
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
@@ -69,7 +72,7 @@ describe('Testing the async LDAP search ', () => {
           .then(() => {
             clientLDAP.search(searchBase, 2, 'objectClass=*')
               .then((result) => {
-                should.deepEqual(result, undefined);
+                result.should.be.empty;
               });
           });
       })
@@ -86,8 +89,8 @@ describe('Testing the async LDAP search ', () => {
   it('should return a single result', (next) => {
     clientLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
       .then((result) => {
-        const singleResult = '\ndn:cn=admin,dc=demoApp,dc=com\nobjectClass:simpleSecurityObject\nobjectClass:organizationalRole\ncn:admin\ndescription:LDAP administrator\nuserPassword:{SSHA}UU9JBg/X7r6HK/ARkYnmRTLTCNNisZFA\n\n';
-        should.deepEqual(result, singleResult);
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.eql(1);
       })
       .then(() => {
         next();
@@ -101,7 +104,8 @@ describe('Testing the async LDAP search ', () => {
   it('should return multiple results located on the same level', (next) => {
     clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
-        should.notDeepEqual(result, undefined); //  unclear on what to compare it with
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(1);
       })
       .then(() => {
         next();
@@ -141,19 +145,12 @@ describe('Testing the async LDAP search ', () => {
                 should.notDeepEqual(result2, result3);
                 clientLDAP.search('dc=wrongBase,dc=err', 2, 'objectClass=errors')
                   .catch((err) => {
-
-                    should.deepEqual(err.message, 'The Search Operation Failed');
+                    err.should.not.be.empty;
                     next();
                   });
-
               });
-
-
           });
-
-
       });
-
   });
 
   /**
@@ -179,25 +176,28 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-  it('should return 10k entries',(next) => {
-   // setTimeout(next,30000);
+  it('should return 10k entries', function (next) {
+    this.timeout(0);
 
-    clientLDAP.search(searchBase,2,'objectClass=person')
-      .then( (result) => {
-       let json = jsonMap.stringLDAPtoJSON(result);
-       let size = Object.keys(json).length;
-       console.log(size);
-       size.should.be.approximately(10000,100);
+    clientLDAP.search(searchBase, 2, 'objectClass=person')
+      .then((result) => {
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(10000);
       })
-        .then(() => {
-          next();
-        })
-          .catch( () => {
-            console.log("bad news!");
-          })
+      .then(() => {
+        next();
+      });
   });
 
- 
+  it('should return results in entire subtree', (next) => {
 
-
+    clientLDAP.search(searchBase, 2, 'objectClass=inetOrgPerson')
+      .then((result) => {
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(1);
+      })
+      .then(() => {
+        next();
+      });
+  });
 });
