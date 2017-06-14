@@ -251,6 +251,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "startTls", startTls);
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
+    Nan::SetPrototypeMethod(tpl, "searchWithPagination", searchWithPagination);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
     
@@ -423,6 +424,11 @@ class LDAPClient : public Nan::ObjectWrap {
     }                         
 
     AsyncQueueWorker(new LDAPSearchProgress(callback, progress, obj->ld, message));                        
+  }
+
+
+  static NAN_METHOD(searchWithPagination) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
   }
 
   static NAN_METHOD(compare) {

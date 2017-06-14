@@ -126,6 +126,34 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
+
+  /**
+ * Search operation using pagination.
+ *
+ * @method searchWithPagination
+ * @param {string} searchBase The base node where the search to start.
+ * @param {int} scope The mod how the search will return the entrys.
+ * @param {string} searchFilter The specification for specific element.
+ * @param {int} pageSize The number of entries per LDAP page
+ * @return {Promise} That resolve and return the a string with search result.
+ * Reject if an error will occure.
+ */
+  searchWithPagination(searchBase, scope, searchFilter, pageSize) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.BOUND) {
+        this._binding.searchWithPagination(searchBase, scope, searchFilter, pageSize, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error('The Search operation can be done just in BOUND state'));
+      }
+    });
+  }
+
   /**
    * Compare operation.
    *
