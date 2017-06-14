@@ -429,6 +429,70 @@ class LDAPClient : public Nan::ObjectWrap {
 
   static NAN_METHOD(searchWithPagination) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+    
+    Nan::Utf8String baseArg(info[0]);
+    Nan::Utf8String filterArg(info[2]);
+
+    char *DNbase = *baseArg;
+    char *filterSearch = *filterArg;
+    int message, result;
+    struct timeval timeOut = {10, 0};
+
+    Local<Value> stateClient[2] = {Null(), Null()};
+
+    Callback *callback = new Callback(info[4].As<Function>());
+    Callback *progress = new Callback(info[5].As<v8::Function>());
+
+    //Verify if the argument is a Number for scope
+    if(!info[1] -> IsNumber() || !info[3] -> IsNumber()) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
+
+    int pageSize = info[3]->NumberValue();
+    int scopeSearch = info[1]->NumberValue();
+    if (scopeSearch <= 0 && scopeSearch >= 3) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
+
+    if (obj->ld == 0) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
+
+    struct berval  *cookie=NULL;
+    char pagingCriticality = 'T';
+    LDAPControl    *pageControl=NULL, *M_controls[2] = { NULL, NULL };
+
+    result = ldap_create_page_control(obj->ld, pageSize, cookie, pagingCriticality, &pageControl);
+
+    /* Insert the control into a list to be passed to the search.     */
+    M_controls[0] = pageControl;
+
+
+    result = ldap_search_ext(obj->ld, 
+                             DNbase, 
+                             scopeSearch, 
+                             filterSearch, 
+                             NULL, 
+                             0, 
+                             M_controls, 
+                             NULL, 
+                             NULL, 
+                             LDAP_NO_LIMIT, 
+                             &message);
+
+    if (result != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }                         
+
+    AsyncQueueWorker(new LDAPSearchProgress(callback, progress, obj->ld, message));
   }
 
   static NAN_METHOD(compare) {
