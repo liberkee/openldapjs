@@ -240,6 +240,67 @@ class LDAPCompareProgress : public AsyncProgressWorker {
     }
 };
 
+
+class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
+    private:
+      LDAP *ld;
+      Callback *progress;
+      int result = 0, l_errcode = 0, msgID;
+      LDAPMessage *resultMsg, *entry, *l_result;
+      int finished = 0;
+      bool flagVerification = false;
+      string resultSearch;
+      int i = 0;
+      LDAPMessage *testVar = 0;
+      int status = 0;
+      int LDAP_FALSE = 0;
+      LDAPControl **returnedControls = NULL;
+
+    public:
+      LDAPSearchWithPaginationProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
+          : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {    
+      }
+    // Executes in worker thread
+    void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
+      struct timeval timeOut = {1, 0};
+      while(finished == 0) {
+        result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
+        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
+        //std::this_thread::sleep_for(chrono::milliseconds(10));
+      }
+    }
+    // Executes in event loop
+    void HandleOKCallback () {    
+
+      Local<Value> stateClient[2] = {Null(), Null()};
+
+      if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT) {
+        stateClient[0] = Nan::New("The Search Operation Failed").ToLocalChecked();
+        callback->Call(1, stateClient);
+      } else {
+        stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
+        callback->Call(2, stateClient);
+      }
+    }
+    
+    void HandleProgressCallback(const char *data, size_t size) {
+      // Required, this is not created automatically 
+      char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
+      int errorCode, prc;
+      int l_rc;
+
+      if (result != LDAP_SUCCESS && result != LDAP_PARTIAL_RESULTS)
+      {
+        finished = 1;
+        return;
+      }
+
+      /* Parse the results to retrieve the controls being returned */
+      l_rc = ldap_parse_result (ld, l_result, &l_errcode, NULL, NULL, NULL, &returnedControls, LDAP_FALSE); 
+       
+    }
+};
+
 class LDAPClient : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init) {
