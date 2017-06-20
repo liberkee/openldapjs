@@ -245,16 +245,20 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
     private:
       LDAP *ld;
       Callback *progress;
-      int result = 0, l_errcode = 0, msgID;
-      LDAPMessage *resultMsg, *entry, *l_result;
+      char *l_dn;
+      int result = 0, l_errcode = 0, msgID, l_entries, l_entry_count = 0;
+      LDAPMessage *resultMsg, *entry, *l_result, *l_entry;
       int finished = 0;
       bool flagVerification = false;
       string resultSearch;
-      int i = 0;
+      int i = 0, morePages, page_nbr;
       LDAPMessage *testVar = 0;
       int status = 0;
-      int LDAP_FALSE = 0;
+      int LDAP_FALSE = 0, LDAP_TRUE = 1;
       LDAPControl **returnedControls = NULL;
+      struct berval  *cookie=NULL;
+      int totalCount;
+      int l_rc;
 
     public:
       LDAPSearchWithPaginationProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
@@ -263,8 +267,11 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
     // Executes in worker thread
     void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
       struct timeval timeOut = {1, 0};
+      
       while(finished == 0) {
-        result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
+        cout<<"C++. In EXECUTE"<<endl;
+        l_rc = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
+        cout<<"C++. In Execute. After Result"<<endl;
         progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
         //std::this_thread::sleep_for(chrono::milliseconds(10));
       }
@@ -274,7 +281,7 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
 
       Local<Value> stateClient[2] = {Null(), Null()};
 
-      if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT) {
+      if (l_rc == LDAP_INVALID_DN_SYNTAX || l_rc == LDAP_NO_SUCH_OBJECT) {
         stateClient[0] = Nan::New("The Search Operation Failed").ToLocalChecked();
         callback->Call(1, stateClient);
       } else {
@@ -287,16 +294,87 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       // Required, this is not created automatically 
       char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
       int errorCode, prc;
-      int l_rc;
+     
+      cout<<"C++. RESULT x= "<<l_rc<<endl;
+      
 
-      if (result != LDAP_SUCCESS && result != LDAP_PARTIAL_RESULTS)
+      /* Parse the results to retrieve the controls being returned */
+      l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &returnedControls, LDAP_TRUE); 
+
+      cout<<"C++. RESULT = "<<l_rc<<endl;
+
+      if (cookie != NULL)
       {
+        ber_bvfree(cookie);
+        cookie = NULL;
+      }
+
+      /* Parse the page control returned to get the cookie and   *
+       * determine whether there are more pages                  */
+      l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+
+      /* Determine if the cookie is not empty, indicating there are more pages  *
+       * for these search parameters                                            */
+      if (cookie && cookie->bv_val != NULL && strlen(cookie->bv_val) > 0)
+      {
+        morePages = LDAP_TRUE;
+        ber_bvfree(cookie);
+        cookie = NULL;
+
+
+        return;
+      }
+      else
+      {
+        cout<<"DN = "<<l_dn<<"\n";
+        morePages = LDAP_FALSE;
+      }
+
+      /* Clean up the controls used */
+      if(returnedControls != NULL)
+      {
+        ldap_controls_free(returnedControls);
+        returnedControls = NULL;
+      }
+
+
+      //M_controls[0] = NULL;
+      //ldap_control_free(pageControl);
+      //pageControl = NULL;
+
+      /******************************************************************/
+      /* Disply the returned result                                     */
+      /*                                                                */
+      /* Determine how many entries have been found.                    */
+      if (morePages == LDAP_TRUE) 
+         printf("===== Page : %d =====\n", page_nbr);
+      l_entries = ldap_count_entries(ld, l_result);
+    
+      if (l_entries > 0)
+      {
+         l_entry_count = l_entry_count + l_entries;
+      }
+
+      for ( l_entry = ldap_first_entry(ld, l_result);
+            l_entry != NULL;
+            l_entry = ldap_next_entry(ld, l_entry) )
+      {
+         l_dn = ldap_get_dn(ld, l_entry);
+         printf("    %s\n",l_dn);
+      }
+
+      /* Free the search results.                                       */
+      ldap_msgfree(l_result);
+      page_nbr = page_nbr + 1;
+
+      if (l_rc != LDAP_SUCCESS && l_rc != LDAP_PARTIAL_RESULTS)
+      {
+        cout<<"c++. FINISHED"<<endl;
         finished = 1;
         return;
       }
 
-      /* Parse the results to retrieve the controls being returned */
-      l_rc = ldap_parse_result (ld, l_result, &l_errcode, NULL, NULL, NULL, &returnedControls, LDAP_FALSE); 
+
        
     }
 };
@@ -499,6 +577,8 @@ class LDAPClient : public Nan::ObjectWrap {
     int message, result;
     struct timeval timeOut = {10, 0};
 
+    
+
     Local<Value> stateClient[2] = {Null(), Null()};
 
     Callback *callback = new Callback(info[4].As<Function>());
@@ -508,6 +588,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if(!info[1] -> IsNumber() || !info[3] -> IsNumber()) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      cout<<"C++.HERE4444!"<<endl; 
       return;
     }
 
@@ -516,12 +597,14 @@ class LDAPClient : public Nan::ObjectWrap {
     if (scopeSearch <= 0 && scopeSearch >= 3) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      cout<<"C++.HERE!333"<<endl; 
       return;
     }
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      cout<<"C++.HERE222!"<<endl; 
       return;
     }
 
@@ -530,6 +613,8 @@ class LDAPClient : public Nan::ObjectWrap {
     LDAPControl    *pageControl=NULL, *M_controls[2] = { NULL, NULL };
 
     result = ldap_create_page_control(obj->ld, pageSize, cookie, pagingCriticality, &pageControl);
+
+    cout<<result<<" = RESULT"<<endl;
 
     /* Insert the control into a list to be passed to the search.     */
     M_controls[0] = pageControl;
@@ -550,10 +635,13 @@ class LDAPClient : public Nan::ObjectWrap {
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      cout<<"C++.HERE11!"<<endl; 
       return;
-    }                         
+    }      
 
-    AsyncQueueWorker(new LDAPSearchProgress(callback, progress, obj->ld, message));
+                      
+
+    AsyncQueueWorker(new LDAPSearchWithPaginationProgress(callback, progress, obj->ld, message));
   }
 
   static NAN_METHOD(compare) {
