@@ -2,11 +2,11 @@
 
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 
-const host = 'ldap://localhost:389';
-const dnUser = 'cn=admin,dc=demoApp,dc=com';
-const searchBase = 'dc=demoApp,dc=com';
-const password = 'secret';
-const searchFilter = process.argv[2];
+const host = process.argv[2];
+const dnUser = process.argv[3];
+const password = process.argv[4];
+const searchBase = process.argv[5];
+const searchFilter = process.argv[6];
 
 const clientLDAP = new LDAPWrap(host);
 
