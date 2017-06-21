@@ -259,10 +259,11 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       struct berval  *cookie=NULL;
       int totalCount;
       int l_rc;
+      LDAPControl **p_control;
 
     public:
-      LDAPSearchWithPaginationProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID) 
-          : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {    
+      LDAPSearchWithPaginationProgress(Callback * callback, Callback * progress, LDAP *ld, int msgID, LDAPControl **p_control) 
+          : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID), p_control(p_control) {    
       }
     // Executes in worker thread
     void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
@@ -297,10 +298,11 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
      
       cout<<"C++. RESULT x= "<<l_rc<<endl;
       
-
+      //cout<<"LD: "<<ld->ld_valid<<endl;
       /* Parse the results to retrieve the controls being returned */
-      l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &returnedControls, LDAP_TRUE); 
-
+      l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &p_control, LDAP_TRUE); 
+      //l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      
       cout<<"C++. RESULT = "<<l_rc<<endl;
 
       if (cookie != NULL)
@@ -311,7 +313,7 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
 
       /* Parse the page control returned to get the cookie and   *
        * determine whether there are more pages                  */
-      l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      //l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
 
       /* Determine if the cookie is not empty, indicating there are more pages  *
        * for these search parameters                                            */
@@ -331,10 +333,10 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       }
 
       /* Clean up the controls used */
-      if(returnedControls != NULL)
+      if(p_control != NULL)
       {
-        ldap_controls_free(returnedControls);
-        returnedControls = NULL;
+        ldap_controls_free(p_control);
+        p_control = NULL;
       }
 
 
@@ -641,7 +643,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
                       
 
-    AsyncQueueWorker(new LDAPSearchWithPaginationProgress(callback, progress, obj->ld, message));
+    AsyncQueueWorker(new LDAPSearchWithPaginationProgress(callback, progress, obj->ld, message, &pageControl));
   }
 
   static NAN_METHOD(compare) {
