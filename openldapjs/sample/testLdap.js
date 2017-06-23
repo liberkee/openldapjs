@@ -16,7 +16,7 @@ const dn = 'cn=admin,dc=demoApp,dc=com';
 const pass = 'secret';
 const searchBase = 'dc=demoApp,dc=com';
 const scope = 2;
-const filter = '(objectclass=*)';
+const filter = '(objectClass=inetOrgPers)';
 const pageSize = 100;
 
 

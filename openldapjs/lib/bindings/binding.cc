@@ -155,7 +155,7 @@ class LDAPSearchProgress : public AsyncProgressWorker {
           finished = 1;
           //testVar = *resultMsg;
           status = ldap_result2error(ld, resultMsg, 0);
-
+          cout<<"C++. WITHOUPAGINATION. MSG = "<<resultMsg<<endl;
           prc = ldap_parse_result(ld,
                                   resultMsg,
                                   &errorCode,
@@ -259,6 +259,7 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       struct berval  *cookie=NULL;
       int totalCount;
       int l_rc;
+      int status_result;
       LDAPControl **p_control;
 
     public:
@@ -270,11 +271,12 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       struct timeval timeOut = {1, 0};
       
       while(finished == 0) {
-        cout<<"C++. In EXECUTE"<<endl;
-        l_rc = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
-        cout<<"C++. In Execute. After Result"<<endl;
-        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
-        //std::this_thread::sleep_for(chrono::milliseconds(10));
+        status_result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
+        cout<<"IN EXECUTE. Status Result = "<<status_result<<endl;
+        cout<<"IN EXECUTE. Status Search = "<<l_rc<<endl;
+        cout<<"IN EXECUTE. Result = "<<resultMsg<<endl;
+        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));     
+        std::this_thread::sleep_for(chrono::milliseconds(10));
       }
     }
     // Executes in event loop
@@ -294,16 +296,15 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
     void HandleProgressCallback(const char *data, size_t size) {
       // Required, this is not created automatically 
       char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
+      string resultLocal = "\n";
       int errorCode, prc;
-     
-      cout<<"C++. RESULT x= "<<l_rc<<endl;
-      
-      //cout<<"LD: "<<ld->ld_valid<<endl;
+      struct timeval timeOut = {1, 0};
+
+      cout<<"IN CALLBACK. BEFORE RESULT = "<<resultMsg<<endl;
       /* Parse the results to retrieve the controls being returned */
       l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &p_control, LDAP_TRUE); 
-      //l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
-      
-      cout<<"C++. RESULT = "<<l_rc<<endl;
+      cout<<"IN CALLBACK. AFTER RESULT = "<<resultMsg<<endl;
+      cout<<"IN CALLBACK. Status Search = "<<l_rc<<endl;
 
       if (cookie != NULL)
       {
@@ -313,7 +314,11 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
 
       /* Parse the page control returned to get the cookie and   *
        * determine whether there are more pages                  */
-      //l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      int state = ldap_start_tls_s(ld, NULL, NULL);
+      cout<<"TLS STATE = "<<state<<endl;
+
+      l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      cout<<"IN CALLBACK. AFTER PARSE PAGE CONTROL. Status = "<<l_rc<<endl;
 
       /* Determine if the cookie is not empty, indicating there are more pages  *
        * for these search parameters                                            */
@@ -322,13 +327,14 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
         morePages = LDAP_TRUE;
         ber_bvfree(cookie);
         cookie = NULL;
-
+        cout<<"No more PAGES"<<endl;
 
         return;
       }
       else
       {
-        cout<<"DN = "<<l_dn<<"\n";
+        cout<<"There are some more pages"<<endl;
+        //cout<<"DN = "<<l_dn<<"\n";
         morePages = LDAP_FALSE;
       }
 
