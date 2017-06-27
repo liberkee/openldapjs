@@ -16,8 +16,8 @@ const dn = 'cn=admin,dc=demoApp,dc=com';
 const pass = 'secret';
 const searchBase = 'dc=demoApp,dc=com';
 const scope = 2;
-const filter = '(objectClass=inetOrgPers)';
-const pageSize = 100;
+const filter = '(cn=manager)';
+const pageSize = 1000;
 
 
 const ldap = new LDAPCLIENT(host);

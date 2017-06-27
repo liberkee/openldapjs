@@ -251,7 +251,7 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       int finished = 0;
       bool flagVerification = false;
       string resultSearch;
-      int i = 0, morePages, page_nbr;
+      int i = 0, morePages, page_nbr = 1;
       LDAPMessage *testVar = 0;
       int status = 0;
       int LDAP_FALSE = 0, LDAP_TRUE = 1;
@@ -302,9 +302,12 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
 
       cout<<"IN CALLBACK. BEFORE RESULT = "<<resultMsg<<endl;
       /* Parse the results to retrieve the controls being returned */
-      l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &p_control, LDAP_TRUE); 
+      l_rc = ldap_parse_result (ld, resultMsg, &l_errcode, NULL, NULL, NULL, &p_control, LDAP_FALSE); 
       cout<<"IN CALLBACK. AFTER RESULT = "<<resultMsg<<endl;
       cout<<"IN CALLBACK. Status Search = "<<l_rc<<endl;
+      string status = ldap_err2string(l_rc);
+      cout<<"IN CALLBACK. BEFORE PARSE PAGE CONTROL. TEXT = "<<status<<endl;
+
 
       if (cookie != NULL)
       {
@@ -314,11 +317,17 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
 
       /* Parse the page control returned to get the cookie and   *
        * determine whether there are more pages                  */
-      int state = ldap_start_tls_s(ld, NULL, NULL);
-      cout<<"TLS STATE = "<<state<<endl;
+      //int state = ldap_start_tls_s(ld, NULL, NULL);
+      //cout<<"TLS STATE = "<<state<<endl;
 
-      l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      l_rc = ldap_parse_page_control(ld, p_control, &totalCount, &cookie);
+      cout<<"NUMBER = "<<totalCount<<endl;
+
+      status = ldap_err2string(l_rc);
+      //int r = ldap_result2error(ld, resultMsg, 0);
       cout<<"IN CALLBACK. AFTER PARSE PAGE CONTROL. Status = "<<l_rc<<endl;
+      cout<<"IN CALLBACK. AFTER PARSE PAGE CONTROL. TEXT = "<<status<<endl;
+      //cout<<"IN CALLBACK. AFTER PARSE PAGE CONTROL. R= = "<<resultMsg<<endl;
 
       /* Determine if the cookie is not empty, indicating there are more pages  *
        * for these search parameters                                            */
@@ -327,13 +336,13 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
         morePages = LDAP_TRUE;
         ber_bvfree(cookie);
         cookie = NULL;
-        cout<<"No more PAGES"<<endl;
+        cout<<"There are more PAGES"<<endl;
 
         return;
       }
       else
       {
-        cout<<"There are some more pages"<<endl;
+        cout<<"There are no more pages"<<endl;
         //cout<<"DN = "<<l_dn<<"\n";
         morePages = LDAP_FALSE;
       }
@@ -343,6 +352,7 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       {
         ldap_controls_free(p_control);
         p_control = NULL;
+        cout<<"FREE CONTROL"<<endl;
       }
 
 
@@ -354,8 +364,11 @@ class LDAPSearchWithPaginationProgress : public AsyncProgressWorker {
       /* Disply the returned result                                     */
       /*                                                                */
       /* Determine how many entries have been found.                    */
-      if (morePages == LDAP_TRUE) 
-         printf("===== Page : %d =====\n", page_nbr);
+      if (morePages == LDAP_TRUE)
+      {
+         //printf("===== Page : %d =====\n", page_nbr);
+         cout<<"PRINTF!!!!!="<<page_nbr<<endl;
+      }
       l_entries = ldap_count_entries(ld, l_result);
     
       if (l_entries > 0)
