@@ -12,10 +12,27 @@ const filter = '(objectclass=*)';
 const dnCompare = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 const filterCompare = 'description';
 const value = 'cghitea@gmail.com';
+const MappingJsonToLdif = require('../modules/mappingJsonToLdif');
+
+const json = {
+  operation: 'replace',
+  modification: {
+    type: 'cn',
+    vals: ['foo', 'bar']
+  }
+}
+
+const map = new MappingJsonToLdif();
+map.changeToLdif(json)
+.then((res) => {
+  console.log(res);
+})
+.catch((err) => {
+  console.log(err);
+})
 
 
-
-newClient.initialize(host)
+/*newClient.initialize(host)
 .then((result) => {
   console.log(result);
   newClient.bind(dn,password)
@@ -43,4 +60,4 @@ newClient.initialize(host)
 })
 .catch((err) => {
   console.log(err);
-});
+});*/

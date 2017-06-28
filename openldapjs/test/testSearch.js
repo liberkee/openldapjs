@@ -185,6 +185,9 @@ describe('Testing the async LDAP search ', () => {
         count.should.be.above(10000);
       })
       .then(() => {
+        
+      })
+      .then(() => {
         next();
       });
   });
