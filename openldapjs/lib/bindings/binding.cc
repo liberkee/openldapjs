@@ -253,6 +253,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
+    Nan::SetPrototypeMethod(tpl, "del", del);
     
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());

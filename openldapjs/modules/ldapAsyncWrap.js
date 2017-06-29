@@ -127,6 +127,29 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
+   * ldap delete operation
+   * @param {String} dn the dn entry to be deleted.
+   * @param {String array} controls Optional controll aray parameter, can be NULL.
+   * @return {Promise} promise that resolves if the element provided was deleted or rejects if not.
+   */
+  del(dn, controls) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.BOUND) {
+        this._binding.del(dn, controls, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error('The Delete operation can be done just in BOUND state'));
+      }
+    });
+  }
+
+
+  /**
    * Compare operation.
    *
    * @method search
