@@ -480,6 +480,39 @@ class LDAPClient : public Nan::ObjectWrap {
     return;
   }
 
+  static NAN_METHOD(del) {
+    LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Local<Value> stateClient[2] = { Null(), Null()};
+    Nan::Utf8String dn(info[0]);
+    Nan::Utf8String controls(info[1]);
+
+    
+    char *ctrls = NULL;
+    char* dns = *dn;
+
+
+    Callback *callback = new Callback(info[2].As<Function>());
+
+    if (obj->ld == 0) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1,stateClient);
+      return;
+    }
+  
+  int result = ldap_delete(obj->ld,dns);
+
+  if(result == -1) {
+    stateClient[0] = Nan::New<Number>(0);
+    callback->Call(1,stateClient);
+    return;
+  }
+
+
+
+
+  }
+
   static inline Nan::Persistent<v8::Function> & constructor() {
     static Nan::Persistent<v8::Function> my_constructor;
     return my_constructor;
