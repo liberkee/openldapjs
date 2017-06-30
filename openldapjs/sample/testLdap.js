@@ -14,16 +14,59 @@ const filterCompare = 'description';
 const value = 'cghitea@gmail.com';
 const MappingJsonToLdif = require('../modules/mappingJsonToLdif');
 
-const json = {
-  operation: 'replace',
+
+const json1 = [];
+const attr = {
+  type:'',
+  vals:[]
+};
+
+attr.type='objectClass';
+attr.vals.push('foo');
+attr.vals.push('boo');
+const entry = {
+  dn:'',
   modification: {
-    type: 'cn',
-    vals: ['foo', 'bar']
+    type:'',
+    vals:[]
   }
-}
+};
+entry.dn = 'admin';
+entry.modification = attr;
+
+json1.push(entry);
+
+// 2
+attr.type='objectClass';
+attr.vals.push('foo2');
+attr.vals.push('boo2');
+entry.dn = 'admin2';
+entry.modification = attr;
+
+json1.push(entry);
+
+
+
+
+//console.log(json1);
+
+
+
+/*const json = {[
+  {
+    operation: 'replace',
+    modification: {
+      type: 'cn',
+      vals: ['foo', 'bar']
+    }
+  },
+  {
+    operation:''
+  }
+]}*/
 
 const map = new MappingJsonToLdif();
-map.changeToLdif(json)
+map.changeToLdif(json1)
 .then((res) => {
   console.log(res);
 })

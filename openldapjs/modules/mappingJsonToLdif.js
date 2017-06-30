@@ -42,6 +42,10 @@ module.exports = class MappingJsonToLdif {
                         resolve(res);
                     })
             } else {
+                this.addToLdif(jsonToChange)
+                    .then((res) => {
+                        resolve(res);
+                    })
                 reject(new Error('Invalid Operation'));
             }
         });
@@ -58,6 +62,10 @@ module.exports = class MappingJsonToLdif {
     addToLdif(json) {
         return new Promise((resolve, reject) => {
             let ldif = [];
+
+            json.forEach(function(element) {
+                console.log(element);
+            }, this);
 
             ldif.push(this._operations.LDAP_MOD_ADD);
             ldif.push(json.modification['type']);
