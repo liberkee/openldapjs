@@ -4,6 +4,8 @@
  * @module LDAPtranzition
  * @class MappingJsonToLdif
  */
+
+const Promise = require('bluebird');
 module.exports = class MappingJsonToLdif {
 
     constructor() {
@@ -18,35 +20,59 @@ module.exports = class MappingJsonToLdif {
     /**
     * Start the preparing of the LDIF for modify operations
     *
-    * @method changeToLdif
+    * @method modifyToLdif
     * @param {json} jsonToChange The JSON that contains all the required info to create the LDIF
     * @return {Promise} That resolves if the json has been parsed successfully the json.
     */
-    changeToLdif(jsonToChange) {
+   modifyToLdif(jsonToChange) {
         return new Promise((resolve, reject) => {
-            const operation = jsonToChange.operation;
+            let ldif = [];
+            let index = 0;
 
-            if (operation === 'add') {
-                this.addToLdif(jsonToChange)
-                    .then((res) => {
-                        resolve(res);
-                    })
-            } else if (operation === 'delete') {
-                this.deleteToLdif(jsonToChange)
-                    .then((res) => {
-                        resolve(res);
-                    })
-            } else if (operation === 'replace') {
-                this.replaceToLdif(jsonToChange)
-                    .then((res) => {
-                        resolve(res);
-                    })
+
+            if (jsonToChange !== null && this.checkJsonStructure(jsonToChange)) {
+                jsonToChange.entries.forEach(function(entry) {
+                    const operation = entry.operation;
+                    index++;
+                    
+                    if (operation === 'add') {
+                        this.addToLdif(entry.modification)
+                        .then((result) => {
+                            ldif.push(result);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        });
+                    } else if (operation === 'delete') {
+                        this.deleteToLdif(entry.modification)
+                        .then((result) => {
+                            ldif.push(result);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        })
+                    } else if (operation === 'replace') {
+                        this.replaceToLdif(entry.modification)
+                        .then((result) => {
+                            ldif.push(result);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        })
+                    };
+
+                    if (index === jsonToChange.entries.length) {
+                        resolve(ldif);
+                    }
+                    
+                }, this)
+
+                if (ldif.length === 0)
+                {
+                    reject(new Error('The passed JSON shall not be empty'));
+                }
             } else {
-                this.addToLdif(jsonToChange)
-                    .then((res) => {
-                        resolve(res);
-                    })
-                reject(new Error('Invalid Operation'));
+                reject(new Error('The passed JSON shall not be null or the structure is not as required'));
             }
         });
 
@@ -63,14 +89,10 @@ module.exports = class MappingJsonToLdif {
         return new Promise((resolve, reject) => {
             let ldif = [];
 
-            json.forEach(function(element) {
-                console.log(element);
-            }, this);
-
             ldif.push(this._operations.LDAP_MOD_ADD);
-            ldif.push(json.modification['type']);
+            ldif.push(json['type']);
 
-            const vals = json.modification['vals'];
+            let vals = json['vals'];
             vals.push(0);
             ldif.push(vals);
 
@@ -90,7 +112,7 @@ module.exports = class MappingJsonToLdif {
             let ldif = [];
 
             ldif.push(this._operations.LDAP_MOD_DELETE);
-            ldif.push(json.modification['type']);
+            ldif.push(json['type']);
             ldif.push(0);
 
             resolve(ldif);
@@ -109,14 +131,42 @@ module.exports = class MappingJsonToLdif {
             let ldif = [];
 
             ldif.push(this._operations.LDAP_MOD_REPLACE);
-            ldif.push(json.modification['type']);
+            ldif.push(json['type']);
 
-            const vals = json.modification['vals'];
+            let vals = json['vals'];
             vals.push(0);
             ldif.push(vals);
 
             resolve(ldif);
         });
+    }
+
+
+    checkJsonStructure(json) {
+        let result;
+        let hasEntry = false;
+        let hasOperation = true;
+        let hasModification = true;
+        if (json.hasOwnProperty('entries')) {
+            hasEntry = true;
+        }
+
+        if (hasEntry) {
+            json.entries.forEach(function(entry) {
+                if (!entry.hasOwnProperty('operation')) {
+                    hasOperation = false;
+                }
+                if (!entry.hasOwnProperty('modification')) {
+                    hasModification = false;
+                }
+
+            }, this);
+        }
+
+        result = hasEntry && hasOperation && hasModification;
+        console.log('result = ' + result);
+        return result; 
+        
     }
 }
 

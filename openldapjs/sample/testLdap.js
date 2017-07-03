@@ -15,58 +15,35 @@ const value = 'cghitea@gmail.com';
 const MappingJsonToLdif = require('../modules/mappingJsonToLdif');
 
 
-const json1 = [];
-const attr = {
-  type:'',
-  vals:[]
-};
 
-attr.type='objectClass';
-attr.vals.push('foo');
-attr.vals.push('boo');
-const entry = {
-  dn:'',
-  modification: {
-    type:'',
-    vals:[]
-  }
-};
-entry.dn = 'admin';
-entry.modification = attr;
-
-json1.push(entry);
-
-// 2
-attr.type='objectClass';
-attr.vals.push('foo2');
-attr.vals.push('boo2');
-entry.dn = 'admin2';
-entry.modification = attr;
-
-json1.push(entry);
-
-
-
-
-//console.log(json1);
-
-
-
-/*const json = {[
-  {
-    operation: 'replace',
-    modification: {
-      type: 'cn',
-      vals: ['foo', 'bar']
+const jsonToParse = {
+  entries: [
+    {
+      operation: 'add',
+      modification: {
+        type: 'objectClass',
+        vals: ['access1', 'access2']
+      }
+    },
+    {
+      operation: 'delete',
+      modification: {
+        type: 'objectClass',
+      }
+    },
+    {
+      operation: 'replace',
+      modification: {
+        type: 'anotherObjectClass',
+        vals: ['noAccess1', 'noAccess2']
+      }
     }
-  },
-  {
-    operation:''
-  }
-]}*/
+  ]
+}
+
 
 const map = new MappingJsonToLdif();
-map.changeToLdif(json1)
+map.modifyToLdif(jsonToParse)
 .then((res) => {
   console.log(res);
 })
