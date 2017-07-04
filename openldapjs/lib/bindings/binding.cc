@@ -43,7 +43,7 @@ class LDAPDeleteProgress : public AsyncProgressWorker {
           callback->Call(1, stateClient);
         }
         else {
-          stateClient[1] = Nan::New<Number>(2);
+          stateClient[1] = Nan::New<Number>(0);
           callback->Call(2, stateClient);
         }
       }
@@ -541,8 +541,8 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String controls(info[1]);
 
     
-    char *ctrls = NULL;
     char* dns = *dn;
+    int msgID;
 
 
     Callback *callback = new Callback(info[2].As<Function>());
@@ -554,15 +554,15 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
   
-  int result = ldap_delete(obj->ld,dns);
+  int result = ldap_delete_ext(obj->ld,dns,NULL,NULL,&msgID);
 
-  if(result == -1) {
+  if(result != 0) {
     stateClient[0] = Nan::New<Number>(0);
     callback->Call(1,stateClient);
     return;
   }
 
-   AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, obj->msgid));  
+   AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, msgID));  
 
 
 

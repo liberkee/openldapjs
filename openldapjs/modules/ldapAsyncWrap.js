@@ -10,7 +10,7 @@ const Promise = require('bluebird');
  */
 module.exports = class LDAPWrapAsync {
 
-  constructor(host, password) {
+  constructor(host) {
     this._hostAdress = host;
     this._E_STATES = {
       CREATED: 0,
@@ -45,6 +45,7 @@ module.exports = class LDAPWrapAsync {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
+                console.log('startTLS failed'+errTls);
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
@@ -52,6 +53,7 @@ module.exports = class LDAPWrapAsync {
               }
             });
           } else {
+            console.log('initialize failed'+ err);
             reject(err);
           }
         });

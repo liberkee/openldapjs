@@ -1,7 +1,7 @@
 'use strict';
 
 const LDAPCLIENT = require('../modules/ldapAsyncWrap.js');
-const newClient = new LDAPCLIENT();
+
  
 const host = 'ldap://localhost:389';
 const dn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
@@ -12,16 +12,17 @@ const filter = '(objectclass=*)';
 const dnCompare = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 const filterCompare = 'description';
 const value = 'cghitea@gmail.com';
+const newClient = new LDAPCLIENT(host);
 
 
 
-newClient.initialize(host)
+newClient.initialize()
 .then((result) => {
   //console.log(result);
   newClient.bind("cn=admin,dc=demoApp,dc=com",password)
   .then((result) => {
     //console.log(result);
-    newClient.del("ou=template2,dc=demoApp,dc=com",[])
+    newClient.del("ou=template3,dc=demoApp,dc=com",[])
     .then((result) => {
       console.log("delete result is:" + result);
     })
@@ -38,10 +39,10 @@ newClient.initialize(host)
     });*/
   })
   .catch((err) => {
-    console.log(err);
+    console.log('binding error'+err);
   });
 })
 .catch((err) => {
-  console.log(err); 
+  console.log('initialize error'+err); 
 });
  
