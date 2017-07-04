@@ -43,6 +43,17 @@ const jsonMultipleEntries = {
 const emptyJson = {
   entries: []
 };
+const incorrectOperationJson = {
+  entries: [
+    {
+      operation: 'exchange',
+      modification: {
+        type: 'objectClass',
+        vals: ['access1', 'access2']
+      }
+    }
+  ]
+}
 
   // const for comparing results
   const resJsonOneEntry = [[0, 'objectClass', ['access1', 'access2', 0]]];
@@ -52,7 +63,7 @@ const emptyJson = {
 
   const resEmptyError = 'The passed JSON shall not be empty';
   const resNullError = 'The passed JSON shall not be null or the structure is not as required';
-                              
+  const resInvOperation = 'The selected operation is invalid';                      
 
   beforeEach((next) => {
     mappingJsonToLdif = new MappingJsonToLdif();
@@ -106,5 +117,12 @@ const emptyJson = {
     });
   });
 
+    it ('should handle error if operation is incorrect', (next) => {
+    mappingJsonToLdif.modifyToLdif(incorrectOperationJson)
+    .catch((err) => {
+      should.deepEqual(err.message, resInvOperation);
+      next();
+    });
+  });
 
 });

@@ -22,7 +22,7 @@
   "scripts": {
     "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testMappingJsonToLdif.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./test/testMappingJsonToLdif.js",
+    "lint": "eslint ./modules/mappingJsonToLdif.js",
     "install": "node-gyp rebuild"
   },
   "author": "",
