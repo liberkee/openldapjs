@@ -9,6 +9,59 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
+class LDAPDeleteProgress : public AsyncProgressWorker {
+    private:
+      LDAP *ld;
+      Callback *progress;
+      int result = 0;
+      LDAPMessage *resultMsg;
+      int msgID;
+    public:
+      LDAPDeleteProgress(Callback *callback, Callback * progress, LDAP *ld, int msgID)
+        : AsyncProgressWorker(callback),progress(progress), ld(ld),msgID(msgID){
+
+        }
+     //Executes in worker thread
+    void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
+      struct timeval timeOut = {0, 1};
+      while(result == 0) {
+        result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
+      }
+    }
+
+    void HandleOKCallback() {
+      Local<Value> stateClient[2] = {Null(), Null()};
+        if (result == -1) {
+        stateClient[0] = Nan::New<Number>(0);
+        callback->Call(1, stateClient);
+      }
+      else {
+        int status = ldap_result2error(ld, resultMsg, 0);
+        if(status != LDAP_SUCCESS) {
+          stateClient[0] = Nan::New<Number>(status);
+          callback->Call(1, stateClient);
+        }
+        else {
+          stateClient[1] = Nan::New<Number>(2);
+          callback->Call(2, stateClient);
+        }
+      }
+    }
+    
+    void HandleProgressCallback(const char *data, size_t size) {
+        // Required, this is not created automatically 
+        Nan::HandleScope scope; 
+        Local<Value> argv[] = {
+            New<v8::Number>(*reinterpret_cast<int*>(const_cast<char*>(data)))
+        };
+        progress->Call(1, argv);
+    }
+      
+    };  
+
+
+
 class LDAPBindProgress : public AsyncProgressWorker {
     private:
       LDAP *ld;
@@ -493,6 +546,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
 
     Callback *callback = new Callback(info[2].As<Function>());
+    Callback *progress = new Callback(info[3].As<v8::Function>());
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
@@ -507,6 +561,8 @@ class LDAPClient : public Nan::ObjectWrap {
     callback->Call(1,stateClient);
     return;
   }
+
+   AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, obj->msgid));  
 
 
 

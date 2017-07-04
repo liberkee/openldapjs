@@ -17,30 +17,31 @@ const value = 'cghitea@gmail.com';
 
 newClient.initialize(host)
 .then((result) => {
-  console.log(result);
-  newClient.bind(dn,password)
+  //console.log(result);
+  newClient.bind("cn=admin,dc=demoApp,dc=com",password)
   .then((result) => {
-    console.log(result);
-    newClient.search(base, scope, filter)
+    //console.log(result);
+    newClient.del("ou=template2,dc=demoApp,dc=com",[])
     .then((result) => {
-      console.log(result);
+      console.log("delete result is:" + result);
     })
     .catch((err) => {
-      console.log(err);
+      console.log('xx='+err);
     });
-
+/*
     newClient.compare(dnCompare, filterCompare, value)
     .then((result) => {
       console.log(result);
     })
     .catch((err) => {
       console.log(err);
-    });
+    });*/
   })
   .catch((err) => {
     console.log(err);
   });
 })
 .catch((err) => {
-  console.log(err);
+  console.log(err); 
 });
+ 
