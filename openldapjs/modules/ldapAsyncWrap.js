@@ -149,6 +149,28 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
+/**
+ * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example';
+ * @param{Object} entry ldif format to be added, needs to have a structure that is mappable to a LDAPMod structure
+ * @param{Object} controls client& sever controls, OPTIONAL parameter
+ */
+  add(dn, entry, controls) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.BOUND) {
+        let entryLdif; //= entry.toLdif(); 
+        this._binding.add(dn, entryLdif, controls, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error('The add operation can be done just in BOUND state'));
+      }
+    });
+  }
+
 
 
   /**
