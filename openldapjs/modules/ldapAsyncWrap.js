@@ -153,12 +153,48 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
+
+  /**
+    * Perform an LDAP modify operation
+    *
+    * @method modify
+    * @param{string} dn The dn of the entry to modify
+    * @param{object} mods An array that contains the fields that shall be changed
+    * @return {Promise} That resolves if LDAP modified successfully the entry.
+    * Reject if the LDAP rejects the operation or the client's state is not BOUND
+    */
+  modify() {
+    return new Promise ((resolve, reject) => {
+      const x1 = {
+        type: 'newType',
+        vals: [1, 5, 12],
+      }
+
+      const x2 = JSON.stringify(x1);
+
+      if (this._stateClient === this._E_STATES.BOUND) {
+        this._binding.modify(x2, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        })
+      } else {
+        reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
+      }
+    })
+  }
+
+
+
+
   /**
     * Unbind from a LDAP server.
     *
     * @method unbind
-    * @return {Promise} That resolves if the LDAP structure was initialized.
-    * Reject if the LDAP structure was not set or initialized.
+    * @return {Promise} That resolves if the LDAP structure was unbound.
+    * Reject if the LDAP was not unbound.
     */
   unbind() {
     return new Promise((resolve, reject) => {

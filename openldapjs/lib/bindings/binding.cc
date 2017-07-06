@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <node.h>
 
 using namespace Nan;
 using namespace v8;
@@ -293,6 +294,7 @@ public:
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
+    Nan::SetPrototypeMethod(tpl, "modify", modify);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -325,6 +327,34 @@ private:
       v8::Local<v8::Function> cons = Nan::New(constructor());
       info.GetReturnValue().Set(cons->NewInstance(argc, argv));
     }
+  }
+
+  static NAN_METHOD(modify) 
+  {
+      LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+      //v8::Local<v8::String> json_string = Nan::New("{ \"JSON\": \"object\" }").ToLocalChecked();
+      //Nan::Utf8String json_string(info[0]);
+
+      //v8::String::Utf8Value json (info[0]->ToString());
+      //v8::Local<v8::String> json_parse(json->ToString());
+      Nan::MaybeLocal<v8::String> json_parse = Nan::To<v8::String>(info[0]);
+
+      //std::string foo = std::string(*json);
+
+      //v8::String json_string = v8::String(info[0]);
+
+      v8::JSON NanJSON;
+      v8::MaybeLocal<v8::Value> result = NanJSON.Parse(json_parse.ToLocalChecked());
+      if (!result.IsEmpty()) {
+        v8::Local<v8::Value> val = result.ToLocalChecked();
+        cout<<"ITE< = "<<val[1]<<endl;
+      }
+    //Local<Array> json = info[0]->ToObject();
+    
+    //v8::Handle<v8::Context> context = v8::Context::GetCurrent();
+    //v8::Handle<v8::Object> global = context->Global();
+    //v8::Handle<v8::Value> jsonValue = global->Get(v8::String::New("JSON"));
+    //v8::JSON rez = v8::JSON::Parse(info[0]->ToObject());
   }
 
   static NAN_METHOD(initialize)
