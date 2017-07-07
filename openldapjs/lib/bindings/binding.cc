@@ -333,21 +333,29 @@ private:
   {
       LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
       //v8::Local<v8::String> json_string = Nan::New("{ \"JSON\": \"object\" }").ToLocalChecked();
-      //Nan::Utf8String json_string(info[0]);
+      Nan::Utf8String test(info[0]);
 
       //v8::String::Utf8Value json (info[0]->ToString());
       //v8::Local<v8::String> json_parse(json->ToString());
       Nan::MaybeLocal<v8::String> json_parse = Nan::To<v8::String>(info[0]);
 
+      //String::Utf8Value xxx(json_parse);
+      //cout<<"xxx ="<<xxx<<endl;
+
+      char *x1 = *test;
+      cout<<"x="<<x1<<endl;
+
+      //char *username = *userArg;
+
       //std::string foo = std::string(*json);
 
       //v8::String json_string = v8::String(info[0]);
 
-      v8::JSON NanJSON;
-      v8::MaybeLocal<v8::Value> result = NanJSON.Parse(json_parse.ToLocalChecked());
+      Nan::JSON NanJSON;
+      Nan::MaybeLocal<v8::Value> result = NanJSON.Parse(json_parse.ToLocalChecked());
       if (!result.IsEmpty()) {
         v8::Local<v8::Value> val = result.ToLocalChecked();
-        cout<<"ITE< = "<<val[1]<<endl;
+        //cout<<"ITE< = "<<val.type<endl;
       }
     //Local<Array> json = info[0]->ToObject();
     

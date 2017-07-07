@@ -171,6 +171,7 @@ module.exports = class LDAPWrapAsync {
       }
 
       const x2 = JSON.stringify(x1);
+      //console.log()
 
       if (this._stateClient === this._E_STATES.BOUND) {
         this._binding.modify(x2, (err, result) => {

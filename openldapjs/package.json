@@ -13,7 +13,7 @@
     "eslint-plugin-jsx-a11y": "^3.0.2",
     "eslint-plugin-react": "^6.9.0",
     "html-pdf": "^2.1.0",
-    "nan": "^2.5.0",
+    "nan": "^2.6.0",
     "nodemon": "^1.10.2",
     "nunjucks": "^2.4.2",
     "promise": "^7.1.1",
