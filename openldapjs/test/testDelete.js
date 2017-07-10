@@ -30,7 +30,7 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-  //trying to delete with an invalid dn syntax
+  //trying to delete with an invalid dn syntax => ldap error code 34
   it('should reject the request with invalidDN error code', (next) => {
     clientLDAP.del('garbage')
       .catch((err) => {

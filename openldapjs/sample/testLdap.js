@@ -16,33 +16,23 @@ const newClient = new LDAPCLIENT(host);
 
 
 
-newClient.initialize()
-.then((result) => {
-  //console.log(result);
-  newClient.bind("cn=admin,dc=demoApp,dc=com",password)
-  .then((result) => {
-    //console.log(result);
-    newClient.del("ou=template3,dc=demoApp,dc=com",[])
-    .then((result) => {
-      console.log("delete result is:" + result);
-    })
-    .catch((err) => {
-      console.log('xx='+err);
-    });
-/*
-    newClient.compare(dnCompare, filterCompare, value)
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });*/
-  })
-  .catch((err) => {
-    console.log('binding error'+err);
-  });
-})
-.catch((err) => {
-  console.log('initialize error'+err); 
-});
- 
+let entry = {
+  cn: 'foo',
+  sn: 'bar',
+  email: ['foobar@bla.com','foo2bar@blabla.com'],
+  objectClass: 'test'
+};
+
+let string = JSON.stringify(entry);
+
+
+console.log(string);
+let bla = Object.keys( entry);
+
+console.log(bla);
+
+for(const key of bla) {
+  console.log(entry[key]);
+}
+
+//console.log(entry);

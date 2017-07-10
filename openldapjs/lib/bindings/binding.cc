@@ -543,6 +543,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     
     char* dns = *dn;
+    cout<<dns<<endl;
     int msgID;
 
 
@@ -569,7 +570,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
 
   }
-
+/*
    static NAN_METHOD(add) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
@@ -609,7 +610,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
 
 
-  }
+  } */
 
   static inline Nan::Persistent<v8::Function> & constructor() {
     static Nan::Persistent<v8::Function> my_constructor;
