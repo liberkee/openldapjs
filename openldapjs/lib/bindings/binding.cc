@@ -142,7 +142,7 @@ public:
 
     case 0:
       finished = 1;
-      if (resultMsg != NULL)
+      if (resultMsg  
       {
         ldap_msgfree(resultMsg);
       }
@@ -332,18 +332,35 @@ private:
   static NAN_METHOD(modify) 
   {
       LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+      Local<Array> x2 = Local<Array>::Cast(info[0]);
+      v8::String::Utf8Value x5(x2->Get(3));
+      char *xx1 = *x5;
+      
+      
+      cout<<"REZZ = "<<xx1<<endl;
+
+
+      //cout<<"REZ = "<<x2[1]<<endl;
+
+      //unsigned int num_locations = x2->Length;
+      
+      //for (unsigned int i = 0; i<3; i++) {
+      //  Local<Object>::Cast(x2->Get(i));
+      //}
+
+
       //v8::Local<v8::String> json_string = Nan::New("{ \"JSON\": \"object\" }").ToLocalChecked();
-      Nan::Utf8String test(info[0]);
+      //Nan::Utf8String test(info[0]);
 
       //v8::String::Utf8Value json (info[0]->ToString());
       //v8::Local<v8::String> json_parse(json->ToString());
-      Nan::MaybeLocal<v8::String> json_parse = Nan::To<v8::String>(info[0]);
+      //Nan::MaybeLocal<v8::String> json_parse = Nan::To<v8::String>(info[0]);
 
       //String::Utf8Value xxx(json_parse);
       //cout<<"xxx ="<<xxx<<endl;
 
-      char *x1 = *test;
-      cout<<"x="<<x1<<endl;
+      //char *x1 = *test;
+      //cout<<"x="<<x1<<endl;
 
       //char *username = *userArg;
 
@@ -351,12 +368,12 @@ private:
 
       //v8::String json_string = v8::String(info[0]);
 
-      Nan::JSON NanJSON;
-      Nan::MaybeLocal<v8::Value> result = NanJSON.Parse(json_parse.ToLocalChecked());
-      if (!result.IsEmpty()) {
-        v8::Local<v8::Value> val = result.ToLocalChecked();
+      //Nan::JSON NanJSON;
+      //Nan::MaybeLocal<v8::Value> result = NanJSON.Parse(json_parse.ToLocalChecked());
+      //if (!result.IsEmpty()) {
+      //  v8::Local<v8::Value> val = result.ToLocalChecked();
         //cout<<"ITE< = "<<val.type<endl;
-      }
+      //}
     //Local<Array> json = info[0]->ToObject();
     
     //v8::Handle<v8::Context> context = v8::Context::GetCurrent();

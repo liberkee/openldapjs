@@ -166,15 +166,26 @@ module.exports = class LDAPWrapAsync {
   modify() {
     return new Promise ((resolve, reject) => {
       const x1 = {
-        type: 'newType',
-        vals: [1, 5, 12],
+        sn: 'newType',
+        objectClass: [1, 5, 12],
       }
 
-      const x2 = JSON.stringify(x1);
+      //const x2 = JSON.stringify(x1);
       //console.log()
 
       if (this._stateClient === this._E_STATES.BOUND) {
-        this._binding.modify(x2, (err, result) => {
+        const keys = Object.keys(x1);
+        const res = [];
+        for(const elem of keys) {
+          res.push(elem);
+          res.push(x1[elem]);
+        }
+
+        //console.log(res);
+
+
+
+        this._binding.modify(res, (err, result) => {
           if (err) {
             reject(new Error(err));
           } else {

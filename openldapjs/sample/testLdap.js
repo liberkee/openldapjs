@@ -41,7 +41,7 @@ function search() {
     });
 }
 
-
+//node testLdap.js modify "ldap://10.16.0.194:389" "cn=admin,dc=demoApp,dc=com" "secret" 
 function modify() {
   const host = process.argv[3];
   const dnUser = process.argv[4];
