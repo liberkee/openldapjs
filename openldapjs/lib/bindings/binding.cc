@@ -142,7 +142,7 @@ public:
 
     case 0:
       finished = 1;
-      if (resultMsg  
+      if (resultMsg)  
       {
         ldap_msgfree(resultMsg);
       }
@@ -158,7 +158,7 @@ public:
         resultLocal += "\n";
       }
 
-      // You have to implement the attribute side
+      // You have to implement the attribute sideasv
       entry = ldap_first_entry(ld, resultMsg);
       for (attribute = ldap_first_attribute(ld, entry, &ber);
            attribute != NULL;
@@ -333,7 +333,7 @@ private:
   {
       LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
       Local<Array> x2 = Local<Array>::Cast(info[0]);
-      v8::String::Utf8Value x5(x2->Get(3));
+      Nan::Utf8String x5(x2->Get(3));
       char *xx1 = *x5;
       
       
