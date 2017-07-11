@@ -633,25 +633,37 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String controls(info[2]);
 
      int length = entries->Length();
-     LDAPMod *newEntries[length];
-     
-     for(int i = 0; i < length; i++){
+     LDAPMod *newEntries[length/2];
+     LDAPMod newEntry;
+     int j =0;
+     for(int i = 0;i < length; i++){
         Nan::Utf8String type(entries->Get(i));
         char *curentType = *type;
         Nan::Utf8String value(entries->Get(i+1));
         char *curentValue = *value;
         //cout<<"bla:"<<curent<<endl;
 
-        LDAPMod newEntry;
+        
         char *newValues[] = {curentValue,NULL};
         newEntry.mod_op = LDAP_MOD_ADD;
         newEntry.mod_type = curentType;
         newEntry.mod_values = newValues;
 
-        newEntries[i] = &newEntry;
+        newEntries[j] = &newEntry;
+       
+       // ldap_mods_free(newEntry,0);
+        i++;
+        j++;
+        cout<<"j is:"<<j<<endl;
 
      }
-  
+ cout<<"length is:"<<length/2<<endl;
+     newEntries[j] = NULL;
+/*
+     cout<<"entry1:"<<newEntries[0]->mod_vals;
+     cout<<"entry2:"<<newEntries[1]->mod_vals;
+     cout<<"entry3:"<<newEntries[2]->mod_vals;
+  */
 
    
 
