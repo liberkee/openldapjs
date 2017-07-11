@@ -23,16 +23,19 @@ let entry = {
   objectClass: 'test'
 };
 
-let string = JSON.stringify(entry);
+newClient.initialize()
+  .then( () => {
+  newClient.bind('cn=admin,dc=demoApp,dc=com','secret')
+    .then( () => {
+      newClient.add('cn=admin,dc=demoApp,dc=com',entry,[])
+        .then( (result) => {
 
+        }).catch( (err) => {
+          console.log(err);
+        })
+    })
 
-console.log(string);
-let bla = Object.keys( entry);
+  })
 
-console.log(bla);
-
-for(const key of bla) {
-  console.log(entry[key]);
-}
 
 //console.log(entry);

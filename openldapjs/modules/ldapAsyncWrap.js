@@ -157,8 +157,16 @@ module.exports = class LDAPWrapAsync {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
-        let entryLdif; //= entry.toLdif(); 
-        this._binding.add(dn, entryLdif, controls, (err, result) => {
+        const keys = Object.keys(entry);
+        const entryArray = [];
+
+        for( const elem of keys) {
+          entryArray.push(elem);
+          entryArray.push(entry[elem]);
+        }
+
+
+        this._binding.add(dn, entryArray, controls, (err, result) => {
           if (err) {
             reject(new Error(err));
           } else {

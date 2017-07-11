@@ -9,6 +9,57 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
+class LDAPAddProgress : public AsyncProgressWorker {
+    private:
+      LDAP *ld;
+      Callback *progress;
+      int result = 0;
+      LDAPMessage *resultMsg;
+      int msgID;
+    public:
+      LDAPAddProgress(Callback *callback, Callback * progress, LDAP *ld, int msgID)
+        : AsyncProgressWorker(callback),progress(progress), ld(ld),msgID(msgID){
+
+        }
+     //Executes in worker thread
+    void Execute(const AsyncProgressWorker::ExecutionProgress& progress) {
+      struct timeval timeOut = {0, 1};
+      while(result == 0) {
+        result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+        progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
+      }
+    }
+
+    void HandleOKCallback() {
+      Local<Value> stateClient[2] = {Null(), Null()};
+        if (result == -1) {
+        stateClient[0] = Nan::New<Number>(0);
+        callback->Call(1, stateClient);
+      }
+      else {
+        int status = ldap_result2error(ld, resultMsg, 0);
+        if(status != LDAP_SUCCESS) {
+          stateClient[0] = Nan::New<Number>(status);
+          callback->Call(1, stateClient);
+        }
+        else {
+          stateClient[1] = Nan::New<Number>(0);
+          callback->Call(2, stateClient);
+        }
+      }
+    }
+    
+    void HandleProgressCallback(const char *data, size_t size) {
+        // Required, this is not created automatically 
+        Nan::HandleScope scope; 
+        Local<Value> argv[] = {
+            New<v8::Number>(*reinterpret_cast<int*>(const_cast<char*>(data)))
+        };
+        progress->Call(1, argv);
+    }
+      
+    };  
+
 class LDAPDeleteProgress : public AsyncProgressWorker {
     private:
       LDAP *ld;
@@ -307,6 +358,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
     Nan::SetPrototypeMethod(tpl, "del", del);
+    Nan::SetPrototypeMethod(tpl, "add", add);
     
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -543,7 +595,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     
     char* dns = *dn;
-    cout<<dns<<endl;
+   
     int msgID;
 
 
@@ -570,17 +622,39 @@ class LDAPClient : public Nan::ObjectWrap {
 
 
   }
-/*
+
    static NAN_METHOD(add) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-     LDAPMod modStructure;
-
-
+    
+    
+    Local<Array> entries = Local<Array>::Cast(info[1]);
     Local<Value> stateClient[2] = { Null(), Null()};
     Nan::Utf8String dn(info[0]);
     Nan::Utf8String controls(info[2]);
-    Nan::Utf8String entryValues(info[1]);
+
+     int length = entries->Length();
+     LDAPMod *newEntries[length];
+     
+     for(int i = 0; i < length; i++){
+        Nan::Utf8String type(entries->Get(i));
+        char *curentType = *type;
+        Nan::Utf8String value(entries->Get(i+1));
+        char *curentValue = *value;
+        //cout<<"bla:"<<curent<<endl;
+
+        LDAPMod newEntry;
+        char *newValues[] = {curentValue,NULL};
+        newEntry.mod_op = LDAP_MOD_ADD;
+        newEntry.mod_type = curentType;
+        newEntry.mod_values = newValues;
+
+        newEntries[i] = &newEntry;
+
+     }
+  
+
+   
+
 
 
     
@@ -596,8 +670,10 @@ class LDAPClient : public Nan::ObjectWrap {
       callback->Call(1,stateClient);
       return;
     }
-  
-  int result = ldap_add_ext(obj->ld,dns,modStructure,NULL,NULL,&msgID);
+  cout<<"before"<<endl;
+  int result = ldap_add_ext(obj->ld,dns,newEntries,NULL,NULL,&msgID);
+
+  cout<<"after ldap_add: "<<result<<endl;
 
   if(result != 0) {
     stateClient[0] = Nan::New<Number>(0);
@@ -605,12 +681,12 @@ class LDAPClient : public Nan::ObjectWrap {
     return;
   }
 
-   AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID));  
+  AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID));  
 
 
 
 
-  } */
+  } 
 
   static inline Nan::Persistent<v8::Function> & constructor() {
     static Nan::Persistent<v8::Function> my_constructor;
