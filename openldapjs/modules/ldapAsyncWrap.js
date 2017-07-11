@@ -163,35 +163,26 @@ module.exports = class LDAPWrapAsync {
     * @return {Promise} That resolves if LDAP modified successfully the entry.
     * Reject if the LDAP rejects the operation or the client's state is not BOUND
     */
-  modify() {
+  modify(dn, json) {
     return new Promise ((resolve, reject) => {
-      const x1 = {
-        sn: 'newType',
-        objectClass: [1, 5, 12],
-      }
-
-      //const x2 = JSON.stringify(x1);
-      //console.log()
-
       if (this._stateClient === this._E_STATES.BOUND) {
-        const keys = Object.keys(x1);
+        const entry = json.modification;
+        const keys = Object.keys(entry);
         const res = [];
         for(const elem of keys) {
           res.push(elem);
           res.push(x1[elem]);
         }
 
-        //console.log(res);
+        if(json.operation === 'add') {
 
+        } else if (json.operation === 'delete') {
 
-
-        this._binding.modify(res, (err, result) => {
-          if (err) {
-            reject(new Error(err));
-          } else {
-            resolve(result);
-          }
-        })
+        } else if (json.operation === 'replace') {
+          // Not implemented
+        } else {
+          reject(new Error('Invalid Operation'));
+        }
       } else {
         reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
       }
