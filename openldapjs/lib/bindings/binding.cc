@@ -632,38 +632,39 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String dn(info[0]);
     Nan::Utf8String controls(info[2]);
 
-     int length = entries->Length();
-     LDAPMod *newEntries[length/2];
-     LDAPMod newEntry;
-     int j =0;
-     for(int i = 0;i < length; i++){
-        Nan::Utf8String type(entries->Get(i));
-        char *curentType = *type;
-        Nan::Utf8String value(entries->Get(i+1));
-        char *curentValue = *value;
-        //cout<<"bla:"<<curent<<endl;
+    int length = entries->Length();
+    LDAPMod *newEntries[length/2+1];
+         
+    int j =0;
+    for(int i = 0;i < length / 2; i++){
+      Nan::Utf8String type(entries->Get(2 * i));
+      Nan::Utf8String value(entries->Get(2 * i + 1));
 
-        
-        char *newValues[] = {curentValue,NULL};
-        newEntry.mod_op = LDAP_MOD_ADD;
-        newEntry.mod_type = curentType;
-        newEntry.mod_values = newValues;
+      newEntries[i] = (LDAPMod *)malloc(sizeof(LDAPMod));
+      newEntries[i]->mod_op = LDAP_MOD_ADD;
+      memcpy(newEntries[i]->mod_type, *type, sizeof(*type));
+      newEntries[i]->mod_values = (char**)malloc(2 * sizeof(char*));
+      char **vals = newEntries[i]->mod_values;
+      memcpy(vals[0], *value, sizeof(*value));
 
-        newEntries[j] = &newEntry;
-       
-       // ldap_mods_free(newEntry,0);
-        i++;
-        j++;
-        cout<<"j is:"<<j<<endl;
+      memcpy(newEntries[i]->mod_values, *value, sizeof(*value));
 
-     }
+      cout << "struct addr" << newEntries[i] << endl;
+      cout << "mod_values addr" << &newEntries[i]->mod_values << endl;
+      //cout << "vals addr" << vals << endl;
+      //cout << "vals size" << sizeof(vals) << endl;
+    }
+
  cout<<"length is:"<<length/2<<endl;
-     newEntries[j] = NULL;
-/*
-     cout<<"entry1:"<<newEntries[0]->mod_vals;
-     cout<<"entry2:"<<newEntries[1]->mod_vals;
-     cout<<"entry3:"<<newEntries[2]->mod_vals;
-  */
+   //  newEntries[j] = NULL;
+
+   for(int i = 0; i < length/2; i++){
+     cout<<"op: "<<newEntries[i]->mod_op<<endl;
+     cout<<"type: "<<newEntries[i]->mod_type<<endl;
+     cout<<"val:"<<newEntries[i]->mod_values[0]<<endl;
+   }
+
+  
 
    
 
