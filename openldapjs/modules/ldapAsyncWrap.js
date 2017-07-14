@@ -171,13 +171,26 @@ module.exports = class LDAPWrapAsync {
         const res = [];
         for(const elem of keys) {
           res.push(elem);
-          res.push(x1[elem]);
+          res.push(entry[elem]);
         }
+        console.log(res);
 
         if(json.operation === 'add') {
-
+          this._binding.add(dn, res, [])
+          .then((result) => {
+            resolve(result);
+          })
+          .catch((error) => {
+            reject(new Error(err));
+          })
         } else if (json.operation === 'delete') {
-
+          this._binding.del(dn, [])
+          .then((result) => {
+            resolve(result);
+          })
+          .catch((error) => {
+            reject(new Error(error));
+          })
         } else if (json.operation === 'replace') {
           // Not implemented
         } else {
