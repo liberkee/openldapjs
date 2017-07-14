@@ -655,15 +655,6 @@ class LDAPClient : public Nan::ObjectWrap {
   }
   newEntries[length/2] = NULL;
 
-  cout<<"length is:"<<length/2<<endl;
-
-
-  for(int i = 0; i < length/2; i++){
-     cout<<"op: "<<newEntries[i]->mod_op<<endl;
-     cout<<"type: "<<newEntries[i]->mod_type<<endl;
-     cout<<"val:"<<newEntries[i]->mod_values[0]<<endl;
-   }
-   cout<<"LAST NULL = "<<newEntries[3]<<endl;
 
     
     char* dns = *dn;
@@ -679,10 +670,8 @@ class LDAPClient : public Nan::ObjectWrap {
       callback->Call(1,stateClient);
       return;
     }
-  cout<<"before"<<endl;
   int result = ldap_add_ext(obj->ld,dns,newEntries,NULL,NULL,&msgID);
   ldap_mods_free(newEntries, 0);
-  cout<<"after ldap_add: "<<result<<endl;
 
   if(result != 0) {
     stateClient[0] = Nan::New<Number>(0);

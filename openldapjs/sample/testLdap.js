@@ -17,7 +17,7 @@ const newClient = new LDAPCLIENT(host);
 
 
 let entry = {
-  objectClass: 'inetOrgPersonz',
+  objectClass: 'inetOrgPerson',
   sn: 'Entryz',
   description: 'Testz'
 };
@@ -27,7 +27,7 @@ newClient.initialize()
     newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret')
       .then(() => {
 
-        newClient.add('cn=newPointChild0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry, [])
+        newClient.add('cn=newPointChildBLABLA5,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry, [])
           .then((result) => {
 
           }).catch((err) => {
