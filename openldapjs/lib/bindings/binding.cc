@@ -26,6 +26,8 @@ class LDAPAddProgress : public AsyncProgressWorker {
       struct timeval timeOut = {0, 1};
       while(result == 0) {
         result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+        //int status = ldap_result2error(ld, resultMsg, 0);
+        //cout<<"RES STATUS = "<<status<<endl;
         progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
       }
     }
@@ -38,6 +40,7 @@ class LDAPAddProgress : public AsyncProgressWorker {
       }
       else {
         int status = ldap_result2error(ld, resultMsg, 0);
+        cout<<"AFTER STATUS = "<<status<<endl;
         if(status != LDAP_SUCCESS) {
           stateClient[0] = Nan::New<Number>(status);
           callback->Call(1, stateClient);
@@ -641,38 +644,31 @@ class LDAPClient : public Nan::ObjectWrap {
       Nan::Utf8String value(entries->Get(2 * i + 1));
 
       newEntries[i] = (LDAPMod *)malloc(sizeof(LDAPMod));
-      newEntries[i]->mod_op = LDAP_MOD_ADD;
-      memcpy(newEntries[i]->mod_type, *type, sizeof(*type));
+      newEntries[i]->mod_type = (char*)malloc(sizeof(char) * (strlen(*type) + 1));
       newEntries[i]->mod_values = (char**)malloc(2 * sizeof(char*));
-      char **vals = newEntries[i]->mod_values;
-      memcpy(vals[0], *value, sizeof(*value));
+      newEntries[i]->mod_values[0] = (char*)malloc(sizeof(char) * (strlen(*value) + 1));
+      
+      newEntries[i]->mod_op = LDAP_MOD_ADD;
+      memcpy(newEntries[i]->mod_type, *type, strlen(*type) + 1);
+      memcpy(newEntries[i]->mod_values[0], *value, strlen(*value) + 1);
+      newEntries[i]->mod_values[1] = NULL;
+  }
+  newEntries[length/2] = NULL;
 
-      memcpy(newEntries[i]->mod_values, *value, sizeof(*value));
+  cout<<"length is:"<<length/2<<endl;
 
-      cout << "struct addr" << newEntries[i] << endl;
-      cout << "mod_values addr" << &newEntries[i]->mod_values << endl;
-      //cout << "vals addr" << vals << endl;
-      //cout << "vals size" << sizeof(vals) << endl;
-    }
 
- cout<<"length is:"<<length/2<<endl;
-   //  newEntries[j] = NULL;
-
-   for(int i = 0; i < length/2; i++){
+  for(int i = 0; i < length/2; i++){
      cout<<"op: "<<newEntries[i]->mod_op<<endl;
      cout<<"type: "<<newEntries[i]->mod_type<<endl;
      cout<<"val:"<<newEntries[i]->mod_values[0]<<endl;
    }
-
-  
-
-   
-
-
+   cout<<"LAST NULL = "<<newEntries[3]<<endl;
 
     
     char* dns = *dn;
     int msgID;
+    cout<<"DN:"<<*dn<<endl;
 
 
     Callback *callback = new Callback(info[3].As<Function>());
@@ -685,7 +681,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
   cout<<"before"<<endl;
   int result = ldap_add_ext(obj->ld,dns,newEntries,NULL,NULL,&msgID);
-
+  ldap_mods_free(newEntries, 0);
   cout<<"after ldap_add: "<<result<<endl;
 
   if(result != 0) {
@@ -695,10 +691,6 @@ class LDAPClient : public Nan::ObjectWrap {
   }
 
   AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID));  
-
-
-
-
   } 
 
   static inline Nan::Persistent<v8::Function> & constructor() {
