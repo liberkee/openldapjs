@@ -40,7 +40,6 @@ class LDAPAddProgress : public AsyncProgressWorker {
       }
       else {
         int status = ldap_result2error(ld, resultMsg, 0);
-        cout<<"AFTER STATUS = "<<status<<endl;
         if(status != LDAP_SUCCESS) {
           stateClient[0] = Nan::New<Number>(status);
           callback->Call(1, stateClient);
@@ -626,6 +625,14 @@ class LDAPClient : public Nan::ObjectWrap {
 
   }
 
+
+/**
+ ** Method that calls the ldap_add_ext routine.
+ ** The entries are taken from a string array 2 by 2 in a for loop (LDAPMods.mod_type and LDAPMods.mod_values respectively)
+ ** entries are placed in the LDAPMod *newEntries[] array alocating memory in each iteration.
+ ** Note: both the last value in mod_values array and in the newEntries array has to be NULL
+ **/
+
    static NAN_METHOD(add) {
     LDAPClient* obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     
@@ -659,8 +666,6 @@ class LDAPClient : public Nan::ObjectWrap {
     
     char* dns = *dn;
     int msgID;
-    cout<<"DN:"<<*dn<<endl;
-
 
     Callback *callback = new Callback(info[3].As<Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());

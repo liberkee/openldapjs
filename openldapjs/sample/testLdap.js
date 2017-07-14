@@ -27,7 +27,7 @@ newClient.initialize()
     newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret')
       .then(() => {
 
-        newClient.add('cn=newPointChildBLABLA5,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry, [])
+        newClient.add('cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry, [])
           .then((result) => {
 
           }).catch((err) => {
