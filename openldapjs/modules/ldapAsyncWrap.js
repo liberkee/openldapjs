@@ -40,12 +40,12 @@ module.exports = class LDAPWrapAsync {
     */
   initialize() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.CREATED) {
+      if (this._stateClient === this._E_STATES.CREATED || this._stateClient === this._E_STATES.UNBOUND) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
-                console.log('startTLS failed'+errTls);
+                console.log('startTLS failed' + errTls);
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
@@ -53,10 +53,12 @@ module.exports = class LDAPWrapAsync {
               }
             });
           } else {
-            console.log('initialize failed'+ err);
+            console.log('initialize failed' + err);
             reject(err);
           }
         });
+      } else {
+       reject(new Error('State is neither CREATED nor BOUND'));
       }
     });
   }
@@ -84,16 +86,25 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
+       
         this.initialize()
           .then(() => {
+            
             this.bind(bindDN, passwordUser)
               .then((result) => {
+                
                 resolve(result);
               })
               .catch((err) => {
+                
                 reject(new Error(err.message));
               });
-          });
+          })
+          .catch((errInit) => {
+            console.log('ASYNC 1');
+            this._stateClient = this._E_STATES.UNBOUND;
+            reject(new Error(errInit));
+          })
       } else {
         reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
       }
@@ -149,22 +160,21 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
-/**
- * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example';
- * @param{Object} entry ldif format to be added, needs to have a structure that is mappable to a LDAPMod structure
- * @param{Object} controls client& sever controls, OPTIONAL parameter
- */
+  /**
+   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example.., NOTE:every entry except the first one,cn=foo in this case, must already exist';
+   * @param{Object} entry ldif format to be added, needs to have a structure that is mappable to a LDAPMod structure
+   * @param{Object} controls client& sever controls, OPTIONAL parameter
+   */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
         const keys = Object.keys(entry);
         const entryArray = [];
 
-        for( const elem of keys) {
+        for (const elem of keys) {
           entryArray.push(elem);
           entryArray.push(entry[elem]);
         }
-
 
         this._binding.add(dn, entryArray, controls, (err, result) => {
           if (err) {

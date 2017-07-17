@@ -55,6 +55,50 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
+  it('should delete the given leaf entry', (next) =>  {
+    clientLDAP.unbind()
+      .then( () => {
+        clientLDAP.bind(dnAdmin,password)
+          .then( () => {
+            clientLDAP.del('cn=newPointChildBLABLA1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',[])
+              .then( (result) => {
+                result.should.be.ok;
+              })
+              .then( () =>{
+                next();
+              });
+          }).catch( (err) =>{
+            console.log(err);
+          });
+      });
+
+  });
+
+ it('should reject the request to delete non-leaf node', (next) => {
+   clientLDAP.unbind()
+    .then( () => {
+      clientLDAP.bind(dnAdmin,password)
+        .then( () => {
+          clientLDAP.del('cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com')
+            .catch ( (err) => {
+              err.message.should.be.deepEqual('66');
+              next();
+            });
+        });
+    });
+ });
+
+ 
 
 
+
+
+
+
+
+ 
 });
+
+
+
+
