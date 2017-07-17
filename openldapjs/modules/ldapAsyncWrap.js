@@ -58,7 +58,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-       reject(new Error('State is neither CREATED nor BOUND'));
+        reject(new Error('State is neither CREATED nor BOUND'));
       }
     });
   }
@@ -86,17 +86,17 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
-       
+
         this.initialize()
           .then(() => {
-            
+
             this.bind(bindDN, passwordUser)
               .then((result) => {
-                
+
                 resolve(result);
               })
               .catch((err) => {
-                
+
                 reject(new Error(err.message));
               });
           })
