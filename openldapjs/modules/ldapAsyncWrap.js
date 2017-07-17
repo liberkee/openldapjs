@@ -164,25 +164,24 @@ module.exports = class LDAPWrapAsync {
     * Reject if the LDAP rejects the operation or the client's state is not BOUND
     */
   modify(dn, json) {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
         const entry = json.modification;
         const keys = Object.keys(entry);
         const res = [];
-        for(const elem of keys) {
+        for (const elem of keys) {
           res.push(elem);
           res.push(entry[elem]);
         }
-        console.log(res);
 
-        if(json.operation === 'add') {
+        if (json.operation === 'add') {
           this._binding.add(dn, res, [])
           .then((result) => {
             resolve(result);
           })
           .catch((error) => {
-            reject(new Error(err));
-          })
+            reject(new Error(error));
+          });
         } else if (json.operation === 'delete') {
           this._binding.del(dn, [])
           .then((result) => {
@@ -190,7 +189,7 @@ module.exports = class LDAPWrapAsync {
           })
           .catch((error) => {
             reject(new Error(error));
-          })
+          });
         } else if (json.operation === 'replace') {
           // Not implemented
         } else {
@@ -199,11 +198,8 @@ module.exports = class LDAPWrapAsync {
       } else {
         reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
       }
-    })
+    });
   }
-
-
-
 
   /**
     * Unbind from a LDAP server.

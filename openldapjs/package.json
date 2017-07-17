@@ -22,7 +22,7 @@
   "scripts": {
     "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testMixOperations.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./modules/ldapAsyncWrap.js",
+    "lint": "eslint ./lib/bindings/binding.cc",
     "install": "node-gyp rebuild"
   },
   "author": "",
