@@ -2,6 +2,7 @@
 
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
+const Promise = require('bluebird');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -9,6 +10,8 @@ describe('Testing the async LDAP delete operation', () => {
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const password = 'secret';
+
+  const resBindStateReq = 'The Delete operation can be done just in BOUND state';
 
   let clientLDAP = new LDAP(host);
 
@@ -30,9 +33,25 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-  //trying to delete with an invalid dn syntax => ldap error code 34
+  /* trying to delete with an invalid dn syntax => ldap error code 34 */
   it('should reject the request with invalidDN error code', (next) => {
     clientLDAP.del('garbage')
+      .catch((err) => {
+        err.message.should.be.deepEqual('34');
+        next();
+      });
+  });
+
+  it('should reject the request for passing an empty DN', (next) => {
+    clientLDAP.del('')
+      .catch((err) => {
+        err.message.should.be.deepEqual('53');
+        next();
+      });
+  });
+
+  it('should reject the request for passing a null DN', (next) => {
+    clientLDAP.del(null)
       .catch((err) => {
         err.message.should.be.deepEqual('34');
         next();
@@ -55,50 +74,93 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-  it('should delete the given leaf entry', (next) =>  {
+  it('should delete the given leaf entry', (next) => {
     clientLDAP.unbind()
-      .then( () => {
-        clientLDAP.bind(dnAdmin,password)
-          .then( () => {
-            clientLDAP.del('cn=newPointChildBLABLA1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',[])
-              .then( (result) => {
+      .then(() => {
+        clientLDAP.bind(dnAdmin, password)
+          .then(() => {
+            clientLDAP.del('cn=newPointChildBLABLA1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
+              .then((result) => {
                 result.should.be.ok;
               })
-              .then( () =>{
+              .then(() => {
                 next();
               });
-          }).catch( (err) =>{
-            console.log(err);
+          })
+          .catch((err) => {
+
           });
       });
 
   });
 
- it('should reject the request to delete non-leaf node', (next) => {
-   clientLDAP.unbind()
-    .then( () => {
-      clientLDAP.bind(dnAdmin,password)
-        .then( () => {
-          clientLDAP.del('cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com')
-            .catch ( (err) => {
-              err.message.should.be.deepEqual('66');
-              next();
-            });
-        });
-    });
- });
+  it('should reject the request to delete non-leaf node', function (next) {
+    this.timeout(0);
+    clientLDAP.unbind()
+      .then(() => {
+        clientLDAP.bind(dnAdmin, password)
+          .then(() => {
+            clientLDAP.del('cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com')
+              .catch((err) => {
+                err.message.should.be.deepEqual('66');
+                next();
+              });
+          });
+      });
+  });
 
- 
+  it('should reject because BOUND state is required', (next) => {
+    clientLDAP.unbind()
+      .then(() => {
+        clientLDAP.del('cn=newPointChildBLABLA1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
+          .catch((err) => {
+            should.deepEqual(err.message, resBindStateReq);
+            next();
+          });
+      });
+  });
 
+  it('should delete sequential requests with one error', function (next) {
+    this.timeout(0);
+    clientLDAP.unbind()
+      .then(() => {
+        clientLDAP.bind(dnAdmin, password)
+          .then(() => {
+            clientLDAP.del('cn=newPointChildBLABLA2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
+              .then((res1) => {
+                res1.should.be.ok;
+                clientLDAP.del('cn=newPointChildBLABLA2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
+                  .catch((err2) => {
+                    should.deepEqual(err2.message, '32');
+                    clientLDAP.del('cn=newPointChildBLABLA3,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
+                      .then((res3) => {
+                        res3.should.be.ok;
+                        next();
+                      });
+                  });
+              });
+          });
+      });
+  });
 
+  it('should delete in paralel requests with one error', function (next) {
+    this.timeout(0);
+    clientLDAP.unbind()
+      .then(() => {
+        clientLDAP.bind(dnAdmin, password)
+          .then(() => {
+            const first = clientLDAP.del('cn=newPointChildBLABLA4,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', []);
+            const second = clientLDAP.del('cn=newPointChildBLABLA5,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', []);
+            const third = clientLDAP.del('cn=newPointChildBLABLA6,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', []);
 
-
-
-
-
- 
+            Promise.all([first, second, third])
+              .then((values) => {
+                values[0].should.be.ok;
+                values[1].should.be.ok;
+                values[2].should.be.ok;
+                next();
+              });
+          });
+      });
+  });
 });
-
-
-
-

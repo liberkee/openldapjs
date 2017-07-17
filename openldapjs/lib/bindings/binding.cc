@@ -26,8 +26,6 @@ class LDAPAddProgress : public AsyncProgressWorker {
       struct timeval timeOut = {0, 1};
       while(result == 0) {
         result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-        //int status = ldap_result2error(ld, resultMsg, 0);
-        //cout<<"RES STATUS = "<<status<<endl;
         progress.Send(reinterpret_cast<const char*>(&result), sizeof(int));
       }
     }

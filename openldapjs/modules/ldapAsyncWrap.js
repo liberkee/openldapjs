@@ -45,7 +45,6 @@ module.exports = class LDAPWrapAsync {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
-                console.log('startTLS failed' + errTls);
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
@@ -53,12 +52,11 @@ module.exports = class LDAPWrapAsync {
               }
             });
           } else {
-            console.log('initialize failed' + err);
             reject(err);
           }
         });
       } else {
-       reject(new Error('State is neither CREATED nor BOUND'));
+        reject(new Error('State is neither CREATED nor BOUND'));
       }
     });
   }
@@ -86,25 +84,21 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
-       
+
         this.initialize()
           .then(() => {
-            
             this.bind(bindDN, passwordUser)
               .then((result) => {
-                
                 resolve(result);
               })
               .catch((err) => {
-                
                 reject(new Error(err.message));
               });
           })
           .catch((errInit) => {
-            console.log('ASYNC 1');
             this._stateClient = this._E_STATES.UNBOUND;
             reject(new Error(errInit));
-          })
+          });
       } else {
         reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
       }
@@ -188,8 +182,6 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
-
-
 
   /**
    * Compare operation.
