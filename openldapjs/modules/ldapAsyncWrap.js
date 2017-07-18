@@ -166,6 +166,16 @@ module.exports = class LDAPWrapAsync {
   modify(dn, json) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
+        if (json === null || json === '') {
+          reject(new Error('The passed JSON is invalid'));
+          return;
+        }
+
+        if (dn === null || dn === '') {
+          reject(new Error('The passed dn is invalid'));
+          return;
+        }
+
         const entry = json.modification;
         const keys = Object.keys(entry);
         const res = [];

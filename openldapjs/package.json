@@ -20,9 +20,9 @@
     "should": "^11.2.0"
   },
   "scripts": {
-    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testMixOperations.js",
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testModify.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./lib/bindings/binding.cc",
+    "lint": "eslint ./test/testModify.js",
     "install": "node-gyp rebuild"
   },
   "author": "",
