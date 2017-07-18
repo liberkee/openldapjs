@@ -641,18 +641,20 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String controls(info[2]);
 
     int length = entries->Length();
-    LDAPMod *newEntries[length/2+1];
+    LDAPMod **newEntries;
+    newEntries = new LDAPMod *[length/2+1];
+ 
          
     int j =0;
     for(int i = 0;i < length / 2; i++){
       Nan::Utf8String type(entries->Get(2 * i));
       Nan::Utf8String value(entries->Get(2 * i + 1));
 
-      newEntries[i] = (LDAPMod *)malloc(sizeof(LDAPMod));
-      newEntries[i]->mod_type = (char*)malloc(sizeof(char) * (strlen(*type) + 1));
-      newEntries[i]->mod_values = (char**)malloc(2 * sizeof(char*));
-      newEntries[i]->mod_values[0] = (char*)malloc(sizeof(char) * (strlen(*value) + 1));
-      
+     newEntries[i] = new LDAPMod;//(LDAPMod *)malloc(sizeof(LDAPMod));
+      newEntries[i]->mod_type = new char[sizeof type];//(char*)malloc(sizeof(char) * (strlen(*type) + 1));
+      newEntries[i]->mod_values = new char*[2*sizeof (char *)]; //(char**)malloc(2 * sizeof(char*));
+      newEntries[i]->mod_values[0] = new char[sizeof value];//(char*)malloc(sizeof(char) * (strlen(*value) + 1));
+     
       newEntries[i]->mod_op = LDAP_MOD_ADD;
       memcpy(newEntries[i]->mod_type, *type, strlen(*type) + 1);
       memcpy(newEntries[i]->mod_values[0], *value, strlen(*value) + 1);
