@@ -10,6 +10,7 @@ describe('Testing the async LDAP delete operation', () => {
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const password = 'secret';
+  const successResult = 0;
 
   const resBindStateReq = 'The Delete operation can be done just in BOUND state';
 
@@ -81,7 +82,7 @@ describe('Testing the async LDAP delete operation', () => {
           .then(() => {
             clientLDAP.del('cn=newPointChildBLABLA1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
               .then((result) => {
-                result.should.be.ok;
+                should.deepEqual(result, successResult);
               })
               .then(() => {
                 next();
@@ -128,13 +129,13 @@ describe('Testing the async LDAP delete operation', () => {
           .then(() => {
             clientLDAP.del('cn=newPointChildBLABLA2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
               .then((res1) => {
-                res1.should.be.ok;
+                should.deepEqual(res1, successResult);
                 clientLDAP.del('cn=newPointChildBLABLA2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
                   .catch((err2) => {
                     should.deepEqual(err2.message, '32');
                     clientLDAP.del('cn=newPointChildBLABLA3,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', [])
                       .then((res3) => {
-                        res3.should.be.ok;
+                        should.deepEqual(res3, successResult);
                         next();
                       });
                   });
@@ -155,9 +156,9 @@ describe('Testing the async LDAP delete operation', () => {
 
             Promise.all([first, second, third])
               .then((values) => {
-                values[0].should.be.ok;
-                values[1].should.be.ok;
-                values[2].should.be.ok;
+                should.deepEqual(values[0], successResult);
+                should.deepEqual(values[1], successResult);
+                should.deepEqual(values[2], successResult);
                 next();
               });
           });

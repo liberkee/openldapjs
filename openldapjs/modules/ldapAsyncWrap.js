@@ -40,7 +40,8 @@ module.exports = class LDAPWrapAsync {
     */
   initialize() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.CREATED || this._stateClient === this._E_STATES.UNBOUND) {
+      if (this._stateClient === this._E_STATES.CREATED ||
+        this._stateClient === this._E_STATES.UNBOUND) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
@@ -155,8 +156,10 @@ module.exports = class LDAPWrapAsync {
     });
   }
   /**
-   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example.., NOTE:every entry except the first one,cn=foo in this case, must already exist';
-   * @param{Object} entry ldif format to be added, needs to have a structure that is mappable to a LDAPMod structure
+   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example..,
+   * NOTE:every entry except the first one,cn=foo in this case, must already exist';
+   * @param{Object} entry ldif format to be added, needs to have a
+   * structure that is mappable to a LDAPMod structure
    * @param{Object} controls client& sever controls, OPTIONAL parameter
    */
   add(dn, entry, controls) {
