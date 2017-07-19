@@ -86,7 +86,7 @@ describe('Testing the async LDAP add operation', () => {
 
     clientLDAP.add('cn=newTestEntry0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', singleEntry)
       .then((result) => {
-        result.should.be.ok;
+        result.should.be.deepEqual(0);
         next();
       });
   });
@@ -100,13 +100,13 @@ describe('Testing the async LDAP add operation', () => {
 
     clientLDAP.add('cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
       .then((res1) => {
-        res1.should.be.ok;
+        res1.should.be.deepEqual(0);
         clientLDAP.add('cn=newTestEntry2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
           .then((res2) => {
-            res2.should.be.ok;
+            res2.should.be.deepEqual(0);
             clientLDAP.add('cn=newTestEntry3,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
               .then((res3) => {
-                res3.should.be.ok;
+                res3.should.be.deepEqual(0);
                 clientLDAP.add('cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
                   .catch((err) => {
                     err.message.should.be.deepEqual('68');
@@ -186,8 +186,8 @@ describe('Testing the async LDAP add operation', () => {
 
     Promise.all([first, second, third])
       .then((values) => {
-        values.forEach((element) => {
-          element.should.be.ok;
+        values.forEach((result) => {
+          result.should.be.deepEqual(0);
         });
         next();
       });
