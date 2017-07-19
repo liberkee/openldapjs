@@ -698,22 +698,24 @@ private:
     LDAPMod **newEntries;
     newEntries = new LDAPMod *[length / 2 + 1];
 
-    int j = 0;
     for (int i = 0; i < length / 2; i++)
     {
       Nan::Utf8String type(entries->Get(2 * i));
+      std::string typeString(*type);
       Nan::Utf8String value(entries->Get(2 * i + 1));
+      std::string valueString(*value);
 
       newEntries[i] = new LDAPMod;
-      newEntries[i]->mod_type = new char[sizeof(*type) + 1];
-      newEntries[i]->mod_values = new char *[2 * sizeof(char *) + 1];
-      newEntries[i]->mod_values[0] = new char[sizeof(*value) + 1];
 
       if (strlen(*type) > 0 && strlen(*value) > 0)
       {
+        newEntries[i]->mod_type = new char[typeString.length() + 1];
+        newEntries[i]->mod_values = new char *[2];
+        newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
+
         newEntries[i]->mod_op = LDAP_MOD_ADD;
-        memcpy(newEntries[i]->mod_type, *type, strlen(*type) + 1);
-        memcpy(newEntries[i]->mod_values[0], *value, strlen(*value) + 1);
+        memcpy(newEntries[i]->mod_type, typeString.c_str(),typeString.length()+1);
+        memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
         newEntries[i]->mod_values[1] = NULL;
       }
     }
