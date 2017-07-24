@@ -56,6 +56,7 @@ public:
         callback->Call(2, stateClient);
       }
     }
+    ldap_msgfree(resultMsg); //  we should free this here.
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -174,6 +175,7 @@ public:
         callback->Call(2, stateClient);
       }
     }
+    ldap_msgfree(resultMsg); //testing this out
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -515,7 +517,7 @@ private:
 
     char *username = *userArg;
     char *password = *passArg;
-    if (obj->ld == 0 || obj->initializedFlag == false)
+    if (obj->ld == 0) //|| obj->initializedFlag == false)
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
@@ -608,7 +610,7 @@ private:
     struct berval bvalue;
 
     bvalue.bv_val = value;
-    bvalue.bv_len = strlen(value);
+    bvalue.bv_len = strlen(value); // isn't a +1 required for the \0 ?
 
     result = ldap_compare_ext(obj->ld,
                               DNEntry,
@@ -630,12 +632,18 @@ private:
 
     if (obj->ld == NULL || obj->initializedFlag == false)
     {
+      cout << "unbind error?:" << endl;
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(2, stateClient);
       return;
     }
 
-    ldap_unbind(obj->ld);
+    int unbindResult = ldap_unbind(obj->ld);
+
+    if (unbindResult != LDAP_SUCCESS)
+    {
+      cout << "unbind failed with error code:" << unbindResult << endl;
+    }
     obj->initializedFlag = false;
 
     stateClient[1] = Nan::New<Number>(5);
@@ -695,9 +703,12 @@ private:
     Nan::Utf8String controls(info[2]);
 
     int length = entries->Length();
-    LDAPMod **newEntries;
-    newEntries = new LDAPMod *[length / 2 + 1];
+    if (length < 2)
+    {
+      return;
+    }
 
+    LDAPMod **newEntries = new LDAPMod *[length / 2 + 1];
     for (int i = 0; i < length / 2; i++)
     {
       Nan::Utf8String type(entries->Get(2 * i));
@@ -707,17 +718,19 @@ private:
 
       newEntries[i] = new LDAPMod;
 
-      if (strlen(*type) > 0 && strlen(*value) > 0)
+      if (typeString.length() > 0 && valueString.length() > 0)
       {
         newEntries[i]->mod_type = new char[typeString.length() + 1];
         newEntries[i]->mod_values = new char *[2];
         newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
 
         newEntries[i]->mod_op = LDAP_MOD_ADD;
-        memcpy(newEntries[i]->mod_type, typeString.c_str(),typeString.length()+1);
+        memcpy(newEntries[i]->mod_type, typeString.c_str(), typeString.length() + 1);
         memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
         newEntries[i]->mod_values[1] = NULL;
       }
+     
+  
     }
 
     newEntries[length / 2] = NULL;
@@ -737,7 +750,8 @@ private:
 
     int result = ldap_add_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
 
-    ldap_mods_free(newEntries, 1);
+    //ldap_mods_free(newEntries, 1);
+    delete newEntries;
 
     if (result != 0)
     {

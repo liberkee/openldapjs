@@ -29,7 +29,7 @@ describe('Testing the async LDAP add operation', () => {
   afterEach(() => {
     clientLDAP.unbind()
       .then(() => {
-      });
+      }); 
   });
 
   it('should reject the add operation with a wrong dn', (next) => {
@@ -153,7 +153,7 @@ describe('Testing the async LDAP add operation', () => {
               });
           });
       });
-  });
+  }); 
 
   it('should reject requests done from an unbound state', (next) => {
     const entry = {

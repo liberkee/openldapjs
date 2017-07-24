@@ -88,6 +88,7 @@ module.exports = class LDAPWrapAsync {
 
         this.initialize()
           .then(() => {
+            this._stateClient = this._E_STATES.INITIALIZED;
             this.bind(bindDN, passwordUser)
               .then((result) => {
                 resolve(result);
