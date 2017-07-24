@@ -1,3 +1,4 @@
+
 'use strict';
 
 const should = require('should');
@@ -33,6 +34,7 @@ describe('Testing the async LDAP search ', () => {
   afterEach(() => {
     clientLDAP.unbind()
       .then(() => {
+        
 
       });
   });
@@ -139,7 +141,7 @@ describe('Testing the async LDAP search ', () => {
         clientLDAP.search(searchBase, 2, 'objectClass=aliens')
           .then((result2) => {
             should.notDeepEqual(result1, result2);
-            clientLDAP.search(searchBase, 1, 'objectClass=*')
+            clientLDAP.search(searchBase, 1, 'objectClass=template')
               .then((result3) => {
                 should.notDeepEqual(result1, result3);
                 should.notDeepEqual(result2, result3);
@@ -176,6 +178,7 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
+  /*
   it('should return 10k entries', function (next) {
     this.timeout(0);
 
@@ -188,6 +191,7 @@ describe('Testing the async LDAP search ', () => {
         next();
       });
   });
+  */
 
   it('should return results in entire subtree', (next) => {
 

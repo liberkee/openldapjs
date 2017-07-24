@@ -232,10 +232,12 @@ module.exports = class LDAPWrapAsync {
             reject(new Error(err));
           } else {
             this._stateClient = state;
+            console.log('client state is:'+ this._stateClient);
             resolve(this._stateClient);
           }
         });
       } else {
+        console.log('2nd Brannch client state is:'+ this._stateClient);
         resolve(this._stateClient);
       }
     });

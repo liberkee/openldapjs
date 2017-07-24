@@ -729,9 +729,7 @@ private:
         memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
         newEntries[i]->mod_values[1] = NULL;
       }
-     
-  
-    }
+        }
 
     newEntries[length / 2] = NULL;
 
@@ -751,7 +749,7 @@ private:
     int result = ldap_add_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
 
     //ldap_mods_free(newEntries, 1);
-    delete newEntries;
+    delete[] newEntries;
 
     if (result != 0)
     {
