@@ -156,6 +156,7 @@ module.exports = class LDAPWrapAsync {
     });
   }
   /**
+   * ldap add operation
    * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already exist';
    * @param{Object} entry ldif format to be added, needs to have a
@@ -165,6 +166,8 @@ module.exports = class LDAPWrapAsync {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
+
+        //turn the json into an Array that can be easily parsed.
         const keys = Object.keys(entry);
         const entryArray = [];
 
