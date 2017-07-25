@@ -56,7 +56,7 @@ public:
         callback->Call(2, stateClient);
       }
     }
-    ldap_msgfree(resultMsg); //  we should free this here.
+    ldap_msgfree(resultMsg); //  we should free this here?.
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -333,7 +333,7 @@ private:
   Callback *progress;
   int result = 0;
   LDAPMessage *resultMsg;
-  int msgID;
+  int msgID = 0;
 
 public:
   LDAPCompareProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID)
@@ -421,7 +421,7 @@ private:
   LDAP *ld;
   LDAPMessage *result;
   unsigned int stateClient = 0;
-  int msgid;
+  int msgid = 0;
   bool initializedFlag = false;
   explicit LDAPClient(){};
   //LDAPMod *attrs[4];
@@ -454,10 +454,9 @@ private:
     obj->initializedFlag = true;
 
     char *hostAddress = *hostArg;
-    int state;
     int protocol_version = LDAP_VERSION3;
 
-    state = ldap_initialize(&obj->ld, hostAddress);
+   int state = ldap_initialize(&obj->ld, hostAddress);
     if (state != LDAP_SUCCESS || obj->ld == 0)
     {
       stateClient[0] = Nan::New<Number>(state);
@@ -488,12 +487,12 @@ private:
     Local<Value> stateClient[2] = {Null(), Null()};
     Callback *callback = new Callback(info[0].As<Function>());
 
-    int state;
-    int msgId;
+   
+    int msgId = 0;
 
     stateClient[0] = Nan::New<Number>(0);
 
-    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+     int state = ldap_start_tls_s(obj->ld, NULL, NULL);
     if (state != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -662,7 +661,7 @@ private:
 
     char *dns = *dn;
 
-    int msgID;
+    int msgID = 0;
 
     Callback *callback = new Callback(info[2].As<Function>());
     Callback *progress = new Callback(info[3].As<v8::Function>());
