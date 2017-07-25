@@ -456,7 +456,7 @@ private:
     char *hostAddress = *hostArg;
     int protocol_version = LDAP_VERSION3;
 
-   int state = ldap_initialize(&obj->ld, hostAddress);
+    int state = ldap_initialize(&obj->ld, hostAddress);
     if (state != LDAP_SUCCESS || obj->ld == 0)
     {
       stateClient[0] = Nan::New<Number>(state);
@@ -487,12 +487,11 @@ private:
     Local<Value> stateClient[2] = {Null(), Null()};
     Callback *callback = new Callback(info[0].As<Function>());
 
-   
     int msgId = 0;
 
     stateClient[0] = Nan::New<Number>(0);
 
-     int state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    int state = ldap_start_tls_s(obj->ld, NULL, NULL);
     if (state != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -728,12 +727,12 @@ private:
         memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
         newEntries[i]->mod_values[1] = NULL;
       }
-        }
+    }
 
     newEntries[length / 2] = NULL;
 
     char *dns = *dn;
-    int msgID;
+    int msgID = 0;
 
     Callback *callback = new Callback(info[3].As<Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());
