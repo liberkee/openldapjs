@@ -17,10 +17,11 @@ private:
   int result = 0;
   LDAPMessage *resultMsg;
   int msgID;
+  LDAPMod **entries;
 
 public:
-  LDAPAddProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID)
+  LDAPAddProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID,LDAPMod **newEntries)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID),entries(newEntries)
   {
   }
   //Executes in worker thread
@@ -36,6 +37,7 @@ public:
 
   void HandleOKCallback()
   {
+    Nan::HandleScope scope;
     Local<Value> stateClient[2] = {Null(), Null()};
     if (result == -1)
     {
@@ -57,6 +59,10 @@ public:
       }
     }
     ldap_msgfree(resultMsg); //  we should free this here?.
+    ldap_mods_free(entries, 1);
+    callback->Reset();
+    progress->Reset();
+
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -96,6 +102,7 @@ public:
 
   void HandleOKCallback()
   {
+    Nan::HandleScope scope;
     Local<Value> stateClient[2] = {Null(), Null()};
     if (result == -1)
     {
@@ -155,6 +162,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
+    Nan::HandleScope scope;
     Local<Value> stateClient[2] = {Null(), Null()};
     if (result == -1)
     {
@@ -175,6 +183,8 @@ public:
         callback->Call(2, stateClient);
       }
     }
+    callback->Reset();
+    progress->Reset();
     ldap_msgfree(resultMsg); //testing this out
   }
 
@@ -221,7 +231,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
-
+    Nan::HandleScope scope;
     Local<Value> stateClient[2] = {Null(), Null()};
 
     if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT)
@@ -234,10 +244,13 @@ public:
       stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
       callback->Call(2, stateClient);
     }
+
+    callback->Reset();
   }
 
   void HandleProgressCallback(const char *data, size_t size)
   {
+    Nan::HandleScope scope; //?
     // Required, this is not created automatically
     char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
     int errorCode, prc;
@@ -318,7 +331,7 @@ public:
       break;
     }
 
-    Nan::HandleScope scope;
+    //Nan::HandleScope scope;
     Local<Value> argv[1] = {Null()};
     argv[0] = Nan::New(resultLocal).ToLocalChecked();
     progress->Call(1, argv);
@@ -353,6 +366,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
+    Nan::HandleScope scope;
     Local<Value> stateClient[2] = {Null(), Null()};
     if (result == -1)
     {
@@ -505,6 +519,7 @@ private:
 
   static NAN_METHOD(bind)
   {
+    //Nan::HandleScope scope; not necesary
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
@@ -523,6 +538,7 @@ private:
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld, obj->msgid));
+
   }
 
   static NAN_METHOD(search)
@@ -598,7 +614,7 @@ private:
     char *DNEntry = *DNArg;
     char *attribute = *attrArg;
     char *value = *valueArg;
-    int message, result;
+    int message = 0, result = 0;
 
     Local<Value> stateClient[2] = {Null(), Null()};
 
@@ -646,6 +662,10 @@ private:
 
     stateClient[1] = Nan::New<Number>(5);
     callback->Call(2, stateClient);
+
+    //freeing callbacks ?
+    callback->Reset();
+    delete callback;
 
     return;
   }
@@ -734,7 +754,7 @@ private:
     char *dns = *dn;
     int msgID = 0;
 
-    Callback *callback = new Callback(info[3].As<Function>());
+    Callback *callback = new Callback(info[3].As<Function>()); //free ?
     Callback *progress = new Callback(info[4].As<v8::Function>());
 
     if (obj->ld == 0)
@@ -747,7 +767,7 @@ private:
     int result = ldap_add_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
 
     //ldap_mods_free(newEntries, 1);
-    delete[] newEntries;
+    
 
     if (result != 0)
     {
@@ -755,7 +775,7 @@ private:
       callback->Call(1, stateClient);
       return;
     }
-    AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID));
+    AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID,newEntries));
   }
 
   static inline Nan::Persistent<v8::Function> &constructor()
