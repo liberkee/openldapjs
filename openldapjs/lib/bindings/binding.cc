@@ -250,6 +250,7 @@ public:
     }
      cout<<"callback gets reset"<<endl;
     callback->Reset();
+    progress->Reset();
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -401,6 +402,8 @@ public:
         callback->Call(1, stateClient);
       }
     }
+    callback->Reset();
+    progress->Reset();
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -498,6 +501,8 @@ private:
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
     callback->Reset();
+    delete callback;
+    callback = nullptr;
     return;
   }
 
@@ -517,12 +522,16 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      callback->Reset();
+      //callback->Reset();
+      delete callback;
+      callback = nullptr;
       return;
     }
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
-    callback->Reset();
+   // callback->Reset();//redundant?
+    delete callback;
+    callback = nullptr;
     return;
   }
 
@@ -543,6 +552,12 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      //should be freed and deleted aswel ?
+      callback->Reset();
+      progress->Reset();
+      delete callback;
+      delete progress;
+
       return;
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
@@ -658,6 +673,7 @@ private:
       cout << "unbind error?:" << endl;
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(2, stateClient);
+      delete callback;
       return;
     }
 
@@ -673,7 +689,10 @@ private:
     callback->Call(2, stateClient);
 
     //freeing callbacks ?
-    callback->Reset();
+   // callback->Reset();
+    delete callback;
+callback = nullptr;
+    
 
     return;
   }
@@ -698,6 +717,9 @@ private:
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       callback->Reset();
+      delete callback;
+      progress->Reset();
+      delete progress;
       return;
     }
 
@@ -778,13 +800,13 @@ private:
 
     //ldap_mods_free(newEntries, 1);
     
-
+/*
     if (result != 0)
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
-    }
+    }*/
     AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID,newEntries));
   }
 

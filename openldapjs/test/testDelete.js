@@ -32,7 +32,7 @@ describe('Testing the async LDAP delete operation', () => {
       .then(() => {
 
       });
-        
+
   });
 
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
@@ -59,15 +59,18 @@ describe('Testing the async LDAP delete operation', () => {
         next();
       });
   });
-  /*
-    it('should reject the request with insufficient access error code', (next) => {
-      clientLDAP.del('ou=users1,o=myhost,dc=demoApp,dc=com')
-        .catch((err) => {
-          err.message.should.be.deepEqual('50');
-          next();
-        });
-    });
-  */
+
+  it('should reject the request with insufficient access error code', (next) => {
+    clientLDAP.bind(dnUser, password)
+      .then(() => {
+        clientLDAP.del('ou=users1,o=myhost,dc=demoApp,dc=com')
+          .catch((err) => {
+            err.message.should.be.deepEqual('50');
+          });
+        next();
+      });
+  });
+
   it('should reject the request with no such object error code', (next) => {
     clientLDAP.del('ou=users2,o=myhost,dc=demoApp,dc=com')
       .catch((err) => {

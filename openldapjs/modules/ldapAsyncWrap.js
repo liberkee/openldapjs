@@ -75,7 +75,8 @@ module.exports = class LDAPWrapAsync {
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED) {
+      if (this._stateClient === this._E_STATES.INITIALIZED||
+          this._stateClient === this._E_STATES.BOUND) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
