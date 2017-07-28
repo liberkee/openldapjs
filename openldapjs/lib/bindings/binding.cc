@@ -123,6 +123,9 @@ public:
         callback->Call(2, stateClient);
       }
     }
+    callback->Reset();
+    progress->Reset();
+    ldap_msgfree(resultMsg);
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -166,7 +169,7 @@ public:
     Local<Value> stateClient[2] = {Null(), Null()};
     if (result == -1)
     {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<Number>(result);
       callback->Call(1, stateClient);
     }
     else
@@ -195,6 +198,7 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
+
   }
 };
 
@@ -244,7 +248,7 @@ public:
       stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
       callback->Call(2, stateClient);
     }
-
+     cout<<"callback gets reset"<<endl;
     callback->Reset();
   }
 
@@ -279,7 +283,9 @@ public:
       {
         resultLocal += "dn:";
         resultLocal += dn;
-        ldap_memfree(dn);
+        ldap_memfree(dn); //ldap_memfree on a char* ?
+       
+        
         resultLocal += "\n";
       }
 
@@ -491,6 +497,7 @@ private:
 
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    callback->Reset();
     return;
   }
 
@@ -510,10 +517,12 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      callback->Reset();
       return;
     }
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    callback->Reset();
     return;
   }
 
@@ -665,7 +674,6 @@ private:
 
     //freeing callbacks ?
     callback->Reset();
-    delete callback;
 
     return;
   }
@@ -689,18 +697,20 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      callback->Reset();
       return;
     }
 
     int result = ldap_delete_ext(obj->ld, dns, NULL, NULL, &msgID);
-
+/*
     if (result != 0)
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      callback->Reset();
       return;
     }
-
+*/
     AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
   }
 

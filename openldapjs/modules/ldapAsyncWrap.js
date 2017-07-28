@@ -56,7 +56,8 @@ module.exports = class LDAPWrapAsync {
             reject(err);
           }
         });
-      } else {
+      } else if (this._stateClient !== this._E_STATES.INITIALIZED) {
+        console.log('BLA BLA BLA');
         reject(new Error('State is neither CREATED nor BOUND'));
       }
     });
@@ -88,14 +89,20 @@ module.exports = class LDAPWrapAsync {
 
         this.initialize()
           .then(() => {
-            this._stateClient = this._E_STATES.INITIALIZED;
-            this.bind(bindDN, passwordUser)
-              .then((result) => {
-                resolve(result);
-              })
-              .catch((err) => {
-                reject(new Error(err.message));
-              });
+            /* this._stateClient = this._E_STATES.INITIALIZED; redundant?
+             this.bind(bindDN, passwordUser)
+               .then((result) => {
+                 resolve(result);
+                 */
+            this._binding.bind(bindDN, passwordUser, (err, state) => {
+              if (err || state !== this._E_STATES.BOUND) {
+                this._stateClient = this._E_STATES.INITIALIZED;
+                reject(new Error(err));
+              } else {
+                this._stateClient = state;
+                resolve(this._stateClient);
+              }
+            });
           })
           .catch((errInit) => {
             this._stateClient = this._E_STATES.UNBOUND;
@@ -129,6 +136,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
+        console.log(this._stateClient);
         reject(new Error('The Search operation can be done just in BOUND state'));
       }
 
@@ -237,7 +245,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-      //  console.log('2nd Brannch client state is:'+ this._stateClient);
+        //  console.log('2nd Brannch client state is:'+ this._stateClient);
         resolve(this._stateClient);
       }
     });

@@ -32,11 +32,11 @@ describe('Testing the async LDAP search ', () => {
       });
   });
   afterEach(() => {
-    clientLDAP.unbind()
+    /*clientLDAP.unbind()
       .then(() => {
         
 
-      });
+      }); */
   });
 
   it('should return an empty search', (next) => {
@@ -74,6 +74,7 @@ describe('Testing the async LDAP search ', () => {
           .then(() => {
             clientLDAP.search(searchBase, 2, 'objectClass=*')
               .then((result) => {
+                console.log('result is:'+result);
                 result.should.be.empty;
               });
           });
