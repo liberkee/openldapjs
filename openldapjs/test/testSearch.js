@@ -4,6 +4,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
+const heapdump = require('heapdump');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -17,6 +18,8 @@ describe('Testing the async LDAP search ', () => {
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
+  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/'+Date.now()+'.heapsnapshot');
+
 
   beforeEach((next) => {
     clientLDAP = new LDAPWrap(host);
@@ -32,11 +35,11 @@ describe('Testing the async LDAP search ', () => {
       });
   });
   afterEach(() => {
-    /*clientLDAP.unbind()
+    clientLDAP.unbind()
       .then(() => {
         
 
-      }); */
+      }); 
   });
 
   it('should return an empty search', (next) => {
@@ -68,16 +71,12 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return nothing', (next) => {
-    clientLDAP.unbind()
-      .then(() => {
         clientLDAP.bind(dnUser, password)
           .then(() => {
             clientLDAP.search(searchBase, 2, 'objectClass=*')
               .then((result) => {
-                console.log('result is:'+result);
                 result.should.be.empty;
               });
-          });
       })
       .then(() => {
         next();
@@ -179,7 +178,7 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-  /*
+/*  
   it('should return 10k entries', function (next) {
     this.timeout(0);
 

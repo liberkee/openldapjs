@@ -20,10 +20,11 @@ private:
   LDAPMod **entries;
 
 public:
-  LDAPAddProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID,LDAPMod **newEntries)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID),entries(newEntries)
+  LDAPAddProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID, LDAPMod **newEntries)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID), entries(newEntries)
   {
   }
+  ~LDAPAddProgress() {}
   //Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
@@ -62,7 +63,6 @@ public:
     ldap_mods_free(entries, 1);
     callback->Reset();
     progress->Reset();
-
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -152,6 +152,7 @@ public:
       : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID)
   {
   }
+  ~LDAPBindProgress() {}
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
@@ -198,7 +199,6 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
-
   }
 };
 
@@ -248,7 +248,7 @@ public:
       stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
       callback->Call(2, stateClient);
     }
-     cout<<"callback gets reset"<<endl;
+    cout << "callback gets reset" << endl;
     callback->Reset();
     progress->Reset();
   }
@@ -284,9 +284,8 @@ public:
       {
         resultLocal += "dn:";
         resultLocal += dn;
-        ldap_memfree(dn); //ldap_memfree on a char* ?
-       
-        
+        ldap_memfree(dn);
+
         resultLocal += "\n";
       }
 
@@ -464,6 +463,7 @@ private:
       v8::Local<v8::Value> argv[argc] = {info[0]};
       v8::Local<v8::Function> cons = Nan::New(constructor());
       info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+      //info.GetReturnValue().Set(Nan::NewInstance(cons,argc,argv).ToLocalChecked()); ?
     }
   }
 
@@ -486,6 +486,7 @@ private:
       callback->Call(1, stateClient);
       // Needed for catch a specific error
       obj->initializedFlag = false;
+      delete callback;
       return;
     }
 
@@ -495,6 +496,7 @@ private:
       stateClient[0] = Nan::New<Number>(state);
       callback->Call(1, stateClient);
       obj->initializedFlag = false;
+      delete callback;
       return;
     }
 
@@ -529,7 +531,7 @@ private:
     }
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
-   // callback->Reset();//redundant?
+    // callback->Reset();//redundant?
     delete callback;
     callback = nullptr;
     return;
@@ -552,9 +554,9 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      //should be freed and deleted aswel ?
-      callback->Reset();
-      progress->Reset();
+      //should be freed and deleted as well ?
+      //  callback->Reset();
+      // progress->Reset();
       delete callback;
       delete progress;
 
@@ -562,7 +564,6 @@ private:
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld, obj->msgid));
-
   }
 
   static NAN_METHOD(search)
@@ -689,10 +690,9 @@ private:
     callback->Call(2, stateClient);
 
     //freeing callbacks ?
-   // callback->Reset();
+    // callback->Reset();
     delete callback;
-callback = nullptr;
-    
+    callback = nullptr;
 
     return;
   }
@@ -724,7 +724,7 @@ callback = nullptr;
     }
 
     int result = ldap_delete_ext(obj->ld, dns, NULL, NULL, &msgID);
-/*
+    /*
     if (result != 0)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -793,21 +793,23 @@ callback = nullptr;
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
     int result = ldap_add_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
 
     //ldap_mods_free(newEntries, 1);
-    
-/*
+
+    /*
     if (result != 0)
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
     }*/
-    AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID,newEntries));
+    AsyncQueueWorker(new LDAPAddProgress(callback, progress, obj->ld, msgID, newEntries));
   }
 
   static inline Nan::Persistent<v8::Function> &constructor()

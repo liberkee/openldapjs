@@ -3,6 +3,7 @@
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
+const heapdump = require('heapdump');
 
 describe('Testing the async LDAP add operation', () => {
 
@@ -12,6 +13,7 @@ describe('Testing the async LDAP add operation', () => {
   const password = 'secret';
 
   let clientLDAP = new LDAP(host);
+  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/Snapshots/' + Date.now() + '.heapsnapshot');
 
   beforeEach((next) => {
     clientLDAP = new LDAP(host);
@@ -29,7 +31,7 @@ describe('Testing the async LDAP add operation', () => {
   afterEach(() => {
     clientLDAP.unbind()
       .then(() => {
-      }); 
+      });
   });
 
   it('should reject the add operation with a wrong dn', (next) => {
@@ -141,19 +143,15 @@ describe('Testing the async LDAP add operation', () => {
       sn: 'Entry',
       description: 'Tesst',
     };
-
-    clientLDAP.unbind()
+    clientLDAP.bind(dnUser, password)
       .then(() => {
-        clientLDAP.bind(dnUser, password)
-          .then(() => {
-            clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
-              .catch((accessError) => {
-                accessError.message.should.be.deepEqual('50');
-                next();
-              });
+        clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
+          .catch((accessError) => {
+            accessError.message.should.be.deepEqual('50');
+            next();
           });
       });
-  }); 
+  });
 
   it('should reject requests done from an unbound state', (next) => {
     const entry = {
