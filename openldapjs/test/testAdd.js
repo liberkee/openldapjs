@@ -28,9 +28,10 @@ describe('Testing the async LDAP add operation', () => {
 
   });
 
-  afterEach(() => {
+  afterEach((next) => {
     clientLDAP.unbind()
       .then(() => {
+        next();
       });
   });
 

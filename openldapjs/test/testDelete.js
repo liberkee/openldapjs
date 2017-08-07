@@ -3,6 +3,7 @@
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
+const heapdump = require('heapdump');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -15,6 +16,7 @@ describe('Testing the async LDAP delete operation', () => {
   const resBindStateReq = 'The Delete operation can be done just in BOUND state';
 
   let clientLDAP = new LDAP(host);
+   heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsDelete/'+Date.now()+'.heapsnapshot');
 
   beforeEach((next) => {
     clientLDAP = new LDAP(host);
@@ -27,10 +29,10 @@ describe('Testing the async LDAP delete operation', () => {
           });
       });
   });
-  afterEach(() => {
+  afterEach((next) => {
     clientLDAP.unbind()
       .then(() => {
-
+        next();
       });
 
   });

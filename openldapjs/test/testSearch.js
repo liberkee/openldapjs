@@ -34,10 +34,10 @@ describe('Testing the async LDAP search ', () => {
 
       });
   });
-  afterEach(() => {
+  afterEach((next) => {
     clientLDAP.unbind()
       .then(() => {
-        
+        next();
 
       }); 
   });
@@ -107,7 +107,7 @@ describe('Testing the async LDAP search ', () => {
     clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(1);
+        count.should.be.above(0);
       })
       .then(() => {
         next();

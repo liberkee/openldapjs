@@ -33,6 +33,7 @@ public:
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
       progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+       std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -97,6 +98,7 @@ public:
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
       progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+       std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -213,7 +215,7 @@ private:
   bool flagVerification = false;
   string resultSearch;
   int i = 0, msgID;
-  LDAPMessage *testVar = 0;
+ // LDAPMessage *testVar = 0;
   int status = 0;
   //int LDAP_NO_SUCH_OBJECT = 32;
 public:
@@ -248,7 +250,6 @@ public:
       stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
       callback->Call(2, stateClient);
     }
-    cout << "callback gets reset" << endl;
     callback->Reset();
     progress->Reset();
   }
@@ -310,6 +311,7 @@ public:
       }
       resultLocal += "\n";
       ber_free(ber, 0);
+      ldap_msgfree(entry); //freed here ?
 
       resultSearch += resultLocal;
       break;
@@ -724,15 +726,7 @@ private:
     }
 
     int result = ldap_delete_ext(obj->ld, dns, NULL, NULL, &msgID);
-    /*
-    if (result != 0)
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      callback->Reset();
-      return;
-    }
-*/
+   
     AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
   }
 
