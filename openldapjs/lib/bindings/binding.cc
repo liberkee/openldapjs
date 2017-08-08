@@ -73,6 +73,8 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
+
+
   }
 };
 
@@ -271,12 +273,13 @@ public:
       ldap_perror(ld, "ldap_result");
       return;
 
-    case 0:
-      finished = 1;
+    case 0: //why free the resultMSg if the timeout was exceeded ? should this case do nothing ?
+     // finished = 1;
       if (resultMsg != NULL)
       {
         ldap_msgfree(resultMsg);
       }
+      
       return;
 
     case LDAP_RES_SEARCH_ENTRY:
@@ -291,12 +294,12 @@ public:
       }
 
       // You have to implement the attribute side
-      entry = ldap_first_entry(ld, resultMsg);
+      entry = ldap_first_entry(ld, resultMsg); //is this necesarry ? why not replace it with resultMsg entirely
       for (attribute = ldap_first_attribute(ld, entry, &ber);
            attribute != NULL;
            attribute = ldap_next_attribute(ld, entry, ber))
       {
-        if ((values = (char **)(intptr_t)ldap_get_values(ld, entry, attribute)) != NULL)
+        if ((values = /*(char **)(intptr_t)*/ldap_get_values(ld, entry, attribute)) != NULL)
         {
           for (i = 0; values[i] != NULL; i++)
           {
@@ -622,6 +625,7 @@ private:
 
     if (result != LDAP_SUCCESS)
     {
+    
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
