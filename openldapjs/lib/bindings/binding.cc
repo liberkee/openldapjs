@@ -9,6 +9,16 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
+typedef struct sentStruct
+{
+  LDAP *ld;
+  int result;
+  LDAPMessage *resultMsg;
+  LDAPMessage *entry;
+  int msgID;
+
+} dataObject_t;
+
 class LDAPAddProgress : public AsyncProgressWorker
 {
 private:
@@ -33,7 +43,7 @@ public:
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
       progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-       std::this_thread::sleep_for(chrono::milliseconds(10));
+      std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -73,8 +83,6 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
-
-
   }
 };
 
@@ -100,7 +108,7 @@ public:
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
       progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-       std::this_thread::sleep_for(chrono::milliseconds(10));
+      std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -217,9 +225,8 @@ private:
   bool flagVerification = false;
   string resultSearch;
   int i = 0, msgID;
- // LDAPMessage *testVar = 0;
   int status = 0;
-  //int LDAP_NO_SUCH_OBJECT = 32;
+
 public:
   LDAPSearchProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID)
       : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID)
@@ -228,12 +235,89 @@ public:
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
+
+    char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
+    int errorCode, prc;
+
+    string resultLocal = "\n";
+    BerElement *ber;
+
     struct timeval timeOut = {1, 0};
     while (finished == 0)
     {
       result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-      std::this_thread::sleep_for(chrono::milliseconds(10));
+
+      switch (result)
+      {
+      case -1:
+        flagVerification = false;
+        ldap_perror(ld, "ldap_result");
+        return;
+
+      case 0:
+        break;
+
+      case LDAP_RES_SEARCH_ENTRY:
+        flagVerification = true;
+        if ((dn = ldap_get_dn(ld, resultMsg)) != NULL)
+        {
+          resultLocal += "dn:";
+          resultLocal += dn;
+          ldap_memfree(dn);
+
+          resultLocal += "\n";
+        }
+
+        // You have to implement the attribute side
+        //entry = ldap_first_entry(ld, resultMsg); //is this necesarry ? why not replace it with resultMsg entirely
+        for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
+             attribute != NULL;
+             attribute = ldap_next_attribute(ld, resultMsg, ber))
+        {
+          if ((values = ldap_get_values(ld, resultMsg, attribute)) != NULL)
+          {
+            for (i = 0; values[i] != NULL; i++)
+            {
+              resultLocal += attribute;
+              resultLocal += ":";
+              resultLocal += values[i];
+              resultLocal += "\n";
+            }
+            ldap_value_free(values);
+          }
+          ldap_memfree(attribute);
+        }
+        resultLocal += "\n";
+        ber_free(ber, 0);
+        ldap_msgfree(resultMsg); //freed here ?
+
+        resultSearch += resultLocal;
+        break;
+
+      case LDAP_RES_SEARCH_RESULT:
+        finished = 1;
+        status = ldap_result2error(ld, resultMsg, 0);
+
+        prc = ldap_parse_result(ld,
+                                resultMsg,
+                                &errorCode,
+                                &matchedDN,
+                                &errorMessage,
+                                NULL,
+                                NULL,
+                                1);
+
+        if (matchedDN != NULL && *matchedDN != 0)
+        {
+          ldap_memfree(matchedDN);
+        }
+
+            break;
+      default:
+        break;
+      }
+      progress.Send(resultLocal.c_str(), resultLocal.length());
+      //std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
   // Executes in event loop
@@ -252,15 +336,16 @@ public:
       stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
       callback->Call(2, stateClient);
     }
+
     callback->Reset();
     progress->Reset();
   }
 
   void HandleProgressCallback(const char *data, size_t size)
   {
-    Nan::HandleScope scope; //?
+    Nan::HandleScope scope;
     // Required, this is not created automatically
-    char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
+    /*    char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
     int errorCode, prc;
 
     string resultLocal = "\n";
@@ -273,14 +358,8 @@ public:
       ldap_perror(ld, "ldap_result");
       return;
 
-    case 0: //why free the resultMSg if the timeout was exceeded ? should this case do nothing ?
-     // finished = 1;
-      if (resultMsg != NULL)
-      {
-        ldap_msgfree(resultMsg);
-      }
-      
-      return;
+    case 0:
+      break;
 
     case LDAP_RES_SEARCH_ENTRY:
       flagVerification = true;
@@ -294,12 +373,12 @@ public:
       }
 
       // You have to implement the attribute side
-      entry = ldap_first_entry(ld, resultMsg); //is this necesarry ? why not replace it with resultMsg entirely
-      for (attribute = ldap_first_attribute(ld, entry, &ber);
+      //entry = ldap_first_entry(ld, resultMsg); //is this necesarry ? why not replace it with resultMsg entirely
+      for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
            attribute != NULL;
-           attribute = ldap_next_attribute(ld, entry, ber))
+           attribute = ldap_next_attribute(ld, resultMsg, ber))
       {
-        if ((values = /*(char **)(intptr_t)*/ldap_get_values(ld, entry, attribute)) != NULL)
+        if ((values = ldap_get_values(ld, resultMsg, attribute)) != NULL)
         {
           for (i = 0; values[i] != NULL; i++)
           {
@@ -314,7 +393,7 @@ public:
       }
       resultLocal += "\n";
       ber_free(ber, 0);
-      ldap_msgfree(entry); //freed here ?
+      ldap_msgfree(resultMsg); //freed here ?
 
       resultSearch += resultLocal;
       break;
@@ -341,10 +420,10 @@ public:
     default:
       break;
     }
-
+*/
     //Nan::HandleScope scope;
     Local<Value> argv[1] = {Null()};
-    argv[0] = Nan::New(resultLocal).ToLocalChecked();
+    argv[0] = Nan::New(data).ToLocalChecked();
     progress->Call(1, argv);
     return;
   }
@@ -625,7 +704,7 @@ private:
 
     if (result != LDAP_SUCCESS)
     {
-    
+
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
@@ -730,7 +809,7 @@ private:
     }
 
     int result = ldap_delete_ext(obj->ld, dns, NULL, NULL, &msgID);
-   
+
     AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
   }
 
