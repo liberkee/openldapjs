@@ -1,5 +1,6 @@
 
 #include <ldap.h>
+#include<lber.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,9 +10,10 @@
 int main(int argc, char **argv)
 {
     int i = 0;
-    mrst
+    int status = 0;
+      struct timeval timeOut = {0, 1};
 
-        while (i < 1000)
+    while (i == 1001)
     {
         LDAP *ld;
         LDAPMessage *result, *e;
@@ -45,7 +47,6 @@ In this example, the client binds anonymously to the server
 
         int rc = ldap_simple_bind(ld, "cn=admin,dc=demoApp,dc=com", "secret");
         int bindResult = 0;
-        struct timeval timeOut = {0, 1};
 
         while (bindResult == 0)
         {
@@ -60,7 +61,7 @@ In this example, the client binds anonymously to the server
         }
         else
         {
-            int status = ldap_result2error(ld, result, 0);
+            int status = ldap_result2error(ld,0);
             if (status != LDAP_SUCCESS)
             {
                 printf("binding failed with error :");
@@ -77,11 +78,12 @@ In this example, the client binds anonymously to the server
         int searchResult = ldap_search_ext(ld,
                                            "cn=admin,dc=demoApp,dc=com",
                                            2,
-                                           "objectClass=inetOrgPerson" NULL,
+                                           "objectClass=inetOrgPerson",
+                                           NULL,
                                            0,
                                            NULL,
                                            NULL,
-                                           &timeout,
+                                           &timeOut,
                                            LDAP_NO_LIMIT,
                                            &message);
 
@@ -95,28 +97,82 @@ In this example, the client binds anonymously to the server
         int searchFinished = 0;
         int msgID;
         LDAPMessage *resultMsg;
+        char *dn2, *attribute, **values, *matchedDN, *errorMessage = NULL;
+        int errorCode, prc;
+        BerElement *ber;
+        
+
         while (searchFinished == 0)
         {
-            ldapResult = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeout, &resultMsg);
+            ldapResult = ldap_result(ld, message, LDAP_MSG_ONE, &timeOut, &resultMsg);
 
             switch (ldapResult)
             {
             case -1:
-                ldapResult = ldap_get_lderrno(ld, NULL, NULL);
-                fprintf(stderr, "ldap_result:%s\n", ldap_err2string(rc));
-                ldap_unbind(ld);
-                return 1;
+                // flagVerification = false;
+                ldap_perror(ld, "ldap_result");
+                return;
 
             case 0:
                 break;
 
             case LDAP_RES_SEARCH_ENTRY:
-                if ((dn = ldap_get_dn(ld, resultMsg)) != NULL)
+                // flagVerification = true;
+                if ((dn2 = ldap_get_dn(ld, resultMsg)) != NULL)
                 {
-                    //do something with dn
-                    ldap_memfree(dn);
-   
+                    //resultLocal += "dn:";
+                    //  resultLocal += dn;
+                    ldap_memfree(dn2);
+
+                    // resultLocal += "\n";
                 }
+
+                // You have to implement the attribute side
+                //entry = ldap_first_entry(ld, resultMsg); //is this necesarry ? why not replace it with resultMsg entirely
+                for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
+                     attribute != NULL;
+                     attribute = ldap_next_attribute(ld, resultMsg, ber))
+                {
+                    if ((values = ldap_get_values(ld, resultMsg, attribute)) != NULL)
+                    {
+                        for (i = 0; values[i] != NULL; i++)
+                        {
+                              //use values or w/e
+                        }
+                        ldap_value_free(values);
+                    }
+                    ldap_memfree(attribute);
+                }
+                //resultLocal += "\n";
+                ber_free(ber, 0);
+                ldap_msgfree(resultMsg); //freed here ?
+
+                //resultSearch += resultLocal;
+                break;
+
+            case LDAP_RES_SEARCH_RESULT:
+                searchFinished = 1;
+                status = ldap_result2error(ld, resultMsg, 0);
+
+                prc = ldap_parse_result(ld,
+                                        resultMsg,
+                                        &errorCode,
+                                        &matchedDN,
+                                        &errorMessage,
+                                        NULL,
+                                        NULL,
+                                        1);
+
+                if (matchedDN != NULL && *matchedDN != 0)
+                {
+                    ldap_memfree(matchedDN);
+                }
+                ldap_msgfree(resultMsg);
+
+
+                break;
+            default:
+                break;
             }
         }
 
@@ -125,6 +181,7 @@ In this example, the client binds anonymously to the server
         if (unbindResult != LDAP_SUCCESS)
         {
             printf("unbind failed with err:");
+            return -1;
         }
 
         i++;

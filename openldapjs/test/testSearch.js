@@ -39,6 +39,7 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         next();
 
+
       }); 
   });
 
@@ -59,7 +60,6 @@ describe('Testing the async LDAP search ', () => {
       .then((result) => {
         const baseDN = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
         should.deepEqual(result, baseDN);
-
       })
       .then(() => {
         next();
@@ -74,8 +74,8 @@ describe('Testing the async LDAP search ', () => {
         clientLDAP.bind(dnUser, password)
           .then(() => {
             clientLDAP.search(searchBase, 2, 'objectClass=*')
-              .then((result) => {
-                result.should.be.empty;
+              .catch( (err) => {
+                err.message.should.be.deepEqual('32');
               });
       })
       .then(() => {
