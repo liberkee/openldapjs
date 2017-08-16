@@ -13,12 +13,12 @@ describe('Testing the async LDAP search ', () => {
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
-  
+
 
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
-  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/'+Date.now()+'.heapsnapshot');
+  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/' + Date.now() + '.heapsnapshot');
 
 
   beforeEach((next) => {
@@ -40,7 +40,7 @@ describe('Testing the async LDAP search ', () => {
         next();
 
 
-      }); 
+      });
   });
 
   it('should return an empty search', (next) => {
@@ -71,12 +71,12 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return nothing', (next) => {
-        clientLDAP.bind(dnUser, password)
-          .then(() => {
-            clientLDAP.search(searchBase, 2, 'objectClass=*')
-              .catch( (err) => {
-                err.message.should.be.deepEqual('32');
-              });
+    clientLDAP.bind(dnUser, password)
+      .then(() => {
+        clientLDAP.search(searchBase, 2, 'objectClass=*')
+          .catch((err) => {
+            err.message.should.be.deepEqual('32');
+          });
       })
       .then(() => {
         next();
@@ -178,20 +178,20 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-/*  
-  it('should return 10k entries', function (next) {
-    this.timeout(0);
-
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
-      .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(10000);
-      })
-      .then(() => {
-        next();
-      });
-  });
-  */
+  /*  
+    it('should return 10k entries', function (next) {
+      this.timeout(0);
+  
+      clientLDAP.search(searchBase, 2, 'objectClass=person')
+        .then((result) => {
+          const count = (result.match(/\ndn:/g) || []).length;
+          count.should.be.above(10000);
+        })
+        .then(() => {
+          next();
+        });
+    });
+    */
 
   it('should return results in entire subtree', (next) => {
 

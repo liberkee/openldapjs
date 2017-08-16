@@ -1,6 +1,6 @@
 
 #include <ldap.h>
-#include<lber.h>
+#include <lber.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 {
     int i = 0;
     int status = 0;
-      struct timeval timeOut = {0, 1};
+    struct timeval timeOut = {0, 1};
 
     while (i == 1001)
     {
@@ -61,7 +61,7 @@ In this example, the client binds anonymously to the server
         }
         else
         {
-            int status = ldap_result2error(ld,0);
+            int status = ldap_result2error(ld, 0);
             if (status != LDAP_SUCCESS)
             {
                 printf("binding failed with error :");
@@ -100,7 +100,6 @@ In this example, the client binds anonymously to the server
         char *dn2, *attribute, **values, *matchedDN, *errorMessage = NULL;
         int errorCode, prc;
         BerElement *ber;
-        
 
         while (searchFinished == 0)
         {
@@ -137,7 +136,7 @@ In this example, the client binds anonymously to the server
                     {
                         for (i = 0; values[i] != NULL; i++)
                         {
-                              //use values or w/e
+                            //use values or w/e
                         }
                         ldap_value_free(values);
                     }
@@ -168,7 +167,6 @@ In this example, the client binds anonymously to the server
                     ldap_memfree(matchedDN);
                 }
                 ldap_msgfree(resultMsg);
-
 
                 break;
             default:

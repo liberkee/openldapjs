@@ -155,7 +155,7 @@ class LDAPBindProgress : public AsyncProgressWorker
 private:
   LDAP *ld;
   Callback *progress;
-  int result = 0;
+  int result;
   LDAPMessage *resultMsg;
   int msgID;
 
@@ -168,6 +168,7 @@ public:
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
+    result = 0;
     struct timeval timeOut = {0, 1};
     while (result == 0)
     {
@@ -190,6 +191,7 @@ public:
       int status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS)
       {
+        
         stateClient[0] = Nan::New<Number>(status);
         callback->Call(1, stateClient);
       }
@@ -201,7 +203,7 @@ public:
     }
     callback->Reset();
     progress->Reset();
-    ldap_msgfree(resultMsg); //testing this out
+      ldap_msgfree(resultMsg); //testing this out
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -313,6 +315,13 @@ public:
                                 NULL,
                                 1);
 
+        if( prc != LDAP_SUCCESS ) {
+          //in case of error ?
+          cout<<"parse result failed with:"<<ldap_err2string(prc)<<endl;
+          return;
+
+        }                        
+
         if (matchedDN != NULL && *matchedDN != 0)
         {
           ldap_memfree(matchedDN);
@@ -328,8 +337,11 @@ public:
       }
 
       char *resultPointer = new char[resultLocal.length()];
+      resultPointer = strdup(resultLocal.c_str());
 
       progress.Send(resultPointer, resultLocal.length());
+
+      delete resultPointer;
     }
   }
   // Executes in event loop
@@ -534,9 +546,6 @@ private:
 
     Local<Value> stateClient[2] = {Null(), Null()};
     Callback *callback = new Callback(info[0].As<Function>());
-
-    int msgId = 0;
-
     stateClient[0] = Nan::New<Number>(0);
 
     int state = ldap_start_tls_s(obj->ld, NULL, NULL);
@@ -544,14 +553,12 @@ private:
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      //callback->Reset();
       delete callback;
       callback = nullptr;
       return;
     }
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
-    // callback->Reset();//redundant?
     delete callback;
     callback = nullptr;
     return;
@@ -559,7 +566,6 @@ private:
 
   static NAN_METHOD(bind)
   {
-    //Nan::HandleScope scope; not necesary
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
@@ -711,7 +717,7 @@ private:
     callback->Call(2, stateClient);
 
     //freeing callbacks ?
-    // callback->Reset();
+    // callback->Reset();set();
     delete callback;
     callback = nullptr;
 
