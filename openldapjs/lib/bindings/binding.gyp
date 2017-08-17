@@ -23,7 +23,8 @@
       "cflags": [
           "-Wall",
           "-g",
-          "-std=c++11"
+          "-std=c++11",
+          "-Wno-reorder"
       ],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"]

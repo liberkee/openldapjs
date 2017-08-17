@@ -42,8 +42,11 @@ public:
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-      std::this_thread::sleep_for(chrono::milliseconds(10));
+
+
+
+      //progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+      //std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -78,11 +81,13 @@ public:
 
   void HandleProgressCallback(const char *data, size_t size)
   {
+    /*
     // Required, this is not created automatically
     Nan::HandleScope scope;
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
+    */
   }
 };
 
@@ -107,8 +112,8 @@ public:
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-      std::this_thread::sleep_for(chrono::milliseconds(10));
+     // progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+     // std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -142,11 +147,13 @@ public:
 
   void HandleProgressCallback(const char *data, size_t size)
   {
+    /* progress.send what ?
     // Required, this is not created automatically
     Nan::HandleScope scope;
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
+    */
   }
 };
 
@@ -214,7 +221,7 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv); */
-    return;
+    
   }
 };
 
@@ -341,7 +348,7 @@ public:
 
       progress.Send(resultPointer, resultLocal.length());
 
-      delete resultPointer;
+      delete resultPointer; //potentialy dangerous ?
     }
   }
   // Executes in event loop
@@ -439,11 +446,13 @@ public:
 
   void HandleProgressCallback(const char *data, size_t size)
   {
+    /*
     // Required, this is not created automatically
     Nan::HandleScope scope;
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);
+    */
   }
 };
 

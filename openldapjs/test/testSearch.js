@@ -70,7 +70,7 @@ describe('Testing the async LDAP search ', () => {
    * test case for search with access denied
    */
 
-  it('should return nothing', (next) => {
+ /* it('should return nothing', (next) => {
     clientLDAP.bind(dnUser, password)
       .then(() => {
         clientLDAP.search(searchBase, 2, 'objectClass=*')
@@ -82,7 +82,7 @@ describe('Testing the async LDAP search ', () => {
         next();
       });
 
-  });
+  }); */
 
   /**
    * test case with a single result
