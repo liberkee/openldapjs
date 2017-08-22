@@ -249,6 +249,8 @@ public:
     while (finished == 0)
     {
       result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
+      resultLocal.clear();
+      resultLocal = "\n";
 
       switch (result)
       {
@@ -330,12 +332,12 @@ public:
         break;
       }
 
-      char *resultPointer = new char[resultLocal.length()];
-      resultPointer = strdup(resultLocal.c_str());
+      // char *resultPointer = new char[resultLocal.length()];
+      // resultPointer = strdup(resultLocal.c_str());
 
-      progress.Send(resultPointer, resultLocal.length());
+      //progress.Send(resultPointer, resultLocal.length());
 
-      delete resultPointer; //potentialy dangerous ?
+      //delete resultPointer; //potentialy dangerous ?
     }
   }
   // Executes in event loop
@@ -360,7 +362,7 @@ public:
   }
 
   void HandleProgressCallback(const char *data, size_t size)
-  {
+  { /*
     Nan::HandleScope scope;
 
     //Nan::HandleScope scope;
@@ -368,6 +370,7 @@ public:
     argv[0] = Nan::New(data).ToLocalChecked();
 
     progress->Call(1, argv);
+    //delete[] data; */
   }
 };
 

@@ -70,19 +70,19 @@ describe('Testing the async LDAP search ', () => {
    * test case for search with access denied
    */
 
- /* it('should return nothing', (next) => {
-    clientLDAP.bind(dnUser, password)
-      .then(() => {
-        clientLDAP.search(searchBase, 2, 'objectClass=*')
-          .catch((err) => {
-            err.message.should.be.deepEqual('32');
-          });
-      })
-      .then(() => {
-        next();
-      });
-
-  }); */
+  /* it('should return nothing', (next) => {
+     clientLDAP.bind(dnUser, password)
+       .then(() => {
+         clientLDAP.search(searchBase, 2, 'objectClass=*')
+           .catch((err) => {
+             err.message.should.be.deepEqual('32');
+           });
+       })
+       .then(() => {
+         next();
+       });
+ 
+   }); */
 
   /**
    * test case with a single result
@@ -106,8 +106,9 @@ describe('Testing the async LDAP search ', () => {
   it('should return multiple results located on the same level', (next) => {
     clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
+        console.log(result);
         const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(0);
+        count.should.be.above(1);
       })
       .then(() => {
         next();
@@ -175,23 +176,21 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  /**
+  /** 
    * Test case with a large number of results (>10k)
    */
-  /*  
-    it('should return 10k entries', function (next) {
-      this.timeout(0);
-  
-      clientLDAP.search(searchBase, 2, 'objectClass=person')
-        .then((result) => {
-          const count = (result.match(/\ndn:/g) || []).length;
-          count.should.be.above(10000);
-        })
-        .then(() => {
-          next();
-        });
-    });
-    */
+
+  it('should return 10k entries', function (next) {
+    clientLDAP.search(searchBase, 2, 'objectClass=person')
+      .then((result) => {
+        const count = (result.match(/\ndn:/g) || []).length;
+        count.should.be.above(10000);
+      })
+      .then(() => {
+        next();
+      });
+  });
+
 
   it('should return results in entire subtree', (next) => {
 
