@@ -9,7 +9,6 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
-
 class LDAPPagedSearchProgress : public AsyncProgressWorker
 {
 private:
@@ -23,10 +22,9 @@ private:
   int scope;
   int pageSize;
 
-
 public:
-  LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld,char *base,int scope,char *filter, int pgSize )
-      : AsyncProgressWorker(callback), progress(progress), ld(ld),scope(scope),filter(filter),base(base),pageSize(pgSize)
+  LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, char *base, int scope, char *filter, int pgSize)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), scope(scope), filter(filter), base(base), pageSize(pgSize)
   {
   }
   // Executes in worker thread
@@ -37,37 +35,36 @@ public:
     LDAPControl *pageControl = NULL;
     LDAPControl *M_controls[2] = {NULL, NULL};
     int message;
-
-    
-
-   
-    
-
-    
-
-
-
+    int searchResult;
 
     struct timeval timeOut = {0, 1};
     while (result == 0)
     {
 
       ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
+      M_controls[0] = pageControl;
 
+      searchResult = ldap_search_ext(obj->ld,
+                                     DNbase,
+                                     scopeSearch,
+                                     filterSearch,
+                                     NULL,
+                                     0,
+                                     M_controls,
+                                     NULL,
+                                     NULL,
+                                     LDAP_NO_LIMIT,
+                                     &message);
 
-      result = ldap_search_ext(obj->ld,
-        DNbase,
-        scopeSearch,
-        filterSearch,
-        NULL,
-        0,
-        M_controls,
-        NULL,
-        NULL,
-        LDAP_NO_LIMIT,
-        &message);
+      //if the search, pass the error message to the handleProgress and exit loop                                   
+      if( searchResult != LDAP_SUCCESS ) 
+      {
+        progress.Send(reinterpret_cast<const char *>(&searchResult), sizeof(int));
+        break;
+      }
+      
+      
 
-     
       progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
     }
   }
@@ -690,7 +687,6 @@ private:
       return;
     }
 
-    
     if (result != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -700,7 +696,7 @@ private:
       return;
     }
 
-    AsyncQueueWorker(new LDAPPagedSearchProgress(callback, progress, obj->ld,DNbase,scopeSearch,filterSearch, pageSize));
+    AsyncQueueWorker(new LDAPPagedSearchProgress(callback, progress, obj->ld, DNbase, scopeSearch, filterSearch, pageSize));
   }
 
   static NAN_METHOD(compare)
