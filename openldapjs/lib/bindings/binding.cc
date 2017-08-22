@@ -280,6 +280,64 @@ public:
   }
 };
 
+class LDAPModifyProgress : public AsyncProgressWorker {
+private:
+  LDAP *ld;
+  Callback *progress;
+  int result = 0;
+  LDAPMessage *resultMsg;
+  int msgID;
+  LDAPMod **entries;
+public:
+  LDAPModifyProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID, LDAPMod **newEntries)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID), entries(newEntries)
+  {
+  }
+  ~LDAPModifyProgress () {}
+
+  void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
+  {
+    struct timeval timeOut = {0, 1};
+    while (result == 0)
+    {
+      result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+    }
+  }
+
+  void HandleOKCallback()
+  {
+    Nan::HandleScope scope;
+    Local<Value> stateClient[2] = {Null(), Null()};
+    if (result == -1)
+    {
+      stateClient[0] = Nan::New<Number>(result);
+      callback->Call(1, stateClient);
+    }
+    else
+    {
+      int status = ldap_result2error(ld, resultMsg, 0);
+      if (status != LDAP_SUCCESS)
+      {
+        stateClient[0] = Nan::New<Number>(status);
+        callback->Call(1, stateClient);
+      }
+      else
+      {
+        stateClient[1] = Nan::New<Number>(0);
+        callback->Call(2, stateClient);
+      }
+    }
+    ldap_msgfree(resultMsg); //  we should free this here?.
+    ldap_mods_free(entries, 1);
+    callback->Reset();
+    progress->Reset();
+  }
+
+  void HandleProgressCallback(const char *data, size_t size)
+  {
+  }
+};
+
 class LDAPClient : public Nan::ObjectWrap
 {
 public:
@@ -293,6 +351,7 @@ public:
     Nan::SetPrototypeMethod(tpl, "startTls", startTls);
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
+    Nan::SetPrototypeMethod(tpl, "modify", modify);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
 
@@ -506,6 +565,73 @@ private:
                               &message);
 
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
+  }
+
+  static NAN_METHOD(modify) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Nan::Utf8String dn(info[0]);
+    Local<Array> entryModify = Local<Array>::Cast(info[2]);
+    Local<Value> stateClient[2] = {Null(), Null()};
+
+    Callback *callback = new Callback(info[3].As<Function>());
+    Callback *progress = new Callback(info[4].As<v8::Function>());
+
+    if(!info[1]->IsNumber()) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
+
+    int operationType = info[1]->NumberValue();
+    int length = entryModify->Length();
+    
+    if (length < 2 || obj->ld == 0)
+    {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
+
+    LDAPMod **newEntries = new LDAPMod *[length / 2 + 1];
+    for (int i = 0; i < length / 2; i++)
+    {
+      Nan::Utf8String type(entryModify->Get(2 * i));
+      std::string typeString(*type);
+      Nan::Utf8String value(entryModify->Get(2 * i + 1));
+      std::string valueString(*value);
+
+      newEntries[i] = new LDAPMod;
+
+      if (typeString.length() > 0 && valueString.length() > 0)
+      {
+        newEntries[i]->mod_type = new char[typeString.length() + 1];
+        newEntries[i]->mod_values = new char *[2];
+        newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
+
+        newEntries[i]->mod_op = operationType;
+        memcpy(newEntries[i]->mod_type, typeString.c_str(), typeString.length() + 1);
+        memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
+        newEntries[i]->mod_values[1] = NULL;
+      }
+    }
+
+    newEntries[length / 2] = NULL;
+    char *dns = *dn;
+    int msgID = 0;
+    
+    if (obj->ld == 0)
+    {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+
+    int result = ldap_modify_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
+    
+    AsyncQueueWorker(new LDAPModifyProgress(callback, progress, obj->ld, msgID, newEntries));   
   }
 
   static NAN_METHOD(unbind)

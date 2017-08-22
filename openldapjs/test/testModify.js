@@ -6,7 +6,7 @@ const should = require('should');
 describe('Testing the Compare functionalities', () => {
   const hostAddress = 'ldap://10.16.0.194:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
-  const dn = 'dn:cn=newPointChildBLABLA4,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com';
+  const dn = 'cn=newPointChildBLABLA,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com';
   const password = 'secret';
 
   const resStateRequired = 'The operation failed. It could be done if the state of the client is BOUND';
@@ -14,21 +14,37 @@ describe('Testing the Compare functionalities', () => {
   const resJsonInvalid = 'The passed JSON is invalid';
   const resDnInvalid = 'The passed dn is invalid';
 
-  const modJson = {
-    operation: 'add',
+  const operationCommand = {
+    addOP: 0,
+    deleteOP: 1,
+    replaceOp: 2,
+  }
+
+  const modAddNewAtt = {
+    operation: operationCommand.addOP,
     modification: {
-      objectClass: 'person',
-      sn: 'newSN',
-      description: 'OurNewObject',
+      description: 'A new description',
+    },
+  };
+
+  const modDeleteExistentAtt = {
+    operation: operationCommand.deleteOP,
+    modification: {
+      description: 'A new description',
+    },
+  };
+
+  const modReplaceExistentAtt = {
+    operation: operationCommand.replaceOp,
+    modification: {
+      description: 'A replace',
     },
   };
 
   const modJsonOpInvalid = {
-    operation: 'invalidOp',
+    operation: 5,
     modification: {
-      objectClass: 'person',
-      sn: 'newSN',
-      description: 'OurNewObject',
+      description: 'Replace an attribute',
     },
   };
 
@@ -57,7 +73,7 @@ describe('Testing the Compare functionalities', () => {
   it('should reject if the state is not BOUND', (next) => {
     ldapAsyncWrap.unbind()
     .then(() => {
-      ldapAsyncWrap.modify(dn, modJson)
+      ldapAsyncWrap.modify(dn, modAddNewAtt)
       .catch((error) => {
         should.deepEqual(error.message, resStateRequired);
         next();
@@ -68,7 +84,7 @@ describe('Testing the Compare functionalities', () => {
   it('should reject operation is invalid', (next) => {
     ldapAsyncWrap.modify(dn, modJsonOpInvalid)
     .catch((error) => {
-      should.deepEqual(error.message, resInvalidOp);
+      should.deepEqual(error.message, '2');
       next();
     });
   });
@@ -90,7 +106,7 @@ describe('Testing the Compare functionalities', () => {
   });
 
   it('should reject operation if the dn is null', (next) => {
-    ldapAsyncWrap.modify(null, modJson)
+    ldapAsyncWrap.modify(null, modAddNewAtt)
     .catch((error) => {
       should.deepEqual(error.message, resDnInvalid);
       next();
@@ -98,9 +114,33 @@ describe('Testing the Compare functionalities', () => {
   });
 
   it('should reject operation if the dn is empty', (next) => {
-    ldapAsyncWrap.modify('', modJson)
+    ldapAsyncWrap.modify('', modAddNewAtt)
     .catch((error) => {
       should.deepEqual(error.message, resDnInvalid);
+      next();
+    });
+  });
+
+  it('should add a new attribute from an existing entry', (next) => {
+    ldapAsyncWrap.modify(dn, modAddNewAtt)
+    .then((result) => {
+      should.deepEqual(result, 0);
+      next();
+    });
+  });
+
+  it('should replace an attribute from an entry', (next) => {
+    ldapAsyncWrap.modify(dn, modDeleteExistentAtt)
+    .then((result) => {
+      should.deepEqual(result, 0);
+      next();
+    });
+  });
+
+  it('should delete an existing attribute from an entry', (next) => {
+    ldapAsyncWrap.modify(dn, modReplaceExistentAtt)
+    .then((result) => {
+      should.deepEqual(result, 0);
       next();
     });
   });

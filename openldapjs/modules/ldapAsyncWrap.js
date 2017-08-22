@@ -179,32 +179,19 @@ module.exports = class LDAPWrapAsync {
         const entry = json.modification;
         const keys = Object.keys(entry);
         const res = [];
+
         for (const elem of keys) {
           res.push(elem);
           res.push(entry[elem]);
         }
 
-        if (json.operation === 'add') {
-          this._binding.add(dn, res, [])
-          .then((result) => {
+        this._binding.modify(dn, json.operation, res, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
             resolve(result);
-          })
-          .catch((error) => {
-            reject(new Error(error));
-          });
-        } else if (json.operation === 'delete') {
-          this._binding.del(dn, [])
-          .then((result) => {
-            resolve(result);
-          })
-          .catch((error) => {
-            reject(new Error(error));
-          });
-        } else if (json.operation === 'replace') {
-          // Not implemented
-        } else {
-          reject(new Error('Invalid Operation'));
-        }
+          }
+        });
       } else {
         reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
       }
