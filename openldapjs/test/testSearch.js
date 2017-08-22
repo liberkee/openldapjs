@@ -106,7 +106,6 @@ describe('Testing the async LDAP search ', () => {
   it('should return multiple results located on the same level', (next) => {
     clientLDAP.search(searchBase, 1, 'objectClass=*')
       .then((result) => {
-        console.log(result);
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.above(1);
       })
