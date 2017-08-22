@@ -9,16 +9,6 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
-typedef struct sentStruct
-{
-  LDAP *ld;
-  int result;
-  LDAPMessage *resultMsg;
-  LDAPMessage *entry;
-  int msgID;
-
-} dataObject_t;
-
 class LDAPAddProgress : public AsyncProgressWorker
 {
 private:
@@ -42,8 +32,6 @@ public:
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-
-
 
       //progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
       //std::this_thread::sleep_for(chrono::milliseconds(10));
@@ -112,8 +100,8 @@ public:
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-     // progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-     // std::this_thread::sleep_for(chrono::milliseconds(10));
+      // progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+      // std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -198,7 +186,7 @@ public:
       int status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS)
       {
-        
+
         stateClient[0] = Nan::New<Number>(status);
         callback->Call(1, stateClient);
       }
@@ -210,7 +198,7 @@ public:
     }
     callback->Reset();
     progress->Reset();
-      ldap_msgfree(resultMsg); //testing this out
+    ldap_msgfree(resultMsg); //testing this out
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -221,7 +209,6 @@ public:
     Local<Value> argv[] = {
         New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv); */
-    
   }
 };
 
@@ -322,12 +309,12 @@ public:
                                 NULL,
                                 1);
 
-        if( prc != LDAP_SUCCESS ) {
+        if (prc != LDAP_SUCCESS)
+        {
           //in case of error ?
-          cout<<"parse result failed with:"<<ldap_err2string(prc)<<endl;
+          cout << "parse result failed with:" << ldap_err2string(prc) << endl;
           return;
-
-        }                        
+        }
 
         if (matchedDN != NULL && *matchedDN != 0)
         {
@@ -618,21 +605,7 @@ private:
     Callback *callback = new Callback(info[3].As<Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());
 
-    //Verify if the argument is a Number for scope
-    if (!info[1]->IsNumber())
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }
-
     int scopeSearch = info[1]->NumberValue();
-    if (scopeSearch <= 0 && scopeSearch >= 3)
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }
 
     if (obj->ld == 0)
     {
