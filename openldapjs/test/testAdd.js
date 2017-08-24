@@ -3,7 +3,7 @@
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
-const heapdump = require('heapdump');
+// const heapdump = require('heapdump');
 
 describe('Testing the async LDAP add operation', () => {
 
@@ -13,8 +13,10 @@ describe('Testing the async LDAP add operation', () => {
   const password = 'secret';
 
   let clientLDAP = new LDAP(host);
-  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/Snapshots/' + Date.now() + '.heapsnapshot');
-
+  /* heapdump.writeSnapshot(
+    '/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/Snapshots/'
+   + Date.now() + '.heapsnapshot');
+  */
   beforeEach((next) => {
     clientLDAP = new LDAP(host);
 

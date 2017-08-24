@@ -111,7 +111,6 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        console.log(this._stateClient);
         reject(new Error('The Search operation can be done just in BOUND state'));
       }
 
@@ -151,7 +150,7 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
 
-        //turn the json into an Array that can be easily parsed.
+        // turn the json into an Array that can be easily parsed.
         const keys = Object.keys(entry);
         const entryArray = [];
 

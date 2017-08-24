@@ -3,7 +3,7 @@
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
-const heapdump = require('heapdump');
+// const heapdump = require('heapdump');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -16,8 +16,10 @@ describe('Testing the async LDAP delete operation', () => {
   const resBindStateReq = 'The Delete operation can be done just in BOUND state';
 
   let clientLDAP = new LDAP(host);
-   heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsDelete/'+Date.now()+'.heapsnapshot');
-
+  /*  heapdump.writeSnapshot(
+    '/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsDelete/'
+                              +Date.now()+'.heapsnapshot');
+ */
   beforeEach((next) => {
     clientLDAP = new LDAP(host);
 
@@ -61,18 +63,18 @@ describe('Testing the async LDAP delete operation', () => {
         next();
       });
   });
-/*
-  it('should reject the request with insufficient access error code', (next) => {
-    clientLDAP.bind(dnUser, password)
-      .then(() => {
-        clientLDAP.del('ou=users1,o=myhost,dc=demoApp,dc=com')
-          .catch((err) => {
-            err.message.should.be.deepEqual('50');
-          });
-        next();
-      });
-  });
-  */
+  /*
+    it('should reject the request with insufficient access error code', (next) => {
+      clientLDAP.bind(dnUser, password)
+        .then(() => {
+          clientLDAP.del('ou=users1,o=myhost,dc=demoApp,dc=com')
+            .catch((err) => {
+              err.message.should.be.deepEqual('50');
+            });
+          next();
+        });
+    });
+    */
 
   it('should reject the request with no such object error code', (next) => {
     clientLDAP.del('ou=users2,o=myhost,dc=demoApp,dc=com')
@@ -91,10 +93,7 @@ describe('Testing the async LDAP delete operation', () => {
       .then(() => {
         next();
       });
-
   });
-
-
 
   it('should reject the request to delete non-leaf node', (next) => {
     clientLDAP.del('cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com')
@@ -132,8 +131,6 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-
-
   it('should delete in paralel requests with one error', (next) => {
     const first = clientLDAP.del('cn=newPointChildBLABLA4,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', []);
     const second = clientLDAP.del('cn=newPointChildBLABLA5,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', []);
@@ -147,7 +144,4 @@ describe('Testing the async LDAP delete operation', () => {
         next();
       });
   });
-
-
 });
-
