@@ -72,7 +72,6 @@ describe('Testing the modify functionalities', () => {
 
     ldapAsyncWrap.initialize()
       .then(() => {
-        console.log('it initializes');
         ldapAsyncWrap.bind(dnAdmin, password)
           .then(() => {
             next();

@@ -214,7 +214,7 @@ module.exports = class LDAPWrapAsync {
     newModify(dn, changes) {
       return new Promise((resolve, reject) => {
         if (this._stateClient === this._E_STATES.BOUND) {
-          if (json === null || json === '') {
+          if (changes === null || changes === '') {
             reject(new Error('The passed JSON is invalid'));
             return;
           }
@@ -225,13 +225,9 @@ module.exports = class LDAPWrapAsync {
           }
           
           this._binding.newModify(dn, changes, (err, result) => {
-            console.log('ERROR:', err);
-            console.log('RESULT:', result);
             if (err) {
-              console.log('ERROR');
               reject(new Error(err));
             } else {
-              console.log('NOT ERROR');
               resolve(result);
             }
           });

@@ -574,7 +574,7 @@ private:
 
     Handle<Array> mods = Handle<Array>::Cast(info[1]);
     unsigned int nummods = mods->Length();
-
+    
     Local<Value> stateClient[2] = {Null(), Null()};
 
     Callback *callback = new Callback(info[2].As<v8::Function>());
@@ -595,7 +595,6 @@ private:
     for(unsigned int i = 0; i < nummods; i++) {
       Local<Object> modHandle = Local<Object>::Cast(mods->Get(Nan::New(i)));
         Local<Object>::Cast(mods->Get(Nan::New(i)));
-
       //ldapmods[i] = (LDAPMod *) malloc(sizeof(LDAPMod));
       ldapmods[i] = new LDAPMod;
       String::Utf8Value mod_op(modHandle->Get(Nan::New("op").ToLocalChecked()));
@@ -607,6 +606,10 @@ private:
       } else if (!strcmp(*mod_op, "replace")) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
       } else {
+        stateClient[0] = Nan::New<Number>(2);
+        callback->Call(1, stateClient);
+        delete callback;
+        delete progress;
         return;
       }
       
