@@ -327,10 +327,10 @@ public:
         callback->Call(2, stateClient);
       }
     }
-    ldap_msgfree(resultMsg); //  we should free this here?.
-    ldap_mods_free(entries, 1);
     callback->Reset();
     progress->Reset();
+    ldap_msgfree(resultMsg); 
+    ldap_mods_free(entries, 1);
   }
 
   void HandleProgressCallback(const char *data, size_t size)
@@ -569,9 +569,10 @@ private:
   }
 
   static NAN_METHOD(newModify) {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<Ldap>
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String dn(info[0]);
 
+    cout << "I'm here newModify" << endl;
     Handle<Array> mods = Handle<Array>::Cast(info[1]);
     unsigned int nummods = mods->Length();
 
@@ -595,7 +596,7 @@ private:
         Local<Object>::Cast(mods->Get(Nan::New(i)));
 
       ldapmods[i] = (LDAPMod *) malloc(sizeof(LDAPMod));
-      string::Utf8Value mod_op(modHandle->Get(Nan::New("op").ToLocalChecked()));
+      String::Utf8Value mod_op(modHandle->Get(Nan::New("op").ToLocalChecked()));
 
       if(!strcmp(*mod_op, "add")) {
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
@@ -604,18 +605,19 @@ private:
       } else if (!strcmp(*mod_op, "replace")) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
       }
-
-      string::Utf8Value mod_type(modHandle->Get(Nan::New("attr").ToLocalChecked()));
+      
+      String::Utf8Value mod_type(modHandle->Get(Nan::New("attr").ToLocalChecked()));
       ldapmods[i]->mod_type = strdup(*mod_type);
 
       Local<Array> modValsHandle = Local<Array>::Cast(modHandle->Get(Nan::New("vals").ToLocalChecked()));
 
       int modValsLength = modValsHandle->Length();
       ldapmods[i]->mod_values = (char **) malloc(sizeof(char *) * (modValsLength + 1));
-
       for(int j = 0; j < modValsLength; j++) {
         Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
-        ldapmods[j]->mod_values[j] = strdup(*modValue);
+        cout << "HERE";
+        ldapmods[i]->mod_values[j] = strdup(*modValue);
+        cout << *modValue << endl;
       }
       ldapmods[i] -> mod_values[modValsLength] = NULL;
     }
@@ -624,8 +626,6 @@ private:
 
     int msgID = 0;
     int result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);
-
-    ldap_mods_free(ldapmods, 1);
 
     AsyncQueueWorker(new LDAPModifyProgress(callback, progress, obj->ld, msgID, ldapmods)); 
   }

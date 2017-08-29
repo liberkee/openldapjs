@@ -76,7 +76,7 @@ function modify() {
     .then( () => {
       clientLDAP.bind(dnUser,password)
       .then( () =>{
-        clientLDAP.newModify(dnUser, [changes])
+        clientLDAP.newModify(dnUser, changes)
           .then( (result) => {
             console.log(result);
           });

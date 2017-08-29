@@ -43,12 +43,15 @@ module.exports = class LDAPWrapAsync {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
-            this._binding.startTls((errTls, stateTls) => {
+            /*this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
                 resolve(stateTls);
+              }*/
+              this._stateClient = this._E_STATES.INITIALIZED;
+              resolve(result);
               }
             });
           } else {
@@ -56,8 +59,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       }
-    });
-  }
+
 
   /**
    * Authentificate to LDAP server.
@@ -210,7 +212,7 @@ module.exports = class LDAPWrapAsync {
     newModify(dn, changes) {
       return new Promise((resolve, reject) => {
         if (this._stateClient === this._E_STATES.BOUND) {
-          this._binding.modify(dn, changes, (err, result) => {
+          this._binding.newModify(dn, changes, (err, result) => {
             if (err) {
               reject(new Error(err));
             } else {
