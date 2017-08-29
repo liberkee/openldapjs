@@ -43,6 +43,7 @@ module.exports = class LDAPWrapAsync {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
+            
             /*this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
                 reject(new Error(errTls));
@@ -51,15 +52,16 @@ module.exports = class LDAPWrapAsync {
                 resolve(stateTls);
               }*/
               this._stateClient = this._E_STATES.INITIALIZED;
-              resolve(result);
-              }
-            });
+            resolve(result);
           } else {
             reject(err);
           }
         });
+      } else {
+        reject(new Error('Can initialize only if created'));
       }
-
+    });
+  }
 
   /**
    * Authentificate to LDAP server.
@@ -213,9 +215,13 @@ module.exports = class LDAPWrapAsync {
       return new Promise((resolve, reject) => {
         if (this._stateClient === this._E_STATES.BOUND) {
           this._binding.newModify(dn, changes, (err, result) => {
+            console.log('ERROR:', err);
+            console.log('RESULT:', result);
             if (err) {
+              console.log('ERROR');
               reject(new Error(err));
             } else {
+              console.log('NOT ERROR');
               resolve(result);
             }
           });

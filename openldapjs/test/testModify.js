@@ -3,8 +3,8 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 
-describe('Testing the Compare functionalities', () => {
-  const hostAddress = 'ldap://10.16.0.194:389';
+describe('Testing the modify functionalities', () => {
+  const hostAddress = 'ldap://localhost:389';
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const password = 'secret';
@@ -72,6 +72,7 @@ describe('Testing the Compare functionalities', () => {
 
     ldapAsyncWrap.initialize()
       .then(() => {
+        console.log('it initializes');
         ldapAsyncWrap.bind(dnAdmin, password)
           .then(() => {
             next();
@@ -87,7 +88,7 @@ describe('Testing the Compare functionalities', () => {
   });
 
 
-  it('should reject if the state is not BOUND', (next) => {
+  /*it('should reject if the state is not BOUND', (next) => {
     ldapAsyncWrap.unbind()
     .then(() => {
       ldapAsyncWrap.newModify(dn, modAddNewAtt)
@@ -136,14 +137,14 @@ describe('Testing the Compare functionalities', () => {
       should.deepEqual(error.message, resDnInvalid);
       next();
     });
-  });
+  });*/
 
   it('should add a new attribute from an existing entry', (next) => {
     ldapAsyncWrap.newModify(dn, modAddNewAtt)
     .then((result) => {
       should.deepEqual(result, 0);
       next();
-    });
+    })
   });
 
   it('should replace an attribute from an entry', (next) => {

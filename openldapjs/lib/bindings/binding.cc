@@ -577,8 +577,8 @@ private:
 
     Local<Value> stateClient[2] = {Null(), Null()};
 
-    Callback *callback = new Callback(info[3].As<v8::Function>());
-    Callback *progress = new Callback(info[4].As<v8::Function>());
+    Callback *callback = new Callback(info[2].As<v8::Function>());
+    Callback *progress = new Callback(info[3].As<v8::Function>());
 
     //LDAPMod **ldapmods = (LDAPMod **) malloc(sizeof(LDAPMod *) * (nummods + 1));
     LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
@@ -605,6 +605,8 @@ private:
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;
       } else if (!strcmp(*mod_op, "replace")) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
+      } else {
+        return;
       }
       
       String::Utf8Value mod_type(modHandle->Get(Nan::New("attr").ToLocalChecked()));

@@ -68,7 +68,7 @@ function modify() {
   const changes = [
     { op: 'add',
       attr: 'description',
-      vals: ['newDescription', 'secondNewDescription']
+      vals: ['asda']
     },
   ];
 
@@ -78,8 +78,8 @@ function modify() {
       .then( () =>{
         clientLDAP.newModify(dnUser, changes)
           .then( (result) => {
-            console.log(result);
-          });
+            console.log('Result', result);
+          })
       });
         
     });
