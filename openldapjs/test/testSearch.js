@@ -4,7 +4,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
-const heapdump = require('heapdump');
+//const heapdump = require('heapdump');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -18,7 +18,7 @@ describe('Testing the async LDAP search ', () => {
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
-  heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/' + Date.now() + '.heapsnapshot');
+  //heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/' + Date.now() + '.heapsnapshot');
 
 
   beforeEach((next) => {
