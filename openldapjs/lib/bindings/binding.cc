@@ -572,7 +572,6 @@ private:
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String dn(info[0]);
 
-    cout << "I'm here newModify" << endl;
     Handle<Array> mods = Handle<Array>::Cast(info[1]);
     unsigned int nummods = mods->Length();
 
@@ -581,8 +580,9 @@ private:
     Callback *callback = new Callback(info[3].As<v8::Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());
 
-    LDAPMod **ldapmods = (LDAPMod **) malloc(sizeof(LDAPMod *) * (nummods + 1));
-
+    //LDAPMod **ldapmods = (LDAPMod **) malloc(sizeof(LDAPMod *) * (nummods + 1));
+    LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
+     
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
@@ -595,7 +595,8 @@ private:
       Local<Object> modHandle = Local<Object>::Cast(mods->Get(Nan::New(i)));
         Local<Object>::Cast(mods->Get(Nan::New(i)));
 
-      ldapmods[i] = (LDAPMod *) malloc(sizeof(LDAPMod));
+      //ldapmods[i] = (LDAPMod *) malloc(sizeof(LDAPMod));
+      ldapmods[i] = new LDAPMod;
       String::Utf8Value mod_op(modHandle->Get(Nan::New("op").ToLocalChecked()));
 
       if(!strcmp(*mod_op, "add")) {
@@ -612,12 +613,11 @@ private:
       Local<Array> modValsHandle = Local<Array>::Cast(modHandle->Get(Nan::New("vals").ToLocalChecked()));
 
       int modValsLength = modValsHandle->Length();
-      ldapmods[i]->mod_values = (char **) malloc(sizeof(char *) * (modValsLength + 1));
+      //ldapmods[i]->mod_values = (char **) malloc(sizeof(char *) * (modValsLength + 1));
+      ldapmods[i]->mod_values = new char * [modValsLength + 1];
       for(int j = 0; j < modValsLength; j++) {
         Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
-        cout << "HERE";
         ldapmods[i]->mod_values[j] = strdup(*modValue);
-        cout << *modValue << endl;
       }
       ldapmods[i] -> mod_values[modValsLength] = NULL;
     }
