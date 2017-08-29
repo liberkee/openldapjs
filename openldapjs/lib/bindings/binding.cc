@@ -352,6 +352,7 @@ public:
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "modify", modify);
+    Nan::SetPrototypeMethod(tpl, "newModify", newModify);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
 
@@ -567,6 +568,67 @@ private:
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
   }
 
+  static NAN_METHOD(newModify) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<Ldap>
+    Nan::Utf8String dn(info[0]);
+
+    Handle<Array> mods = Handle<Array>::Cast(info[1]);
+    unsigned int nummods = mods->Length();
+
+    Local<Value> stateClient[2] = {Null(), Null()};
+
+    Callback *callback = new Callback(info[3].As<v8::Function>());
+    Callback *progress = new Callback(info[4].As<v8::Function>());
+
+    LDAPMod **ldapmods = (LDAPMod **) malloc(sizeof(LDAPMod *) * (nummods + 1));
+
+    if (obj->ld == 0) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+
+    for(unsigned int i = 0; i < nummods; i++) {
+      Local<Object> modHandle = Local<Object>::Cast(mods->Get(Nan::New(i)));
+        Local<Object>::Cast(mods->Get(Nan::New(i)));
+
+      ldapmods[i] = (LDAPMod *) malloc(sizeof(LDAPMod));
+      string::Utf8Value mod_op(modHandle->Get(Nan::New("op").ToLocalChecked()));
+
+      if(!strcmp(*mod_op, "add")) {
+        ldapmods[i]->mod_op = LDAP_MOD_ADD;
+      } else if (!strcmp(*mod_op, "delete")) {
+        ldapmods[i]->mod_op = LDAP_MOD_DELETE;
+      } else if (!strcmp(*mod_op, "replace")) {
+        ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
+      }
+
+      string::Utf8Value mod_type(modHandle->Get(Nan::New("attr").ToLocalChecked()));
+      ldapmods[i]->mod_type = strdup(*mod_type);
+
+      Local<Array> modValsHandle = Local<Array>::Cast(modHandle->Get(Nan::New("vals").ToLocalChecked()));
+
+      int modValsLength = modValsHandle->Length();
+      ldapmods[i]->mod_values = (char **) malloc(sizeof(char *) * (modValsLength + 1));
+
+      for(int j = 0; j < modValsLength; j++) {
+        Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
+        ldapmods[j]->mod_values[j] = strdup(*modValue);
+      }
+      ldapmods[i] -> mod_values[modValsLength] = NULL;
+    }
+
+    ldapmods[nummods] = NULL;
+
+    int msgID = 0;
+    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);
+
+    ldap_mods_free(ldapmods, 1);
+
+    AsyncQueueWorker(new LDAPModifyProgress(callback, progress, obj->ld, msgID, ldapmods)); 
+  }
   static NAN_METHOD(modify) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 

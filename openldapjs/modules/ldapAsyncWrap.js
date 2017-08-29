@@ -199,6 +199,31 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
+    * Perform an LDAP modify operation
+    *
+    * @method newModify
+    * @param{string} dn The dn of the entry to modify
+    * @param{array} mods An array that contains the fields that shall be changed
+    * @return {Promise} That resolves if LDAP modified successfully the entry.
+    * Reject if the LDAP rejects the operation or the client's state is not BOUND
+    */
+    newModify(dn, changes) {
+      return new Promise((resolve, reject) => {
+        if (this._stateClient === this._E_STATES.BOUND) {
+          this._binding.modify(dn, changes, (err, result) => {
+            if (err) {
+              reject(new Error(err));
+            } else {
+              resolve(result);
+            }
+          });
+        } else {
+          reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
+        }
+      });
+    }
+
+  /**
     * Unbind from a LDAP server.
     *
     * @method unbind

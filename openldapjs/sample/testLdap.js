@@ -64,20 +64,19 @@ function modify() {
   const password = process.argv[5];
   const clientLDAP = new LDAPWrap(host);
 
-  const json = {
-    operation: 'add',
-    modification: {
-      objectClass:'person',
-      sn:'newSN',
-      description:'OurNewObject'
-    }
-  }
+  const userDnModify = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
+  const changes = [
+    { op: 'add',
+      attr: 'description',
+      vals: ['newDescription', 'secondNewDescription']
+    },
+  ];
 
   clientLDAP.initialize()
     .then( () => {
       clientLDAP.bind(dnUser,password)
       .then( () =>{
-        clientLDAP.modify(dnUser, json)
+        clientLDAP.newModify(dnUser, [changes])
           .then( (result) => {
             console.log(result);
           });
