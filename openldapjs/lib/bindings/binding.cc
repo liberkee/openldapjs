@@ -583,9 +583,10 @@ private:
     //LDAPMod **ldapmods = (LDAPMod **) malloc(sizeof(LDAPMod *) * (nummods + 1));
     LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
      
-    if (obj->ld == 0) {
+    if (obj->ld == 0 || obj->ld == NULL) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      ldap_mods_free(ldapmods, 1);
       delete callback;
       delete progress;
       return;

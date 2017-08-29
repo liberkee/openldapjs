@@ -88,7 +88,7 @@ describe('Testing the modify functionalities', () => {
   });
 
 
-  /*it('should reject if the state is not BOUND', (next) => {
+  it('should reject if the state is not BOUND', (next) => {
     ldapAsyncWrap.unbind()
     .then(() => {
       ldapAsyncWrap.newModify(dn, modAddNewAtt)
@@ -137,7 +137,7 @@ describe('Testing the modify functionalities', () => {
       should.deepEqual(error.message, resDnInvalid);
       next();
     });
-  });*/
+  });
 
   it('should add a new attribute from an existing entry', (next) => {
     ldapAsyncWrap.newModify(dn, modAddNewAtt)
