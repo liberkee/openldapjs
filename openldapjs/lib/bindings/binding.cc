@@ -367,7 +367,7 @@ public:
   }
 };
 
-class LDAPSearchWithPaginationProgress : public AsyncProgressWorker
+class LDAPpagedSearchProgress : public AsyncProgressWorker
 {
 private:
   LDAP *ld;
@@ -384,7 +384,7 @@ private:
   LDAPControl **returnedControls = NULL;
 
 public:
-  LDAPSearchWithPaginationProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID)
+  LDAPpagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID)
       : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID)
   {
   }
@@ -448,7 +448,7 @@ public:
     Nan::SetPrototypeMethod(tpl, "startTls", startTls);
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
-    Nan::SetPrototypeMethod(tpl, "searchWithPagination", searchWithPagination);
+    Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
 
@@ -638,7 +638,7 @@ private:
     AsyncQueueWorker(new LDAPSearchProgress(callback, progress, obj->ld, message));
   }
 
-  static NAN_METHOD(searchWithPagination)
+  static NAN_METHOD(pagedSearch)
   {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
