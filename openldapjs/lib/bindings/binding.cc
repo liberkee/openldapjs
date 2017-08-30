@@ -21,6 +21,7 @@ private:
   char *filter;
   int scope;
   int pageSize;
+  
 
 public:
   LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, char *base, int scope, char *filter, int pgSize)
@@ -30,7 +31,7 @@ public:
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
-    struct berval *cookie = NULL;
+    
     char pagingCriticality = 'T';
     LDAPControl *pageControl = NULL;
     LDAPControl *M_controls[2] = {NULL, NULL};
