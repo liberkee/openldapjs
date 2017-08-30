@@ -224,6 +224,33 @@ module.exports = class LDAPWrapAsync {
             return;
           }
           
+          if(Array.isArray(changes) === false) {
+            reject(new Error('The json is not an array of elements'));
+            return;
+          }
+
+          const lengthChanges = changes.length;
+
+          for (let i = 0; i < lengthChanges; i++) {
+            if (typeof changes[i] !== 'object') {
+              reject(new Error('The json don\'t have object'));
+              return;
+            }
+            const operation = changes[i].op;
+            const attribute = changes[i].attr;
+            const values = changes[i].vals;
+
+            if(operation || attribute || values === undefined || NULL) {
+              reject(new Error('One of the members of object is not defined'));
+              return;
+            }
+
+            if (Array.isArray(values) === false) {
+              reject(new Error('The value member must be an array of values'));
+              return;
+            }
+          }
+
           this._binding.newModify(dn, changes, (err, result) => {
             if (err) {
               reject(new Error(err));
