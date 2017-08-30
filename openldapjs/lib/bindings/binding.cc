@@ -238,7 +238,7 @@ public:
     char *attribute;
     char **values;
     char *matchedDN;
-    char *errorMessage = NULL;
+    char *errorMessage = nullptr;
     int errorCode;
     int prc;
 
@@ -307,8 +307,8 @@ public:
                                 &errorCode,
                                 &matchedDN,
                                 &errorMessage,
-                                NULL,
-                                NULL,
+                                nullptr,
+                                nullptr,
                                 1);
 
         if (prc != LDAP_SUCCESS)
@@ -547,7 +547,7 @@ private:
     Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
     stateClient[0] = Nan::New<v8::Number>(0);
 
-    int state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    int state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if (state != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New<v8::Number>(0);
@@ -621,10 +621,10 @@ private:
                              DNbase,
                              scopeSearch,
                              filterSearch,
-                             NULL,
+                             nullptr,
                              0,
-                             NULL,
-                             NULL,
+                             nullptr,
+                             nullptr,
                              &timeOut,
                              LDAP_NO_LIMIT,
                              &message);
@@ -667,8 +667,8 @@ private:
                               DNEntry,
                               attribute,
                               &bvalue,
-                              NULL,
-                              NULL,
+                              nullptr,
+                              nullptr,
                               &message);
 
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
@@ -735,7 +735,7 @@ private:
       return;
     }
 
-    int result = ldap_delete_ext(obj->ld, dns, NULL, NULL, &msgID);
+    int result = ldap_delete_ext(obj->ld, dns, nullptr, nullptr, &msgID);
 
     AsyncQueueWorker(new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
   }
@@ -802,7 +802,7 @@ private:
       return;
     }
 
-    int result = ldap_add_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
+    int result = ldap_add_ext(obj->ld, dns, newEntries, nullptr, nullptr, &msgID);
 
     //ldap_mods_free(newEntries, 1);
 
