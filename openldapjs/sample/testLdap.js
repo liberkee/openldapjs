@@ -34,15 +34,16 @@ function search() {
   const clientLDAP = new LDAPWrap(host);
 
   clientLDAP.initialize()
-    .then( () => {
-      clientLDAP.bind(dnUser,password)
-      .then( () =>{
-        clientLDAP.search(searchBase,2,searchFilter)
-          .then( (result) => {
-            console.log(result);
-          });
-      });
-        
+    .then(() => {
+      clientLDAP.bind(dnUser, password)
+        .then(() => {
+          clientLDAP.search(searchBase, 2, searchFilter)
+            .then((result) => {
+              console.log(result);
+              console.log(result.length);
+            });
+        });
+
     });
 }
 
@@ -66,22 +67,29 @@ function modify() {
 
   const userDnModify = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const changes = [
-    { op: 'add',
+
+    {
+      op: 'add',
       attr: 'description',
-      vals: ['asda']
+      vals: ['a', 'b', 'c',]
     },
+    {
+      op: 'replace',
+      attr: 'description',
+      vals: ['asdaaa----------------']
+    }
   ];
 
   clientLDAP.initialize()
-    .then( () => {
-      clientLDAP.bind(dnUser,password)
-      .then( () =>{
-        clientLDAP.newModify(dnUser, changes)
-          .then( (result) => {
-            console.log('Result', result);
-          })
-      });
-        
+    .then(() => {
+      clientLDAP.bind(dnUser, password)
+        .then(() => {
+          clientLDAP.newModify('cn=42,ou=rtu,o=hufsm', changes)
+            .then((result) => {
+              console.log('Result', result);
+            })
+        });
+
     });
 
 }

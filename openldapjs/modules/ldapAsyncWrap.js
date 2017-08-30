@@ -2,7 +2,8 @@
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
-
+const validator = require('./json_validator/json_validator');
+const changeSechema = require('./schemas/change_schema');
 
 /**
  * @module LDAPtranzition
@@ -43,15 +44,15 @@ module.exports = class LDAPWrapAsync {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
-            
-            /*this._binding.startTls((errTls, stateTls) => {
+
+            /* this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
                 resolve(stateTls);
-              }*/
-              this._stateClient = this._E_STATES.INITIALIZED;
+              } */
+            this._stateClient = this._E_STATES.INITIALIZED;
             resolve(result);
           } else {
             reject(err);
@@ -211,46 +212,74 @@ module.exports = class LDAPWrapAsync {
     * @return {Promise} That resolves if LDAP modified successfully the entry.
     * Reject if the LDAP rejects the operation or the client's state is not BOUND
     */
-    newModify(dn, changes) {
-      return new Promise((resolve, reject) => {
-        if (this._stateClient === this._E_STATES.BOUND) {
-          if (changes === null || changes === '') {
-            reject(new Error('The passed JSON is invalid'));
-            return;
+  // newModify(dn, changes) {
+  //   return new Promise((resolve, reject) => {
+  //     if (this._stateClient === this._E_STATES.BOUND) {
+  //       if (changes === null || changes === '') {
+  //         reject(new Error('The passed JSON is invalid'));
+  //         return;
+  //       }
+
+  //       if (dn === null || dn === '') {
+  //         reject(new Error('The passed dn is invalid'));
+  //         return;
+  //       }
+
+  //       if (Array.isArray(changes) === false) {
+  //         reject(new Error('The json is not an array of elements'));
+  //         return;
+  //       }
+
+  //       const lengthChanges = changes.length;
+
+  //       for (let i = 0; i < lengthChanges; i++) {
+  //         if (typeof changes[i] !== 'object') {
+  //           reject(new Error('The json don\'t have object'));
+  //           return;
+  //         }
+  //         const operation = changes[i].op;
+  //         const attribute = changes[i].attr;
+  //         const values = changes[i].vals;
+
+  //         if (operation || attribute || values === undefined || NULL) {
+  //           reject(new Error('One of the members of object is not defined'));
+  //           return;
+  //         }
+
+  //         if (Array.isArray(values) === false) {
+  //           reject(new Error('The value member must be an array of values'));
+  //           return;
+  //         }
+  //       }
+
+  //       this._binding.newModify(dn, changes, (err, result) => {
+  //         if (err) {
+  //           reject(new Error(err));
+  //         } else {
+  //           resolve(result);
+  //         }
+  //       });
+  //     } else {
+  //       reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
+  //     }
+  //   });
+  // }
+  newModify(dn, changes) {
+    return new Promise((resolve, reject) => {
+      const cheangArray = [];
+      changes.forEach((element) => {
+        const result = validator(element, changeSechema);
+        if (result.valid === true) {
+          cheangArray.push(Promise.resolve(result));
+        } else {
+          cheangArray.push(Promise.reject(result));
+        }
+      });
+      return Promise.all(cheangArray)
+        .then((change) => {
+          if (this._stateClient !== this._E_STATES.BOUND) {
+            reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
           }
-  
-          if (dn === null || dn === '') {
-            reject(new Error('The passed dn is invalid'));
-            return;
-          }
-          
-          if(Array.isArray(changes) === false) {
-            reject(new Error('The json is not an array of elements'));
-            return;
-          }
-
-          const lengthChanges = changes.length;
-
-          for (let i = 0; i < lengthChanges; i++) {
-            if (typeof changes[i] !== 'object') {
-              reject(new Error('The json don\'t have object'));
-              return;
-            }
-            const operation = changes[i].op;
-            const attribute = changes[i].attr;
-            const values = changes[i].vals;
-
-            if(operation || attribute || values === undefined || NULL) {
-              reject(new Error('One of the members of object is not defined'));
-              return;
-            }
-
-            if (Array.isArray(values) === false) {
-              reject(new Error('The value member must be an array of values'));
-              return;
-            }
-          }
-
           this._binding.newModify(dn, changes, (err, result) => {
             if (err) {
               reject(new Error(err));
@@ -258,11 +287,9 @@ module.exports = class LDAPWrapAsync {
               resolve(result);
             }
           });
-        } else {
-          reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
-        }
-      });
-    }
+        });
+    });
+  }
 
   /**
     * Unbind from a LDAP server.
