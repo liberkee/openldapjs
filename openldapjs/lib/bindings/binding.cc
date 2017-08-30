@@ -264,7 +264,7 @@ public:
 
       case LDAP_RES_SEARCH_ENTRY:
         flagVerification = true;
-        if ((dn = ldap_get_dn(ld, resultMsg)) != NULL)
+        if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
         {
           resultLocal += "dn:";
           resultLocal += dn;
@@ -275,12 +275,12 @@ public:
 
         // You have to implement the attribute side
         for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
-             attribute != NULL;
+             attribute != nullptr;
              attribute = ldap_next_attribute(ld, resultMsg, ber))
         {
-          if ((values = ldap_get_values(ld, resultMsg, attribute)) != NULL)
+          if ((values = ldap_get_values(ld, resultMsg, attribute)) != nullptr)
           {
-            for (i = 0; values[i] != NULL; i++)
+            for (i = 0; values[i] != nullptr; i++)
             {
               resultLocal += attribute;
               resultLocal += ":";
@@ -318,12 +318,12 @@ public:
           return;
         }
 
-        if (matchedDN != NULL && *matchedDN != 0)
+        if (matchedDN != nullptr && *matchedDN != 0)
         {
           ldap_memfree(matchedDN);
         }
 
-        if (errorMessage != NULL)
+        if (errorMessage != nullptr)
         {
           ldap_memfree(errorMessage);
         }
@@ -681,7 +681,7 @@ private:
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
 
-    if (obj->ld == NULL || obj->initializedFlag == false)
+    if (obj->ld == nullptr || obj->initializedFlag == false)
     {
       std::cout << "unbind error?:" << std::endl;
       stateClient[0] = Nan::New<v8::Number>(0);
@@ -781,11 +781,11 @@ private:
         newEntries[i]->mod_op = LDAP_MOD_ADD;
         memcpy(newEntries[i]->mod_type, typeString.c_str(), typeString.length() + 1);
         memcpy(newEntries[i]->mod_values[0], valueString.c_str(), valueString.length() + 1);
-        newEntries[i]->mod_values[1] = NULL;
+        newEntries[i]->mod_values[1] = nullptr;
       }
     }
 
-    newEntries[length / 2] = NULL;
+    newEntries[length / 2] = nullptr;
 
     char *dns = *dn;
     int msgID = 0;
