@@ -7,8 +7,6 @@
 #include <thread>
 #include <chrono>
 
-
-
 class LDAPAddProgress : public Nan::AsyncProgressWorker
 {
 private:
@@ -29,10 +27,10 @@ public:
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress)
   {
     struct timeval timeOut = {0, 1};
+
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-
       //progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
       //std::this_thread::sleep_for(chrono::milliseconds(10));
     }
@@ -802,7 +800,21 @@ private:
       return;
     }
 
-    int result = ldap_add_ext(obj->ld, dns, newEntries, nullptr, nullptr, &msgID);
+    //sample code for creating adn using control for CSN retrieval
+    LDAPControl *ctrl = nullptr;
+    struct berval *ber = new berval;
+    int bv_length = sizeof("entryCSN");
+    ber->bv_len = bv_length;
+    ber->bv_val = new char[bv_length];
+    memcpy(ber->bv_val, "entryCSN", bv_length);
+
+    int ctrlFlag = ldap_control_create("1.3.6.1.1.13.2", 1, ber, 0, &ctrl);
+    LDAPControl *M_Control[2] = {nullptr, nullptr};
+    M_Control[1] = ctrl;
+
+    std::cout << "ctrlFlag is:" << ctrlFlag << std::endl;
+
+    int result = ldap_add_ext(obj->ld, dns, newEntries, nullptr, M_Control, &msgID);
 
     //ldap_mods_free(newEntries, 1);
 
@@ -822,6 +834,5 @@ private:
     return my_constructor;
   }
 };
-
 
 NODE_MODULE(objectwrapper, LDAPClient::Init)
