@@ -56,16 +56,10 @@ public:
                                      LDAP_NO_LIMIT,
                                      &message);
 
-      //if the search, pass the error message to the handleProgress and exit loop                                   
-      if( searchResult != LDAP_SUCCESS ) 
-      {
-        progress.Send(reinterpret_cast<const char *>(&searchResult), sizeof(int));
-        break;
-      }
-      
+     
       
 
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+      
     }
   }
   // Executes in event loop
