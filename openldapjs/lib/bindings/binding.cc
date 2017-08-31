@@ -27,7 +27,7 @@ private:
 
 public:
   LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, char *base, int scope, char *filter, int pgSize, struct berval *cookie)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld), scope(scope), filter(filter), base(base), pageSize(pgSize), cookie(cookie)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld),base(base), scope(scope), filter(filter), pageSize(pgSize), cookie(cookie)
   {
   }
   // Executes in worker thread
@@ -55,8 +55,11 @@ public:
     struct timeval timeOut = {0, 1};
     int totalCount = 0;
 
-    ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
+    ldap_create_page_control(ld, pageSize, NULL, pagingCriticality, &pageControl);
     M_controls[0] = pageControl;
+    cout<<"filter:"<<filter<<endl;
+    cout<<"base:"<<base<<endl;
+    cout<<"scope:"<<scope<<endl;
 
     searchResult = ldap_search_ext(ld,
                                    base,
@@ -170,15 +173,16 @@ public:
           returnedControls = nullptr;
         }
 
-        M_controls[0] = nullptr;
         ldap_control_free(pageControl);
+        M_controls[0] = nullptr;
         pageControl = nullptr;
-
+/*
         if (resultMsg != nullptr)
         {
           //should not be null
           ldap_msgfree(resultMsg);
         }
+        */
  
         break;
       default:
@@ -694,6 +698,8 @@ private:
     Nan::Utf8String filterArg(info[2]);
 
     char *DNbase = *baseArg;
+    cout<<"baseArg is:"<<*baseArg<<endl;
+    cout<<"dnbase is:"<<DNbase<<endl;
     char *filterSearch = *filterArg;
     int message;
     int result;

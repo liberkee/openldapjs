@@ -38,26 +38,33 @@ module.exports = class LDAPWrapAsync {
     * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
     * Reject if the address is incorect.
     */
-  initialize() {
-    return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.CREATED) {
-        this._binding.initialize(this._hostAdress, (err, result) => {
-          if (result) {
-            this._binding.startTls((errTls, stateTls) => {
-              if (errTls) {
-                reject(new Error(errTls));
-              } else {
+    initialize() {
+      return new Promise((resolve, reject) => {
+        if (this._stateClient === this._E_STATES.CREATED) {
+          this._binding.initialize(this._hostAdress, (err, result) => {
+            if (result) {/*
+              this._binding.startTls((errTls, stateTls) => {
+                if (errTls) {
+                  reject(new Error(errTls));
+                } else {
+                  this._stateClient = this._E_STATES.INITIALIZED;
+                  resolve(stateTls);
+                }*/
                 this._stateClient = this._E_STATES.INITIALIZED;
-                resolve(stateTls);
-              }
-            });
-          } else {
-            reject(err);
-          }
-        });
-      }
-    });
-  }
+                resolve(result);
+              
+            //  });
+            } else {
+              reject(err);
+            }
+          });
+        } else {
+          reject(new Error('object not created'));
+        }
+      });
+    }
+  
+  
 
   /**
    * Authentificate to LDAP server.
@@ -71,7 +78,8 @@ module.exports = class LDAPWrapAsync {
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED) {
+      if (this._stateClient === this._E_STATES.INITIALIZED ||
+        this._stateClient === this._E_STATES.BOUND) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
@@ -81,23 +89,11 @@ module.exports = class LDAPWrapAsync {
             resolve(this._stateClient);
           }
         });
-      } else if (this._stateClient === this._E_STATES.UNBOUND) {
-        this.initialize()
-          .then(() => {
-            this.bind(bindDN, passwordUser)
-              .then((result) => {
-                resolve(result);
-              })
-              .catch((err) => {
-                reject(new Error(err.message));
-              });
-          });
       } else {
-        reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
+        reject(new Error('Can only bind from initialized or bound'));
       }
     });
   }
-
   /**
    * Search operation.
    *
