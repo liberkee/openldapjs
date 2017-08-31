@@ -98,8 +98,6 @@ public:
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      // progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-      // std::this_thread::sleep_for(chrono::milliseconds(10));
     }
   }
 
@@ -133,13 +131,8 @@ public:
 
   void HandleProgressCallback(const char *data, size_t size)
   {
-    /* progress.send what ?
-    // Required, this is not created automatically
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> argv[] = {
-        New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
-    progress->Call(1, argv);
-    */
+    // progress.send what ?
+
   }
 };
 
@@ -196,17 +189,12 @@ public:
     }
     callback->Reset();
     progress->Reset();
-    ldap_msgfree(resultMsg); //testing this out
+    ldap_msgfree(resultMsg); 
   }
 
   void HandleProgressCallback(const char *data, size_t size)
   {
-    // Required, this is not created automatically
-    /*
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> argv[] = {
-        New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
-    progress->Call(1, argv); */
+     //considering switching to AsyncWorker
   }
 };
 
@@ -216,11 +204,12 @@ private:
   LDAP *ld;
   Nan::Callback *progress;
   int result = 0;
-  LDAPMessage *resultMsg, *entry;
+  LDAPMessage *resultMsg;
+  LDAPMessage *entry;
   int finished = 0;
-  bool flagVerification = false;
   std::string resultSearch;
-  int i = 0, msgID;
+  int i = 0;
+  int msgID;
   int status = 0;
 
 public:
@@ -253,7 +242,6 @@ public:
       switch (result)
       {
       case -1:
-        flagVerification = false;
         ldap_perror(ld, "ldap_result");
         return;
 
@@ -261,7 +249,6 @@ public:
         break;
 
       case LDAP_RES_SEARCH_ENTRY:
-        flagVerification = true;
         if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
         {
           resultLocal += "dn:";
@@ -291,12 +278,12 @@ public:
         }
         resultLocal += "\n";
         ber_free(ber, 0);
-        ldap_msgfree(resultMsg);
+        ldap_msgfree(resultMsg); //might lead to errors...MIGHT
 
         resultSearch += resultLocal;
         break;
 
-      case LDAP_RES_SEARCH_RESULT:
+      case LDAP_RES_SEARCH_RESULT: //memory leak on resultMsg ???
         finished = 1;
         status = ldap_result2error(ld, resultMsg, 0);
 
@@ -309,12 +296,7 @@ public:
                                 nullptr,
                                 1);
 
-        if (prc != LDAP_SUCCESS)
-        {
-          //in case of error ?
-          std::cout << "parse result failed with:" << ldap_err2string(prc) << std::endl;
-          return;
-        }
+     
 
         if (matchedDN != nullptr && *matchedDN != 0)
         {
@@ -329,13 +311,6 @@ public:
       default:
         break;
       }
-
-      // char *resultPointer = new char[resultLocal.length()];
-      // resultPointer = strdup(resultLocal.c_str());
-
-      //progress.Send(resultPointer, resultLocal.length());
-
-      //delete resultPointer; //potentialy dangerous ?
     }
   }
   // Executes in event loop
@@ -360,15 +335,8 @@ public:
   }
 
   void HandleProgressCallback(const char *data, size_t size)
-  { /*
-    Nan::HandleScope scope;
-
-    //Nan::HandleScope scope;
-    v8::Local<v8::Value> argv[1] = {Null()};
-    argv[0] = Nan::New(data).ToLocalChecked();
-
-    progress->Call(1, argv);
-    //delete[] data; */
+  { 
+    
   }
 };
 
@@ -434,13 +402,7 @@ public:
 
   void HandleProgressCallback(const char *data, size_t size)
   {
-    /*
-    // Required, this is not created automatically
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> argv[] = {
-        New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
-    progress->Call(1, argv);
-    */
+    
   }
 };
 
