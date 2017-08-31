@@ -27,7 +27,7 @@ private:
 
 public:
   LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, char *base, int scope, char *filter, int pgSize, struct berval *cookie)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld),base(base), scope(scope), filter(filter), pageSize(pgSize), cookie(cookie)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld),base(base), scope(scope),filter(filter) , pageSize(pgSize), cookie(cookie)
   {
   }
   // Executes in worker thread
@@ -62,7 +62,7 @@ public:
     cout<<"scope:"<<scope<<endl;
 
     searchResult = ldap_search_ext(ld,
-                                   base,
+                                   "dc=demoApp,dc=com",
                                    scope,
                                    filter,
                                    NULL,
@@ -183,6 +183,7 @@ public:
           ldap_msgfree(resultMsg);
         }
         */
+        //ldap_msgfree(resultMsg);
  
         break;
       default:
@@ -208,7 +209,7 @@ public:
     }
 
     cookie != nullptr ? std::cout << "cookie is not null" << std::endl : std::cout << "cookie is null " << std::endl;
-
+   // ldap_msgfree(resultMsg);
     callback->Reset();
     progress->Reset();
   }

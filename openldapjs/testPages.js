@@ -12,7 +12,7 @@ clientLDAP.initialize()
   .then(() => {
     clientLDAP.bind(dnAdmin, password)
       .then(() => {
-        clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 20)
+        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=person', 20)
           .then((result) => {
             console.log('result is:'+result);
           });
