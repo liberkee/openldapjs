@@ -1,0 +1,1 @@
+cmd_Release/obj.target/binding.node := g++ -shared -pthread -rdynamic -m64 -L/usr/local/lib  -Wl,-soname=binding.node -o Release/obj.target/binding.node -Wl,--start-group Release/obj.target/binding/binding.o -Wl,--end-group -lldap

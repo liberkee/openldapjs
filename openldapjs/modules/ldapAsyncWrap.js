@@ -145,7 +145,7 @@ module.exports = class LDAPWrapAsync {
         let cookieMonster = null;
         let pagesAvailable = true;
 
-        while (pagesAvailable) {
+       // while (pagesAvailable) {
           this._binding.pagedSearch(searchBase, scope, searchFilter, pageSize, (err, result) => {
             if (err) {
               reject(new Error(err));
@@ -155,7 +155,7 @@ module.exports = class LDAPWrapAsync {
               resolve(result);
             }
           });
-        }
+       // }
       } else {
         reject(new Error('The Search operation can be done just in BOUND state'));
       }
