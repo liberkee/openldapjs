@@ -46,3 +46,4 @@ openldapjs/lib/bindings/build/Release/binding.node
 openldapjs/lib/bindings/build/Release/binding.node
 openldapjs/lib/bindings/build/Release/obj.target/binding.node
 openldapjs/lib/bindings/build/*
+openldapjs/bla.txt

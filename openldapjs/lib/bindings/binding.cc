@@ -37,7 +37,7 @@ public:
     int l_rc, l_entries, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
     struct berval *cookie = nullptr;
     char pagingCriticality = 'T', *l_dn;
-    int totalCount;
+    int totalCount = 0;
     LDAPControl *pageControl = nullptr, *M_controls[2] = {nullptr, nullptr}, **returnedControls = nullptr;
     LDAPMessage *l_result, *l_entry;
     int msgId = 0;
@@ -53,6 +53,7 @@ public:
     /* through the loop                                               */
     do
     {
+      pageResult+="\n";
         l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
 
         /* Insert the control into a list to be passed to the search.     */
@@ -127,7 +128,9 @@ public:
         {
             l_dn = ldap_get_dn(ld, l_entry);
             //printf("    %s\n", l_dn);
+            pageResult+="dn: ";
             pageResult+= l_dn;
+            pageResult+= "\n";
 
 
             for (attribute = ldap_first_attribute(ld, l_entry, &ber);
@@ -152,11 +155,16 @@ public:
        //  std::cout<<"------173----"<<std::endl;
          ldap_memfree(attribute);
        }
+       pageResult+= "\n";
         }
 
         /* Free the search results.                                       */
         ldap_msgfree(l_result);
-        page_nbr = page_nbr + 1;
+        page_nbr+= 1;
+        pageResult+="---------";
+        pageResult+= std::to_string(page_nbr);
+        pageResult+= "------\n";
+        
 
     } while (morePages == true);
 
