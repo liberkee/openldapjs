@@ -19,7 +19,7 @@ LDAP *ld;
 
 int main(int argc, char** argv)
 {
-
+    BerElement *ber;
     int l_rc, l_entries, l_port, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
     unsigned long pageSize;
     struct berval *cookie = NULL;
@@ -28,6 +28,8 @@ int main(int argc, char** argv)
     LDAPControl *pageControl = NULL, *M_controls[2] = {NULL, NULL}, **returnedControls = NULL;
     LDAPMessage *l_result, *l_entry;
     int msgId = 0;
+    char *attribute;
+    char **values;
 
     server = "ldap://localhost:389";
 
@@ -51,6 +53,10 @@ int main(int argc, char** argv)
         printf("  Init of server %s at port %d failed.\n", server, l_port);
         return -1;
     }
+
+    int version = LDAP_VERSION3;
+    
+            ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &version);
     /*                                                                */
     /******************************************************************/
 
@@ -60,7 +66,7 @@ int main(int argc, char** argv)
     l_rc = ldap_simple_bind_s(ld, BIND_DN, BIND_PW);
     if (l_rc != LDAP_SUCCESS)
     {
-        printf("==Error== %s");
+        printf("==Error== ");
         printf("  Unable to Bind to the LDAP server.  Return code is %d.\n", l_rc);
         return 0;
     }
@@ -149,6 +155,26 @@ int main(int argc, char** argv)
         {
             l_dn = ldap_get_dn(ld, l_entry);
             printf("    %s\n", l_dn);
+
+
+            for (attribute = ldap_first_attribute(ld, l_entry, &ber);
+            attribute != NULL;
+            attribute = ldap_next_attribute(ld, l_entry, ber))
+       {
+         if ((values = ldap_get_values(ld, l_entry, attribute)) != NULL)
+         {
+           for (int i = 0; values[i] != NULL; i++)
+           {
+              printf("%s:",attribute);
+             //resultLocal += ":";
+             printf("%s\n",values[i]);
+             //resultLocal += "\n";
+           }
+           ldap_value_free(values);
+         }
+       //  std::cout<<"------173----"<<std::endl;
+         ldap_memfree(attribute);
+       }
         }
 
         /* Free the search results.                                       */
