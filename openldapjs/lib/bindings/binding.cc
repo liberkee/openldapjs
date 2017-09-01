@@ -33,158 +33,137 @@ public:
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
-
-    char *dn;
+    BerElement *ber;
+    int l_rc, l_entries, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
+    struct berval *cookie = NULL;
+    char pagingCriticality = 'T', *l_dn;
+    int totalCount;
+    LDAPControl *pageControl = NULL, *M_controls[2] = {NULL, NULL}, **returnedControls = NULL;
+    LDAPMessage *l_result, *l_entry;
+    int msgId = 0;
     char *attribute;
     char **values;
-    char *matchedDN;
-    char *errorMessage = nullptr;
-    int errorCode;
-    int prc;
+    /*                                                                */
+    /******************************************************************/
 
-    std::string resultLocal = "\n";
-    BerElement *ber;
+    page_nbr = 1;
 
-    LDAPMessage *searchEntry;
-    char pagingCriticality = 'T';
-    LDAPControl *pageControl = nullptr;
-    LDAPControl **returnedControls = nullptr;
-    LDAPControl *M_controls[2] = {nullptr, nullptr};
-    int message;
-    int searchResult;
-    int finished = 0;
-    struct timeval timeOut = {1, 0};
-    int totalCount = 0;
-
-    ldap_create_page_control(ld, pageSize, NULL, pagingCriticality, &pageControl);
-    M_controls[0] = pageControl;
-    std::cout << "------60-----" << std::endl;
-    searchResult = ldap_search_ext(ld,
-                                   base.c_str(),
-                                   scope,
-                                   filter.c_str(),
-                                   NULL,
-                                   0,
-                                   M_controls,
-                                   NULL,
-                                   NULL,
-                                   LDAP_NO_LIMIT,
-                                   &message);
-
-    while (result == 0)
+    /******************************************************************/
+    /* Get one page of the returned results each time                 */
+    /* through the loop                                               */
+    do
     {
+        l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
 
-      result = ldap_result(ld, message, 1, &timeOut, &resultMsg);
-    }
+        /* Insert the control into a list to be passed to the search.     */
+        M_controls[0] = pageControl;
 
-    resultLocal.clear();
-    resultLocal = "\n";
-
-    if (result == -1)
-    {
-
-      // flagVerification = false;
-      ldap_perror(ld, "ldap_result");
-      return;
-    }
-
-    prc = ldap_parse_result(ld,
-                            resultMsg,
-                            &errorCode,
-                            &matchedDN,
-                            &errorMessage,
-                            nullptr,
-                            &returnedControls,
-                            1);
-    std::cout << "------98-----" << std::endl;
-
-    /*
-    status = ldap_result2error(ld, resultMsg, 0);
-
-    std::cout << "------101-----" << std::endl;
-
-    if (prc != LDAP_SUCCESS)
-    {
-      //in case of error ?
-      std::cout << "parse result failed with:" << ldap_err2string(prc) << std::endl;
-      return;
-    }
-
-    if (matchedDN != nullptr && *matchedDN != 0)
-    {
-      ldap_memfree(matchedDN);
-    }
-
-    if (errorMessage != nullptr)
-    {
-      ldap_memfree(errorMessage);
-    }
-*/
-    std::cout << "------117-----" << std::endl;
-    if (cookie != nullptr)
-    {
-      ber_bvfree(cookie);
-      cookie = nullptr;
-    }
-    std::cout << "------123-----" << std::endl;
-    prc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
-    std::cout << "------125-----" << std::endl;
-    if (returnedControls != nullptr)
-    {
-      ldap_controls_free(returnedControls);
-      returnedControls = nullptr;
-    }
-    std::cout << "------131-----" << std::endl;
-    M_controls[0] = nullptr;
-    ldap_control_free(pageControl);
-    pageControl = nullptr;
-
-    std::cout << "------135-----" << std::endl;
-
-    for (searchEntry = ldap_first_entry(ld, resultMsg);
-         searchEntry != NULL;
-         searchEntry = ldap_next_entry(ld, searchEntry))
-    {
-
-      if ((dn = ldap_get_dn(ld, searchEntry)) != nullptr)
-      {
-        resultLocal += "dn:";
-        resultLocal += dn;
-        ldap_memfree(dn);
-
-        resultLocal += "\n";
-      }
-
-      for (attribute = ldap_first_attribute(ld, searchEntry, &ber);
-           attribute != nullptr;
-           attribute = ldap_next_attribute(ld, searchEntry, ber))
-      {
-        if ((values = ldap_get_values(ld, searchEntry, attribute)) != nullptr)
+        /* Search for entries in the directory using the parmeters.       */
+        l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), NULL, 0, M_controls, NULL, NULL, 0, &msgId);
+        if ((l_rc != LDAP_SUCCESS))
         {
-          for (int i = 0; values[i] != nullptr; i++)
-          {
-            resultLocal += attribute;
-            resultLocal += ":";
-            resultLocal += values[i];
-            resultLocal += "\n";
-          }
-          ldap_value_free(values);
+            printf("==Error==");
+            printf("  Failure during a search.  Return code is %d.\n", l_rc);
+            ldap_unbind(ld);
+            break;
         }
-        std::cout<<"------173----"<<std::endl;
-        ldap_memfree(attribute);
-      }
-      ber_free(ber,0);
-    }
 
-    std::cout << "------150-----" << std::endl;
-    // You have to implement the attribute side
+        int pagedResult = 0;
+        struct timeval timeOut = {1, 0};
+        while (pagedResult == 0)
+        {
+            pagedResult = ldap_result(ld, msgId, 1, &timeOut, &l_result);
+        }
 
-    resultLocal += "\n";
-    pageResult += resultLocal;
-    std::cout << "------171-----" << std::endl;
-    //ber_free(ber, 0);
-    ldap_msgfree(resultMsg);
-    //ber_bvfree(cookie);
+        /* Parse the results to retrieve the contols being returned.      */
+        l_rc = ldap_parse_result(ld, l_result, &l_errcode, NULL, NULL, NULL, &returnedControls, false);
+
+        if (cookie != NULL)
+        {
+            ber_bvfree(cookie);
+            cookie = NULL;
+        }
+
+        /* Parse the page control returned to get the cookie and          */
+        /* determine whether there are more pages.                        */
+        l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+
+        /* Determine if the cookie is not empty, indicating there are more pages */
+        /* for these search parameters. */
+        if (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0))
+        {
+            morePages = true;
+        }
+        else
+        {
+            morePages = false;
+        }
+
+        /* Cleanup the controls used. */
+        if (returnedControls != NULL)
+        {
+            ldap_controls_free(returnedControls);
+            returnedControls = NULL;
+        }
+        M_controls[0] = NULL;
+        ldap_control_free(pageControl);
+        pageControl = NULL;
+
+        /******************************************************************/
+        /* Disply the returned result                                     */
+        /*                                                                */
+        /* Determine how many entries have been found.                    */
+        if (morePages == true)
+            printf("===== Page : %d =====\n", page_nbr);
+        l_entries = ldap_count_entries(ld, l_result);
+
+        if (l_entries > 0)
+        {
+            l_entry_count = l_entry_count + l_entries;
+        }
+
+        for (l_entry = ldap_first_entry(ld, l_result);
+             l_entry != NULL;
+             l_entry = ldap_next_entry(ld, l_entry))
+        {
+            l_dn = ldap_get_dn(ld, l_entry);
+            printf("    %s\n", l_dn);
+
+
+            for (attribute = ldap_first_attribute(ld, l_entry, &ber);
+            attribute != NULL;
+            attribute = ldap_next_attribute(ld, l_entry, ber))
+       {
+         if ((values = ldap_get_values(ld, l_entry, attribute)) != NULL)
+         {
+           for (int i = 0; values[i] != NULL; i++)
+           {
+              printf("%s:",attribute);
+             //resultLocal += ":";
+             printf("%s\n",values[i]);
+             //resultLocal += "\n";
+           }
+           ldap_value_free(values);
+         }
+       //  std::cout<<"------173----"<<std::endl;
+         ldap_memfree(attribute);
+       }
+        }
+
+        /* Free the search results.                                       */
+        ldap_msgfree(l_result);
+        page_nbr = page_nbr + 1;
+
+    } while (morePages == true);
+
+    printf("\n  %d entries found during the search", l_entry_count);
+    /* Free the cookie since all the pages for these search parameters   */
+    /* have been retrieved.                                              */
+    ber_bvfree(cookie);
+    cookie = NULL;
+
+    /* Close the LDAP session.                                           */
+    ldap_unbind(ld);
   }
 
   // Executes in event loop
