@@ -52,7 +52,7 @@ public:
     int message;
     int searchResult;
     int finished = 0;
-    struct timeval timeOut = {0, 1};
+    struct timeval timeOut = {1, 0};
     int totalCount = 0;
 
     ldap_create_page_control(ld, pageSize, NULL, pagingCriticality, &pageControl);
