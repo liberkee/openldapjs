@@ -45,6 +45,7 @@ public:
     std::string resultLocal = "\n";
     BerElement *ber;
 
+    LDAPMessage *searchEntry;
     char pagingCriticality = 'T';
     LDAPControl *pageControl = nullptr;
     LDAPControl **returnedControls = nullptr;
@@ -57,7 +58,7 @@ public:
 
     ldap_create_page_control(ld, pageSize, NULL, pagingCriticality, &pageControl);
     M_controls[0] = pageControl;
-    std::cout<<"------60-----"<<std::endl;
+    std::cout << "------60-----" << std::endl;
     searchResult = ldap_search_ext(ld,
                                    base.c_str(),
                                    scope,
@@ -95,11 +96,12 @@ public:
                             nullptr,
                             &returnedControls,
                             1);
-                            std::cout<<"------98-----"<<std::endl;
-     /*                       
+    std::cout << "------98-----" << std::endl;
+
+    /*
     status = ldap_result2error(ld, resultMsg, 0);
 
-    std::cout<<"------101-----"<<std::endl;
+    std::cout << "------101-----" << std::endl;
 
     if (prc != LDAP_SUCCESS)
     {
@@ -117,59 +119,70 @@ public:
     {
       ldap_memfree(errorMessage);
     }
-    */
-    std::cout<<"------117-----"<<std::endl;
+*/
+    std::cout << "------117-----" << std::endl;
     if (cookie != nullptr)
     {
       ber_bvfree(cookie);
       cookie = nullptr;
     }
-    std::cout<<"------123-----"<<std::endl;
+    std::cout << "------123-----" << std::endl;
     prc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
-    std::cout<<"------125-----"<<std::endl;
+    std::cout << "------125-----" << std::endl;
     if (returnedControls != nullptr)
     {
       ldap_controls_free(returnedControls);
       returnedControls = nullptr;
     }
-    std::cout<<"------131-----"<<std::endl;
+    std::cout << "------131-----" << std::endl;
     M_controls[0] = nullptr;
     ldap_control_free(pageControl);
     pageControl = nullptr;
 
-    std::cout<<"------135-----"<<std::endl;
+    std::cout << "------135-----" << std::endl;
 
-    if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
+    for (searchEntry = ldap_first_entry(ld, resultMsg);
+         searchEntry != NULL;
+         searchEntry = ldap_next_entry(ld, searchEntry))
     {
-      resultLocal += "dn:";
-      resultLocal += dn;
-      ldap_memfree(dn);
 
-      resultLocal += "\n";
-    }
-    std::cout<<"------150-----"<<std::endl;
-    // You have to implement the attribute side
-    for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
-         attribute != nullptr;
-         attribute = ldap_next_attribute(ld, resultMsg, ber))
-    {
-      if ((values = ldap_get_values(ld, resultMsg, attribute)) != nullptr)
+      if ((dn = ldap_get_dn(ld, searchEntry)) != nullptr)
       {
-        for (int i = 0; values[i] != nullptr; i++)
-        {
-          resultLocal += attribute;
-          resultLocal += ":";
-          resultLocal += values[i];
-          resultLocal += "\n";
-        }
-        ldap_value_free(values);
+        resultLocal += "dn:";
+        resultLocal += dn;
+        ldap_memfree(dn);
+
+        resultLocal += "\n";
       }
-      ldap_memfree(attribute);
+
+      for (attribute = ldap_first_attribute(ld, searchEntry, &ber);
+           attribute != nullptr;
+           attribute = ldap_next_attribute(ld, searchEntry, ber))
+      {
+        if ((values = ldap_get_values(ld, searchEntry, attribute)) != nullptr)
+        {
+          for (int i = 0; values[i] != nullptr; i++)
+          {
+            resultLocal += attribute;
+            resultLocal += ":";
+            resultLocal += values[i];
+            resultLocal += "\n";
+          }
+          ldap_value_free(values);
+        }
+        std::cout<<"------173----"<<std::endl;
+        ldap_memfree(attribute);
+      }
+      ber_free(ber,0);
     }
+
+    std::cout << "------150-----" << std::endl;
+    // You have to implement the attribute side
+
     resultLocal += "\n";
     pageResult += resultLocal;
-    std::cout<<"------171-----"<<std::endl;
-    ber_free(ber, 0);
+    std::cout << "------171-----" << std::endl;
+    //ber_free(ber, 0);
     ldap_msgfree(resultMsg);
     //ber_bvfree(cookie);
   }
