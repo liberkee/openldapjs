@@ -27,7 +27,7 @@ private:
 
 public:
   LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, std::string base, int scope, std::string filter, int pgSize, struct berval *cookie)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld),base(base), scope(scope),filter(filter) , pageSize(pgSize), cookie(cookie)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), base(base), scope(scope), filter(filter), pageSize(pgSize), cookie(cookie)
   {
   }
   // Executes in worker thread
@@ -57,6 +57,7 @@ public:
 
     ldap_create_page_control(ld, pageSize, NULL, pagingCriticality, &pageControl);
     M_controls[0] = pageControl;
+    std::cout<<"------60-----"<<std::endl;
     searchResult = ldap_search_ext(ld,
                                    base.c_str(),
                                    scope,
@@ -69,125 +70,112 @@ public:
                                    LDAP_NO_LIMIT,
                                    &message);
 
-    while (finished == 0)
+    while (result == 0)
     {
 
       result = ldap_result(ld, message, 1, &timeOut, &resultMsg);
+    }
 
-      resultLocal.clear();
-      resultLocal = "\n";
+    resultLocal.clear();
+    resultLocal = "\n";
 
-      switch (result)
+    if (result == -1)
+    {
+
+      // flagVerification = false;
+      ldap_perror(ld, "ldap_result");
+      return;
+    }
+
+    prc = ldap_parse_result(ld,
+                            resultMsg,
+                            &errorCode,
+                            &matchedDN,
+                            &errorMessage,
+                            nullptr,
+                            &returnedControls,
+                            1);
+                            std::cout<<"------98-----"<<std::endl;
+     /*                       
+    status = ldap_result2error(ld, resultMsg, 0);
+
+    std::cout<<"------101-----"<<std::endl;
+
+    if (prc != LDAP_SUCCESS)
+    {
+      //in case of error ?
+      std::cout << "parse result failed with:" << ldap_err2string(prc) << std::endl;
+      return;
+    }
+
+    if (matchedDN != nullptr && *matchedDN != 0)
+    {
+      ldap_memfree(matchedDN);
+    }
+
+    if (errorMessage != nullptr)
+    {
+      ldap_memfree(errorMessage);
+    }
+    */
+    std::cout<<"------117-----"<<std::endl;
+    if (cookie != nullptr)
+    {
+      ber_bvfree(cookie);
+      cookie = nullptr;
+    }
+    std::cout<<"------123-----"<<std::endl;
+    prc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+    std::cout<<"------125-----"<<std::endl;
+    if (returnedControls != nullptr)
+    {
+      ldap_controls_free(returnedControls);
+      returnedControls = nullptr;
+    }
+    std::cout<<"------131-----"<<std::endl;
+    M_controls[0] = nullptr;
+    ldap_control_free(pageControl);
+    pageControl = nullptr;
+
+    std::cout<<"------135-----"<<std::endl;
+
+    if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
+    {
+      resultLocal += "dn:";
+      resultLocal += dn;
+      ldap_memfree(dn);
+
+      resultLocal += "\n";
+    }
+    std::cout<<"------150-----"<<std::endl;
+    // You have to implement the attribute side
+    for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
+         attribute != nullptr;
+         attribute = ldap_next_attribute(ld, resultMsg, ber))
+    {
+      if ((values = ldap_get_values(ld, resultMsg, attribute)) != nullptr)
       {
-      case -1:
-        // flagVerification = false;
-        ldap_perror(ld, "ldap_result");
-        return;
-
-      case 0:
-        break;
-
-      case LDAP_RES_SEARCH_ENTRY:
-        //flagVerification = true;
-        if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
+        for (int i = 0; values[i] != nullptr; i++)
         {
-          resultLocal += "dn:";
-          resultLocal += dn;
-          ldap_memfree(dn);
-
+          resultLocal += attribute;
+          resultLocal += ":";
+          resultLocal += values[i];
           resultLocal += "\n";
         }
-
-        // You have to implement the attribute side
-        for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
-             attribute != nullptr;
-             attribute = ldap_next_attribute(ld, resultMsg, ber))
-        {
-          if ((values = ldap_get_values(ld, resultMsg, attribute)) != nullptr)
-          {
-            for (int i = 0; values[i] != nullptr; i++)
-            {
-              resultLocal += attribute;
-              resultLocal += ":";
-              resultLocal += values[i];
-              resultLocal += "\n";
-            }
-            ldap_value_free(values);
-          }
-          ldap_memfree(attribute);
-        }
-        resultLocal += "\n";
-        ber_free(ber, 0);
-        ldap_msgfree(resultMsg);
-
-        pageResult += resultLocal;
-        break;
-
-      case LDAP_RES_SEARCH_RESULT:
-        finished = 1;
-        status = ldap_result2error(ld, resultMsg, 0);
-
-        prc = ldap_parse_result(ld,
-                                resultMsg,
-                                &errorCode,
-                                &matchedDN,
-                                &errorMessage,
-                                nullptr,
-                                &returnedControls,
-                                1);
-
-        if (prc != LDAP_SUCCESS)
-        {
-          //in case of error ?
-          std::cout << "parse result failed with:" << ldap_err2string(prc) << std::endl;
-          return;
-        }
-
-        if (matchedDN != nullptr && *matchedDN != 0)
-        {
-          ldap_memfree(matchedDN);
-        }
-
-        if (errorMessage != nullptr)
-        {
-          ldap_memfree(errorMessage);
-        }
-
-        if (cookie != nullptr)
-        {
-          ber_bvfree(cookie);
-          cookie = nullptr;
-        }
-
-        //get cookie for the next page
-
-        prc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
-
-        if (returnedControls != nullptr)
-        {
-          ldap_controls_free(returnedControls);
-          returnedControls = nullptr;
-        }
-
-        ldap_control_free(pageControl);
-        M_controls[0] = nullptr;
-        pageControl = nullptr;
-/*
-        if (resultMsg != nullptr)
-        {
-          //should not be null
-          ldap_msgfree(resultMsg);
-        }
-        */
-        //ldap_msgfree(resultMsg);
- 
-        break;
-      default:
-        break;
+        ldap_value_free(values);
       }
+      ldap_memfree(attribute);
     }
+    resultLocal += "\n";
+    pageResult += resultLocal;
+    std::cout<<"------171-----"<<std::endl;
+    ber_free(ber, 0);
+    ldap_msgfree(resultMsg);
+    //ber_bvfree(cookie);
   }
+
   // Executes in event loop
+
   void HandleOKCallback()
   {
     Nan::HandleScope scope;
@@ -205,7 +193,7 @@ public:
     }
 
     cookie != nullptr ? std::cout << "cookie is not null" << std::endl : std::cout << "cookie is null " << std::endl;
-   // ldap_msgfree(resultMsg);
+    // ldap_msgfree(resultMsg);
     callback->Reset();
     progress->Reset();
   }
@@ -213,10 +201,6 @@ public:
   void HandleProgressCallback(const char *data, size_t size)
   {
     // Required, this is not created automatically
-    Nan::HandleScope scope;
-    Local<Value> argv[] = {
-        New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
-    progress->Call(1, argv);
   }
 };
 

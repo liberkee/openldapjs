@@ -43,3 +43,5 @@ openldapjs/lib/bindings/build/Release/binding.node
 openldapjs/lib/bindings/build/Release/obj.target/binding.node
 .vscode/settings.json
 openldapjs/lib/bindings/build/Release/binding.node
+openldapjs/lib/bindings/build/Release/binding.node
+openldapjs/lib/bindings/build/Release/obj.target/binding.node
