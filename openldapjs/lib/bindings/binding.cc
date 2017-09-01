@@ -35,10 +35,10 @@ public:
   {
     BerElement *ber;
     int l_rc, l_entries, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
-    struct berval *cookie = NULL;
+    struct berval *cookie = nullptr;
     char pagingCriticality = 'T', *l_dn;
     int totalCount;
-    LDAPControl *pageControl = NULL, *M_controls[2] = {NULL, NULL}, **returnedControls = NULL;
+    LDAPControl *pageControl = nullptr, *M_controls[2] = {nullptr, nullptr}, **returnedControls = nullptr;
     LDAPMessage *l_result, *l_entry;
     int msgId = 0;
     char *attribute;
@@ -59,15 +59,14 @@ public:
         M_controls[0] = pageControl;
 
         /* Search for entries in the directory using the parmeters.       */
-        l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), NULL, 0, M_controls, NULL, NULL, 0, &msgId);
+        l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), nullptr, 0, M_controls, nullptr, nullptr, 0, &msgId);
         if ((l_rc != LDAP_SUCCESS))
         {
-            printf("==Error==");
-            printf("  Failure during a search.  Return code is %d.\n", l_rc);
-            ldap_unbind(ld);
+            status = -1;
+        
             break;
         }
-
+       
         int pagedResult = 0;
         struct timeval timeOut = {1, 0};
         while (pagedResult == 0)
@@ -76,12 +75,12 @@ public:
         }
 
         /* Parse the results to retrieve the contols being returned.      */
-        l_rc = ldap_parse_result(ld, l_result, &l_errcode, NULL, NULL, NULL, &returnedControls, false);
+        l_rc = ldap_parse_result(ld, l_result, &l_errcode, nullptr, nullptr, nullptr, &returnedControls, false);
 
-        if (cookie != NULL)
+        if (cookie != nullptr)
         {
             ber_bvfree(cookie);
-            cookie = NULL;
+            cookie = nullptr;
         }
 
         /* Parse the page control returned to get the cookie and          */
@@ -90,7 +89,7 @@ public:
 
         /* Determine if the cookie is not empty, indicating there are more pages */
         /* for these search parameters. */
-        if (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0))
+        if (cookie && cookie->bv_val != nullptr && (strlen(cookie->bv_val) > 0))
         {
             morePages = true;
         }
@@ -100,21 +99,21 @@ public:
         }
 
         /* Cleanup the controls used. */
-        if (returnedControls != NULL)
+        if (returnedControls != nullptr)
         {
             ldap_controls_free(returnedControls);
-            returnedControls = NULL;
+            returnedControls = nullptr;
         }
-        M_controls[0] = NULL;
+        M_controls[0] = nullptr;
         ldap_control_free(pageControl);
-        pageControl = NULL;
+        pageControl = nullptr;
 
         /******************************************************************/
         /* Disply the returned result                                     */
         /*                                                                */
         /* Determine how many entries have been found.                    */
         if (morePages == true)
-            printf("===== Page : %d =====\n", page_nbr);
+           // printf("===== Page : %d =====\n", page_nbr);
         l_entries = ldap_count_entries(ld, l_result);
 
         if (l_entries > 0)
@@ -123,25 +122,30 @@ public:
         }
 
         for (l_entry = ldap_first_entry(ld, l_result);
-             l_entry != NULL;
+             l_entry != nullptr;
              l_entry = ldap_next_entry(ld, l_entry))
         {
             l_dn = ldap_get_dn(ld, l_entry);
-            printf("    %s\n", l_dn);
+            //printf("    %s\n", l_dn);
+            pageResult+= l_dn;
 
 
             for (attribute = ldap_first_attribute(ld, l_entry, &ber);
-            attribute != NULL;
+            attribute != nullptr;
             attribute = ldap_next_attribute(ld, l_entry, ber))
        {
-         if ((values = ldap_get_values(ld, l_entry, attribute)) != NULL)
+         if ((values = ldap_get_values(ld, l_entry, attribute)) != nullptr)
          {
-           for (int i = 0; values[i] != NULL; i++)
+           for (int i = 0; values[i] != nullptr; i++)
            {
-              printf("%s:",attribute);
+             // printf("%s:",attribute);
+              pageResult+= attribute;
+              pageResult+= ":";
              //resultLocal += ":";
-             printf("%s\n",values[i]);
+            // printf("%s\n",values[i]);
              //resultLocal += "\n";
+             pageResult+= values[i];
+             pageResult+= "\n";
            }
            ldap_value_free(values);
          }
@@ -156,11 +160,11 @@ public:
 
     } while (morePages == true);
 
-    printf("\n  %d entries found during the search", l_entry_count);
+  // printf("\n  %d entries found during the search", l_entry_count);
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
     ber_bvfree(cookie);
-    cookie = NULL;
+    cookie = nullptr;
 
     /* Close the LDAP session.                                           */
     ldap_unbind(ld);
@@ -184,7 +188,7 @@ public:
       callback->Call(2, stateClient);
     }
 
-    cookie != nullptr ? std::cout << "cookie is not null" << std::endl : std::cout << "cookie is null " << std::endl;
+    cookie != nullptr ? std::cout << "cookie is not nullptr" << std::endl : std::cout << "cookie is nullptr " << std::endl;
     // ldap_msgfree(resultMsg);
     callback->Reset();
     progress->Reset();
@@ -223,7 +227,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(),Nan::Null()};
     if (result == -1)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -289,7 +293,7 @@ public:
   void HandleOKCallback()
   {
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     if (status == LDAP_INVALID_DN_SYNTAX || status == LDAP_NO_SUCH_OBJECT)
     {
@@ -306,7 +310,7 @@ public:
   void HandleProgressCallback(const char *data, size_t size)
   {
     // Required, this is not created automatically
-    char *dn, *attribute, **values, *matchedDN, *errorMessage = NULL;
+    char *dn, *attribute, **values, *matchedDN, *errorMessage = nullptr;
     int errorCode, prc;
 
     string resultLocal = "\n";
@@ -321,7 +325,7 @@ public:
 
     case 0:
       finished = 1;
-      if (resultMsg != NULL)
+      if (resultMsg != nullptr)
       {
         ldap_msgfree(resultMsg);
       }
@@ -329,7 +333,7 @@ public:
 
     case LDAP_RES_SEARCH_ENTRY:
       flagVerification = true;
-      if ((dn = ldap_get_dn(ld, resultMsg)) != NULL)
+      if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr)
       {
         resultLocal += "dn:";
         resultLocal += dn;
@@ -340,12 +344,12 @@ public:
       // You have to implement the attribute side
       entry = ldap_first_entry(ld, resultMsg);
       for (attribute = ldap_first_attribute(ld, entry, &ber);
-           attribute != NULL;
+           attribute != nullptr;
            attribute = ldap_next_attribute(ld, entry, ber))
       {
-        if ((values = (char **)(intptr_t)ldap_get_values(ld, entry, attribute)) != NULL)
+        if ((values = (char **)(intptr_t)ldap_get_values(ld, entry, attribute)) != nullptr)
         {
-          for (i = 0; values[i] != NULL; i++)
+          for (i = 0; values[i] != nullptr; i++)
           {
             resultLocal += attribute;
             resultLocal += ":";
@@ -372,11 +376,11 @@ public:
                               &errorCode,
                               &matchedDN,
                               &errorMessage,
-                              NULL,
-                              NULL,
+                              nullptr,
+                              nullptr,
                               1);
 
-      if (matchedDN != NULL && *matchedDN != 0)
+      if (matchedDN != nullptr && *matchedDN != 0)
       {
         ldap_memfree(matchedDN);
       }
@@ -386,7 +390,7 @@ public:
     }
 
     Nan::HandleScope scope;
-    Local<Value> argv[1] = {Null()};
+    Local<Value> argv[1] = {Nan::Null()};
     argv[0] = Nan::New(resultLocal).ToLocalChecked();
     progress->Call(1, argv);
     return;
@@ -420,7 +424,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     if (result == -1)
     {
       stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
@@ -515,7 +519,7 @@ private:
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     Nan::Utf8String hostArg(info[0]);
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Callback *callback = new Callback(info[1].As<Function>());
     obj->initializedFlag = true;
 
@@ -543,7 +547,7 @@ private:
       return;
     }
 
-    /*state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    /*state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if(state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(state);
       callback->Call(1, stateClient);
@@ -559,7 +563,7 @@ private:
   {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Callback *callback = new Callback(info[0].As<Function>());
 
     int state;
@@ -567,7 +571,7 @@ private:
 
     stateClient[0] = Nan::New<Number>(0);
 
-    state = ldap_start_tls_s(obj->ld, NULL, NULL);
+    state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if (state != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -585,7 +589,7 @@ private:
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Callback *callback = new Callback(info[2].As<Function>());
     Callback *progress = new Callback(info[3].As<v8::Function>());
 
@@ -613,7 +617,7 @@ private:
     int message, result;
     struct timeval timeOut = {10, 0};
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Callback *callback = new Callback(info[3].As<Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());
@@ -645,10 +649,10 @@ private:
                              DNbase,
                              scopeSearch,
                              filterSearch,
-                             NULL,
+                             nullptr,
                              0,
-                             NULL,
-                             NULL,
+                             nullptr,
+                             nullptr,
                              &timeOut,
                              LDAP_NO_LIMIT,
                              &message);
@@ -677,7 +681,7 @@ private:
     struct timeval timeOut = {1, 0};
     struct berval *cookie = nullptr;
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(),Nan::Null()};
 
     Callback *callback = new Callback(info[4].As<Function>());
     Callback *progress = new Callback(info[5].As<v8::Function>());
@@ -722,7 +726,7 @@ private:
     char *value = *valueArg;
     int message, result;
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Callback *callback = new Callback(info[3].As<Function>());
     Callback *progress = new Callback(info[4].As<v8::Function>());
@@ -736,8 +740,8 @@ private:
                               DNEntry,
                               attribute,
                               &bvalue,
-                              NULL,
-                              NULL,
+                              nullptr,
+                              nullptr,
                               &message);
 
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
@@ -747,10 +751,10 @@ private:
   {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-    Local<Value> stateClient[2] = {Null(), Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Callback *callback = new Callback(info[0].As<Function>());
 
-    if (obj->ld == NULL || obj->initializedFlag == false)
+    if (obj->ld == nullptr || obj->initializedFlag == false)
     {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(2, stateClient);
