@@ -1,10 +1,26 @@
 #include <nan.h>
 #include <ldap.h>
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <thread>
 #include <chrono>
 #include <node.h>
+#include <lber.h>
+//#include <lber_pvt.h>
+
+#define LBER_ALIGNED_BUFFER(uname, size) \
+        union uname { \
+          char buffer[size]; \
+          int ialign; \
+          long lalign; \
+          float falign; \
+          double dalign; \
+          char* palign; \
+        }
+
+#define LBER_ELEMENT_SIZEOF (256)
+typedef LBER_ALIGNED_BUFFER(lber_berelement_u, LBER_ELEMENT_SIZEOF)
+        BerElementBuffer;
 
 using namespace Nan;
 using namespace v8;
@@ -306,16 +322,27 @@ public:
 
   void HandleOKCallback()
   {
+    int status;
     Nan::HandleScope scope;
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+
+    int errorCode;
+    struct berval bv;
+    char *matchedDN, *errorMessage = NULL, **refData = NULL;;
+    BerElement *ber;
+    LDAPControl **serverCTL;
+    BerVarray vals = NULL;
+    char *str = NULL;
+    std::string modifyResult;
+
     if (result == -1)
     {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
     }
-    else
+    else if(result == LDAP_RES_MODIFY)
     {
-      int status = ldap_result2error(ld, resultMsg, 0);
+      status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS)
       {
         stateClient[0] = Nan::New<v8::Number>(status);
@@ -323,15 +350,40 @@ public:
       }
       else
       {
-        stateClient[1] = Nan::New<v8::Number>(0);
+        status = ldap_parse_result(ld, resultMsg, &errorCode, &matchedDN, &errorMessage, &refData, &serverCTL, 0);
+        ber = ber_init(&serverCTL[0]->ldctl_value);
+        if (ber == NULL) {
+          cout << "ber is NULL" << endl;
+          return;
+        } else if( ber_scanf(ber, "{m{" /*}}*/ , &bv) == LBER_ERROR) {
+          cout << "BER error" << endl;
+          return;
+        } else {
+          modifyResult += "\n";
+          modifyResult += "dn: ";
+          modifyResult += bv.bv_val;
+          while (ber_scanf(ber, "{m"/*}*/ , &bv) != LBER_ERROR) {
+            if (ber_scanf(ber, "[W]", &vals) == LBER_ERROR || vals == NULL) {
+              cout << "Vals error" << endl;
+              return;
+            }
+              modifyResult += "\n";
+              modifyResult += bv.bv_val;
+              modifyResult += ": ";
+              modifyResult += vals[0].bv_val;
+          }
+          modifyResult += "\n";
+        }
+      }
+
+        stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
         callback->Call(2, stateClient);
       }
+      callback->Reset();
+      progress->Reset();
+      ldap_msgfree(resultMsg);
+      ldap_mods_free(entries, 1);
     }
-    callback->Reset();
-    progress->Reset();
-    ldap_msgfree(resultMsg);
-    ldap_mods_free(entries, 1);
-  }
 
   void HandleProgressCallback(const char *data, size_t size)
   {
@@ -573,17 +625,18 @@ private:
     Nan::Utf8String dn(info[0]);
 
     v8::Handle<v8::Array> mods = v8::Handle<v8::Array>::Cast(info[1]);
+    v8::Handle<v8::Array> returnAttr = v8::Handle<v8::Array>::Cast(info[2]);
     unsigned int nummods = mods->Length();
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
 
     if (obj->ld == 0 || obj->ld == NULL) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
       delete ldapmods;
       delete callback;
@@ -627,9 +680,59 @@ private:
     }
 
     ldapmods[nummods] = NULL;
+    int msgID;
 
-    int msgID = 0;
-    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);
+    LDAPControl **ctrls, c[1];
+    ctrls = (LDAPControl**) malloc(sizeof(c) + 3 *sizeof(LDAPControl*));
+    char *control, *cvalue, *optarg = "postread=entryCSN", *postread_attrs = NULL;
+    BerElementBuffer berbuf;
+    BerElement *ber = (BerElement *)&berbuf;
+    char **attrs = NULL, **res = NULL;
+    res = (char **) malloc(sizeof(res) + 20);
+    int returnAttrLength = returnAttr->Length();
+    for (int z = 0; z <= returnAttrLength; z++) {
+      if (z == returnAttrLength) {
+        res[z] = NULL;
+        break;
+      }
+      Nan::Utf8String modValue(returnAttr->Get(Nan::New(z)));
+      res[z] = strdup(*modValue);
+    }
+
+    attrs = res;
+    int err;
+
+    ber_init2(ber, NULL, LBER_USE_DER);
+    if(ber_printf(ber, "{v}", attrs) == -1) {
+      cout << "preread attrs encode failed. \n" << endl;
+      return;
+    }
+    
+    err = ber_flatten2(ber, &c[0].ldctl_value, 0);
+    if (err < 0) {
+      cout << "preread flatten failed" << endl;
+      return;
+    }
+
+    c[0].ldctl_oid = LDAP_CONTROL_PRE_READ;
+    c[0].ldctl_iscritical = 0;
+    ctrls[0] = &c[0];
+    ctrls[1] = NULL;
+
+    //err = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, ctrls);
+   
+    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls, NULL, &msgID);
+    free(ctrls);
+
+    if(/*controlResult != LDAP_SUCCESS || */result != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<Number>(LDAP_INSUFFICIENT_ACCESS);
+      callback->Call(1, stateClient);
+      delete ldapmods;
+      delete callback;
+      delete progress;
+      return;
+    }
+
 
     AsyncQueueWorker(new LDAPModifyProgress(callback, progress, obj->ld, msgID, ldapmods));
   }

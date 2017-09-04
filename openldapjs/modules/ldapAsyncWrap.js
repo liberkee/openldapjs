@@ -264,8 +264,11 @@ module.exports = class LDAPWrapAsync {
   //     }
   //   });
   // }
-  newModify(dn, changes) {
+  newModify(dn, changes, returnAttr) {
     return new Promise((resolve, reject) => {
+      if(Array.isArray(returnAttr) === false) {
+        reject(new Error("returnAttr is not array"));
+      }
       const cheangArray = [];
       changes.forEach((element) => {
         const result = validator(element, changeSechema);
@@ -280,7 +283,7 @@ module.exports = class LDAPWrapAsync {
           if (this._stateClient !== this._E_STATES.BOUND) {
             reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
           }
-          this._binding.newModify(dn, changes, (err, result) => {
+          this._binding.newModify(dn, changes, returnAttr, (err, result) => {
             if (err) {
               reject(new Error(err));
             } else {

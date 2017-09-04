@@ -67,26 +67,27 @@ function modify() {
 
   const userDnModify = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const changes = [
-
-    {
-      op: 'add',
-      attr: 'description',
-      vals: ['a', 'b', 'c',]
-    },
     {
       op: 'replace',
       attr: 'description',
       vals: ['asdaaa----------------']
+    },
+    {
+      op: 'add',
+      attr: 'description',
+      vals: ['a', 'b', 'c',]
     }
   ];
+
+  const attributeArray = ['cn', 'entryCSN', 'description']; 
 
   clientLDAP.initialize()
     .then(() => {
       clientLDAP.bind(dnUser, password)
         .then(() => {
-          clientLDAP.newModify('cn=42,ou=rtu,o=hufsm', changes)
+          clientLDAP.newModify(userDnModify, changes, attributeArray)
             .then((result) => {
-              console.log('Result', result);
+              console.log(result);
             })
         });
 

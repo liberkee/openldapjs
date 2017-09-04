@@ -12,7 +12,8 @@
             "-Wl,-z,defs"
       ],
       'libraries': [
-         "-lldap"
+         "-lldap",
+         "-llber"
       ],
       "defines": [
           "LDAP_DEPRECATED"
@@ -23,7 +24,8 @@
       "cflags": [
           "-Wall",
           "-g",
-          "-std=c++11"
+          "-std=c++11",
+          "-Wreorder"
       ],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"]
