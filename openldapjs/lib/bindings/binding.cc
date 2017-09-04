@@ -53,129 +53,117 @@ public:
     /* through the loop                                               */
     do
     {
-      pageResult+="\n";
-        l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
+      pageResult += "\n";
+      l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
 
-        /* Insert the control into a list to be passed to the search.     */
-        M_controls[0] = pageControl;
+      /* Insert the control into a list to be passed to the search.     */
+      M_controls[0] = pageControl;
 
-        /* Search for entries in the directory using the parmeters.       */
-        l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), nullptr, 0, M_controls, nullptr, nullptr, 0, &msgId);
-        if ((l_rc != LDAP_SUCCESS))
-        {
-            status = -1;
-        
-            break;
-        }
-       
-        int pagedResult = 0;
-        struct timeval timeOut = {1, 0};
-        while (pagedResult == 0)
-        {
-            pagedResult = ldap_result(ld, msgId, 1, &timeOut, &l_result);
-        }
+      /* Search for entries in the directory using the parmeters.       */
+      l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), nullptr, 0, M_controls, nullptr, nullptr, 0, &msgId);
+      if ((l_rc != LDAP_SUCCESS))
+      {
+        status = -1;
 
-        /* Parse the results to retrieve the contols being returned.      */
-        l_rc = ldap_parse_result(ld, l_result, &l_errcode, nullptr, nullptr, nullptr, &returnedControls, false);
+        break;
+      }
 
-        if (cookie != nullptr)
-        {
-            ber_bvfree(cookie);
-            cookie = nullptr;
-        }
+      int pagedResult = 0;
+      struct timeval timeOut = {1, 0};
+      while (pagedResult == 0)
+      {
+        pagedResult = ldap_result(ld, msgId, 1, &timeOut, &l_result);
+      }
 
-        /* Parse the page control returned to get the cookie and          */
-        /* determine whether there are more pages.                        */
-        l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      /* Parse the results to retrieve the contols being returned.      */
+      l_rc = ldap_parse_result(ld, l_result, &l_errcode, nullptr, nullptr, nullptr, &returnedControls, false);
 
-        /* Determine if the cookie is not empty, indicating there are more pages */
-        /* for these search parameters. */
-        if (cookie && cookie->bv_val != nullptr && (strlen(cookie->bv_val) > 0))
-        {
-            morePages = true;
-        }
-        else
-        {
-            morePages = false;
-        }
+      if (cookie != nullptr)
+      {
+        ber_bvfree(cookie);
+        cookie = nullptr;
+      }
 
-        /* Cleanup the controls used. */
-        if (returnedControls != nullptr)
-        {
-            ldap_controls_free(returnedControls);
-            returnedControls = nullptr;
-        }
-        M_controls[0] = nullptr;
-        ldap_control_free(pageControl);
-        pageControl = nullptr;
+      /* Parse the page control returned to get the cookie and          */
+      /* determine whether there are more pages.                        */
+      l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
 
-        /******************************************************************/
-        /* Disply the returned result                                     */
-        /*                                                                */
-        /* Determine how many entries have been found.                    */
-        if (morePages == true)
-           // printf("===== Page : %d =====\n", page_nbr);
+      /* Determine if the cookie is not empty, indicating there are more pages */
+      /* for these search parameters. */
+      if (cookie && cookie->bv_val != nullptr && (strlen(cookie->bv_val) > 0))
+      {
+        morePages = true;
+      }
+      else
+      {
+        morePages = false;
+      }
+
+      /* Cleanup the controls used. */
+      if (returnedControls != nullptr)
+      {
+        ldap_controls_free(returnedControls);
+        returnedControls = nullptr;
+      }
+      M_controls[0] = nullptr;
+      ldap_control_free(pageControl);
+      pageControl = nullptr;
+
+      /******************************************************************/
+      /* Disply the returned result                                     */
+      /*                                                                */
+      /* Determine how many entries have been found.                    */
+      if (morePages == true)
+
         l_entries = ldap_count_entries(ld, l_result);
 
-        if (l_entries > 0)
+      if (l_entries > 0)
+      {
+        l_entry_count = l_entry_count + l_entries;
+      }
+
+      for (l_entry = ldap_first_entry(ld, l_result);
+           l_entry != nullptr;
+           l_entry = ldap_next_entry(ld, l_entry))
+      {
+        l_dn = ldap_get_dn(ld, l_entry);
+        pageResult += "dn: ";
+        pageResult += l_dn;
+        pageResult += "\n";
+
+        for (attribute = ldap_first_attribute(ld, l_entry, &ber);
+             attribute != nullptr;
+             attribute = ldap_next_attribute(ld, l_entry, ber))
         {
-            l_entry_count = l_entry_count + l_entries;
+          if ((values = ldap_get_values(ld, l_entry, attribute)) != nullptr)
+          {
+            for (int i = 0; values[i] != nullptr; i++)
+            {
+              pageResult += attribute;
+              pageResult += ":";
+              pageResult += values[i];
+              pageResult += "\n";
+            }
+            ldap_value_free(values);
+          }
+          ldap_memfree(attribute);
         }
+        pageResult += "\n";
+      }
 
-        for (l_entry = ldap_first_entry(ld, l_result);
-             l_entry != nullptr;
-             l_entry = ldap_next_entry(ld, l_entry))
-        {
-            l_dn = ldap_get_dn(ld, l_entry);
-            //printf("    %s\n", l_dn);
-            pageResult+="dn: ";
-            pageResult+= l_dn;
-            pageResult+= "\n";
-
-
-            for (attribute = ldap_first_attribute(ld, l_entry, &ber);
-            attribute != nullptr;
-            attribute = ldap_next_attribute(ld, l_entry, ber))
-       {
-         if ((values = ldap_get_values(ld, l_entry, attribute)) != nullptr)
-         {
-           for (int i = 0; values[i] != nullptr; i++)
-           {
-             // printf("%s:",attribute);
-              pageResult+= attribute;
-              pageResult+= ":";
-             //resultLocal += ":";
-            // printf("%s\n",values[i]);
-             //resultLocal += "\n";
-             pageResult+= values[i];
-             pageResult+= "\n";
-           }
-           ldap_value_free(values);
-         }
-       //  std::cout<<"------173----"<<std::endl;
-         ldap_memfree(attribute);
-       }
-       pageResult+= "\n";
-        }
-
-        /* Free the search results.                                       */
-        ldap_msgfree(l_result);
-        page_nbr+= 1;
-        pageResult+="---------";
-        pageResult+= std::to_string(page_nbr);
-        pageResult+= "------\n";
-        
+      /* Free the search results.                                       */
+      ldap_msgfree(l_result);
+      page_nbr += 1;
+      pageResult += "---------";
+      pageResult += std::to_string(page_nbr);
+      pageResult += "------\n";
 
     } while (morePages == true);
 
-  // printf("\n  %d entries found during the search", l_entry_count);
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
     ber_bvfree(cookie);
     cookie = nullptr;
-
-    /* Close the LDAP session.                                           */
-    ldap_unbind(ld);
   }
 
   // Executes in event loop
@@ -184,7 +172,7 @@ public:
   {
     Nan::HandleScope scope;
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-
+   
     if (status != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New(status);
@@ -192,6 +180,13 @@ public:
     }
     else
     {
+      char *byteBuffer = new char[sizeof(cookie)];
+      cout<<"size of byteBuffer"<<sizeof(byteBuffer)<<endl;
+      cout<<"before memcopy"<<endl;
+      memcpy(byteBuffer, cookie, sizeof(cookie));
+      cout<<"buffer is:"<<byteBuffer<<endl;
+
+      stateClient[0] = Nan::New(byteBuffer).ToLocalChecked();
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
       callback->Call(2, stateClient);
     }
@@ -235,7 +230,7 @@ public:
   // Executes in event loop
   void HandleOKCallback()
   {
-    Local<Value> stateClient[2] = {Nan::Null(),Nan::Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     if (result == -1)
     {
       stateClient[0] = Nan::New<Number>(0);
@@ -689,7 +684,7 @@ private:
     struct timeval timeOut = {1, 0};
     struct berval *cookie = nullptr;
 
-    Local<Value> stateClient[2] = {Nan::Null(),Nan::Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Callback *callback = new Callback(info[4].As<Function>());
     Callback *progress = new Callback(info[5].As<v8::Function>());
