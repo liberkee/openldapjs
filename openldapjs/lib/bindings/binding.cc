@@ -21,7 +21,7 @@ private:
   std::string filter;
   int scope;
   int pageSize;
-  struct berval *cookie;
+  struct berval *cookie = nullptr;
   std::string pageResult;
   int status = 0;
 
@@ -35,7 +35,7 @@ public:
   {
     BerElement *ber;
     int l_rc, l_entries, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
-    struct berval *cookie = nullptr;
+    //struct berval *cookie = nullptr;
     char pagingCriticality = 'T', *l_dn;
     int totalCount = 0;
     LDAPControl *pageControl = nullptr, *M_controls[2] = {nullptr, nullptr}, **returnedControls = nullptr;
@@ -162,8 +162,8 @@ public:
 
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
-    ber_bvfree(cookie);
-    cookie = nullptr;
+   // ber_bvfree(cookie);
+    //cookie = nullptr;
   }
 
   // Executes in event loop
@@ -171,8 +171,8 @@ public:
   void HandleOKCallback()
   {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-   
+    v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null()};
+
     if (status != LDAP_SUCCESS)
     {
       stateClient[0] = Nan::New(status);
@@ -180,15 +180,19 @@ public:
     }
     else
     {
-      char *byteBuffer = new char[sizeof(cookie)];
+      
+      char byteBuffer[sizeof(cookie)];
       cout<<"size of byteBuffer"<<sizeof(byteBuffer)<<endl;
       cout<<"before memcopy"<<endl;
-      memcpy(byteBuffer, cookie, sizeof(cookie));
+      memcpy(byteBuffer, &cookie, sizeof(cookie));
       cout<<"buffer is:"<<byteBuffer<<endl;
 
-      stateClient[0] = Nan::New(byteBuffer).ToLocalChecked();
+      
+
+      
+      stateClient[2] = Nan::New(byteBuffer).ToLocalChecked();
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
-      callback->Call(2, stateClient);
+      callback->Call(3, stateClient);
     }
 
     cookie != nullptr ? std::cout << "cookie is not nullptr" << std::endl : std::cout << "cookie is nullptr " << std::endl;
