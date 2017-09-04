@@ -24,17 +24,20 @@ private:
   struct berval *cookie = nullptr;
   std::string pageResult;
   int status = 0;
+  bool morePages = false;
 
 public:
   LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, std::string base, int scope, std::string filter, int pgSize, struct berval *cookie)
       : AsyncProgressWorker(callback), progress(progress), ld(ld), base(base), scope(scope), filter(filter), pageSize(pgSize), cookie(cookie)
   {
+  cookie != NULL ?  cout<<"-------------length--------"<<cookie->bv_len<<endl: cout<<"cookie is null"<<endl;
+
   }
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
   {
     BerElement *ber;
-    int l_rc, l_entries, l_entry_count = 0, morePages, l_errcode = 0, page_nbr;
+    int l_rc, l_entries, l_entry_count = 0, l_errcode = 0, page_nbr;
     //struct berval *cookie = nullptr;
     char pagingCriticality = 'T', *l_dn;
     int totalCount = 0;
@@ -51,7 +54,7 @@ public:
     /******************************************************************/
     /* Get one page of the returned results each time                 */
     /* through the loop                                               */
-    do
+   // do
     {
       pageResult += "\n";
       l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
@@ -65,7 +68,8 @@ public:
       {
         status = -1;
 
-        break;
+       // break;
+       return;
       }
 
       int pagedResult = 0;
@@ -80,9 +84,9 @@ public:
 
       if (cookie != nullptr)
       {
-        ber_bvfree(cookie);
+       // ber_bvfree(cookie);
         cookie = nullptr;
-      }
+      } 
 
       /* Parse the page control returned to get the cookie and          */
       /* determine whether there are more pages.                        */
@@ -93,6 +97,7 @@ public:
       if (cookie && cookie->bv_val != nullptr && (strlen(cookie->bv_val) > 0))
       {
         morePages = true;
+
       }
       else
       {
@@ -158,7 +163,7 @@ public:
       pageResult += std::to_string(page_nbr);
       pageResult += "------\n";
 
-    } while (morePages == true);
+    } //while (morePages == true);
 
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
@@ -171,7 +176,7 @@ public:
   void HandleOKCallback()
   {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null()};
+    v8::Local<v8::Value> stateClient[4] = {Nan::Null(), Nan::Null(),Nan::Null(),Nan::Null()};
 
     if (status != LDAP_SUCCESS)
     {
@@ -192,7 +197,8 @@ public:
       
       stateClient[2] = Nan::New(byteBuffer).ToLocalChecked();
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
-      callback->Call(3, stateClient);
+      morePages == true ? stateClient[3] = Nan::True() : stateClient[3] = Nan::False();
+      callback->Call(4, stateClient);
     }
 
     cookie != nullptr ? std::cout << "cookie is not nullptr" << std::endl : std::cout << "cookie is nullptr " << std::endl;
@@ -680,18 +686,33 @@ private:
 
     Nan::Utf8String baseArg(info[0]);
     Nan::Utf8String filterArg(info[2]);
-
+    Nan::Utf8String jsCookie(info[4]);
+ //cout<<"cast sucessful"<<*jsCookie<<endl;
     std::string DNbase = *baseArg;
     std::string filterSearch = *filterArg;
-    int message;
-    int result;
     struct timeval timeOut = {1, 0};
-    struct berval *cookie = nullptr;
 
-    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    struct berval *cookie;
 
-    Callback *callback = new Callback(info[4].As<Function>());
-    Callback *progress = new Callback(info[5].As<v8::Function>());
+    if(jsCookie.length() == 0){
+      cookie = {};
+
+    } else {
+
+      cookie = ( berval *) *jsCookie;
+      cout<<"blabla!!"<<endl;
+      cout<<cookie->bv_len<<endl;
+    }
+    
+
+
+
+
+
+    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(),Nan::Null(),Nan::Null()};
+
+    Callback *callback = new Callback(info[5].As<Function>());
+    Callback *progress = new Callback(info[6].As<v8::Function>());
 
     //Verify if the argument is a Number for scope
 
@@ -707,15 +728,6 @@ private:
       return;
     }
 
-    /*
-    if (result != LDAP_SUCCESS)
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      callback->Reset();
-      progress->Reset();
-      return;
-    } */
 
     AsyncQueueWorker(new LDAPPagedSearchProgress(callback, progress, obj->ld, DNbase, scopeSearch, filterSearch, pageSize, cookie));
   }

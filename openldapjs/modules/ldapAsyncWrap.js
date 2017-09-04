@@ -38,11 +38,11 @@ module.exports = class LDAPWrapAsync {
     * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
     * Reject if the address is incorect.
     */
-    initialize() {
-      return new Promise((resolve, reject) => {
-        if (this._stateClient === this._E_STATES.CREATED) {
-          this._binding.initialize(this._hostAdress, (err, result) => {
-            if (result) {/*
+  initialize() {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.CREATED) {
+        this._binding.initialize(this._hostAdress, (err, result) => {
+          if (result) {/*
               this._binding.startTls((errTls, stateTls) => {
                 if (errTls) {
                   reject(new Error(errTls));
@@ -50,21 +50,21 @@ module.exports = class LDAPWrapAsync {
                   this._stateClient = this._E_STATES.INITIALIZED;
                   resolve(stateTls);
                 }*/
-                this._stateClient = this._E_STATES.INITIALIZED;
-                resolve(result);
-              
+            this._stateClient = this._E_STATES.INITIALIZED;
+            resolve(result);
+
             //  });
-            } else {
-              reject(err);
-            }
-          });
-        } else {
-          reject(new Error('object not created'));
-        }
-      });
-    }
-  
-  
+          } else {
+            reject(err);
+          }
+        });
+      } else {
+        reject(new Error('object not created'));
+      }
+    });
+  }
+
+
 
   /**
    * Authentificate to LDAP server.
@@ -134,24 +134,28 @@ module.exports = class LDAPWrapAsync {
  * @return {Promise} That resolve and return the a string with search result.
  * Reject if an error will occure.
  */
-  pagedSearch(searchBase, scope, searchFilter, pageSize) {
+  pagedSearch(searchBase, scope, searchFilter, pageSize,cookieThingy) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
 
         let cookieMonster = null;
         let pagesAvailable = true;
 
-       // while (pagesAvailable) {
-          this._binding.pagedSearch(searchBase, scope, searchFilter, pageSize, (err, result) => {
-            if (err) {
-              reject(new Error(err));
-            } else {
-              //receive one page and decide for the next page
+        // while (pagesAvailable) {
+        this._binding.pagedSearch(searchBase, scope, searchFilter, pageSize,cookieThingy, (err, page, cookie, morePages) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            //receive one page and decide for the next page
 
-              resolve(result);
-            }
-          });
-       // }
+            resolve({
+              result: page,
+              cookieChain: cookie,
+              more: morePages
+            });
+          }
+        });
+        // }
       } else {
         reject(new Error('The Search operation can be done just in BOUND state'));
       }
