@@ -3,7 +3,8 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const validator = require('./json_validator/json_validator');
-const changeSechema = require('./schemas/change_schema');
+const changeSchema = require('./schemas/change_schema');
+const modifySchema = require('./schemas/modify_schema');
 
 /**
  * @module LDAPtranzition
@@ -264,26 +265,29 @@ module.exports = class LDAPWrapAsync {
   //     }
   //   });
   // }
-  newModify(dn, changes, returnAttr) {
+  newModify(dn, json) {
     return new Promise((resolve, reject) => {
-      if(Array.isArray(returnAttr) === false) {
-        reject(new Error("returnAttr is not array"));
+      const jsonPromiseArray = [];
+
+      const resultModify = validator(json, modifySchema);
+      if (resultModify.valid === true) {
+        json.changes.forEach((element) => {
+          const result = validator(element, changeSchema);
+          if (result.valid === true) {
+            jsonPromiseArray.push(Promise.resolve(result));
+          } else {
+            jsonPromiseArray.push(Promise.reject(result));
+          }
+        });
+      } else {
+        jsonPromiseArray.push(Promise.reject(resultModify));
       }
-      const cheangArray = [];
-      changes.forEach((element) => {
-        const result = validator(element, changeSechema);
-        if (result.valid === true) {
-          cheangArray.push(Promise.resolve(result));
-        } else {
-          cheangArray.push(Promise.reject(result));
-        }
-      });
-      return Promise.all(cheangArray)
+      return Promise.all(jsonPromiseArray)
         .then((change) => {
           if (this._stateClient !== this._E_STATES.BOUND) {
             reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
           }
-          this._binding.newModify(dn, changes, returnAttr, (err, result) => {
+          this._binding.newModify(dn, json, (err, result) => {
             if (err) {
               reject(new Error(err));
             } else {

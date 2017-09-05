@@ -25,7 +25,7 @@
           "-Wall",
           "-g",
           "-std=c++11",
-          "-Wreorder"
+          "-Wno-reorder"
       ],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"]

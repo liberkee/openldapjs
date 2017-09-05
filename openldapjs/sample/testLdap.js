@@ -66,26 +66,41 @@ function modify() {
   const clientLDAP = new LDAPWrap(host);
 
   const userDnModify = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
-  const changes = [
-    {
+  const json = {
+    changes: [{
       op: 'replace',
       attr: 'description',
-      vals: ['asdaaa----------------']
+      vals: ['aa'],
     },
     {
       op: 'add',
       attr: 'description',
-      vals: ['a', 'b', 'c',]
+      vals: ['bb'],
+    }],
+    prepostControl: 'postread',
+    operationCtr: ['entryCSN', 'description'],
+  }
+
+  const changes = [
+    {
+      op: 'replace',
+      attr: 'description',
+      vals: ['aa']
+    },
+    {
+      op: 'add',
+      attr: 'description',
+      vals: ['bb']
     }
   ];
 
-  const attributeArray = ['cn', 'entryCSN', 'description']; 
+  const attributeArray = ['cn', 'entryCSN', 'description', 'entryUUID']; 
 
   clientLDAP.initialize()
     .then(() => {
       clientLDAP.bind(dnUser, password)
         .then(() => {
-          clientLDAP.newModify(userDnModify, changes, attributeArray)
+          clientLDAP.newModify(userDnModify, json)
             .then((result) => {
               console.log(result);
             })
