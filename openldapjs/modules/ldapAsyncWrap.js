@@ -148,10 +148,8 @@ module.exports = class LDAPWrapAsync {
           } else {
             //receive one page and decide for the next page
 
-            resolve({
-              result: page,
-              more: morePages
-            });
+            resolve(page);
+            
           }
         });
         // }

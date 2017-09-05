@@ -61,17 +61,17 @@ public:
     // do
     {
       pageResult += "\n";
-      cout<<"--------"<<__LINE__<<endl;
+      //
       l_rc = ldap_create_page_control(ld, pageSize, (*cookies)[cookieID], pagingCriticality, &pageControl);
-      cout<<"--------"<<__LINE__<<endl;
+      //
 
       /* Insert the control into a list to be passed to the search.     */
       M_controls[0] = pageControl;
 
       /* Search for entries in the directory using the parmeters.       */
-      cout<<"--------"<<__LINE__<<endl;
+      //
       l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), nullptr, 0, M_controls, nullptr, nullptr, 0, &msgId);
-      cout<<"--------"<<__LINE__<<endl;
+      //
       if ((l_rc != LDAP_SUCCESS))
       {
         status = -1;
@@ -88,9 +88,9 @@ public:
       }
 
       /* Parse the results to retrieve the contols being returned.      */
-      cout<<"--------"<<__LINE__<<endl;
+      //
       l_rc = ldap_parse_result(ld, l_result, &l_errcode, nullptr, nullptr, nullptr, &returnedControls, false);
-      cout<<"--------"<<__LINE__<<endl;
+      //
       if ((*cookies)[cookieID] != nullptr )
       {
         ber_bvfree((*cookies)[cookieID]);
@@ -99,9 +99,9 @@ public:
 
       /* Parse the page control returned to get the cookie and          */
       /* determine whether there are more pages.                        */
-      cout<<"--------"<<__LINE__<<endl;
+      //
       l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &(*cookies)[cookieID]);
-      cout<<"--------"<<__LINE__<<endl;
+      //
 
       /* Determine if the cookie is not empty, indicating there are more pages */
       /* for these search parameters. */
@@ -178,7 +178,7 @@ public:
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
 
-    cout<<"------------"<<__LINE__<<"--------------"<<endl;
+   // cout<<"------------"<<__LINE__<<"--------------"<<endl;
   }
 
   // Executes in event loop
@@ -195,22 +195,22 @@ public:
     }
     else
     {
-      cout<<"-------cookieID-----"<<__LINE__<<"--------------"<<cookieID<<endl;
+     // cout<<"-------cookieID-----"<<__LINE__<<"--------------"<<cookieID<<endl;
 //      const auto & it = cookies->find(cookieID);
 //      if (it != cookies->end()){
 //        cout<<"------found------"<<__LINE__<<"--------------"<<endl;
 //        cookies->insert(it, {cookieID, cookie});
 //      }
 
-      cout<<"------------"<<__LINE__<<"--------------"<<endl;
+     // cout<<"------------"<<__LINE__<<"--------------"<<endl;
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
-      cout<<"------------"<<__LINE__<<"--------------"<<endl;
+      //cout<<"------------"<<__LINE__<<"--------------"<<endl;
       morePages == true ? stateClient[3] = Nan::True() : stateClient[3] = Nan::False();
-      cout<<"------------"<<__LINE__<<"--------------"<<endl;
+     // cout<<"------------"<<__LINE__<<"--------------"<<endl;
       callback->Call(4, stateClient);
-      cout<<"------------"<<__LINE__<<"--------------"<<endl;
+     // cout<<"------------"<<__LINE__<<"--------------"<<endl;
     }
-    cout<<"wtf?"<<endl;
+   // cout<<"wtf?"<<endl;
 
 
     // ldap_msgfree(resultMsg);
