@@ -1,41 +1,12 @@
-cookie is null
-size of byteBuffer8
-before memcopy
-buffer is: 
-cookie is not nullptr
-result is:
-dn: dc=demoApp,dc=com
-objectClass:top
-objectClass:dcObject
-objectClass:organization
-o:orgName
-dc:demoApp
-
-dn: cn=admin,dc=demoApp,dc=com
-objectClass:simpleSecurityObject
-objectClass:organizationalRole
-cn:admin
-userPassword:{SSHA}BL8HilCkMYY/VdxffoYmX4z3DOwbAlUq
-description:asd
-description:asda
-
----------2------
-
-cookie is:ï¿½
+--------59
+--------61
+--------67
+--------69
+--------86
+--------88
+--------97
+--------99
+-----------1- result number:------2
+cookie is:ï¿½
 more pages is:true
-blabla!!
-230539247
--------------length--------230539247
-size of byteBuffer8
-before memcopy
-buffer is:
-cookie is nullptr 
------1-----------------
-cookie is null
-size of byteBuffer8
-before memcopy
-buffer is:P
-
-cookie is not nullptr
------2-----------------P
-
+--------59

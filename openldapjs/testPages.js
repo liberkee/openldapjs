@@ -12,23 +12,25 @@ clientLDAP.initialize()
   .then(() => {
     clientLDAP.bind(dnAdmin, password)
       .then(() => {
-        let fuckCookies = '';
-        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,fuckCookies)
+        let searchID = 1;
+        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID)
           .then((result) => {
-            console.log('result is:'+result.result);
-            console.log('cookie is:'+result.cookieChain);
-            console.log('more pages is:'+result.more);
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,result.cookieChain);  
+         
+            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID);  
 
           })
           .then( (result) => {
-            console.log('-----1-----------------'+result.cookieChain);
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,result.cookieChain);
+          
+            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID);
           })
           .then( (result) => {
-            console.log('-----2-----------------'+result.cookieChain);
+            const count = (result.result.match(/\ndn:/g) || []).length;
+            console.log('-----------2- result number:------'+count );
+          //  console.log('-------2-------'+result.result);
+            console.log('-----2-----------------'+searchID);
           })
       });
 
   });
 
+  

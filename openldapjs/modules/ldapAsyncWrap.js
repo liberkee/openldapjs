@@ -134,7 +134,7 @@ module.exports = class LDAPWrapAsync {
  * @return {Promise} That resolve and return the a string with search result.
  * Reject if an error will occure.
  */
-  pagedSearch(searchBase, scope, searchFilter, pageSize,cookieThingy) {
+  pagedSearch(searchBase, scope, searchFilter, pageSize,searchID) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.BOUND) {
 
@@ -142,7 +142,7 @@ module.exports = class LDAPWrapAsync {
         let pagesAvailable = true;
 
         // while (pagesAvailable) {
-        this._binding.pagedSearch(searchBase, scope, searchFilter, pageSize,cookieThingy, (err, page, cookie, morePages) => {
+        this._binding.pagedSearch(searchBase, scope, searchFilter, pageSize,searchID, (err, page, morePages) => {
           if (err) {
             reject(new Error(err));
           } else {
@@ -150,7 +150,6 @@ module.exports = class LDAPWrapAsync {
 
             resolve({
               result: page,
-              cookieChain: cookie,
               more: morePages
             });
           }

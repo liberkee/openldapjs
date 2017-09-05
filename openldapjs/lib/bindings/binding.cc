@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <map>
 
 using namespace Nan;
 using namespace v8;
@@ -12,6 +13,7 @@ using namespace std;
 class LDAPPagedSearchProgress : public AsyncProgressWorker
 {
 private:
+  LDAPClient *refference;
   LDAP *ld;
   Callback *progress;
   int result = 0;
@@ -25,13 +27,13 @@ private:
   std::string pageResult;
   int status = 0;
   bool morePages = false;
+  unsigned int cookieID;
 
 public:
-  LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, std::string base, int scope, std::string filter, int pgSize, struct berval *cookie)
-      : AsyncProgressWorker(callback), progress(progress), ld(ld), base(base), scope(scope), filter(filter), pageSize(pgSize), cookie(cookie)
+  LDAPPagedSearchProgress(Callback *callback, Callback *progress, LDAP *ld, std::string base, int scope, std::string filter, unsigned int cookieID, int pgSize, struct berval *cookie,LDAPClient *refference)
+      : AsyncProgressWorker(callback), progress(progress), ld(ld), base(base), scope(scope), filter(filter),cookieID(cookieID), pageSize(pgSize), cookie(cookie), refference(refference)
   {
-  cookie != NULL ?  cout<<"-------------length--------"<<cookie->bv_len<<endl: cout<<"cookie is null"<<endl;
-
+    // cookie != NULL ?  cout<<"-------------length--------"<<cookie->bv_len<<endl: cout<<"cookie is null"<<endl;
   }
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress)
@@ -54,22 +56,26 @@ public:
     /******************************************************************/
     /* Get one page of the returned results each time                 */
     /* through the loop                                               */
-   // do
+    // do
     {
       pageResult += "\n";
+      cout<<"--------"<<__LINE__<<endl;
       l_rc = ldap_create_page_control(ld, pageSize, cookie, pagingCriticality, &pageControl);
+      cout<<"--------"<<__LINE__<<endl;
 
       /* Insert the control into a list to be passed to the search.     */
       M_controls[0] = pageControl;
 
       /* Search for entries in the directory using the parmeters.       */
+      cout<<"--------"<<__LINE__<<endl;
       l_rc = ldap_search_ext(ld, base.c_str(), scope, filter.c_str(), nullptr, 0, M_controls, nullptr, nullptr, 0, &msgId);
+      cout<<"--------"<<__LINE__<<endl;
       if ((l_rc != LDAP_SUCCESS))
       {
         status = -1;
 
-       // break;
-       return;
+        // break;
+        return;
       }
 
       int pagedResult = 0;
@@ -80,24 +86,26 @@ public:
       }
 
       /* Parse the results to retrieve the contols being returned.      */
+      cout<<"--------"<<__LINE__<<endl;
       l_rc = ldap_parse_result(ld, l_result, &l_errcode, nullptr, nullptr, nullptr, &returnedControls, false);
-
-      if (cookie != nullptr)
+      cout<<"--------"<<__LINE__<<endl;
+      if (cookie != nullptr )
       {
-       // ber_bvfree(cookie);
+        ber_bvfree(cookie);
         cookie = nullptr;
-      } 
+      }
 
       /* Parse the page control returned to get the cookie and          */
       /* determine whether there are more pages.                        */
+      cout<<"--------"<<__LINE__<<endl;
       l_rc = ldap_parse_page_control(ld, returnedControls, &totalCount, &cookie);
+      cout<<"--------"<<__LINE__<<endl;
 
       /* Determine if the cookie is not empty, indicating there are more pages */
       /* for these search parameters. */
       if (cookie && cookie->bv_val != nullptr && (strlen(cookie->bv_val) > 0))
       {
         morePages = true;
-
       }
       else
       {
@@ -167,8 +175,8 @@ public:
 
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
-   // ber_bvfree(cookie);
-    //cookie = nullptr;
+
+    cout<<"------------"<<__LINE__<<"--------------"<<endl;
   }
 
   // Executes in event loop
@@ -176,7 +184,7 @@ public:
   void HandleOKCallback()
   {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[4] = {Nan::Null(), Nan::Null(),Nan::Null(),Nan::Null()};
+    v8::Local<v8::Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null(), Nan::Null()};
 
     if (status != LDAP_SUCCESS)
     {
@@ -185,23 +193,20 @@ public:
     }
     else
     {
-      
-      char byteBuffer[sizeof(cookie)];
-      cout<<"size of byteBuffer"<<sizeof(byteBuffer)<<endl;
-      cout<<"before memcopy"<<endl;
-      memcpy(byteBuffer, &cookie, sizeof(cookie));
-      cout<<"buffer is:"<<byteBuffer<<endl;
 
-      
+      obj->cookies.insert_or_assign(cookieID,cookie);
 
-      
-      stateClient[2] = Nan::New(byteBuffer).ToLocalChecked();
+      cout<<"------------"<<__LINE__<<"--------------"<<endl;
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
+      cout<<"------------"<<__LINE__<<"--------------"<<endl;
       morePages == true ? stateClient[3] = Nan::True() : stateClient[3] = Nan::False();
+      cout<<"------------"<<__LINE__<<"--------------"<<endl;
       callback->Call(4, stateClient);
+      cout<<"------------"<<__LINE__<<"--------------"<<endl;
     }
+    cout<<"wtf?"<<endl;
 
-    cookie != nullptr ? std::cout << "cookie is not nullptr" << std::endl : std::cout << "cookie is nullptr " << std::endl;
+  
     // ldap_msgfree(resultMsg);
     callback->Reset();
     progress->Reset();
@@ -502,6 +507,7 @@ public:
 protected:
 private:
   LDAP *ld;
+  std::map<unsigned int, berval> cookies{};
   LDAPMessage *result;
   unsigned int stateClient = 0;
   int msgid;
@@ -686,114 +692,102 @@ private:
 
     Nan::Utf8String baseArg(info[0]);
     Nan::Utf8String filterArg(info[2]);
-    Nan::Utf8String jsCookie(info[4]);
- //cout<<"cast sucessful"<<*jsCookie<<endl;
+    unsigned int cookieID = info[4]->NumberValue();
     std::string DNbase = *baseArg;
     std::string filterSearch = *filterArg;
-    struct timeval timeOut = {1, 0};
 
-    struct berval *cookie;
+    berval cookie = obj->cookies.at(cookieID);
 
-    if(jsCookie.length() == 0){
-      cookie = {};
-
-    } else {
-
-      cookie = ( berval *) *jsCookie;
-      cout<<"blabla!!"<<endl;
-      cout<<cookie->bv_len<<endl;
-    }
-    
+   
 
 
 
 
+  Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null(), Nan::Null()};
 
-    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(),Nan::Null(),Nan::Null()};
+  Callback *callback = new Callback(info[5].As<Function>());
+  Callback *progress = new Callback(info[6].As<v8::Function>());
 
-    Callback *callback = new Callback(info[5].As<Function>());
-    Callback *progress = new Callback(info[6].As<v8::Function>());
+  //Verify if the argument is a Number for scope
 
-    //Verify if the argument is a Number for scope
+  int pageSize = info[3]->NumberValue();
+  int scopeSearch = info[1]->NumberValue();
 
-    int pageSize = info[3]->NumberValue();
-    int scopeSearch = info[1]->NumberValue();
-
-    if (obj->ld == 0)
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(1, stateClient);
-      callback->Reset();
-      progress->Reset();
-      return;
-    }
-
-
-    AsyncQueueWorker(new LDAPPagedSearchProgress(callback, progress, obj->ld, DNbase, scopeSearch, filterSearch, pageSize, cookie));
-  }
-
-  static NAN_METHOD(compare)
+  if (obj->ld == 0)
   {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    Nan::Utf8String DNArg(info[0]);
-    Nan::Utf8String attrArg(info[1]);
-    Nan::Utf8String valueArg(info[2]);
-
-    char *DNEntry = *DNArg;
-    char *attribute = *attrArg;
-    char *value = *valueArg;
-    int message, result;
-
-    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-
-    Callback *callback = new Callback(info[3].As<Function>());
-    Callback *progress = new Callback(info[4].As<v8::Function>());
-
-    struct berval bvalue;
-
-    bvalue.bv_val = value;
-    bvalue.bv_len = strlen(value);
-
-    result = ldap_compare_ext(obj->ld,
-                              DNEntry,
-                              attribute,
-                              &bvalue,
-                              nullptr,
-                              nullptr,
-                              &message);
-
-    AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
-  }
-
-  static NAN_METHOD(unbind)
-  {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Callback *callback = new Callback(info[0].As<Function>());
-
-    if (obj->ld == nullptr || obj->initializedFlag == false)
-    {
-      stateClient[0] = Nan::New<Number>(0);
-      callback->Call(2, stateClient);
-      return;
-    }
-
-    ldap_unbind(obj->ld);
-    obj->initializedFlag = false;
-
-    stateClient[1] = Nan::New<Number>(5);
-    callback->Call(2, stateClient);
-
+    stateClient[0] = Nan::New<Number>(0);
+    callback->Call(1, stateClient);
+    callback->Reset();
+    progress->Reset();
     return;
   }
 
-  static inline Nan::Persistent<v8::Function> &constructor()
+  AsyncQueueWorker(new LDAPPagedSearchProgress(callback, progress, obj->ld, DNbase, scopeSearch, filterSearch,cookieID, pageSize, &cookie, obj));
+}
+
+static NAN_METHOD(compare)
+{
+  LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+  Nan::Utf8String DNArg(info[0]);
+  Nan::Utf8String attrArg(info[1]);
+  Nan::Utf8String valueArg(info[2]);
+
+  char *DNEntry = *DNArg;
+  char *attribute = *attrArg;
+  char *value = *valueArg;
+  int message, result;
+
+  Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+
+  Callback *callback = new Callback(info[3].As<Function>());
+  Callback *progress = new Callback(info[4].As<v8::Function>());
+
+  struct berval bvalue;
+
+  bvalue.bv_val = value;
+  bvalue.bv_len = strlen(value);
+
+  result = ldap_compare_ext(obj->ld,
+                            DNEntry,
+                            attribute,
+                            &bvalue,
+                            nullptr,
+                            nullptr,
+                            &message);
+
+  AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
+}
+
+static NAN_METHOD(unbind)
+{
+  LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+  Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+  Callback *callback = new Callback(info[0].As<Function>());
+
+  if (obj->ld == nullptr || obj->initializedFlag == false)
   {
-    static Nan::Persistent<v8::Function> my_constructor;
-    return my_constructor;
+    stateClient[0] = Nan::New<Number>(0);
+    callback->Call(2, stateClient);
+    return;
   }
-};
+
+  ldap_unbind(obj->ld);
+  obj->initializedFlag = false;
+
+  stateClient[1] = Nan::New<Number>(5);
+  callback->Call(2, stateClient);
+
+  return;
+}
+
+static inline Nan::Persistent<v8::Function> &constructor()
+{
+  static Nan::Persistent<v8::Function> my_constructor;
+  return my_constructor;
+}
+}
+;
 
 NODE_MODULE(objectwrapper, LDAPClient::Init)
