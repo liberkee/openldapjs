@@ -21,6 +21,66 @@
 typedef LBER_ALIGNED_BUFFER(lber_berelement_u, LBER_ELEMENT_SIZEOF)
         BerElementBuffer;
 
+LDAPControl **ControlHandler(v8::Local<v8::Array> controlObj) {
+  LDAPControl **ctrls;
+  int controlLength = controlObj->Length();
+  LDAPControl c[controlLength];
+  int i;
+  //std::cout << controlObj << std::endl;
+  ctrls = new LDAPControl*[controlLength+1];
+  for (i = 0; i < controlLength; i++) {
+    v8::Local<v8::Object> control = v8::Local<v8::Object>::Cast(controlObj->Get(Nan::New(i)));
+      v8::Local<v8::Object>::Cast(controlObj->Get(Nan::New(i)));
+    v8::Local<v8::Array> valueAttr = v8::Local<v8::Array>::Cast(control->Get(Nan::New("value").ToLocalChecked()));
+    std::cout << "3" << std::endl;
+    int valueAttrLength = valueAttr->Length();
+    BerElementBuffer berbuf;
+    BerElement *ber = (BerElement *)&berbuf;
+    char **attrs = NULL, **res = NULL;
+    res = new char*[valueAttrLength + 1];
+    for (int j = 0; j <= valueAttrLength; j++) {
+      if (j == valueAttrLength) {
+        res[j] = NULL;
+        break;
+      }
+      Nan::Utf8String modValues(valueAttr->Get(Nan::New(j)));
+      res[j] = strdup(*modValues);
+    }
+    attrs = res;
+    int err;
+
+    ber_init2(ber, nullptr, LBER_USE_DER);
+    if(ber_printf(ber, "{v}", attrs) == -1) {
+      std::cout << "preread attrs encode failed. \n" << std::endl;
+      return NULL;
+    }
+
+    err = ber_flatten2(ber, &c[i].ldctl_value, 0);
+    if (err < 0) {
+      std::cout << "preread attrs encode failed. \n" << std::endl;
+      return NULL;
+    }
+
+    v8::String::Utf8Value controlOperation(control->Get(Nan::New("oid").ToLocalChecked()));
+
+    if(std::strcmp(*controlOperation, "postread") == 0) {
+      c[0].ldctl_oid = LDAP_CONTROL_POST_READ;
+    } else if (std::strcmp(*controlOperation, "preread") == 0) {
+      c[0].ldctl_oid = LDAP_CONTROL_PRE_READ;
+    } else {
+      return NULL;
+    }
+
+    v8::String::Utf8Value isCriticalFlag(control->Get(Nan::New("iscritical").ToLocalChecked()));
+    c[i].ldctl_iscritical = 0;
+    ctrls[i] = &c[i];
+  }
+  i++;
+  ctrls[i] = NULL;
+
+  return ctrls;
+}
+
 enum StateMachine {
   CREATED = 0,
   INITIALIZED = 1,
@@ -353,6 +413,15 @@ public:
       else
       {
         status = ldap_parse_result(ld, resultMsg, &errorCode, &matchedDN, &errorMessage, &refData, &serverCTL, 0);
+        if (serverCTL == nullptr) {
+          stateClient[1] = Nan::New<v8::Number>(0);
+          callback->Call(2, stateClient);
+          callback->Reset();
+          progress->Reset();
+          ldap_msgfree(resultMsg);
+          ldap_mods_free(entries, 1);
+          return;
+        }
         ber = ber_init(&serverCTL[0]->ldctl_value);
         if (ber == NULL) {
           std::cout << "ber is NULL" << std::endl;
@@ -629,21 +698,23 @@ private:
 
   static NAN_METHOD(newModify) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+    // Take the dn from nodejs side
     Nan::Utf8String dn(info[0]);
-    v8::Local<v8::Object> modHandle = v8::Local<v8::Object>::Cast(info[1]);
-    v8::Local<v8::Array> mods = v8::Local<v8::Array>::Cast(modHandle->Get(Nan::New("changes").ToLocalChecked()));
-    v8::Local<v8::Array> returnAttr = v8::Local<v8::Array>::Cast(modHandle->Get(Nan::New("operationCtr").ToLocalChecked()));
-      
+    //Take the Json object with the elements
+    v8::Local<v8::Array> mods = v8::Local<v8::Array>::Cast(info[1]);
+    //Get the array member that have the mods values
+    v8::Local<v8::Array> controls = v8::Local<v8::Array>::Cast(info[2]);
+    
+    //Interogate the mod array and set up the mods
     unsigned int nummods = mods->Length();
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
-
-    if (obj->ld == 0 || obj->ld == NULL) {
+    if (obj->ld == 0 || obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
       delete ldapmods;
@@ -684,22 +755,30 @@ private:
         Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
         ldapmods[i]->mod_values[j] = strdup(*modValue);
       }
-      ldapmods[i] -> mod_values[modValsLength] = NULL;
+      ldapmods[i] -> mod_values[modValsLength] = nullptr;
+    }
+    // LDAPMessage structure for the elements
+    ldapmods[nummods] = nullptr;
+
+    int msgID;
+    LDAPControl **ctrls;
+    //Control for reading the attributes
+    if (controls == Nan::Null()) {
+      ctrls = NULL;
+    } else {
+      ctrls = ControlHandler(controls);
     }
 
-    ldapmods[nummods] = NULL;
-    int msgID;
-
-    LDAPControl **ctrls, c[1];
-    ctrls = (LDAPControl**) malloc(sizeof(c) + 3 *sizeof(LDAPControl*));
+    /*LDAPControl **ctrls, c[1];
+    ctrls = new LDAPControl*[3];
     BerElementBuffer berbuf;
     BerElement *ber = (BerElement *)&berbuf;
-    char **attrs = NULL, **res = NULL;
+    char **attrs = nullptr, **res = nullptr;
     res = (char **) malloc(sizeof(res) + 20);
     int returnAttrLength = returnAttr->Length();
     for (int z = 0; z <= returnAttrLength; z++) {
       if (z == returnAttrLength) {
-        res[z] = NULL;
+        res[z] = nullptr;
         break;
       }
       Nan::Utf8String modValue(returnAttr->Get(Nan::New(z)));
@@ -710,7 +789,7 @@ private:
     attrs = res;
     int err;
 
-    ber_init2(ber, NULL, LBER_USE_DER);
+    ber_init2(ber, nullptr, LBER_USE_DER);
     if(ber_printf(ber, "{v}", attrs) == -1) {
       std::cout << "preread attrs encode failed. \n" << std::endl;
       return;
@@ -731,6 +810,7 @@ private:
     } else {
       stateClient[0] = Nan::New<v8::Number>(2);
       callback->Call(1, stateClient);
+      delete ctrls;
       delete ldapmods;
       delete callback;
       delete progress;
@@ -739,17 +819,14 @@ private:
 
     c[0].ldctl_iscritical = 0;
     ctrls[0] = &c[0];
-    ctrls[1] = NULL;
+    ctrls[1] = nullptr;*/
 
-    //err = ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, ctrls);
     
     int result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls, NULL, &msgID);
-    free(ctrls);
 
     if(result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
-      delete ldapmods;
       delete callback;
       delete progress;
       return;

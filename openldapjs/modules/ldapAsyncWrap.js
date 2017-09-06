@@ -4,7 +4,7 @@ const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const validator = require('./json_validator/json_validator');
 const changeSchema = require('./schemas/change_schema');
-const modifySchema = require('./schemas/modify_schema');
+const controlSchema = require('./schemas/control_schema');
 
 /**
  * @module LDAPtranzition
@@ -186,10 +186,10 @@ module.exports = class LDAPWrapAsync {
         const keys = Object.keys(entry);
         const res = [];
 
-        for (const elem of keys) {
+        keys.forEach((elem) => {
           res.push(elem);
           res.push(entry[elem]);
-        }
+        });
 
         this._binding.modify(dn, json.operation, res, (err, result) => {
           if (err) {
@@ -209,85 +209,42 @@ module.exports = class LDAPWrapAsync {
     *
     * @method newModify
     * @param{string} dn The dn of the entry to modify
-    * @param{array} mods An array that contains the fields that shall be changed
+    * @param{object} json have to contain the value of changes and the attributes for the return
     * @return {Promise} That resolves if LDAP modified successfully the entry.
     * Reject if the LDAP rejects the operation or the client's state is not BOUND
     */
-  // newModify(dn, changes) {
-  //   return new Promise((resolve, reject) => {
-  //     if (this._stateClient === this._E_STATES.BOUND) {
-  //       if (changes === null || changes === '') {
-  //         reject(new Error('The passed JSON is invalid'));
-  //         return;
-  //       }
-
-  //       if (dn === null || dn === '') {
-  //         reject(new Error('The passed dn is invalid'));
-  //         return;
-  //       }
-
-  //       if (Array.isArray(changes) === false) {
-  //         reject(new Error('The json is not an array of elements'));
-  //         return;
-  //       }
-
-  //       const lengthChanges = changes.length;
-
-  //       for (let i = 0; i < lengthChanges; i++) {
-  //         if (typeof changes[i] !== 'object') {
-  //           reject(new Error('The json don\'t have object'));
-  //           return;
-  //         }
-  //         const operation = changes[i].op;
-  //         const attribute = changes[i].attr;
-  //         const values = changes[i].vals;
-
-  //         if (operation || attribute || values === undefined || NULL) {
-  //           reject(new Error('One of the members of object is not defined'));
-  //           return;
-  //         }
-
-  //         if (Array.isArray(values) === false) {
-  //           reject(new Error('The value member must be an array of values'));
-  //           return;
-  //         }
-  //       }
-
-  //       this._binding.newModify(dn, changes, (err, result) => {
-  //         if (err) {
-  //           reject(new Error(err));
-  //         } else {
-  //           resolve(result);
-  //         }
-  //       });
-  //     } else {
-  //       reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
-  //     }
-  //   });
-  // }
-  newModify(dn, json) {
+  newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
-      const jsonPromiseArray = [];
+      const PromiseArray = [];
+      jsonChange.forEach((element) => {
+        const result = validator(element, changeSchema);
+        if (result.valid === true) {
+          PromiseArray.push(Promise.resolve(result));
+        } else {
+          PromiseArray.push(Promise.reject(result));
+        }
+      });
 
-      const resultModify = validator(json, modifySchema);
-      if (resultModify.valid === true) {
-        json.changes.forEach((element) => {
-          const result = validator(element, changeSchema);
-          if (result.valid === true) {
-            jsonPromiseArray.push(Promise.resolve(result));
+      if(controls === undefined || controls === null) {
+        controls = null;
+      } else {
+        controls.forEach((element) => {
+          console.log('--------------------------')
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
           } else {
-            jsonPromiseArray.push(Promise.reject(result));
+            PromiseArray.push(Promise.reject(resultMessage));
           }
         });
-      } else {
-        jsonPromiseArray.push(Promise.reject(resultModify));
       }
-      return Promise.all(jsonPromiseArray)
+
+      return Promise.all(PromiseArray)
         .then((change) => {
           if (this._stateClient !== this._E_STATES.BOUND) {
             reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
           }
-          this._binding.newModify(dn, json, (err, result) => {
+          this._binding.newModify(dn, jsonChange, controls, (err, result) => {
             if (err) {
               reject(new Error(err));
             } else {
