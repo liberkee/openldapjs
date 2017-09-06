@@ -1,7 +1,6 @@
 'use strict'
 
 const Readable = require('stream').Readable;
-const binding = require('../lib/bindings/build/Release/binding.node');
 
  module.exports = class PagedSearchStream extends Readable {
 
