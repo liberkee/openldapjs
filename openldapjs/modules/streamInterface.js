@@ -5,10 +5,10 @@ const binding = require('../lib/bindings/build/Release/binding.node');
 
  module.exports = class PagedSearchStream extends Readable {
 
-    constructor(base,scope,filter,pageSize,searchID){
+    constructor(base,scope,filter,pageSize,searchID, ldapInstance){
         super();
         this.objectMode = true;
-        this._binding = new binding.LDAPClient();  
+        this._binding = ldapInstance;  
         this._base = base;
         this._scope = scope;
         this._filter = filter;

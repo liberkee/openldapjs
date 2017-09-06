@@ -135,7 +135,7 @@ module.exports = class LDAPWrapAsync {
  */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
      this._searchID+=1;
-     return new SearchStream(searchBase,scope,searchFilter,pageSize,this._searchID);
+     return new SearchStream(searchBase,scope,searchFilter,pageSize,this._searchID, this._binding);
    
   }
 
