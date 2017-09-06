@@ -12,22 +12,9 @@ clientLDAP.initialize()
   .then(() => {
     clientLDAP.bind(dnAdmin, password)
       .then(() => {
-        let searchID = 1;
-        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 100,searchID)
-          .then((result) => {
-            console.log('Page 1:\n'+result);
-         
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*',100,searchID);  
-
-          })
-          .then( (result) => {
-           console.log('Page 2:\n'+result);
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 100,searchID);
-          })
-          .then( (result) => {
-            console.log('Page3:\n'+result);
+        clientLDAP.pagedSearch(searchBase,2,'objectClass=*',10).pipe(process.stdout);
+        
       
-          })
       });
 
   });

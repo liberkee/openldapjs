@@ -167,8 +167,7 @@ public:
       pageResult += std::to_string(page_nbr);
       pageResult += "------\n";
 
-    } // while (morePages == true);
-
+    } 
     /* Free the cookie since all the pages for these search parameters   */
     /* have been retrieved.                                              */
   }
@@ -177,8 +176,8 @@ public:
 
   void HandleOKCallback() {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[4] = {Nan::Null(), Nan::Null(),
-                                           Nan::Null(), Nan::Null()};
+    v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null(),
+                                           Nan::Null()};
 
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New(status);
@@ -187,10 +186,10 @@ public:
 
       stateClient[1] = Nan::New(pageResult).ToLocalChecked();
 
-      morePages == true ? stateClient[3] = Nan::True() : stateClient[3] =
+      morePages == true ? stateClient[2] = Nan::True() : stateClient[2] =
                                                              Nan::False();
 
-      callback->Call(4, stateClient);
+      callback->Call(3, stateClient);
     }
 
     // ldap_msgfree(resultMsg);
@@ -346,7 +345,6 @@ public:
 
     case LDAP_RES_SEARCH_RESULT:
       finished = 1;
-      // testVar = *resultMsg;
       status = ldap_result2error(ld, resultMsg, 0);
 
       prc = ldap_parse_result(ld, resultMsg, &errorCode, &matchedDN,
@@ -444,9 +442,8 @@ public:
              Nan::GetFunction(tpl).ToLocalChecked());
   }
 
- protected:
-  
- private:
+protected:
+private:
   LDAP *ld;
   std::shared_ptr<std::map<std::string, berval *>> cookies{};
   LDAPMessage *result;
@@ -456,9 +453,8 @@ public:
   explicit LDAPClient() {
     cookies = std::make_shared<std::map<std::string, berval *>>();
   }
- 
 
-  ~LDAPClient(){}
+  ~LDAPClient() {}
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
@@ -612,7 +608,9 @@ public:
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     Nan::Utf8String baseArg(info[0]);
+    int scopeSearch = info[1]->NumberValue();
     Nan::Utf8String filterArg(info[2]);
+    int pageSize = info[3]->NumberValue();
     Nan::Utf8String cookieID(info[4]);
     std::string DNbase = *baseArg;
     std::string filterSearch = *filterArg;
@@ -622,14 +620,13 @@ public:
       obj->cookies->insert(it, {cookie_id, nullptr});
     }
 
-    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null(),
-                                   Nan::Null()};
+    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null()};                            
 
     Callback *callback = new Callback(info[5].As<Function>());
     Callback *progress = new Callback(info[6].As<v8::Function>());
 
-    int pageSize = info[3]->NumberValue();
-    int scopeSearch = info[1]->NumberValue();
+
+   
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
