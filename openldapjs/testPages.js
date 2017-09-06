@@ -13,23 +13,20 @@ clientLDAP.initialize()
     clientLDAP.bind(dnAdmin, password)
       .then(() => {
         let searchID = 1;
-        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID)
+        clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 100,searchID)
           .then((result) => {
             console.log('Page 1:\n'+result);
          
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID);  
+            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*',100,searchID);  
 
           })
           .then( (result) => {
            console.log('Page 2:\n'+result);
-            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 2,searchID);
+            return clientLDAP.pagedSearch('dc=demoApp,dc=com', 2, 'objectClass=*', 100,searchID);
           })
           .then( (result) => {
             console.log('Page3:\n'+result);
-           // const count = (result.result.match(/\ndn:/g) || []).length;
-           // console.log('-----------2- result number:------'+count );
-          //  console.log('-------2-------'+result.result);
-            //console.log('-----2-----------------'+searchID);
+      
           })
       });
 
