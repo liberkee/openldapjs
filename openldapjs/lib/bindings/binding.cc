@@ -6,20 +6,8 @@
 #include <chrono>
 #include <node.h>
 #include <lber.h>
+#include "ldap_control.h"
 
-#define LBER_ALIGNED_BUFFER(uname, size) \
-        union uname { \
-          char buffer[size]; \
-          int ialign; \
-          long lalign; \
-          float falign; \
-          double dalign; \
-          char* palign; \
-        }
-
-#define LBER_ELEMENT_SIZEOF (256)
-typedef LBER_ALIGNED_BUFFER(lber_berelement_u, LBER_ELEMENT_SIZEOF)
-        BerElementBuffer;
 
 enum StateMachine {
   CREATED = 0,
@@ -597,7 +585,7 @@ private:
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    
+
     Nan::Utf8String DNArg(info[0]);
     Nan::Utf8String attrArg(info[1]);
     Nan::Utf8String valueArg(info[2]);
@@ -627,7 +615,7 @@ private:
       stateClient[0] = Nan::New<v8::Number>(2);
       callback->Call(1, stateClient);
       return;
-    }                          
+    }
     AsyncQueueWorker(new LDAPCompareProgress(callback, progress, obj->ld, message));
   }
 
@@ -637,7 +625,7 @@ private:
 
     v8::Local<v8::Array> mods = v8::Local<v8::Array>::Cast(info[1]);
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[2]);
-      
+
     unsigned int nummods = mods->Length();
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -693,62 +681,71 @@ private:
     ldapmods[nummods] = NULL;
     int msgID;
 
-    
-    int controlsLength = controlHandle->Length();
 
-    LDAPControl **ctrls = new LDAPControl*[controlsLength + 2];
-    LDAPControl c[controlsLength];
-    for(int j = 0; j <= controlsLength; j++) {
-      if (j == controlsLength) {
-        ctrls[j] = NULL;
-        break;
-      }
-      ctrls[j] = new LDAPControl;
-      v8::Local<v8::Object> controls = v8::Local<v8::Object>::Cast(controlHandle->Get(Nan::New(j)));
-      v8::Local<v8::Array> valueControl = v8::Local<v8::Array>::Cast(controls->Get(Nan::New("value").ToLocalChecked()));
-      int valueControlLength = valueControl->Length();
-      BerElementBuffer berbuf;
-      BerElement *ber = (BerElement *)&berbuf;
-      char **attrs = NULL, **res = NULL;
-      res = new char*[valueControlLength + 20];
-      for (int y = 0; y <= valueControlLength; y++) {
-        if (y == valueControlLength) {
-          res[y] = NULL;
-          break;
-        }
-        Nan::Utf8String modValue(valueControl->Get(Nan::New(y)));
-        res[y] = strdup(*modValue);
-      }
+//    int controlsLength = controlHandle->Length();
+    const auto& ldap_controls = new LdapControls();
+    auto ctrls = ldap_controls->CreateControls(controlHandle);
+    //LDAPControl **ctrls = new LDAPControl*[controlsLength + 2];
+//    /LDAPControl c[controlsLength];
+//    std::vector<LDAPControl*> ctrls(controlsLength + 2);
+//    //std::vector<LDAPControl> c(controlsLength);
+//    for(int j = 0; j < controlsLength; j++) {
+////      if (j == controlsLength) {
+////        ctrls[j] = NULL;
+////        break;
+////      }
+//      ctrls[j] = new LDAPControl;
+//      v8::Local<v8::Object> controls = v8::Local<v8::Object>::Cast(controlHandle->Get(Nan::New(j)));
+//      v8::Local<v8::Array> valueControl = v8::Local<v8::Array>::Cast(controls->Get(Nan::New("value").ToLocalChecked()));
+//      int valueControlLength = valueControl->Length();
+//      BerElementBuffer berbuf;
+//      BerElement *ber = (BerElement *)&berbuf;
+//      std::vector<char*> attrs(valueControlLength); //= NULL, **res = NULL;
+//      //res = new char*[valueControlLength + 20];
+//      for (int y = 0; y <= valueControlLength; y++) {
+//        if (y == valueControlLength) {
+//          attrs[y] = NULL;
+//          break;
+//        }
+//        Nan::Utf8String modValue(valueControl->Get(Nan::New(y)));
+//        attrs[y] = strdup(*modValue);
+//      }
 
-      attrs = res;
-      int err;
+////      attrs = res;
+//      int err;
 
-      ber_init2(ber, NULL, LBER_USE_DER);
-      if(ber_printf(ber, "{v}", attrs) == -1) {
-        std::cout << "preread attrs encode failed. \n" << std::endl;
-        return;
-      }
-      
-      err = ber_flatten2(ber, &c[j].ldctl_value, 0);
-      if (err < 0) {
-        std::cout << "preread flatten failed" << std::endl;
-        return;
-      }
-  
-      v8::String::Utf8Value controlOperation(controls->Get(Nan::New("oid").ToLocalChecked()));
-      
-      if(std::strcmp(*controlOperation, "postread") == 0) {
-        c[j].ldctl_oid = LDAP_CONTROL_POST_READ;
-      } else if (std::strcmp(*controlOperation, "preread") == 0) {
-        c[j].ldctl_oid = LDAP_CONTROL_PRE_READ;
-      }
-      
-      c[j].ldctl_iscritical = 0;
-      ctrls[j] = &c[j];
-    }
+//      ber_init2(ber, NULL, LBER_USE_DER);
+//      if(ber_printf(ber, "{v}", attrs.data()) == -1) {
+//        std::cout << "preread attrs encode failed. \n" << std::endl;
+//        return;
+//      }
 
-    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls, NULL, &msgID);
-    free(ctrls);
+//      err = ber_flatten2(ber, &ctrls[j]->ldctl_value, 0);
+//      if (err < 0) {
+//        std::cout << "preread flatten failed" << std::endl;
+//        return;
+//      }
+
+//      v8::String::Utf8Value controlOperation(controls->Get(Nan::New("oid").ToLocalChecked()));
+
+//      if(std::strcmp(*controlOperation, "postread") == 0) {
+//        ctrls[j]->ldctl_oid = LDAP_CONTROL_POST_READ;
+//      } else if (std::strcmp(*controlOperation, "preread") == 0) {
+//        ctrls[j]->ldctl_oid = LDAP_CONTROL_PRE_READ;
+//      }
+
+//      ctrls[j]->ldctl_iscritical = 0;
+//      //ctrls[j] = &c[j];
+//    }
+
+////    if (j == controlsLength) {
+////      ctrls[j] = NULL;
+////      break;
+////    }
+    ctrls.push_back(NULL);
+
+    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), NULL, &msgID);
+    //free(ctrls);
 
     if(result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
