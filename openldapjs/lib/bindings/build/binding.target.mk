@@ -81,7 +81,10 @@ INCS_Release := \
 	-I/usr/local/include
 
 OBJS := \
-	$(obj).target/$(TARGET)/binding.o
+	$(obj).target/$(TARGET)/binding.o \
+	$(obj).target/$(TARGET)/ldap_paged_search_progress.o \
+	$(obj).target/$(TARGET)/ldap_bind_progress.o \
+	$(obj).target/$(TARGET)/ldap_search_progress.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)
