@@ -17,6 +17,9 @@ const Readable = require('stream').Readable;
 
     _read(){
         this._binding.pagedSearch(this._base, this._scope, this._filter, this._pageSize, this._searchID, (err, page, morePages) => {
+            if(err){
+                this.emit('err',err);
+            }
             if(!morePages){
                 this.push(null);
             } else {
