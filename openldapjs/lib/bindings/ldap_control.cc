@@ -1,5 +1,5 @@
 #include "ldap_control.h"
-
+#include "constants.h"
 LdapControls::LdapControls()
 {
 
@@ -14,7 +14,7 @@ std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Arra
     const auto index = &ctrl - &ctrls[0];
     ctrl = new LDAPControl;
 
-    const auto controls = v8::Local<v8::Object>::Cast(control_handle->Get(Nan::New(static_cast<int>(index))));
+    const auto controls = v8::Local<v8::Object>::Cast(control_handle->Get(Nan::New(static_cast<uint>(index))));
     const auto value_controles = v8::Local<v8::Array>::Cast(controls->Get(Nan::New("value").ToLocalChecked()));
     int value_controles_length = value_controles->Length();
     BerElementBuffer berbuf;
@@ -42,13 +42,13 @@ std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Arra
 
     v8::String::Utf8Value controlOperation(controls->Get(Nan::New("oid").ToLocalChecked()));
 
-    if(std::strcmp(*controlOperation, "postread") == 0) {
+    if(std::strcmp(*controlOperation, constants::postread) == 0) {
       ctrl->ldctl_oid = LDAP_CONTROL_POST_READ;
     } else if (std::strcmp(*controlOperation, "preread") == 0) {
       ctrl->ldctl_oid = LDAP_CONTROL_PRE_READ;
     }
 
-    ctrl->ldctl_iscritical = 0;
+    ctrl->ldctl_iscritical = constants::not_critical;
 
   }
 
