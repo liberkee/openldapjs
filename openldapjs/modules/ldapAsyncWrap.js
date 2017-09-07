@@ -123,15 +123,14 @@ module.exports = class LDAPWrapAsync {
 
 
   /**
- * Search operation using pagination.
+ * Search operation with reasults displayed page by page.
  *
  * @method pagedSearch
  * @param {string} searchBase The base node where the search to start.
  * @param {int} scope The mod how the search will return the entrys.
  * @param {string} searchFilter The specification for specific element.
  * @param {int} pageSize The number of entries per LDAP page
- * @return {Promise} That resolve and return the a string with search result.
- * Reject if an error will occure.
+ * @return {Readable stream} that pushes search results page by page
  */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
      this._searchID+=1;
