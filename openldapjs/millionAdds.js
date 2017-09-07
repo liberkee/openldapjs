@@ -15,18 +15,28 @@ const entry = {
   description: 'Testz',
 };
 
-clientLDAP.initialize().then(() => {
+clientLDAP.initialize()
+  .then(() => {
   clientLDAP.bind(dnAdmin, password).then(() => {
-    for (let i = 2000; i < 1000000; i++) {
-      let dn = 'cn=newPointChildMillionaire' + i +
-          ',cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com';
+    for (let i = 0; i < 600000; i++) {
 
-      clientLDAP.add(dn, entry, [])
-        .catch((err) => {
-          throw new Error(err);
-        });
-      }
-    });
-  });
+      let dn = 'cn=newPointChildMillionaire' +( i+ 600000)+
+          ',cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com';
+          setTimeout(()=> {clientLDAP.add(dn, entry, [])
+          .catch( (err)=> {
+            console.log(i);
+
+            
+          }) }
+          ,i*1)
+          }
          
+          
+        
+    
+
+      });
+
+    });
+   
     
