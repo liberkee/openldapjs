@@ -216,12 +216,13 @@ module.exports = class LDAPWrapAsync {
   newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
+      //const resultChange = validator(jsonChange, changeSchema);
       jsonChange.forEach((element) => {
         const result = validator(element, changeSchema);
         if (result.valid === true) {
           PromiseArray.push(Promise.resolve(result));
         } else {
-          PromiseArray.push(Promise.reject(result));
+          PromiseArray.push(Promise.reject(result.errors || result.error));
         }
       });
 
@@ -229,12 +230,11 @@ module.exports = class LDAPWrapAsync {
         controls = null;
       } else {
         controls.forEach((element) => {
-          console.log('--------------------------')
           const resultMessage = validator(element, controlSchema);
           if (resultMessage.valid === true) {
             PromiseArray.push(Promise.resolve(resultMessage));
           } else {
-            PromiseArray.push(Promise.reject(resultMessage));
+            PromiseArray.push(Promise.reject(resultMessage.errors || resultMessage.error));
           }
         });
       }
