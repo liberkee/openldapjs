@@ -185,6 +185,7 @@ describe('Testing the async LDAP search ', () => {
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.above(10000);
+        console.log(count);
         console.log(result);
       })
      
