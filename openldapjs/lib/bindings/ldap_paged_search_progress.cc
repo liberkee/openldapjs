@@ -133,6 +133,7 @@ void LDAPPagedSearchProgress::Execute(
       pageResult += "\n";
     }
 
+
     /* Free the search results.                                       */
     ldap_msgfree(l_result);
     page_nbr += 1;
@@ -146,10 +147,10 @@ void LDAPPagedSearchProgress::Execute(
 
 // Executes in event loop
 
+
 void LDAPPagedSearchProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null(), Nan::Null()};
-
   if (status != LDAP_SUCCESS) {
     stateClient[0] = Nan::New(status);
     callback->Call(1, stateClient);
