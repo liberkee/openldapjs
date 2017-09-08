@@ -26,6 +26,7 @@ class LdapControls
     LdapControls();
 
     std::vector<LDAPControl*> CreateControls(const v8::Local<v8::Array>& control_handle);
+    std::string PrintControls(LDAP *ld, LDAPMessage *resultMsg);
 };
 
 #endif // LDAP_CONTROLs_H

@@ -3,6 +3,7 @@
 #include <iostream>
 namespace constants {
   char postread[] = "postread";
+  char preread[] = "preread";
   unsigned int not_critical = 0;
 }
 

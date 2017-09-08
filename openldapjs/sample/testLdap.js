@@ -70,7 +70,7 @@ function modify() {
   const controlJson = [
   {
     oid: 'postread',
-    value: ['entryCSN', 'description'],
+    value: ['entryCSN', 'entryUUID'],
     iscritical: false,
   },
   {

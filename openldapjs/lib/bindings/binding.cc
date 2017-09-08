@@ -16,7 +16,6 @@ enum StateMachine {
   UNBOUND = 5
 };
 
-
 class LDAPBindProgress : public Nan::AsyncProgressWorker
 {
 private:
@@ -316,12 +315,6 @@ public:
     Nan::HandleScope scope;
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    int errorCode;
-    struct berval bv;
-    char *matchedDN, *errorMessage = NULL, **refData = NULL;;
-    BerElement *ber;
-    LDAPControl **serverCTL;
-    BerVarray vals = NULL;
     std::string modifyResult;
 
 
@@ -340,48 +333,26 @@ public:
       }
       else
       {
-        status = ldap_parse_result(ld, resultMsg, &errorCode, &matchedDN, &errorMessage, &refData, &serverCTL, 0);
-        int i = 0;
-        while (serverCTL[i] != 0) {
-          ber = ber_init(&serverCTL[i]->ldctl_value);
-          if (ber == NULL) {
-            std::cout << "ber is NULL" << std::endl;
-            return;
-          } else if( ber_scanf(ber, "{m{" /*}}*/ , &bv) == LBER_ERROR) {
-            std::cout << "BER error" << std::endl;
-            return;
-          } else {
-            modifyResult += "\n";
-            modifyResult += "dn: ";
-            modifyResult += bv.bv_val;
-            while (ber_scanf(ber, "{m"/*}*/ , &bv) != LBER_ERROR) {
-              if (ber_scanf(ber, "[W]", &vals) == LBER_ERROR || vals == NULL) {
-                std::cout << "Vals error" << std::endl;
-                return;
-              }
-                modifyResult += "\n";
-                modifyResult += bv.bv_val;
-                modifyResult += ": ";
-                modifyResult += vals[0].bv_val;
-            }
-            modifyResult += "\n";
-          }
-          i++;
+        const auto& ldap_controls = new LdapControls();
+        modifyResult = ldap_controls->PrintControls(ld, resultMsg);
+        if(modifyResult != "") {
+          stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
+          callback->Call(2, stateClient);
         }
-      }
-
-        stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
+      
+        stateClient[1] = Nan::New<v8::Number>(0);
         callback->Call(2, stateClient);
       }
       callback->Reset();
       progress->Reset();
-      ldap_controls_free(serverCTL);
-      ldap_msgfree(resultMsg);
       ldap_mods_free(entries, 1);
+      ldap_msgfree(resultMsg);
     }
+  }
 
   void HandleProgressCallback(const char *data, size_t size)
   {
+    
   }
 };
 
@@ -679,72 +650,16 @@ private:
     }
 
     ldapmods[nummods] = NULL;
-    int msgID;
+    int msgID, result;
 
-
-//    int controlsLength = controlHandle->Length();
-    const auto& ldap_controls = new LdapControls();
-    auto ctrls = ldap_controls->CreateControls(controlHandle);
-    //LDAPControl **ctrls = new LDAPControl*[controlsLength + 2];
-//    /LDAPControl c[controlsLength];
-//    std::vector<LDAPControl*> ctrls(controlsLength + 2);
-//    //std::vector<LDAPControl> c(controlsLength);
-//    for(int j = 0; j < controlsLength; j++) {
-////      if (j == controlsLength) {
-////        ctrls[j] = NULL;
-////        break;
-////      }
-//      ctrls[j] = new LDAPControl;
-//      v8::Local<v8::Object> controls = v8::Local<v8::Object>::Cast(controlHandle->Get(Nan::New(j)));
-//      v8::Local<v8::Array> valueControl = v8::Local<v8::Array>::Cast(controls->Get(Nan::New("value").ToLocalChecked()));
-//      int valueControlLength = valueControl->Length();
-//      BerElementBuffer berbuf;
-//      BerElement *ber = (BerElement *)&berbuf;
-//      std::vector<char*> attrs(valueControlLength); //= NULL, **res = NULL;
-//      //res = new char*[valueControlLength + 20];
-//      for (int y = 0; y <= valueControlLength; y++) {
-//        if (y == valueControlLength) {
-//          attrs[y] = NULL;
-//          break;
-//        }
-//        Nan::Utf8String modValue(valueControl->Get(Nan::New(y)));
-//        attrs[y] = strdup(*modValue);
-//      }
-
-////      attrs = res;
-//      int err;
-
-//      ber_init2(ber, NULL, LBER_USE_DER);
-//      if(ber_printf(ber, "{v}", attrs.data()) == -1) {
-//        std::cout << "preread attrs encode failed. \n" << std::endl;
-//        return;
-//      }
-
-//      err = ber_flatten2(ber, &ctrls[j]->ldctl_value, 0);
-//      if (err < 0) {
-//        std::cout << "preread flatten failed" << std::endl;
-//        return;
-//      }
-
-//      v8::String::Utf8Value controlOperation(controls->Get(Nan::New("oid").ToLocalChecked()));
-
-//      if(std::strcmp(*controlOperation, "postread") == 0) {
-//        ctrls[j]->ldctl_oid = LDAP_CONTROL_POST_READ;
-//      } else if (std::strcmp(*controlOperation, "preread") == 0) {
-//        ctrls[j]->ldctl_oid = LDAP_CONTROL_PRE_READ;
-//      }
-
-//      ctrls[j]->ldctl_iscritical = 0;
-//      //ctrls[j] = &c[j];
-//    }
-
-////    if (j == controlsLength) {
-////      ctrls[j] = NULL;
-////      break;
-////    }
-    ctrls.push_back(NULL);
-
-    int result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), NULL, &msgID);
+    if(controlHandle == Nan::Null()) {
+      result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);      
+    } else {
+      const auto& ldap_controls = new LdapControls();
+      auto ctrls = ldap_controls->CreateControls(controlHandle);
+      ctrls.push_back(NULL);
+      result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), NULL, &msgID);
+    }
     //free(ctrls);
 
     if(result != LDAP_SUCCESS) {

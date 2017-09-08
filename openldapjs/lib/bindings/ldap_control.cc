@@ -44,7 +44,7 @@ std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Arra
 
     if(std::strcmp(*controlOperation, constants::postread) == 0) {
       ctrl->ldctl_oid = LDAP_CONTROL_POST_READ;
-    } else if (std::strcmp(*controlOperation, "preread") == 0) {
+    } else if (std::strcmp(*controlOperation, constants::preread) == 0) {
       ctrl->ldctl_oid = LDAP_CONTROL_PRE_READ;
     }
 
@@ -53,4 +53,47 @@ std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Arra
   }
 
   return ctrls;
+}
+
+std::string LdapControls::PrintControls (LDAP *ld, LDAPMessage *resultMsg) {
+  struct berval bv;
+  BerElement *ber;
+  LDAPControl **serverCTL = NULL;
+  BerVarray vals = NULL;
+  std::string modifyResult = "";
+
+  ldap_parse_result(ld, resultMsg, NULL, NULL, NULL, NULL, &serverCTL, 0);
+  int i = 0;
+
+  if(serverCTL == NULL) {
+    return modifyResult;
+  }
+  while (serverCTL[i] != 0) {
+    ber = ber_init(&serverCTL[i]->ldctl_value);
+    if (ber == NULL) {
+      std::cout << "ber is NULL" << std::endl;
+      return modifyResult;
+    } else if( ber_scanf(ber, "{m{" /*}}*/ , &bv) == LBER_ERROR) {
+      std::cout << "BER error" << std::endl;
+      return modifyResult;
+    } else {
+      modifyResult += "\n";
+      modifyResult += "dn: ";
+      modifyResult += bv.bv_val;
+      while (ber_scanf(ber, "{m" /*}*/ , &bv) != LBER_ERROR) {
+        if (ber_scanf(ber, "[W]", &vals) == LBER_ERROR || vals == NULL) {
+          std::cout << "Vals error" << std::endl;
+          return modifyResult;
+        }
+          modifyResult += "\n";
+          modifyResult += bv.bv_val;
+          modifyResult += ": ";
+          modifyResult += vals[0].bv_val;
+        }
+        modifyResult += "\n";
+      }
+    i++;
+  }
+  ldap_controls_free(serverCTL);
+  return modifyResult;
 }
