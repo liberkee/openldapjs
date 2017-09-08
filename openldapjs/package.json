@@ -5,6 +5,7 @@
   "main": "ldapAsyncWrap.js",
   "dependencies": {
     "addict-ioc": "^1.0.6",
+    "async": "^2.5.0",
     "bluebird": "^3.4.3",
     "enum": "^2.3.0",
     "eslint": "^3.13.1",
@@ -20,7 +21,7 @@
     "should": "^11.2.0"
   },
   "scripts": {
-    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testAdd.js",
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testSearch.js",
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./test/testDelete.js",
     "install": "node-gyp rebuild"
