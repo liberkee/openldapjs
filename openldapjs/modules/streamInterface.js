@@ -26,9 +26,9 @@ module.exports = class PagedSearchStream extends Readable {
           if (!morePages) {
             this.push(null);
           } else {
-            setTimeout( () => {
+           // setTimeout( () => {
             this.push(page);
-          },1000)
+      //    },1000)
           }
         }
         });
