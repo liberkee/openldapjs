@@ -1,8 +1,10 @@
+
 'use strict';
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
+//const heapdump = require('heapdump');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -11,11 +13,13 @@ describe('Testing the async LDAP search ', () => {
   const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
   const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
   const searchBase = 'dc=demoApp,dc=com';
-  
+
 
 
   const password = 'secret';
   let clientLDAP = new LDAPWrap(host);
+  //heapdump.writeSnapshot('/home/hufserverldap/Desktop/Share/raribas/openldapjs/openldapjs/SnapshotsSearch/' + Date.now() + '.heapsnapshot');
+
 
   beforeEach((next) => {
     clientLDAP = new LDAPWrap(host);
@@ -30,9 +34,11 @@ describe('Testing the async LDAP search ', () => {
 
       });
   });
-  afterEach(() => {
+  afterEach((next) => {
     clientLDAP.unbind()
       .then(() => {
+        next();
+
 
       });
   });
@@ -54,7 +60,6 @@ describe('Testing the async LDAP search ', () => {
       .then((result) => {
         const baseDN = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
         should.deepEqual(result, baseDN);
-
       })
       .then(() => {
         next();
@@ -65,22 +70,19 @@ describe('Testing the async LDAP search ', () => {
    * test case for search with access denied
    */
 
-  it('should return nothing', (next) => {
-    clientLDAP.unbind()
-      .then(() => {
-        clientLDAP.bind(dnUser, password)
-          .then(() => {
-            clientLDAP.search(searchBase, 2, 'objectClass=*')
-              .then((result) => {
-                result.should.be.empty;
-              });
-          });
-      })
-      .then(() => {
-        next();
-      });
-
-  });
+  /* it('should return nothing', (next) => {
+     clientLDAP.bind(dnUser, password)
+       .then(() => {
+         clientLDAP.search(searchBase, 2, 'objectClass=*')
+           .catch((err) => {
+             err.message.should.be.deepEqual('32');
+           });
+       })
+       .then(() => {
+         next();
+       });
+ 
+   }); */
 
   /**
    * test case with a single result
@@ -139,7 +141,7 @@ describe('Testing the async LDAP search ', () => {
         clientLDAP.search(searchBase, 2, 'objectClass=aliens')
           .then((result2) => {
             should.notDeepEqual(result1, result2);
-            clientLDAP.search(searchBase, 1, 'objectClass=*')
+            clientLDAP.search(searchBase, 1, 'objectClass=template')
               .then((result3) => {
                 should.notDeepEqual(result1, result3);
                 should.notDeepEqual(result2, result3);
@@ -173,21 +175,22 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  /**
+  /** 
    * Test case with a large number of results (>10k)
    */
-  it('should return 10k entries', function (next) {
-    this.timeout(0);
 
-    clientLDAP.search(searchBase, 2, 'objectClass=person')
+  it.only('should return 10k entries', function () {
+    this.timeout(0);
+ return   clientLDAP.search(searchBase, 2, 'objectClass=person')
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.above(10000);
+        console.log(count);
+        console.log(result);
       })
-      .then(() => {
-        next();
-      });
+     
   });
+
 
   it('should return results in entire subtree', (next) => {
 

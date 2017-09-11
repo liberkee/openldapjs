@@ -26,55 +26,46 @@ describe('Testing the Compare functionalities', () => {
   beforeEach((next) => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize()
-      .then(() => {
-        ldapAsyncWrap.bind(dn, password)
-          .then(() => {
-            next();
-          });
-      });
+    ldapAsyncWrap.initialize().then(
+        () => { ldapAsyncWrap.bind(dn, password).then(() => { next(); }); });
   });
 
   afterEach(() => {
-    ldapAsyncWrap.unbind()
-      .then(() => {
+    ldapAsyncWrap.unbind().then(
+        () => {
 
-      });
+        });
   });
 
   it('should compare existing attribute', (next) => {
-    ldapAsyncWrap.compare(dn, attr, val)
-      .then((result) => {
-        should.deepEqual(result, comparisonResTrue);
-        next();
-      });
+    ldapAsyncWrap.compare(dn, attr, val).then((result) => {
+      should.deepEqual(result, comparisonResTrue);
+      next();
+    });
   });
 
 
   it('should compare not existing value for attribute', (next) => {
-    ldapAsyncWrap.compare(dn, attr, nonVal)
-      .then((result) => {
-        should.deepEqual(result, comparisonResFalse);
-        next();
-      });
+    ldapAsyncWrap.compare(dn, attr, nonVal).then((result) => {
+      should.deepEqual(result, comparisonResFalse);
+      next();
+    });
   });
 
 
   it('should compare not existing attribute', (next) => {
-    ldapAsyncWrap.compare(dn, nonAttr, val)
-      .catch((err) => {
-        should.deepEqual(err.message, LDAP_UNDEFINED_TYPE);
-        next();
-      });
+    ldapAsyncWrap.compare(dn, nonAttr, val).catch((err) => {
+      should.deepEqual(err.message, LDAP_UNDEFINED_TYPE);
+      next();
+    });
   });
 
 
   it('should compare not existing object', (next) => {
-    ldapAsyncWrap.compare(nonObj, attr, val)
-      .catch((err) => {
-        should.deepEqual(err.message, LDAP_NO_SUCH_OBJECT);
-        next();
-      });
+    ldapAsyncWrap.compare(nonObj, attr, val).catch((err) => {
+      should.deepEqual(err.message, LDAP_NO_SUCH_OBJECT);
+      next();
+    });
   });
 
 
@@ -82,95 +73,87 @@ describe('Testing the Compare functionalities', () => {
     const noAccessDn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize()
-      .then(() => {
-        ldapAsyncWrap.bind(noAccessDn, password)
-          .then(() => {
-            ldapAsyncWrap.compare(dn, attr, val)
-              .catch((err) => {
-                should.deepEqual(err.message, LDAP_NO_SUCH_OBJECT);
-                next();
-              });
-          });
+    ldapAsyncWrap.initialize().then(() => {
+      ldapAsyncWrap.bind(noAccessDn, password).then(() => {
+        ldapAsyncWrap.compare(dn, attr, val).catch((err) => {
+          should.deepEqual(err.message, LDAP_NO_SUCH_OBJECT);
+          next();
+        });
       });
+    });
   });
 
   it('should not compare if the binding failed', (next) => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize()
-      .then(() => {
-        ldapAsyncWrap.bind(dn, noPass)
-          .catch(() => {
-            ldapAsyncWrap.compare(dn, attr, val)
-              .catch((err) => {
-                should.deepEqual(err.message, 'The Compare operation can be done just in BOUND state');
-                next();
-              });
-          });
+    ldapAsyncWrap.initialize().then(() => {
+      ldapAsyncWrap.bind(dn, noPass).catch(() => {
+        ldapAsyncWrap.compare(dn, attr, val).catch((err) => {
+          should.deepEqual(
+              err.message,
+              'The Compare operation can be done just in BOUND state');
+          next();
+        });
       });
+    });
   });
 
-  it('should throw an error if the binding was not done before comparing', (next) => {
-    ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
+  it('should throw an error if the binding was not done before comparing',
+     (next) => {
+       ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize()
-      .then(() => {
-        ldapAsyncWrap.compare(dn, attr, val)
-          .catch((err) => {
-            should.deepEqual(err.message, 'The Compare operation can be done just in BOUND state');
-            next();
-          });
-      });
-  });
+       ldapAsyncWrap.initialize().then(() => {
+         ldapAsyncWrap.compare(dn, attr, val).catch((err) => {
+           should.deepEqual(
+               err.message,
+               'The Compare operation can be done just in BOUND state');
+           next();
+         });
+       });
+     });
 
   it('should not compare if the client is unbound', (next) => {
-    ldapAsyncWrap.unbind()
-      .then(() => {
-        ldapAsyncWrap.compare(dn, attr, val)
-          .catch((err) => {
-            should.deepEqual(err.message, 'The Compare operation can be done just in BOUND state');
-            next();
-          });
+    ldapAsyncWrap.unbind().then(() => {
+      ldapAsyncWrap.compare(dn, attr, val).catch((err) => {
+        should.deepEqual(
+            err.message,
+            'The Compare operation can be done just in BOUND state');
+        next();
       });
+    });
   });
 
   it('should compare several identical sequential compares', (next) => {
-    ldapAsyncWrap.compare(dn, attr, val)
-      .then((result1) => {
-        should.deepEqual(result1, comparisonResTrue);
+    ldapAsyncWrap.compare(dn, attr, val).then((result1) => {
+      should.deepEqual(result1, comparisonResTrue);
 
-        ldapAsyncWrap.compare(dn, attr, val)
-          .then((result2) => {
-            should.deepEqual(result2, comparisonResTrue);
+      ldapAsyncWrap.compare(dn, attr, val).then((result2) => {
+        should.deepEqual(result2, comparisonResTrue);
 
-            ldapAsyncWrap.compare(dn, attr, val)
-              .then((result3) => {
-                should.deepEqual(result3, comparisonResTrue);
-                next();
-              });
-          });
+        ldapAsyncWrap.compare(dn, attr, val).then((result3) => {
+          should.deepEqual(result3, comparisonResTrue);
+          next();
+        });
       });
+    });
   });
 
 
-  it('should compare several different sequential compares with error cases', (next) => {
-    ldapAsyncWrap.compare(dn, attr, val)
-      .then((result1) => {
-        should.deepEqual(result1, comparisonResTrue);
+  it('should compare several different sequential compares with error cases',
+     (next) => {
+       ldapAsyncWrap.compare(dn, attr, val).then((result1) => {
+         should.deepEqual(result1, comparisonResTrue);
 
-        ldapAsyncWrap.compare(dn, nonAttr, val)
-          .catch((err) => {
-            should.deepEqual(err.message, LDAP_UNDEFINED_TYPE);
+         ldapAsyncWrap.compare(dn, nonAttr, val).catch((err) => {
+           should.deepEqual(err.message, LDAP_UNDEFINED_TYPE);
 
-            ldapAsyncWrap.compare(dn, attr, nonVal)
-              .then((result3) => {
-                should.deepEqual(result3, comparisonResFalse);
-                next();
-              });
-          });
-      });
-  });
+           ldapAsyncWrap.compare(dn, attr, nonVal).then((result3) => {
+             should.deepEqual(result3, comparisonResFalse);
+             next();
+           });
+         });
+       });
+     });
 
   it('should compare several parallel compares', (next) => {
     const firstCompare = ldapAsyncWrap.compare(dn, attr, val);
@@ -178,14 +161,12 @@ describe('Testing the Compare functionalities', () => {
     const thirdCompare = ldapAsyncWrap.compare(dn, attr, val);
 
     Promise.all([firstCompare, secondCompare, thirdCompare])
-      .then((values) => {
-        should.deepEqual(values[0], comparisonResTrue);
-        should.deepEqual(values[1], comparisonResTrue);
-        should.deepEqual(values[2], comparisonResTrue);
-      })
-      .then(() => {
-        next();
-      });
+        .then((values) => {
+          should.deepEqual(values[0], comparisonResTrue);
+          should.deepEqual(values[1], comparisonResTrue);
+          should.deepEqual(values[2], comparisonResTrue);
+        })
+        .then(() => { next(); });
 
   });
 });

@@ -2,7 +2,6 @@
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
-const SearchStream = require('./streamInterface.js');
 
 
 /**
@@ -10,9 +9,9 @@ const SearchStream = require('./streamInterface.js');
  * @class LDAPWrapAsync
  */
 module.exports = class LDAPWrapAsync {
+
   constructor(host) {
     this._hostAdress = host;
-    this._searchID = 0;
     this._E_STATES = {
       CREATED: 0,
       INITIALIZED: 1,
@@ -23,45 +22,42 @@ module.exports = class LDAPWrapAsync {
     this._stateClient = this._E_STATES.CREATED;
   }
 
-  set config(value) { this._hostAdress = value; }
+  set config(value) {
+    this._hostAdress = value;
+  }
 
-  get config() { return this._hostAdress; }
+  get config() {
+    return this._hostAdress;
+  }
 
   /**
     * Initialize to an LDAP server.
     *
     * @method initialize
     * @param {string} host The host address of server LDAP.
-    * @return {Promise} That resolves if the LDAP initialize the structure to a
-   * specific server.
+    * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
     * Reject if the address is incorect.
     */
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
-          if (result) { /*
-               this._binding.startTls((errTls, stateTls) => {
-                 if (errTls) {
-                   reject(new Error(errTls));
-                 } else {
-                   this._stateClient = this._E_STATES.INITIALIZED;
-                   resolve(stateTls);
-                 }*/
-            this._stateClient = this._E_STATES.INITIALIZED;
-            resolve(result);
-
-            //  });
+          if (result) {
+            this._binding.startTls((errTls, stateTls) => {
+              if (errTls) {
+                reject(new Error(errTls));
+              } else {
+                this._stateClient = this._E_STATES.INITIALIZED;
+                resolve(stateTls);
+              }
+            });
           } else {
-            reject(err); 
+            reject(err);
           }
         });
-      } else {
-        reject(new Error('object not created'));
       }
     });
   }
-
 
 
   /**
@@ -77,7 +73,7 @@ module.exports = class LDAPWrapAsync {
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.INITIALIZED ||
-          this._stateClient === this._E_STATES.BOUND) {
+        this._stateClient === this._E_STATES.BOUND) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
@@ -92,6 +88,7 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
+
   /**
    * Search operation.
    *
@@ -114,28 +111,65 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(
-            new Error('The Search operation can be done just in BOUND state'));
+        reject(new Error('The Search operation can be done just in BOUND state'));
       }
 
     });
   }
 
-
   /**
- * Search operation with reasults displayed page by page.
- *
- * @method pagedSearch
- * @param {string} searchBase The base node where the search to start.
- * @param {int} scope The mod how the search will return the entrys.
- * @param {string} searchFilter The specification for specific element.
- * @param {int} pageSize The number of entries per LDAP page
- * @return {Readable stream} that pushes search results page by page
- */
-  pagedSearch(searchBase, scope, searchFilter, pageSize) {
-     this._searchID+=1;
-     return new SearchStream(searchBase,scope,searchFilter,pageSize,this._searchID, this._binding);
-   
+   * ldap delete operation
+   * @param {String} dn the dn entry to be deleted.
+   * @param {String array} controls Optional controll aray parameter, can be NULL.
+   * @return {Promise} promise that resolves if the element provided was deleted or rejects if not.
+   */
+  del(dn, controls) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.BOUND) {
+        this._binding.del(dn, controls, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error('The Delete operation can be done just in BOUND state'));
+      }
+    });
+  }
+  /**
+   * ldap add operation
+   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example..,
+   * NOTE:every entry except the first one,cn=foo in this case, must already exist';
+   * @param{Object} entry ldif format to be added, needs to have a
+   * structure that is mappable to a LDAPMod structure
+   * @param{Object} controls client& sever controls, OPTIONAL parameter
+   */
+  add(dn, entry, controls) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === this._E_STATES.BOUND) {
+
+        // turn the json into an Array that can be easily parsed.
+        const keys = Object.keys(entry);
+        const entryArray = [];
+
+        for (const elem of keys) {
+          entryArray.push(elem);
+          entryArray.push(entry[elem]);
+        }
+
+        this._binding.add(dn, entryArray, controls, (err, result) => {
+          if (err) {
+            reject(new Error(err));
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error('The add operation can be done just in BOUND state'));
+      }
+    });
   }
 
   /**
@@ -145,8 +179,7 @@ module.exports = class LDAPWrapAsync {
    * @param {string} dn The dn of the entry to compare.
    * @param {string} attr The attribute given for interogation.
    * @param {string} value Value send to verify.
-   * @return {Promise} That resolve and return True if the element are equal or
-   * False otherwise.
+   * @return {Promise} That resolve and return True if the element are equal or False otherwise.
    * Reject if an error will occure.
    */
 
@@ -161,8 +194,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(
-            new Error('The Compare operation can be done just in BOUND state'));
+        reject(new Error('The Compare operation can be done just in BOUND state'));
       }
     });
   }
@@ -191,3 +223,4 @@ module.exports = class LDAPWrapAsync {
     });
   }
 };
+
