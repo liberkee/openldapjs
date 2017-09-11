@@ -71,8 +71,7 @@ public:
   void HandleProgressCallback(const char *data, size_t size)
   {
     // Required, this is not created automatically
-    /*std::cout << "----------------------------" << __LINE__ << std::endl;
-    Nan::HandleScope scope;
+    /*Nan::HandleScope scope;
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
     progress->Call(1, argv);*/
@@ -616,7 +615,7 @@ private:
 
     LDAPMod **ldapmods = new LDAPMod*[nummods + 1];
 
-    if (obj->ld == 0 || obj->ld == NULL) {
+    if (obj->ld == 0 || obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
       delete ldapmods;
@@ -656,19 +655,19 @@ private:
         Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
         ldapmods[i]->mod_values[j] = strdup(*modValue);
       }
-      ldapmods[i] -> mod_values[modValsLength] = NULL;
+      ldapmods[i] -> mod_values[modValsLength] = nullptr;
     }
 
-    ldapmods[nummods] = NULL;
+    ldapmods[nummods] = nullptr;
     int msgID, result;
 
     if(controlHandle == Nan::Null()) {
-      result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);      
+      result = ldap_modify_ext(obj->ld, *dn, ldapmods, nullptr, nullptr, &msgID);      
     } else {
       const auto& ldap_controls = new LdapControls();
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
-      ctrls.push_back(NULL);
-      result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), NULL, &msgID);
+      ctrls.push_back(nullptr);
+      result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), nullptr, &msgID);
     }
     //free(ctrls);
 

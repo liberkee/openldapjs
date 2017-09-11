@@ -4,7 +4,9 @@
 namespace constants {
   char postread[] = "postread";
   char preread[] = "preread";
-  unsigned int not_critical = 0;
+  char changeValueMember[] = "value";
+  char changeOidMember[] = "oid";
+  char changeIsCriticalMember[] = "iscritical";
 }
 
 
