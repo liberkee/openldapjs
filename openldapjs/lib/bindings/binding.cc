@@ -1,340 +1,24 @@
-#include <ldap.h>
-#include <nan.h>
+#include "ldap_paged_search_progress.h"
+#include "ldap_bind_progress.h"
+#include "ldap_search_progress.h"
+#include "ldap_compare_progress.h"
 #include <chrono>
 #include <iostream>
+#include <ldap.h>
+#include <map>
+#include <nan.h>
 #include <string>
 #include <thread>
 
-class LDAPAddProgress : public Nan::AsyncProgressWorker {
- private:
-  LDAP *ld;
-  Nan::Callback *progress;
-  int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID;
-  LDAPMod **entries;
+using namespace Nan;
+using namespace v8;
+using namespace std;
 
- public:
-  LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                  int msgID, LDAPMod **newEntries)
-      : Nan::AsyncProgressWorker(callback),
-        progress(progress),
-        ld(ld),
-        msgID(msgID),
-        entries(newEntries) {}
-  ~LDAPAddProgress() {}
-  // Executes in worker thread
-  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    struct timeval timeOut = {0, 1};
 
-    while (result == 0) {
-      result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-    }
-  }
 
-  void HandleOKCallback() {
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    if (result == -1) {
-      stateClient[0] = Nan::New<v8::Number>(result);
-      callback->Call(1, stateClient);
-    } else {
-      int status = ldap_result2error(ld, resultMsg, 0);
-      if (status != LDAP_SUCCESS) {
-        stateClient[0] = Nan::New<v8::Number>(status);
-        callback->Call(1, stateClient);
-      } else {
-        stateClient[1] = Nan::New<v8::Number>(0);
-        callback->Call(2, stateClient);
-      }
-    }
-    ldap_msgfree(resultMsg);
-    ldap_mods_free(entries, 1);
-    callback->Reset();
-    progress->Reset();
-  }
-
-  void HandleProgressCallback(const char *data, size_t size) {}
-};
-
-class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
- private:
-  LDAP *ld;
-  Nan::Callback *progress;
-  int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID;
-
- public:
-  LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     int msgID)
-      : Nan::AsyncProgressWorker(callback),
-        progress(progress),
-        ld(ld),
-        msgID(msgID) {}
-  // Executes in worker thread
-  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    struct timeval timeOut = {0, 1};
-    while (result == 0) {
-      result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-    }
-  }
-
-  void HandleOKCallback() {
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    if (result == -1) {
-      stateClient[0] = Nan::New<v8::Number>(result);
-      callback->Call(1, stateClient);
-    } else {
-      int status = ldap_result2error(ld, resultMsg, 0);
-      if (status != LDAP_SUCCESS) {
-        stateClient[0] = Nan::New<v8::Number>(status);
-        callback->Call(1, stateClient);
-      } else {
-        stateClient[1] = Nan::New<v8::Number>(0);
-        callback->Call(2, stateClient);
-      }
-    }
-    callback->Reset();
-    progress->Reset();
-    ldap_msgfree(resultMsg);
-  }
-
-  void HandleProgressCallback(const char *data, size_t size) {
-    // progress.send what ?
-  }
-};
-
-class LDAPBindProgress : public Nan::AsyncProgressWorker {
- private:
-  LDAP *ld;
-  Nan::Callback *progress;
-  int result;
-  LDAPMessage *resultMsg;
-  int msgID;
-
- public:
-  LDAPBindProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                   int msgID)
-      : Nan::AsyncProgressWorker(callback),
-        progress(progress),
-        ld(ld),
-        msgID(msgID) {}
-  ~LDAPBindProgress() {}
-  // Executes in worker thread
-  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    result = 0;
-    struct timeval timeOut = {0, 1};
-    while (result == 0) {
-      result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      // progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-    }
-  }
-  // Executes in event loop
-  void HandleOKCallback() {
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    if (result == -1) {
-      stateClient[0] = Nan::New<v8::Number>(result);
-      callback->Call(1, stateClient);
-    } else {
-      int status = ldap_result2error(ld, resultMsg, 0);
-      if (status != LDAP_SUCCESS) {
-        stateClient[0] = Nan::New<v8::Number>(status);
-        callback->Call(1, stateClient);
-      } else {
-        stateClient[1] = Nan::New<v8::Number>(2);
-        callback->Call(2, stateClient);
-      }
-    }
-    callback->Reset();
-    progress->Reset();
-    ldap_msgfree(resultMsg);
-  }
-
-  void HandleProgressCallback(const char *data, size_t size) {
-    // considering switching to AsyncWorker
-  }
-};
-
-class LDAPSearchProgress : public Nan::AsyncProgressWorker {
- private:
-  LDAP *ld;
-  Nan::Callback *progress;
-  int result = 0;
-  LDAPMessage *resultMsg;
-  LDAPMessage *entry;
-  int finished = 0;
-  std::string resultSearch;
-  int i = 0;
-  int msgID;
-  int status = 0;
-
- public:
-  LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     int msgID)
-      : Nan::AsyncProgressWorker(callback),
-        progress(progress),
-        ld(ld),
-        msgID(msgID) {}
-
-  // Executes in worker thread
-  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    char *dn;
-    char *attribute;
-    char **values;
-    char *matchedDN;
-    char *errorMessage = nullptr;
-    int errorCode;
-    int prc;
-
-    std::string resultLocal = "\n";
-    BerElement *ber;
-
-    struct timeval timeOut = {1, 0};
-    while (finished == 0) {
-      result = ldap_result(ld, msgID, LDAP_MSG_ONE, &timeOut, &resultMsg);
-      resultLocal.clear();
-      resultLocal = "\n";
-
-      switch (result) {
-        case -1:
-          ldap_perror(ld, "ldap_result");
-          return;
-
-        case 0:
-          break;
-
-        case LDAP_RES_SEARCH_ENTRY:
-          if ((dn = ldap_get_dn(ld, resultMsg)) != nullptr) {
-            resultLocal += "dn:";
-            resultLocal += dn;
-            ldap_memfree(dn);
-
-            resultLocal += "\n";
-          }
-
-          // You have to implement the attribute side
-          for (attribute = ldap_first_attribute(ld, resultMsg, &ber);
-               attribute != nullptr;
-               attribute = ldap_next_attribute(ld, resultMsg, ber)) {
-            if ((values = ldap_get_values(ld, resultMsg, attribute)) !=
-                nullptr) {
-              for (i = 0; values[i] != nullptr; i++) {
-                resultLocal += attribute;
-                resultLocal += ":";
-                resultLocal += values[i];
-                resultLocal += "\n";
-              }
-              ldap_value_free(values);
-            }
-            ldap_memfree(attribute);
-          }
-          resultLocal += "\n";
-          ber_free(ber, 0);
-          ldap_msgfree(resultMsg);  // might lead to errors...MIGHT
-
-          resultSearch += resultLocal;
-          break;
-
-        case LDAP_RES_SEARCH_RESULT:  // memory leak on resultMsg ???
-          finished = 1;
-          status = ldap_result2error(ld, resultMsg, 0);
-
-          prc = ldap_parse_result(ld, resultMsg, &errorCode, &matchedDN,
-                                  &errorMessage, nullptr, nullptr, 1);
-
-          if (matchedDN != nullptr && *matchedDN != 0) {
-            ldap_memfree(matchedDN);
-          }
-
-          if (errorMessage != nullptr) {
-            ldap_memfree(errorMessage);
-          }
-          break;
-        default:
-          break;
-      }
-    }
-  }
-  // Executes in event loop
-  void HandleOKCallback() {
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-
-    if (status != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New(status);
-      callback->Call(1, stateClient);
-    } else {
-      stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
-      callback->Call(2, stateClient);
-    }
-
-    callback->Reset();
-    progress->Reset();
-  }
-
-  void HandleProgressCallback(const char *data, size_t size) {}
-};
-
-class LDAPCompareProgress : public Nan::AsyncProgressWorker {
- private:
-  LDAP *ld;
-  Nan::Callback *progress;
-  int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID = 0;
-
- public:
-  LDAPCompareProgress(Nan::Callback *callback, Nan::Callback *progress,
-                      LDAP *ld, int msgID)
-      : Nan::AsyncProgressWorker(callback),
-        progress(progress),
-        ld(ld),
-        msgID(msgID) {}
-  // Executes in worker thread
-  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    struct timeval timeOut = {0, 1};
-    while (result == 0) {
-      result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
-    }
-  }
-  // Executes in event loop
-  void HandleOKCallback() {
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    if (result == -1) {
-      stateClient[1] =
-          Nan::New("The Comparison Result: false").ToLocalChecked();
-      callback->Call(2, stateClient);
-    } else {
-      int status = ldap_result2error(ld, resultMsg, 0);
-      if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE) {
-        if (status == LDAP_COMPARE_TRUE) {
-          stateClient[1] =
-              Nan::New("The Comparison Result: true").ToLocalChecked();
-        } else {
-          stateClient[1] =
-              Nan::New("The Comparison Result: false").ToLocalChecked();
-        }
-        callback->Call(2, stateClient);
-      } else {
-        // Return ERROR
-        stateClient[0] = Nan::New(status);
-        callback->Call(1, stateClient);
-      }
-    }
-    callback->Reset();
-    progress->Reset();
-  }
-
-  void HandleProgressCallback(const char *data, size_t size) {}
-};
 
 class LDAPClient : public Nan::ObjectWrap {
- public:
+public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
     tpl->SetClassName(Nan::New("LDAPClient").ToLocalChecked());
@@ -344,23 +28,27 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "startTls", startTls);
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
+    Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
-    Nan::SetPrototypeMethod(tpl, "del", del);
-    Nan::SetPrototypeMethod(tpl, "add", add);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
              Nan::GetFunction(tpl).ToLocalChecked());
   }
 
- private:
-  LDAP *ld_;
+protected:
+private:
+  LDAP *ld;
+  std::shared_ptr<std::map<std::string, berval *>> cookies{};
   LDAPMessage *result;
   unsigned int stateClient = 0;
-  int msgid = 0;
+  int msgid;
   bool initializedFlag = false;
-  explicit LDAPClient() {}
+  explicit LDAPClient() {
+    cookies = std::make_shared<std::map<std::string, berval *>>();
+  }
+
   ~LDAPClient() {}
 
   static NAN_METHOD(New) {
@@ -372,69 +60,70 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::Local<v8::Value> argv[argc] = {info[0]};
       v8::Local<v8::Function> cons = Nan::New(constructor());
       info.GetReturnValue().Set(cons->NewInstance(argc, argv));
-      // info.GetReturnValue().Set(Nan::NewInstance(cons,argc,argv).ToLocalChecked());
-      // ?
     }
   }
 
   static NAN_METHOD(initialize) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
     Nan::Utf8String hostArg(info[0]);
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Callback *callback = new Callback(info[1].As<Function>());
     obj->initializedFlag = true;
 
     char *hostAddress = *hostArg;
+    int state;
     int protocol_version = LDAP_VERSION3;
 
-    int state = ldap_initialize(&obj->ld, hostAddress);
+    stateClient[0] = Nan::New<Number>(0);
+    state = ldap_initialize(&obj->ld, hostAddress);
     if (state != LDAP_SUCCESS || obj->ld == 0) {
-      stateClient[0] = Nan::New<v8::Number>(state);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       // Needed for catch a specific error
       obj->initializedFlag = false;
-      delete callback;
       return;
     }
 
     state =
         ldap_set_option(obj->ld, LDAP_OPT_PROTOCOL_VERSION, &protocol_version);
     if (state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(state);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       obj->initializedFlag = false;
-      delete callback;
       return;
     }
 
-    stateClient[1] = Nan::New<v8::Number>(1);
+    /*state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
+    if(state != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<Number>(state);
+      callback->Call(1, stateClient);
+      return;
+    }*/
+
+    stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
-    callback->Reset();
-    delete callback;
-    callback = nullptr;
     return;
   }
 
   static NAN_METHOD(startTls) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
-    stateClient[0] = Nan::New<v8::Number>(0);
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Callback *callback = new Callback(info[0].As<Function>());
 
-    int state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
+    int state;
+    int msgId;
+
+    stateClient[0] = Nan::New<Number>(0);
+
+    state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      delete callback;
-      callback = nullptr;
       return;
     }
-    stateClient[1] = Nan::New<v8::Number>(1);
+    stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
-    delete callback;
-    callback = nullptr;
     return;
   }
 
@@ -443,17 +132,15 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
 
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Callback *callback = new Callback(info[2].As<Function>());
+    Callback *progress = new Callback(info[3].As<v8::Function>());
 
     char *username = *userArg;
     char *password = *passArg;
-    if (obj->ld == 0) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+    if (obj->ld == 0 || obj->initializedFlag == false) {
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
       return;
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
@@ -472,15 +159,27 @@ class LDAPClient : public Nan::ObjectWrap {
     int message, result;
     struct timeval timeOut = {10, 0};
 
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
+    Callback *callback = new Callback(info[3].As<Function>());
+    Callback *progress = new Callback(info[4].As<v8::Function>());
+
+    // Verify if the argument is a Number for scope
+    if (!info[1]->IsNumber()) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
 
     int scopeSearch = info[1]->NumberValue();
+    if (scopeSearch <= 0 && scopeSearch >= 3) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      return;
+    }
 
     if (obj->ld == 0) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
     }
@@ -490,13 +189,51 @@ class LDAPClient : public Nan::ObjectWrap {
                         nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       return;
     }
 
     AsyncQueueWorker(
         new LDAPSearchProgress(callback, progress, obj->ld, message));
+  }
+
+  static NAN_METHOD(pagedSearch) {
+
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Nan::Utf8String baseArg(info[0]);
+    int scopeSearch = info[1]->NumberValue();
+    Nan::Utf8String filterArg(info[2]);
+    int pageSize = info[3]->NumberValue();
+    Nan::Utf8String cookieID(info[4]);
+    std::string DNbase = *baseArg;
+    std::string filterSearch = *filterArg;
+    std::string cookie_id = *cookieID;
+    const auto &it = obj->cookies->find(cookie_id);
+    if (it == obj->cookies->end()) {
+      obj->cookies->insert(it, {cookie_id, nullptr});
+    }
+
+    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null()};                            
+
+    Callback *callback = new Callback(info[5].As<Function>());
+    Callback *progress = new Callback(info[6].As<v8::Function>());
+
+
+   
+
+    if (obj->ld == 0) {
+      stateClient[0] = Nan::New<Number>(0);
+      callback->Call(1, stateClient);
+      callback->Reset();
+      progress->Reset();
+      return;
+    }
+
+    AsyncQueueWorker(new LDAPPagedSearchProgress(
+        callback, progress, obj->ld, DNbase, scopeSearch, filterSearch,
+        cookie_id, pageSize, obj->cookies));
   }
 
   static NAN_METHOD(compare) {
@@ -509,17 +246,17 @@ class LDAPClient : public Nan::ObjectWrap {
     char *DNEntry = *DNArg;
     char *attribute = *attrArg;
     char *value = *valueArg;
-    int message = 0, result = 0;
+    int message, result;
 
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
+    Callback *callback = new Callback(info[3].As<Function>());
+    Callback *progress = new Callback(info[4].As<v8::Function>());
 
     struct berval bvalue;
 
     bvalue.bv_val = value;
-    bvalue.bv_len = strlen(value);  // isn't a +1 required for the \0 ?
+    bvalue.bv_len = strlen(value);
 
     result = ldap_compare_ext(obj->ld, DNEntry, attribute, &bvalue, nullptr,
                               nullptr, &message);
@@ -531,154 +268,22 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(unbind) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
+    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Callback *callback = new Callback(info[0].As<Function>());
 
     if (obj->ld == nullptr || obj->initializedFlag == false) {
-      std::cout << "unbind error?:" << std::endl;
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(2, stateClient);
-      delete callback;
       return;
     }
 
-    int unbindResult = ldap_unbind(obj->ld);
-
-    if (unbindResult != LDAP_SUCCESS) {
-      std::cout << "unbind failed with error code:" << unbindResult
-                << std::endl;
-    }
+    ldap_unbind(obj->ld);
     obj->initializedFlag = false;
 
-    stateClient[1] = Nan::New<v8::Number>(5);
+    stateClient[1] = Nan::New<Number>(5);
     callback->Call(2, stateClient);
 
-    // freeing callbacks ?
-    // callback->Reset();set();
-    delete callback;
-    callback = nullptr;
-
     return;
-  }
-
-  static NAN_METHOD(del) {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Utf8String dn(info[0]);
-    Nan::Utf8String controls(info[1]);
-
-    char *dns = *dn;
-
-    int msgID = 0;
-
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
-
-    if (obj->ld == 0) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      callback->Reset();
-      delete callback;
-      progress->Reset();
-      delete progress;
-      return;
-    }
-
-    int result = ldap_delete_ext(obj->ld, dns, nullptr, nullptr, &msgID);
-
-    AsyncQueueWorker(
-        new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
-  }
-
-  /**
- ** Method that calls the ldap_add_ext routine.
- ** The entries are taken from a string array 2 by 2 in a for loop
- *(LDAPMods.mod_type and LDAPMods.mod_values respectively)
- ** entries are placed in the LDAPMod *newEntries[] array alocating memory in
- *each iteration.
- ** Note: both the last value in mod_values array and in the newEntries array
- *has to be NULL
- **/
-
-  static NAN_METHOD(add) {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    v8::Local<v8::Array> entries = v8::Local<v8::Array>::Cast(info[1]);
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Utf8String dn(info[0]);
-    Nan::Utf8String controls(info[2]);
-
-    int length = entries->Length();
-    if (length < 2) {
-      return;
-    }
-
-    LDAPMod **newEntries = new LDAPMod *[length / 2 + 1];
-    for (int i = 0; i < length / 2; i++) {
-      Nan::Utf8String type(entries->Get(2 * i));
-      std::string typeString(*type);
-      Nan::Utf8String value(entries->Get(2 * i + 1));
-      std::string valueString(*value);
-
-      newEntries[i] = new LDAPMod;
-
-      if (typeString.length() > 0 && valueString.length() > 0) {
-        newEntries[i]->mod_type = new char[typeString.length() + 1];
-        newEntries[i]->mod_values = new char *[2];
-        newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
-
-        newEntries[i]->mod_op = LDAP_MOD_ADD;
-        memcpy(newEntries[i]->mod_type, typeString.c_str(),
-               typeString.length() + 1);
-        memcpy(newEntries[i]->mod_values[0], valueString.c_str(),
-               valueString.length() + 1);
-        newEntries[i]->mod_values[1] = nullptr;
-      }
-    }
-
-    newEntries[length / 2] = nullptr;
-
-    char *dns = *dn;
-    int msgID = 0;
-
-    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
-
-    if (obj->ld == 0) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-    /*
-        //sample code for creating adn using control for CSN retrieval
-        LDAPControl *ctrl = nullptr;
-        struct berval *ber = new berval;
-        int bv_length = sizeof("entryCSN");
-        ber->bv_len = bv_length;
-        ber->bv_val = new char[bv_length];
-        memcpy(ber->bv_val, "entryCSN", bv_length);
-
-        int ctrlFlag = ldap_control_create("1.3.6.1.1.13.2", 1, ber, 0, &ctrl);
-        LDAPControl *M_Control[2] = {nullptr, nullptr};
-        M_Control[1] = ctrl;
-
-        std::cout << "ctrlFlag is:" << ctrlFlag << std::endl;
-    */
-    int result =
-        ldap_add_ext(obj->ld, dns, newEntries, nullptr, nullptr, &msgID);
-
-    /*
-    if (result != 0)
-    {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }*/
-    AsyncQueueWorker(
-        new LDAPAddProgress(callback, progress, obj->ld, msgID, newEntries));
   }
 
   static inline Nan::Persistent<v8::Function> &constructor() {
