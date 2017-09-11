@@ -2,28 +2,6 @@
 
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 
-
-/**
- * an example of program ussage would be:
- * 1. SEARCH
- * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret' 'dc=demoApp,dc=com' 'objectClass=*' 
- * 
- * 2. MODIFY
- * node testLdap.js modify 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret'                                                                                        
- */
-
-const method = process.argv[2]
-
-if (method === 'search') {
-  search();
-} else if (method === 'modify') {
-  modify();
-} else {
-  console.log('The operation is invalid');
-}
-
-
-
 function search() {
   const host = process.argv[3];
   const dnUser = process.argv[4];
@@ -68,32 +46,33 @@ function modify() {
   const userDnModify = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 
   const controlJson = [
-  {
-    oid: 'postread',
-    value: ['entryCSN', 'entryUUID'],
-    iscritical: false,
-  },
-  {
-    oid: 'preread',
-    value: ['cn', 'sn'],
-    iscritical: false,
-  },
-]
+    {
+      oid: 'postread',
+      value: ['entryCSN', 'entryUUID'],
+      iscritical: false,
+    },
+    {
+      oid: 'preread',
+      value: ['cn', 'sn'],
+      iscritical: false,
+    },
+  ];
 
   const changes = [
     {
       op: 'replace',
       attr: 'description',
-      vals: ['aa']
+      vals: ['aa'],
     },
     {
       op: 'add',
       attr: 'description',
-      vals: ['bb']
-    }
+      vals: ['bb'],
+    },
   ];
 
-  const attributeArray = ['cn', 'entryCSN', 'description', 'entryUUID']; 
+
+  const attributeArray = ['cn', 'entryCSN', 'description', 'entryUUID'];
 
   clientLDAP.initialize()
     .then(() => {
@@ -102,10 +81,26 @@ function modify() {
           clientLDAP.newModify(userDnModify, changes, controlJson)
             .then((result) => {
               console.log(result);
-            })
+            });
         });
-
     });
-
 }
 
+/**
+ * an example of program ussage would be:
+ * 1. SEARCH
+ * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret' 'dc=demoApp,dc=com' 'objectClass=*'
+ *
+ * 2. MODIFY
+ * node testLdap.js modify 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret'
+ */
+
+const method = process.argv[2];
+
+if (method === 'search') {
+  search();
+} else if (method === 'modify') {
+  modify();
+} else {
+  console.log('The operation is invalid');
+}

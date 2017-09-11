@@ -33,16 +33,18 @@ public:
   // Executes in worker thread
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress)
   {
+
     struct timeval timeOut = {0, 1};
     while (result == 0)
     {
       result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-      progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
+      //progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
     }
   }
   // Executes in event loop
   void HandleOKCallback()
   {
+
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     if (result == -1)
     {
@@ -51,6 +53,7 @@ public:
     }
     else
     {
+  
       int status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS)
       {
@@ -68,10 +71,11 @@ public:
   void HandleProgressCallback(const char *data, size_t size)
   {
     // Required, this is not created automatically
+    /*std::cout << "----------------------------" << __LINE__ << std::endl;
     Nan::HandleScope scope;
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::Number>(*reinterpret_cast<int *>(const_cast<char *>(data)))};
-    progress->Call(1, argv);
+    progress->Call(1, argv);*/
   }
 };
 
@@ -334,7 +338,7 @@ public:
       else
       {
         const auto& ldap_controls = new LdapControls();
-        modifyResult = ldap_controls->PrintControls(ld, resultMsg);
+        modifyResult = ldap_controls->PrintModificationControls(ld, resultMsg);
         if(modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
@@ -415,6 +419,7 @@ private:
     Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
     obj->initializedFlag = true;
 
+    
     char *hostAddress = *hostArg;
     int state;
     int protocol_version = LDAP_VERSION3;
@@ -439,6 +444,7 @@ private:
       return;
     }
 
+    
     stateClient[1] = Nan::New<v8::Number>(StateMachine::INITIALIZED);
     callback->Call(2, stateClient);
     return;
@@ -479,13 +485,17 @@ private:
 
     char *username = *userArg;
     char *password = *passArg;
+
     if (obj->ld == 0 || obj->initializedFlag == false)
     {
+  
       stateClient[0] = Nan::New<v8::Number>(StateMachine::CREATED);
       callback->Call(1, stateClient);
       return;
     }
+
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
+
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld, obj->msgid));
   }
 
@@ -598,7 +608,7 @@ private:
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[2]);
 
     unsigned int nummods = mods->Length();
-
+    
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
@@ -656,7 +666,7 @@ private:
       result = ldap_modify_ext(obj->ld, *dn, ldapmods, NULL, NULL, &msgID);      
     } else {
       const auto& ldap_controls = new LdapControls();
-      auto ctrls = ldap_controls->CreateControls(controlHandle);
+      auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(NULL);
       result = ldap_modify_ext(obj->ld, *dn, ldapmods, ctrls.data(), NULL, &msgID);
     }

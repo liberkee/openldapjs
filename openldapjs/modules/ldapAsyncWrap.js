@@ -45,18 +45,14 @@ module.exports = class LDAPWrapAsync {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
-
-            /* this._binding.startTls((errTls, stateTls) => {
+            this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
                 reject(new Error(errTls));
               } else {
                 this._stateClient = this._E_STATES.INITIALIZED;
                 resolve(stateTls);
-              } */
-            this._stateClient = this._E_STATES.INITIALIZED;
-            resolve(result);
-          } else {
-            reject(err);
+              }
+            });
           }
         });
       } else {
@@ -216,18 +212,23 @@ module.exports = class LDAPWrapAsync {
   newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      //const resultChange = validator(jsonChange, changeSchema);
-      jsonChange.forEach((element) => {
-        const result = validator(element, changeSchema);
-        if (result.valid === true) {
-          PromiseArray.push(Promise.resolve(result));
-        } else {
-          PromiseArray.push(Promise.reject(result.errors || result.error));
-        }
-      });
+      if (Array.isArray(jsonChange) === false) {
+        PromiseArray.push(Promise.reject('The json is not array'));
+      } else {
+        jsonChange.forEach((element) => {
+          const result = validator(element, changeSchema);
+          if (result.valid === true) {
+            PromiseArray.push(Promise.resolve(result));
+          } else {
+            PromiseArray.push(Promise.reject(result.errors || result.error));
+          }
+        });
+      }
 
-      if(controls === undefined || controls === null) {
+      if (controls === undefined || controls === null) {
         controls = null;
+      } else if (Array.isArray(controls) === false) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
       } else {
         controls.forEach((element) => {
           const resultMessage = validator(element, controlSchema);
@@ -243,14 +244,18 @@ module.exports = class LDAPWrapAsync {
         .then((change) => {
           if (this._stateClient !== this._E_STATES.BOUND) {
             reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
+          } else {
+            this._binding.newModify(dn, jsonChange, controls, (err, result) => {
+              if (err) {
+                reject(new Error(err));
+              } else {
+                resolve(result);
+              }
+            });
           }
-          this._binding.newModify(dn, jsonChange, controls, (err, result) => {
-            if (err) {
-              reject(new Error(err));
-            } else {
-              resolve(result);
-            }
-          });
+        })
+        .catch((error) => {
+          reject(new Error(error));
         });
     });
   }

@@ -5,7 +5,7 @@ LdapControls::LdapControls()
 
 }
 
-std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Array> &control_handle) {
+std::vector<LDAPControl *> LdapControls::CreateModificationControls(const v8::Local<v8::Array> &control_handle) {
   const auto controls_length = control_handle->Length();
 
   std::vector<LDAPControl*> ctrls(controls_length);
@@ -46,16 +46,20 @@ std::vector<LDAPControl *> LdapControls::CreateControls(const v8::Local<v8::Arra
       ctrl->ldctl_oid = LDAP_CONTROL_POST_READ;
     } else if (std::strcmp(*controlOperation, constants::preread) == 0) {
       ctrl->ldctl_oid = LDAP_CONTROL_PRE_READ;
+    } else {
+      return std::vector<LDAPControl *>();
     }
 
-    ctrl->ldctl_iscritical = constants::not_critical;
+    auto isCritical = v8::Local<v8::Number>::Cast(controls->Get(Nan::New("iscritical").ToLocalChecked()));
+    int isC = isCritical->NumberValue();
+    ctrl->ldctl_iscritical = isC;
 
   }
 
   return ctrls;
 }
 
-std::string LdapControls::PrintControls (LDAP *ld, LDAPMessage *resultMsg) {
+std::string LdapControls::PrintModificationControls (LDAP *ld, LDAPMessage *resultMsg) {
   struct berval bv;
   BerElement *ber;
   LDAPControl **serverCTL = NULL;

@@ -1,0 +1,36 @@
+{
+  "ldapAuthentification": {
+    "host": "ldap://localhost:389",
+    "dnAdmin": "cn=admin,dc=demoApp,dc=com",
+    "passwordAdmin": "secret",
+    "passwordUser": "secret"
+  },
+  "ldapModificationReplace": {
+    "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "operation": "replace",
+    "attribute": "description",
+    "vals": ["1Modification", "2Modification", "3Modification"]
+  },
+  "ldapModificationAdd": {
+    "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "operation": "add",
+    "attribute": "description",
+    "vals": ["4Modification", "5Modification", "6Modification"]
+  },
+  "ldapModificationDelete": {
+    "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "operation": "delete",
+    "attribute": "description",
+    "vals": ["4Modification", "5Modification", "6Modification"]
+  },
+  "ldapModificationControlPostRead": {
+    "oid": "postread",
+    "value": ["entryCSN", "entryUUID"],
+    "iscritical": false
+  },
+  "ldapModificationControlPreRead": {
+    "oid": "preread",
+    "value": ["cn", "sn"],
+    "iscritical": false
+  }
+}
