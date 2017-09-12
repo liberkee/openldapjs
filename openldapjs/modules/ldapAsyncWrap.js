@@ -11,7 +11,6 @@ const controlSchema = require('./schemas/control_schema');
  * @class LDAPWrapAsync
  */
 module.exports = class LDAPWrapAsync {
-
   constructor(host, password) {
     this._hostAdress = host;
     this._E_STATES = {
@@ -24,20 +23,17 @@ module.exports = class LDAPWrapAsync {
     this._stateClient = this._E_STATES.CREATED;
   }
 
-  set config(value) {
-    this._hostAdress = value;
-  }
+  set config(value) { this._hostAdress = value; }
 
-  get config() {
-    return this._hostAdress;
-  }
+  get config() { return this._hostAdress; }
 
   /**
     * Initialize to an LDAP server.
     *
     * @method initialize
     * @param {string} host The host address of server LDAP.
-    * @return {Promise} That resolves if the LDAP initialize the structure to a specific server.
+    * @return {Promise} That resolves if the LDAP initialize the structure to a
+   * specific server.
     * Reject if the address is incorect.
     */
   initialize() {
@@ -84,18 +80,15 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
-        this.initialize()
-          .then(() => {
-            this.bind(bindDN, passwordUser)
-              .then((result) => {
-                resolve(result);
-              })
-              .catch((err) => {
-                reject(new Error(err.message));
-              });
-          });
+        this.initialize().then(() => {
+          this.bind(bindDN, passwordUser)
+              .then((result) => { resolve(result); })
+              .catch((err) => { reject(new Error(err.message)); });
+        });
       } else {
-        reject(new Error('The bind operation failed. It could be done if the state of the client is Initialized'));
+        reject(
+            new Error(
+                'The bind operation failed. It could be done if the state of the client is Initialized'));
       }
     });
   }
@@ -122,7 +115,8 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('The Search operation can be done just in BOUND state'));
+        reject(
+            new Error('The Search operation can be done just in BOUND state'));
       }
 
     });
@@ -135,7 +129,8 @@ module.exports = class LDAPWrapAsync {
    * @param {string} dn The dn of the entry to compare.
    * @param {string} attr The attribute given for interogation.
    * @param {string} value Value send to verify.
-   * @return {Promise} That resolve and return True if the element are equal or False otherwise.
+   * @return {Promise} That resolve and return True if the element are equal or
+   * False otherwise.
    * Reject if an error will occure.
    */
 
@@ -150,7 +145,8 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('The Compare operation can be done just in BOUND state'));
+        reject(
+            new Error('The Compare operation can be done just in BOUND state'));
       }
     });
   }
@@ -161,9 +157,11 @@ module.exports = class LDAPWrapAsync {
     *
     * @method modify
     * @param{string} dn The dn of the entry to modify
-    * @param{object} mods An array that contains the fields that shall be changed
+    * @param{object} mods An array that contains the fields that shall be
+   * changed
     * @return {Promise} That resolves if LDAP modified successfully the entry.
-    * Reject if the LDAP rejects the operation or the client's state is not BOUND
+    * Reject if the LDAP rejects the operation or the client's state is not
+   * BOUND
     */
   modify(dn, json) {
     return new Promise((resolve, reject) => {
@@ -195,7 +193,9 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
+        reject(
+            new Error(
+                'The operation failed. It could be done if the state of the client is BOUND'));
       }
     });
   }
@@ -205,9 +205,11 @@ module.exports = class LDAPWrapAsync {
     *
     * @method newModify
     * @param{string} dn The dn of the entry to modify
-    * @param{object} json have to contain the value of changes and the attributes for the return
+    * @param{object} json have to contain the value of changes and the
+   * attributes for the return
     * @return {Promise} That resolves if LDAP modified successfully the entry.
-    * Reject if the LDAP rejects the operation or the client's state is not BOUND
+    * Reject if the LDAP rejects the operation or the client's state is not
+   * BOUND
     */
   newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
@@ -225,8 +227,8 @@ module.exports = class LDAPWrapAsync {
         });
       }
 
-      if (controls === undefined || controls === null) {
-        controls = null;
+      if (controls === undefined) {
+        // Do nothing
       } else if (Array.isArray(controls) === false) {
         PromiseArray.push(Promise.reject('The controls is not array'));
       } else {
@@ -235,28 +237,31 @@ module.exports = class LDAPWrapAsync {
           if (resultMessage.valid === true) {
             PromiseArray.push(Promise.resolve(resultMessage));
           } else {
-            PromiseArray.push(Promise.reject(resultMessage.errors || resultMessage.error));
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
           }
         });
       }
 
       return Promise.all(PromiseArray)
-        .then((change) => {
-          if (this._stateClient !== this._E_STATES.BOUND) {
-            reject(new Error('The operation failed. It could be done if the state of the client is BOUND'));
-          } else {
-            this._binding.newModify(dn, jsonChange, controls, (err, result) => {
-              if (err) {
-                reject(new Error(err));
-              } else {
-                resolve(result);
-              }
-            });
-          }
-        })
-        .catch((error) => {
-          reject(new Error(error));
-        });
+          .then((change) => {
+            if (this._stateClient !== this._E_STATES.BOUND) {
+              reject(
+                  new Error(
+                      'The operation failed. It could be done if the state of the client is BOUND'));
+            } else {
+              this._binding.newModify(
+                  dn, jsonChange, (controls != undefined) ? controls : null,
+                  (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
     });
   }
 
@@ -283,6 +288,4 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
-
 };
-

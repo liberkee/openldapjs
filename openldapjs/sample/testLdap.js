@@ -53,7 +53,7 @@ function modify() {
     },
     {
       oid: 'preread',
-      value: ['cn', 'sn'],
+      value: ['entryCSN', 'sn'],
       iscritical: false,
     },
   ];
@@ -78,7 +78,7 @@ function modify() {
     .then(() => {
       clientLDAP.bind(dnUser, password)
         .then(() => {
-          clientLDAP.newModify(userDnModify, changes, controlJson)
+          clientLDAP.newModify(userDnModify, changes)
             .then((result) => {
               console.log(result);
             });

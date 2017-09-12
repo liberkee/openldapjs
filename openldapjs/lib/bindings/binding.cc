@@ -341,6 +341,7 @@ public:
         if(modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
+          return;
         }
       
         stateClient[1] = Nan::New<v8::Number>(0);
