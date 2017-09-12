@@ -164,10 +164,10 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-  it('should return 10k entries', function(next) {
+  it('should return >10k entries', function(next) {
     this.timeout(0);
 
-    adminLDAP.search(searchBase, 2, 'objectClass=person')
+    adminLDAP.search(searchBase, 2, 'objectClass=*')
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.above(10000);
