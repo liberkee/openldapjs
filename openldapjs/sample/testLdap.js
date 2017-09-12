@@ -16,26 +16,23 @@ const newClient = new LDAPCLIENT(host);
 
 
 
-let entry = {
-  objectClass: 'inetOrgPerson',
-  sn: 'Entryz',
-  description: 'Testz'
-};
+let entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
 
-newClient.initialize()
-  .then(() => {
-    newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret')
-      .then(() => {
+newClient.initialize().then(() => {
+  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret').then(() => {
 
-        newClient.add('cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry, [])
-          .then((result) => {
+    newClient
+        .add(
+            'cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+            entry, [])
+        .then(
+            (result) => {
 
-          }).catch((err) => {
-            console.log(err);
-          });
-      });
-
+            })
+        .catch((err) => { console.log(err); });
   });
 
+});
 
-//console.log(entry);
+
+// console.log(entry);

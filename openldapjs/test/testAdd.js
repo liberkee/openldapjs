@@ -20,22 +20,12 @@ describe('Testing the async LDAP add operation', () => {
   beforeEach((next) => {
     clientLDAP = new LDAP(host);
 
-    clientLDAP.initialize()
-      .then(() => {
-        clientLDAP.bind(dnAdmin, password)
-          .then(() => {
-            next();
-          });
-      });
+    clientLDAP.initialize().then(
+        () => { clientLDAP.bind(dnAdmin, password).then(() => { next(); }); });
 
   });
 
-  afterEach((next) => {
-    clientLDAP.unbind()
-      .then(() => {
-        next();
-      });
-  });
+  afterEach((next) => { clientLDAP.unbind().then(() => { next(); }); });
 
   it('should reject the add operation with a wrong dn', (next) => {
 
@@ -45,11 +35,10 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    clientLDAP.add('garbage', validEntry, [])
-      .catch((invalidDnError) => {
-        invalidDnError.message.should.be.deepEqual('34');
-        next();
-      });
+    clientLDAP.add('garbage', validEntry, []).catch((invalidDnError) => {
+      invalidDnError.message.should.be.deepEqual('34');
+      next();
+    });
 
   });
 
@@ -61,11 +50,14 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    clientLDAP.add('cn=newPointChildBLABL0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', invalidEntry)
-      .catch((undefinedTypeErr) => {
-        undefinedTypeErr.message.should.be.deepEqual('17');
-        next();
-      });
+    clientLDAP
+        .add(
+            'cn=newPointChildBLABL0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+            invalidEntry)
+        .catch((undefinedTypeErr) => {
+          undefinedTypeErr.message.should.be.deepEqual('17');
+          next();
+        });
   });
 
   it('should reject the add operation with a duplicated entry', (next) => {
@@ -75,11 +67,14 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Testz',
     };
 
-    clientLDAP.add('cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
-      .catch((duplicatedEntryError) => {
-        duplicatedEntryError.message.should.be.deepEqual('68');
-        next();
-      });
+    clientLDAP
+        .add(
+            'cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+            entry)
+        .catch((duplicatedEntryError) => {
+          duplicatedEntryError.message.should.be.deepEqual('68');
+          next();
+        });
   });
 
   it('should add a single entry', (next) => {
@@ -89,11 +84,14 @@ describe('Testing the async LDAP add operation', () => {
       description: 'TestEntry',
     };
 
-    clientLDAP.add('cn=newTestEntry0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', singleEntry)
-      .then((result) => {
-        result.should.be.deepEqual(0);
-        next();
-      });
+    clientLDAP
+        .add(
+            'cn=newTestEntry0,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+            singleEntry)
+        .then((result) => {
+          result.should.be.deepEqual(0);
+          next();
+        });
   });
 
   it('should add multiple entries sequentialy and reject to add a duplicate', (next) => {
@@ -103,24 +101,36 @@ describe('Testing the async LDAP add operation', () => {
       description: 'TestEntry',
     };
 
-    clientLDAP.add('cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
-      .then((res1) => {
-        res1.should.be.deepEqual(0);
-        clientLDAP.add('cn=newTestEntry2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
-          .then((res2) => {
-            res2.should.be.deepEqual(0);
-            clientLDAP.add('cn=newTestEntry3,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
-              .then((res3) => {
-                res3.should.be.deepEqual(0);
-                clientLDAP.add('cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry)
-                  .catch((err) => {
-                    err.message.should.be.deepEqual('68');
-                    next();
-                  });
+    clientLDAP
+        .add(
+            'cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+            entry)
+        .then((res1) => {
+          res1.should.be.deepEqual(0);
+          clientLDAP
+              .add(
+                  'cn=newTestEntry2,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+                  entry)
+              .then((res2) => {
+                res2.should.be.deepEqual(0);
+                clientLDAP
+                    .add(
+                        'cn=newTestEntry3,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+                        entry)
+                    .then((res3) => {
+                      res3.should.be.deepEqual(0);
+                      clientLDAP
+                          .add(
+                              'cn=newTestEntry1,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+                              entry)
+                          .catch((err) => {
+                            err.message.should.be.deepEqual('68');
+                            next();
+                          });
 
+                    });
               });
-          });
-      });
+        });
 
   });
 
@@ -132,11 +142,10 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    clientLDAP.add(null, entry)
-      .catch((err) => {
-        err.message.should.be.deepEqual('34');
-        next();
-      });
+    clientLDAP.add(null, entry).catch((err) => {
+      err.message.should.be.deepEqual('34');
+      next();
+    });
   });
 
 
@@ -146,14 +155,13 @@ describe('Testing the async LDAP add operation', () => {
       sn: 'Entry',
       description: 'Tesst',
     };
-    clientLDAP.bind(dnUser, password)
-      .then(() => {
-        clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
+    clientLDAP.bind(dnUser, password).then(() => {
+      clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
           .catch((accessError) => {
             accessError.message.should.be.deepEqual('50');
             next();
           });
-      });
+    });
   });
 
   it('should reject requests done from an unbound state', (next) => {
@@ -163,14 +171,14 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Tesst',
     };
 
-    clientLDAP.unbind()
-      .then(() => {
-        clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
+    clientLDAP.unbind().then(() => {
+      clientLDAP.add('cn=newTopEntry,dc=demoApp,dc=com', entry)
           .catch((stateError) => {
-            stateError.message.should.be.deepEqual('The add operation can be done just in BOUND state');
+            stateError.message.should.be.deepEqual(
+                'The add operation can be done just in BOUND state');
             next();
           });
-      });
+    });
   });
 
 
@@ -181,17 +189,20 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Tesst',
     };
 
-    const first = clientLDAP.add('cn=newTestEntry97,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry);
-    const second = clientLDAP.add('cn=newTestEntry98,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry);
-    const third = clientLDAP.add('cn=newTestEntry99,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com', entry);
+    const first = clientLDAP.add(
+        'cn=newTestEntry97,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+        entry);
+    const second = clientLDAP.add(
+        'cn=newTestEntry98,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+        entry);
+    const third = clientLDAP.add(
+        'cn=newTestEntry99,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
+        entry);
 
-    Promise.all([first, second, third])
-      .then((values) => {
-        values.forEach((result) => {
-          result.should.be.deepEqual(0);
-        });
-        next();
-      });
+    Promise.all([first, second, third]).then((values) => {
+      values.forEach((result) => { result.should.be.deepEqual(0); });
+      next();
+    });
   });
 
 });
