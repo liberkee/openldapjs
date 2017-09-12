@@ -17,6 +17,7 @@ module.exports = class LDAPWrapAsync {
       CREATED: 0,
       INITIALIZED: 1,
       BOUND: 2,
+      SECURED: 3,
       UNBOUND: 5,
     };
     this._binding = new binding.LDAPClient();
@@ -40,26 +41,46 @@ module.exports = class LDAPWrapAsync {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
-          if (result) { 
-               this._binding.startTls((errTls, stateTls) => {
-                 if (errTls) {
-                   reject(new Error(errTls));
-                 } else {
-                   this._stateClient = this._E_STATES.INITIALIZED;
-                   resolve(stateTls);
-                 }
-           // this._stateClient = this._E_STATES.INITIALIZED;
-           // resolve(result);
+          if (result) {
+            this._binding.startTls((errTls, stateTls) => {
+              if (errTls) {
+                reject(new Error(errTls));
+              } else {
+                this._stateClient = this._E_STATES.INITIALIZED;
+                resolve(stateTls);
+              }
+              // this._stateClient = this._E_STATES.INITIALIZED;
+              // resolve(result);
 
-              });
+            });
           } else {
-            reject(err); 
+            reject(err);
           }
         });
       } else {
         reject(new Error('object not created'));
       }
     });
+  }
+
+  /**
+   * initializes a tls connection. Can only be done if the client is
+   * initialized.
+   * @return {Boolean} True or false, in case the operation succeded.
+   */
+  startTls() {
+    if (this._stateClient === this._E_STATES.INITIALIZED) {
+      this._binding.startTls((errTls, stateTls) => {
+        if (errTls) {
+          return false;
+        } else {
+          this._stateClient = this._E_STATES.SECURED;
+          return true;
+        }
+      });
+    } else {
+      return false;
+    }
   }
 
 
@@ -76,7 +97,8 @@ module.exports = class LDAPWrapAsync {
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED) {
+      if (this._stateClient === this._E_STATES.INITIALIZED ||
+          this._stateClient === this._E_STATES.SECURED) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
@@ -87,7 +109,7 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('Can only bind from initialized or bound'));
+        reject(new Error('Can only bind from INITIALIZED or SECURED'));
       }
     });
   }
@@ -104,7 +126,8 @@ module.exports = class LDAPWrapAsync {
 
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
+      if (this._stateClient === this._E_STATES.BOUND ||
+          this._stateClient === this._E_STATES.SECURED) {
         this._binding.search(searchBase, scope, searchFilter, (err, result) => {
           if (err) {
             reject(new Error(err));
@@ -114,7 +137,8 @@ module.exports = class LDAPWrapAsync {
         });
       } else {
         reject(
-            new Error('The Search operation can be done just in BOUND state'));
+            new Error(
+                'The Search operation can be done just in BOUND or SECURED state'));
       }
 
     });
@@ -132,9 +156,12 @@ module.exports = class LDAPWrapAsync {
  * @return {Readable stream} that pushes search results page by page
  */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
-    if(this._stateClient === this._E_STATES.BOUND) {
-      this._searchID+=1;
-      return new SearchStream(searchBase,scope,searchFilter,pageSize,this._searchID, this._binding);
+    if (this._stateClient === this._E_STATES.BOUND ||
+        this._stateClient === this._E_STATES.SECURED) {
+      this._searchID += 1;
+      return new SearchStream(
+          searchBase, scope, searchFilter, pageSize, this._searchID,
+          this._binding);
 
     } else {
       return new Error('Client state is unbound');
@@ -155,7 +182,8 @@ module.exports = class LDAPWrapAsync {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
+      if (this._stateClient === this._E_STATES.BOUND ||
+          this._stateClient === this._E_STATES.SECURED) {
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
             reject(new Error(err));

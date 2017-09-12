@@ -22,25 +22,18 @@ describe('Testing the async LDAP connection', () => {
     UNBOUND: 5,
   };
 
-  beforeEach((next) => {
-    next();
-  });
+  beforeEach((next) => { next(); });
 
-  afterEach(() => {
-  });
+  afterEach(() => {});
 
   it('should bind multiple clients on the same time', (next) => {
     const progress = 0;
-    clientLDAP.initialize(host)
-    .then(() => {
-      clientLDAP2.initialize(host)
-      .then(() => {
-        clientLDAP.bind(dn, password)
-        .then((result) => {
+    clientLDAP.initialize(host).then(() => {
+      clientLDAP2.initialize(host).then(() => {
+        clientLDAP.bind(dn, password).then((result) => {
           should.deepEqual(result, E_STATES.BOUND);
         });
-        clientLDAP2.bind(dn2, password2)
-        .then((result) => {
+        clientLDAP2.bind(dn2, password2).then((result) => {
           should.deepEqual(result, E_STATES.BOUND);
         });
         next();

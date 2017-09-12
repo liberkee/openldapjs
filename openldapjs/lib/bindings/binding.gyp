@@ -7,7 +7,7 @@
         "<!(node -e \"require('nan')\")",
         "/usr/local/include"
       ],
-      'sources': [ 'binding.cc'],
+      'sources': [ 'binding.cc', "ldap_paged_search_progress.cc","ldap_bind_progress.cc","ldap_search_progress.cc","ldap_compare_progress.cc"],
       "ldflags": [
             "-Wl,-z,defs"
       ],
@@ -23,8 +23,7 @@
       "cflags": [
           "-Wall",
           "-g",
-          "-std=c++11",
-          "-Wno-reorder"
+          "-std=c++11"
       ],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"]

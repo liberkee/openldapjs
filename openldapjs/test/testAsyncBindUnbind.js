@@ -16,19 +16,13 @@ describe('Testing the async LDAP authentification', () => {
     UNBOUND: 5,
   };
 
-  beforeEach((next) => {
-    clientLDAP.initialize(host)
-    .then(() => {
-      next();
-    });
-  });
-  afterEach(() => {
-  });
+  beforeEach(
+      (next) => { clientLDAP.initialize(host).then(() => { next(); }); });
+  afterEach(() => {});
 
   it('should bind to server', (next) => {
     const progress = 0;
-    clientLDAP.bind(dn, password)
-    .then((result) => {
+    clientLDAP.bind(dn, password).then((result) => {
       should.deepEqual(result, E_STATES.BOUND);
       next();
     });
@@ -36,8 +30,7 @@ describe('Testing the async LDAP authentification', () => {
 
   it('should not bind to server', (next) => {
     const newDN = 'cn=rmim,ou=users,o=myhost,dc=demoApp,dc=com';
-    clientLDAP.bind(newDN, password)
-    .catch((err) => {
+    clientLDAP.bind(newDN, password).catch((err) => {
       // Give the specific error not the state of the operation
       should.deepEqual(err, 49);
       next();
@@ -45,19 +38,16 @@ describe('Testing the async LDAP authentification', () => {
   });
 
   it('should unbind from server', (next) => {
-    clientLDAP.unbind()
-    .then((result) => {
+    clientLDAP.unbind().then((result) => {
       should.deepEqual(result, E_STATES.UNBOUND);
       next();
     });
   });
 
   it('should return error for uninitialized', (next) => {
-    clientLDAP.unbind()
-    .then(() => {
+    clientLDAP.unbind().then(() => {
       // I will repet the operation for test porpes
-      clientLDAP.unbind()
-      .catch((err) => {
+      clientLDAP.unbind().catch((err) => {
         should.deepEqual(err, E_STATES.ERROR);
         next();
       });

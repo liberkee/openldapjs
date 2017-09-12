@@ -13,17 +13,13 @@ describe('Testing the async initialization', () => {
     UNBOUND: 5,
   };
 
-  beforeEach((next) => {
-    next();
-  });
+  beforeEach((next) => { next(); });
 
-  afterEach(() => {
-  });
+  afterEach(() => {});
 
   it('should be INITIALIZED', (next) => {
     const host = 'ldap://10.16.0.194:389';
-    ldapWrap.initialize(host)
-    .then((result) => {
+    ldapWrap.initialize(host).then((result) => {
       should.deepEqual(result, E_STATES.INITIALIZED);
       next();
     });
@@ -32,8 +28,7 @@ describe('Testing the async initialization', () => {
   it('should be not INITIALIZED', (next) => {
     const host = 'lp://10.16.0.194:389';
 
-    ldapWrap.initialize(host)
-    .catch((err) => {
+    ldapWrap.initialize(host).catch((err) => {
       should.deepEqual(err, E_STATES.ERROR);
       next();
     });

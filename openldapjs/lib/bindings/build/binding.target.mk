@@ -4,6 +4,9 @@ TOOLSET := target
 TARGET := binding
 DEFS_Debug := \
 	'-DNODE_GYP_MODULE_NAME=binding' \
+	'-DUSING_UV_SHARED=1' \
+	'-DUSING_V8_SHARED=1' \
+	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DLDAP_DEPRECATED' \
@@ -22,7 +25,6 @@ CFLAGS_Debug := \
 	-Wall \
 	-g \
 	-std=c++11 \
-	-Wno-reorder \
 	-g \
 	-O0
 
@@ -35,15 +37,18 @@ CFLAGS_CC_Debug := \
 	-std=gnu++0x
 
 INCS_Debug := \
-	-I/usr/include/nodejs/include/node \
-	-I/usr/include/nodejs/src \
-	-I/usr/include/nodejs/deps/uv/include \
-	-I/usr/include/nodejs/deps/v8/include \
+	-I/home/raribas/.node-gyp/4.8.4/include/node \
+	-I/home/raribas/.node-gyp/4.8.4/src \
+	-I/home/raribas/.node-gyp/4.8.4/deps/uv/include \
+	-I/home/raribas/.node-gyp/4.8.4/deps/v8/include \
 	-I$(srcdir)/../../node_modules/nan \
 	-I/usr/local/include
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=binding' \
+	'-DUSING_UV_SHARED=1' \
+	'-DUSING_V8_SHARED=1' \
+	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DLDAP_DEPRECATED' \
@@ -60,7 +65,6 @@ CFLAGS_Release := \
 	-Wall \
 	-g \
 	-std=c++11 \
-	-Wno-reorder \
 	-O3 \
 	-ffunction-sections \
 	-fdata-sections \
@@ -75,15 +79,19 @@ CFLAGS_CC_Release := \
 	-std=gnu++0x
 
 INCS_Release := \
-	-I/usr/include/nodejs/include/node \
-	-I/usr/include/nodejs/src \
-	-I/usr/include/nodejs/deps/uv/include \
-	-I/usr/include/nodejs/deps/v8/include \
+	-I/home/raribas/.node-gyp/4.8.4/include/node \
+	-I/home/raribas/.node-gyp/4.8.4/src \
+	-I/home/raribas/.node-gyp/4.8.4/deps/uv/include \
+	-I/home/raribas/.node-gyp/4.8.4/deps/v8/include \
 	-I$(srcdir)/../../node_modules/nan \
 	-I/usr/local/include
 
 OBJS := \
-	$(obj).target/$(TARGET)/binding.o
+	$(obj).target/$(TARGET)/binding.o \
+	$(obj).target/$(TARGET)/ldap_paged_search_progress.o \
+	$(obj).target/$(TARGET)/ldap_bind_progress.o \
+	$(obj).target/$(TARGET)/ldap_search_progress.o \
+	$(obj).target/$(TARGET)/ldap_compare_progress.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)

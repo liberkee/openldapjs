@@ -4,8 +4,14 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Callback *callback, Callback *progress, LDAP *ld, std::string base,
     int scope, std::string filter, const std::string &cookieID, int pgSize,
     const std::shared_ptr<std::map<std::string, berval *>> &cookies)
-    : AsyncProgressWorker(callback), progress(progress), ld(ld), base(base),
-      scope(scope), filter(filter), cookieID(cookieID), pageSize(pgSize),
+    : AsyncProgressWorker(callback),
+      progress(progress),
+      ld(ld),
+      base(base),
+      scope(scope),
+      filter(filter),
+      cookieID(cookieID),
+      pageSize(pgSize),
       cookies(cookies) {
   // cookie != NULL ?
   // cout<<"-------------length--------"<<cookie->bv_len<<endl: cout<<"cookie
@@ -14,7 +20,6 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
 // Executes in worker thread
 void LDAPPagedSearchProgress::Execute(
     const AsyncProgressWorker::ExecutionProgress &progress) {
-        
   BerElement *ber;
   int l_rc, l_entries, l_entry_count = 0, l_errcode = 0, page_nbr;
   char pagingCriticality = 'T', *l_dn;
@@ -101,9 +106,7 @@ void LDAPPagedSearchProgress::Execute(
     /* Disply the returned result                                     */
     /*                                                                */
     /* Determine how many entries have been found.                    */
-    if (morePages == true)
-
-      l_entries = ldap_count_entries(ld, l_result);
+    if (morePages == true) l_entries = ldap_count_entries(ld, l_result);
 
     if (l_entries > 0) {
       l_entry_count = l_entry_count + l_entries;
@@ -133,7 +136,6 @@ void LDAPPagedSearchProgress::Execute(
       pageResult += "\n";
     }
 
-
     /* Free the search results.                                       */
     ldap_msgfree(l_result);
     page_nbr += 1;
@@ -147,7 +149,6 @@ void LDAPPagedSearchProgress::Execute(
 
 // Executes in event loop
 
-
 void LDAPPagedSearchProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null(), Nan::Null()};
@@ -155,7 +156,6 @@ void LDAPPagedSearchProgress::HandleOKCallback() {
     stateClient[0] = Nan::New(status);
     callback->Call(1, stateClient);
   } else {
-
     stateClient[1] = Nan::New(pageResult).ToLocalChecked();
 
     morePages == true ? stateClient[2] = Nan::True() : stateClient[2] =

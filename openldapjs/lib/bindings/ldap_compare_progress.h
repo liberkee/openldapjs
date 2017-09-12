@@ -24,17 +24,14 @@ private:
 public:
   LDAPCompareProgress(Callback *callback, Callback *progress, LDAP *ld,
                       int msgID);
-     
+
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress);
-   
-  
+
   // Executes in event loop
   void HandleOKCallback();
-   
 
   void HandleProgressCallback(const char *data, size_t size);
-    // Required, this is not created automatically
-   
+  // Required, this is not created automatically
 };
-#endif //BINDINGS_LDAP_COMPARE_PROGRESS_H_ 
+#endif // BINDINGS_LDAP_COMPARE_PROGRESS_H_

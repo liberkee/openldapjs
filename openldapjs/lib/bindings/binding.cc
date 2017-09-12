@@ -1,7 +1,7 @@
-#include "ldap_paged_search_progress.h"
 #include "ldap_bind_progress.h"
-#include "ldap_search_progress.h"
 #include "ldap_compare_progress.h"
+#include "ldap_paged_search_progress.h"
+#include "ldap_search_progress.h"
 #include <chrono>
 #include <iostream>
 #include <ldap.h>
@@ -13,9 +13,6 @@
 using namespace Nan;
 using namespace v8;
 using namespace std;
-
-
-
 
 class LDAPClient : public Nan::ObjectWrap {
 public:
@@ -215,13 +212,10 @@ private:
       obj->cookies->insert(it, {cookie_id, nullptr});
     }
 
-    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null()};                            
+    Local<Value> stateClient[4] = {Nan::Null(), Nan::Null(), Nan::Null()};
 
     Callback *callback = new Callback(info[5].As<Function>());
     Callback *progress = new Callback(info[6].As<v8::Function>());
-
-
-   
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);

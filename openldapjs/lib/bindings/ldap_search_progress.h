@@ -13,7 +13,6 @@ using namespace Nan;
 using namespace v8;
 using namespace std;
 
-
 class LDAPSearchProgress : public AsyncProgressWorker {
 private:
   LDAP *ld;
@@ -28,16 +27,14 @@ private:
 public:
   LDAPSearchProgress(Callback *callback, Callback *progress, LDAP *ld,
                      int msgID);
-    
+
   // Executes in worker thread
   void Execute(const AsyncProgressWorker::ExecutionProgress &progress);
-    
+
   // Executes in event loop
   void HandleOKCallback();
-  
 
   void HandleProgressCallback(const char *data, size_t size);
-  
 };
 
-#endif //BINDINGS_LDAP_SEARCH_PROGRESS_H_
+#endif // BINDINGS_LDAP_SEARCH_PROGRESS_H_
