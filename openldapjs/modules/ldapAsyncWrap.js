@@ -266,6 +266,66 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
+      * Perform an LDAP modify operation
+      *
+      * @method rename
+      * @param{string} dn The dn of the entry to rename
+      * @param{string} The new rdn for the dn
+      * @param{string} New parent for the rdn
+      * @param{array} Control that is send as a request to server
+      * @return {Promise} Will return succes or a result from a control if the
+      * operation is succesfull, else will return an error number.
+      */
+  rename(dn, newrdn, newparent, controls) {
+    return new Promise((resolve, reject) => {
+      const PromiseArray = [];
+      if (typeof(dn) !== 'string' || typeof(newrdn) !== 'string' ||
+          typeof(newparent) !== 'string') {
+        const parameter = typeof(dn) !== 'string' ?
+            'dn' :
+            typeof(newrdn) !== 'string' ?
+            'newrdn' :
+            typeof(newparent) !== 'string' ? 'newparent' : '';
+        PromiseArray.push(Promise.reject(`The ${parameter} is not string `));
+      }
+
+      if (Array.isArray(controls) === false && controls !== undefined) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
+      } else if (controls !== undefined) {
+        controls.forEach((element) => {
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
+          } else {
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
+          }
+        });
+      }
+
+      return Promise.all(PromiseArray)
+          .then((change) => {
+            if (this._stateClient !== this._E_STATES.BOUND) {
+              reject(
+                  new Error(
+                      'The operation failed. It could be done if the state of the client is BOUND'));
+            } else {
+              this._binding.rename(
+                  dn, newrdn, newparent,
+                  (controls != undefined) ? controls : null, (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
+    });
+  }
+
+  /**
     * Unbind from a LDAP server.
     *
     * @method unbind
