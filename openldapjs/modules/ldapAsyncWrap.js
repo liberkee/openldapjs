@@ -32,7 +32,6 @@ module.exports = class LDAPWrapAsync {
     * Initialize to an LDAP server.
     *
     * @method initialize
-    * @param {string} host The host address of server LDAP.
     * @return {Promise} That resolves if the LDAP initialize the structure to a
    * specific server.
     * Reject if the address is incorect.
@@ -46,12 +45,9 @@ module.exports = class LDAPWrapAsync {
               if (errTls) {
                 reject(new Error(errTls));
               } else {
-                this._stateClient = this._E_STATES.INITIALIZED;
+                this._stateClient = this._E_STATES.SECURED;
                 resolve(stateTls);
-              }
-              // this._stateClient = this._E_STATES.INITIALIZED;
-              // resolve(result);
-
+              }    
             });
           } else {
             reject(err);
@@ -63,11 +59,11 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
-  /**
-   * initializes a tls connection. Can only be done if the client is
-   * initialized.
-   * @return {Boolean} True or false, in case the operation succeded.
-   */
+/**
+ * Secures the client-server connection, usualy done after initialize.
+ * @method startTls
+ * @return {boolean} true if connection was secured, false if otherwise.
+ */
   startTls() {
     if (this._stateClient === this._E_STATES.INITIALIZED) {
       this._binding.startTls((errTls, stateTls) => {
@@ -117,9 +113,10 @@ module.exports = class LDAPWrapAsync {
    * Search operation.
    *
    * @method search
-   * @param {string} base The base node where the search to start.
-   * @param {int} scope The mod how the search will return the entrys.
-   * @param {string} filter The specification for specific element.
+   * @param {string} base the base for the search.
+   * @param {int} scope scope for the search, can be 0(BASE), 1(ONE) or
+   * 2(SUBTREE)
+   * @param {string} filter  search filter.
    * @return {Promise} That resolve and return the a string with search result.
    * Reject if an error will occure.
    */
@@ -149,9 +146,10 @@ module.exports = class LDAPWrapAsync {
  * Search operation with reasults displayed page by page.
  *
  * @method pagedSearch
- * @param {string} searchBase The base node where the search to start.
- * @param {int} scope The mod how the search will return the entrys.
- * @param {string} searchFilter The specification for specific element.
+ * @param {string} searchBase the base for the search.
+ * @param {int} scope scope for the search, can be 0(BASE), 1(ONE) or
+   * 2(SUBTREE)
+ * @param {string} searchFilter search filter.
  * @param {int} pageSize The number of entries per LDAP page
  * @return {Readable stream} that pushes search results page by page
  */
@@ -162,7 +160,6 @@ module.exports = class LDAPWrapAsync {
       return new SearchStream(
           searchBase, scope, searchFilter, pageSize, this._searchID,
           this._binding);
-
     } else {
       return new Error('Client state is unbound');
     }
