@@ -2,6 +2,8 @@
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
+const validator = require('./json_validator/json_validator');
+const controlSchema = require('./schemas/control_schema');
 
 
 /**
@@ -124,18 +126,40 @@ module.exports = class LDAPWrapAsync {
    */
   del(dn, controls) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
-        this._binding.del(dn, controls, (err, result) => {
-          if (err) {
-            reject(new Error(err));
+      const PromiseArray = [];
+      if (Array.isArray(controls) === false && controls !== undefined) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
+      } else {
+        controls.forEach((element) => {
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
           } else {
-            resolve(result);
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
           }
         });
-      } else {
-        reject(
-            new Error('The Delete operation can be done just in BOUND state'));
       }
+
+      return Promise.all(PromiseArray)
+          .then((change) => {
+            if (this._stateClient !== this._E_STATES.BOUND) {
+              reject(
+                  new Error(
+                      'The Delete operation can be done just in BOUND state'));
+            } else {
+              this._binding.del(
+                  dn, (controls != undefined) ? controls : null,
+                  (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
     });
   }
   /**
@@ -149,26 +173,50 @@ module.exports = class LDAPWrapAsync {
    */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
-        // turn the json into an Array that can be easily parsed.
-        const keys = Object.keys(entry);
-        const entryArray = [];
-
-        for (const elem of keys) {
-          entryArray.push(elem);
-          entryArray.push(entry[elem]);
-        }
-
-        this._binding.add(dn, entryArray, controls, (err, result) => {
-          if (err) {
-            reject(new Error(err));
+      const PromiseArray = [];
+      if (Array.isArray(controls) === false && controls !== undefined) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
+      } else {
+        controls.forEach((element) => {
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
           } else {
-            resolve(result);
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
           }
         });
-      } else {
-        reject(new Error('The add operation can be done just in BOUND state'));
       }
+
+      return Promise.all(PromiseArray)
+          .then((change) => {
+            if (this._stateClient === this._E_STATES.BOUND) {
+              // turn the json into an Array that can be easily parsed.
+              const keys = Object.keys(entry);
+              const entryArray = [];
+
+              for (const elem of keys) {
+                entryArray.push(elem);
+                entryArray.push(entry[elem]);
+              }
+
+              this._binding.add(
+                  dn, entryArray, (controls != undefined) ? controls : null,
+                  (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                      console.log(err);
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            } else {
+              reject(
+                  new Error(
+                      'The add operation can be done just in BOUND state'));
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
     });
   }
 

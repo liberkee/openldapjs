@@ -14,25 +14,29 @@ const filterCompare = 'description';
 const value = 'cghitea@gmail.com';
 const newClient = new LDAPCLIENT(host);
 
-
+const control = [
+  {
+    oid: 'preread',
+    value: ['entryCSN'],
+    iscritical: false,
+  },
+  {
+    oid: 'postread',
+    value: ['entryCSN'],
+    iscritical: false,
+  },
+];
 
 let entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
 
 newClient.initialize().then(() => {
   newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret').then(() => {
-
     newClient
         .add(
-            'cn=newPointChildBLABLA10,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com',
-            entry, [])
-        .then(
-            (result) => {
-
-            })
-        .catch((err) => { console.log(err); });
+            'cn=newPoint1932,ou=users,o=myhost,dc=demoApp,dc=com', entry,
+            control)
+        .then((result) => { console.log(result); })
+        .catch((err) => { console.log(err.message); });
   });
 
 });
-
-
-// console.log(entry);

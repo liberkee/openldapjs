@@ -61,7 +61,6 @@ function objectLDAPEntry(LDAPentry) {
   });
 
   for (i = 0; i < entryElementArrayLenght; i += 1) {
-
     const attributeArray = entryElementArray[i].split(':');
 
     const type = attributeArray[0];
@@ -69,7 +68,6 @@ function objectLDAPEntry(LDAPentry) {
 
     // Verify if is an attribute or the DN
     if (type !== '' && type !== undefined) {
-
       const currentType = alreadyExist(entryObject.attribute, type);
 
       // Verify if the type alreadyExist
@@ -83,10 +81,8 @@ function objectLDAPEntry(LDAPentry) {
     } else if (type !== undefined && value !== undefined) {
       entryObject.dn = value;
     }
-
   }
   return entryObject;
-
 }
 
 /**
@@ -95,15 +91,14 @@ function objectLDAPEntry(LDAPentry) {
  */
 
 class stringJSON {
-
- /**
-   * Transform a string message from LDAP search operation to JSON.
-   *
-   * @method stringLDAPtoJSON
-   * @param {string} LDAPstring
-   * @return {Promise} That resolves if the stringLDAPtoJSON was successful.
-   * Rejects if is not a string and don't have the LDIF structure.
-   */
+  /**
+    * Transform a string message from LDAP search operation to JSON.
+    *
+    * @method stringLDAPtoJSON
+    * @param {string} LDAPstring
+    * @return {Promise} That resolves if the stringLDAPtoJSON was successful.
+    * Rejects if is not a string and don't have the LDIF structure.
+    */
 
   stringLDAPtoJSON(LDAPstring) {
     return new Promise((resolve, reject) => {
@@ -144,7 +139,6 @@ class stringJSON {
       resolve(this.JSONobject);
     });
   }
-
 }
 
 module.exports = stringJSON;
