@@ -11,6 +11,7 @@ const controlSchema = require('./schemas/control_schema');
  * @class LDAPWrapAsync
  */
 module.exports = class LDAPWrapAsync {
+
   constructor(host, password) {
     this._hostAdress = host;
     this._E_STATES = {
@@ -80,10 +81,15 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else if (this._stateClient === this._E_STATES.UNBOUND) {
-        this.initialize().then(() => {
+        this.initialize()
+        .then(() => {
           this.bind(bindDN, passwordUser)
-              .then((result) => { resolve(result); })
-              .catch((err) => { reject(new Error(err.message)); });
+          .then((result) => {
+            resolve(result);
+          })
+          .catch((err) => {
+            reject(new Error(err.message));
+          });
         });
       } else {
         reject(
@@ -227,11 +233,9 @@ module.exports = class LDAPWrapAsync {
         });
       }
 
-      if (controls === undefined) {
-        // Do nothing
-      } else if (Array.isArray(controls) === false) {
+      if (Array.isArray(controls) === false && controls !== undefined) {
         PromiseArray.push(Promise.reject('The controls is not array'));
-      } else {
+      } else if (controls !== undefined) {
         controls.forEach((element) => {
           const resultMessage = validator(element, controlSchema);
           if (resultMessage.valid === true) {
@@ -251,7 +255,7 @@ module.exports = class LDAPWrapAsync {
                       'The operation failed. It could be done if the state of the client is BOUND'));
             } else {
               this._binding.newModify(
-                  dn, jsonChange, (controls != undefined) ? controls : null,
+                  dn, jsonChange, (controls !== undefined) ? controls : null,
                   (err, result) => {
                     if (err) {
                       reject(new Error(err));
@@ -279,13 +283,11 @@ module.exports = class LDAPWrapAsync {
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      if (typeof(dn) !== 'string' || typeof(newrdn) !== 'string' ||
-          typeof(newparent) !== 'string') {
-        const parameter = typeof(dn) !== 'string' ?
-            'dn' :
-            typeof(newrdn) !== 'string' ?
-            'newrdn' :
-            typeof(newparent) !== 'string' ? 'newparent' : '';
+      const parameter = typeof (dn) !== 'string' ? 'dn' :
+      typeof (newrdn) !== 'string' ? 'newrdn' :
+      typeof (newparent) !== 'string' ? 'newparent' : '';
+
+      if (parameter !== '') {
         PromiseArray.push(Promise.reject(`The ${parameter} is not string `));
       }
 
@@ -312,7 +314,7 @@ module.exports = class LDAPWrapAsync {
             } else {
               this._binding.rename(
                   dn, newrdn, newparent,
-                  (controls != undefined) ? controls : null, (err, result) => {
+                  (controls !== undefined) ? controls : null, (err, result) => {
                     if (err) {
                       reject(new Error(err));
                     } else {
@@ -348,4 +350,5 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
+
 };

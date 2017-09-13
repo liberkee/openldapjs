@@ -60,14 +60,14 @@ function modify() {
 
   const changes = [
     {
-      op: 'replace',
-      attr: 'description',
-      vals: ['aa'],
+      op: 'delete',
+      attr: 'userPassword',
+      vals: ['cosmin'],
     },
     {
       op: 'add',
-      attr: 'description',
-      vals: ['bb'],
+      attr: 'userPassword',
+      vals: ['secret'],
     },
   ];
 
