@@ -47,7 +47,7 @@ module.exports = class LDAPWrapAsync {
               } else {
                 this._stateClient = this._E_STATES.SECURED;
                 resolve(stateTls);
-              }    
+              }
             });
           } else {
             reject(err);
@@ -59,11 +59,11 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
-/**
- * Secures the client-server connection, usualy done after initialize.
- * @method startTls
- * @return {boolean} true if connection was secured, false if otherwise.
- */
+  /**
+   * Secures the client-server connection, usualy done after initialize.
+   * @method startTls
+   * @return {boolean} true if connection was secured, false if otherwise.
+   */
   startTls() {
     if (this._stateClient === this._E_STATES.INITIALIZED) {
       this._binding.startTls((errTls, stateTls) => {
