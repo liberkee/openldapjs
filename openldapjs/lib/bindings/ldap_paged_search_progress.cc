@@ -12,22 +12,24 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
       filter(filter),
       cookieID(cookieID),
       pageSize(pgSize),
-      cookies(cookies) {
-  // cookie != NULL ?
-  // cout<<"-------------length--------"<<cookie->bv_len<<endl: cout<<"cookie
-  // is null"<<endl;
-}
+      cookies(cookies) {}
 // Executes in worker thread
 void LDAPPagedSearchProgress::Execute(
     const AsyncProgressWorker::ExecutionProgress &progress) {
   BerElement *ber;
-  int l_rc, l_entries, l_entry_count = 0, l_errcode = 0, page_nbr;
-  char pagingCriticality = 'T', *l_dn;
+  int l_rc;
+  int l_entries;
+  int l_entry_count = 0;
+  int l_errcode = 0;
+  int page_nbr;
+  char pagingCriticality = 'T';
+  char *l_dn;
   int totalCount = 0;
   LDAPControl *pageControl = nullptr;
   LDAPControl *M_controls[2] = {nullptr, nullptr};
   LDAPControl **returnedControls = nullptr;
-  LDAPMessage *l_result, *l_entry;
+  LDAPMessage *l_result;
+  LDAPMessage *l_entry;
   int msgId = 0;
   char *attribute;
   char **values;
@@ -55,6 +57,7 @@ void LDAPPagedSearchProgress::Execute(
                            M_controls, nullptr, nullptr, 0, &msgId);
 
     if ((l_rc != LDAP_SUCCESS)) {
+      cout << "-------------" << __LINE__ << "----------" << endl;
       status = -1;
 
       // break;
@@ -118,6 +121,7 @@ void LDAPPagedSearchProgress::Execute(
       pageResult += "dn: ";
       pageResult += l_dn;
       pageResult += "\n";
+      ldap_memfree(l_dn);
 
       for (attribute = ldap_first_attribute(ld, l_entry, &ber);
            attribute != nullptr;
@@ -158,13 +162,11 @@ void LDAPPagedSearchProgress::HandleOKCallback() {
   } else {
     stateClient[1] = Nan::New(pageResult).ToLocalChecked();
 
-    morePages == true ? stateClient[2] = Nan::True() : stateClient[2] =
-                                                           Nan::False();
+    morePages ? stateClient[2] = Nan::True() : stateClient[2] = Nan::False();
 
     callback->Call(3, stateClient);
   }
 
-  // ldap_msgfree(resultMsg);
   callback->Reset();
   progress->Reset();
 }

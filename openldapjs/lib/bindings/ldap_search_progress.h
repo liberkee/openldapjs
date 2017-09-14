@@ -1,11 +1,11 @@
 #ifndef BINDINGS_LDAP_SEARCH_PROGRESS_H_
 #define BINDINGS_LDAP_SEARCH_PROGRESS_H_
 
+#include <ldap.h>
+#include <nan.h>
 #include <chrono>
 #include <iostream>
-#include <ldap.h>
 #include <map>
-#include <nan.h>
 #include <string>
 #include <thread>
 
@@ -14,17 +14,18 @@ using namespace v8;
 using namespace std;
 
 class LDAPSearchProgress : public AsyncProgressWorker {
-private:
+ private:
   LDAP *ld;
   Callback *progress;
   int result = 0;
   int finished = 0;
   bool flagVerification = false;
   string resultSearch;
-  int i = 0, msgID;
+  int i = 0;
+  int msgID;
   int status = 0;
 
-public:
+ public:
   LDAPSearchProgress(Callback *callback, Callback *progress, LDAP *ld,
                      int msgID);
 
@@ -37,4 +38,4 @@ public:
   void HandleProgressCallback(const char *data, size_t size);
 };
 
-#endif // BINDINGS_LDAP_SEARCH_PROGRESS_H_
+#endif  // BINDINGS_LDAP_SEARCH_PROGRESS_H_

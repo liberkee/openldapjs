@@ -54,14 +54,12 @@ void LDAPSearchProgress::Execute(
 
 // Executes in event loop
 void LDAPSearchProgress::HandleOKCallback() {
-
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (status != LDAP_SUCCESS) {
     stateClient[0] = Nan::New(status);
     callback->Call(1, stateClient);
   } else {
-
     stateClient[1] = Nan::New(resultSearch).ToLocalChecked();
     callback->Call(2, stateClient);
   }

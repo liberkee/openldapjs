@@ -16,7 +16,6 @@ describe('Testing the async LDAP search ', () => {
   const searchBase = 'dc=demoApp,dc=com';
 
 
-
   const password = 'secret';
   let adminLDAP = new LDAPWrap(host);
   let userLDAP = new LDAPWrap(host);
@@ -63,13 +62,11 @@ describe('Testing the async LDAP search ', () => {
    * test case for search with access denied
    */
 
-  it('should return an LDAP_OBJECT_NOT_FOUND error',
-     (next) => {userLDAP.search(searchBase, 2, 'objectClass=*')
-                    .catch((err) => {
-                      err.message.should.be.deepEqual(OBJECT_NOT_FOUND);
-                    })
-                    .then(() => { next(); })});
-
+  it('should return an LDAP_OBJECT_NOT_FOUND error', (next) => {
+    userLDAP.search(searchBase, 2, 'objectClass=*')
+        .catch((err) => { err.message.should.be.deepEqual(OBJECT_NOT_FOUND); })
+        .then(() => { next(); });
+  });
 
 
   /**

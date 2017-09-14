@@ -1,6 +1,6 @@
 cmd_Release/obj.target/binding/binding.o := g++ '-DNODE_GYP_MODULE_NAME=binding' '-DUSING_UV_SHARED=1' '-DUSING_V8_SHARED=1' '-DV8_DEPRECATION_WARNINGS=1' '-D_LARGEFILE_SOURCE' '-D_FILE_OFFSET_BITS=64' '-DLDAP_DEPRECATED' '-DBUILDING_NODE_EXTENSION' -I/home/raribas/.node-gyp/4.8.4/include/node -I/home/raribas/.node-gyp/4.8.4/src -I/home/raribas/.node-gyp/4.8.4/deps/uv/include -I/home/raribas/.node-gyp/4.8.4/deps/v8/include -I../../../node_modules/nan -I/usr/local/include  -fPIC -pthread -Wall -Wextra -Wno-unused-parameter -m64 -Wall -g -std=c++11 -O3 -ffunction-sections -fdata-sections -fno-omit-frame-pointer -fno-rtti -std=gnu++0x -MMD -MF ./Release/.deps/Release/obj.target/binding/binding.o.d.raw   -c -o Release/obj.target/binding/binding.o ../binding.cc
 Release/obj.target/binding/binding.o: ../binding.cc \
- ../ldap_paged_search_progress.h ../../../node_modules/nan/nan.h \
+ ../../../node_modules/nan/nan.h \
  /home/raribas/.node-gyp/4.8.4/include/node/node_version.h \
  /home/raribas/.node-gyp/4.8.4/include/node/uv.h \
  /home/raribas/.node-gyp/4.8.4/include/node/uv-errno.h \
@@ -29,9 +29,9 @@ Release/obj.target/binding/binding.o: ../binding.cc \
  ../../../node_modules/nan/nan_private.h \
  ../../../node_modules/nan/nan_typedarray_contents.h \
  ../../../node_modules/nan/nan_json.h ../ldap_bind_progress.h \
- ../ldap_search_progress.h ../ldap_compare_progress.h
+ ../ldap_compare_progress.h ../ldap_paged_search_progress.h \
+ ../ldap_search_progress.h
 ../binding.cc:
-../ldap_paged_search_progress.h:
 ../../../node_modules/nan/nan.h:
 /home/raribas/.node-gyp/4.8.4/include/node/node_version.h:
 /home/raribas/.node-gyp/4.8.4/include/node/uv.h:
@@ -62,5 +62,6 @@ Release/obj.target/binding/binding.o: ../binding.cc \
 ../../../node_modules/nan/nan_typedarray_contents.h:
 ../../../node_modules/nan/nan_json.h:
 ../ldap_bind_progress.h:
-../ldap_search_progress.h:
 ../ldap_compare_progress.h:
+../ldap_paged_search_progress.h:
+../ldap_search_progress.h:

@@ -1,21 +1,21 @@
+#include <ldap.h>
+#include <nan.h>
+#include <chrono>
+#include <iostream>
+#include <map>
+#include <string>
+#include <thread>
 #include "ldap_bind_progress.h"
 #include "ldap_compare_progress.h"
 #include "ldap_paged_search_progress.h"
 #include "ldap_search_progress.h"
-#include <chrono>
-#include <iostream>
-#include <ldap.h>
-#include <map>
-#include <nan.h>
-#include <string>
-#include <thread>
 
 using namespace Nan;
 using namespace v8;
 using namespace std;
 
 class LDAPClient : public Nan::ObjectWrap {
-public:
+ public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
     tpl->SetClassName(Nan::New("LDAPClient").ToLocalChecked());
@@ -34,8 +34,8 @@ public:
              Nan::GetFunction(tpl).ToLocalChecked());
   }
 
-protected:
-private:
+ protected:
+ private:
   LDAP *ld;
   std::shared_ptr<std::map<std::string, berval *>> cookies{};
   LDAPMessage *result;
@@ -77,7 +77,6 @@ private:
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       // Needed for catch a specific error
-      obj->initializedFlag = false;
       return;
     }
 
@@ -86,16 +85,8 @@ private:
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      obj->initializedFlag = false;
       return;
     }
-
-    /*state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
-    if(state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(state);
-      callback->Call(1, stateClient);
-      return;
-    }*/
 
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
@@ -115,7 +106,7 @@ private:
 
     state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<Number>(state);
       callback->Call(1, stateClient);
       return;
     }
@@ -153,7 +144,8 @@ private:
 
     char *DNbase = *baseArg;
     char *filterSearch = *filterArg;
-    int message, result;
+    int message;
+    int result;
     struct timeval timeOut = {10, 0};
 
     Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -196,7 +188,6 @@ private:
   }
 
   static NAN_METHOD(pagedSearch) {
-
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     Nan::Utf8String baseArg(info[0]);

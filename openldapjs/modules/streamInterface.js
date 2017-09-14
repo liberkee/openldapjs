@@ -1,6 +1,6 @@
-'use strict'
+'use strict';
 
-    const Readable = require('stream').Readable;
+const Readable = require('stream').Readable;
 
 /**
  * @class PagedSearchStream
@@ -34,11 +34,15 @@ module.exports = class PagedSearchStream extends Readable {
         (err, page, morePages) => {
           if (err) {
             this.emit('err', err);
+            console.log(err);
+            this.push(null);
           } else {
             if (!morePages) {
+              console.log('if:' + morePages);
               this.push(null);
             } else {
               this.push(page);
+              console.log('else:' + morePages);
             }
           }
         });
