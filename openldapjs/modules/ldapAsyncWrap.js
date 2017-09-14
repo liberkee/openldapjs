@@ -11,7 +11,6 @@ const controlSchema = require('./schemas/control_schema');
  * @class LDAPWrapAsync
  */
 module.exports = class LDAPWrapAsync {
-
   constructor(host, password) {
     this._hostAdress = host;
     this._E_STATES = {
@@ -23,7 +22,6 @@ module.exports = class LDAPWrapAsync {
     this._binding = new binding.LDAPClient();
     this._stateClient = this._E_STATES.CREATED;
   }
-
   set config(value) { this._hostAdress = value; }
 
   get config() { return this._hostAdress; }
@@ -59,18 +57,19 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
-   * Authentificate to LDAP server.
-   *
-   * @method bind
-   * @param {string} username The username of specific client.
-   * @param {string} password The password for authentification.
-   * @return {Promise} That resolves if the credentials are correct.
-   * Reject dn or password are incorect.
-   */
+    * Authentificate to LDAP server.
+    *
+    * @method bind
+    * @param {string} username The username of specific client.
+    * @param {string} password The password for authentification.
+    * @return {Promise} That resolves if the credentials are correct.
+    * Reject dn or password are incorect.
+    */
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED) {
+      if (this._stateClient === this._E_STATES.INITIALIZED ||
+          this._stateClient === this._E_STATES.BOUND) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
           if (err || state !== this._E_STATES.BOUND) {
             this._stateClient = this._E_STATES.INITIALIZED;
@@ -80,21 +79,8 @@ module.exports = class LDAPWrapAsync {
             resolve(this._stateClient);
           }
         });
-      } else if (this._stateClient === this._E_STATES.UNBOUND) {
-        this.initialize()
-        .then(() => {
-          this.bind(bindDN, passwordUser)
-          .then((result) => {
-            resolve(result);
-          })
-          .catch((err) => {
-            reject(new Error(err.message));
-          });
-        });
       } else {
-        reject(
-            new Error(
-                'The bind operation failed. It could be done if the state of the client is Initialized'));
+        reject(new Error('Can only bind from initialized or bound'));
       }
     });
   }
@@ -283,9 +269,11 @@ module.exports = class LDAPWrapAsync {
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      const parameter = typeof (dn) !== 'string' ? 'dn' :
-      typeof (newrdn) !== 'string' ? 'newrdn' :
-      typeof (newparent) !== 'string' ? 'newparent' : '';
+      const parameter = typeof(dn) !== 'string' ?
+          'dn' :
+          typeof(newrdn) !== 'string' ?
+          'newrdn' :
+          typeof(newparent) !== 'string' ? 'newparent' : '';
 
       if (parameter !== '') {
         PromiseArray.push(Promise.reject(`The ${parameter} is not string `));
@@ -328,6 +316,110 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
+   * ldap delete operation
+   * @param {String} dn the dn entry to be deleted.
+   * @param {String array} controls Optional controll aray parameter, can be
+   * NULL.
+   * @return {Promise} promise that resolves if the element provided was deleted
+   * or rejects if not.
+   */
+  del(dn, controls) {
+    return new Promise((resolve, reject) => {
+      const PromiseArray = [];
+      if (Array.isArray(controls) === false && controls !== undefined) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
+      } else if (controls !== undefined) {
+        controls.forEach((element) => {
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
+          } else {
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
+          }
+        });
+      }
+
+      return Promise.all(PromiseArray)
+          .then((change) => {
+            if (this._stateClient !== this._E_STATES.BOUND) {
+              reject(
+                  new Error(
+                      'The Delete operation can be done just in BOUND state'));
+            } else {
+              this._binding.del(
+                  dn, (controls !== undefined) ? controls : null,
+                  (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
+    });
+  }
+  /**
+   * ldap add operation
+   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example..,
+   * NOTE:every entry except the first one,cn=foo in this case, must already
+   * exist';
+   * @param{Object} entry ldif format to be added, needs to have a
+   * structure that is mappable to a LDAPMod structure
+   * @param{Object} controls client& sever controls, OPTIONAL parameter
+   */
+  add(dn, entry, controls) {
+    return new Promise((resolve, reject) => {
+      const PromiseArray = [];
+      if (Array.isArray(controls) === false && controls !== undefined) {
+        PromiseArray.push(Promise.reject('The controls is not array'));
+      } else if (controls !== undefined) {
+        controls.forEach((element) => {
+          const resultMessage = validator(element, controlSchema);
+          if (resultMessage.valid === true) {
+            PromiseArray.push(Promise.resolve(resultMessage));
+          } else {
+            PromiseArray.push(
+                Promise.reject(resultMessage.errors || resultMessage.error));
+          }
+        });
+      }
+
+      return Promise.all(PromiseArray)
+          .then((change) => {
+            if (this._stateClient === this._E_STATES.BOUND) {
+              // turn the json into an Array that can be easily parsed.
+              const keys = Object.keys(entry);
+              const entryArray = [];
+
+              for (const elem of keys) {
+                entryArray.push(elem);
+                entryArray.push(entry[elem]);
+              }
+
+              this._binding.add(
+                  dn, entryArray, (controls !== undefined) ? controls : null,
+                  (err, result) => {
+                    if (err) {
+                      reject(new Error(err));
+                      console.log(err);
+                    } else {
+                      resolve(result);
+                    }
+                  });
+            } else {
+              reject(
+                  new Error(
+                      'The add operation can be done just in BOUND state'));
+            }
+          })
+          .catch((error) => { reject(new Error(error)); });
+    });
+  }
+
+  /**
     * Unbind from a LDAP server.
     *
     * @method unbind
@@ -350,5 +442,4 @@ module.exports = class LDAPWrapAsync {
       }
     });
   }
-
 };

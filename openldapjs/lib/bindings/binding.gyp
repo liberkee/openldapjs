@@ -7,7 +7,7 @@
         "<!(node -e \"require('nan')\")",
         "/usr/local/include"
       ],
-      'sources': [ 'binding.cc', 'ldap_control.cc'],
+      'sources': [ 'binding.cc', 'ldap_control.cc',"ldap_bind_progress.cc","ldap_search_progress.cc"],
       "ldflags": [
             "-Wl,-z,defs"
       ],

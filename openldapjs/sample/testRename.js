@@ -1,16 +1,20 @@
 'use strict';
 
-const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+const LDAPCLIENT = require('../modules/ldapAsyncWrap.js');
 
-const clientLDAP = new LDAPWrap('ldap://localhost:386');
 
-const dnUser = 'cn=admin,dc=demoApp,dc=com';
+const host = 'ldap://localhost:389';
+const dn = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 const password = 'secret';
-const dnChange = 'cn=cosming,o=myhost,dc=demoApp,dc=com';
-const newrdn = 'cn=cghitea';
-const newparent = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const base = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const scope = 2;
+const filter = '(objectclass=*)';
+const dnCompare = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
+const filterCompare = 'description';
+const value = 'cghitea@gmail.com';
+const newClient = new LDAPCLIENT(host);
 
-const controls = [
+const control = [
   {
     oid: 'preread',
     value: ['entryCSN'],
@@ -23,16 +27,16 @@ const controls = [
   },
 ];
 
-clientLDAP.initialize()
-.then(() => {
-  clientLDAP.bind(dnUser, password)
-  .then(() => {
-    clientLDAP.rename(dnChange, newrdn, newparent, controls)
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+let entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
+
+newClient.initialize().then(() => {
+  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret').then(() => {
+    newClient
+        .del(
+            'cn=newPoint222,ou=users,o=myhost,dc=demoApp,dc=com',
+            control)
+        .then((result) => { console.log(result); })
+        .catch((err) => { console.log(err.message); });
   });
+
 });

@@ -56,8 +56,8 @@
     }
   },
   "ldapRename": {
-      "dnChange": "cn=cosming,ou=users,o=myhost,dc=demoApp,dc=com",
-      "newrdn": "cn=cghitea",
-      "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
-    }
+    "dnChange": "cn=cosming,ou=users,o=myhost,dc=demoApp,dc=com",
+    "newrdn": "cn=cghitea",
+    "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
+  }
 }
