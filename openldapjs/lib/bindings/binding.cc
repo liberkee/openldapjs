@@ -56,7 +56,7 @@ public:
         if (addResult != "") {
           stateClient[1] = Nan::New(addResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;
+          return; //Potential memory leak if returning with no cleanup ?
         }
         stateClient[1] = Nan::New<v8::Number>(0);
         callback->Call(2, stateClient);
@@ -110,7 +110,7 @@ public:
         if (deleteResult != "") {
           stateClient[1] = Nan::New(deleteResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;
+          return; //returning with no cleanup ?
         }
         stateClient[1] = Nan::New<v8::Number>(0);
         callback->Call(2, stateClient);
@@ -227,7 +227,7 @@ public:
         if (modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;
+          return; //return with no cleanup, 
         }
 
         stateClient[1] = Nan::New<v8::Number>(0);
@@ -287,7 +287,7 @@ public:
         if (modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;
+          return; //return with no cleanup
         }
 
         stateClient[1] = Nan::New<v8::Number>(0);
@@ -355,8 +355,6 @@ private:
     Nan::Utf8String hostArg(info[0]);
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
-    obj->initializedFlag = true;
-
     char *hostAddress = *hostArg;
     int protocol_version = LDAP_VERSION3;
 
@@ -365,7 +363,6 @@ private:
       stateClient[0] = Nan::New<v8::Number>(state);
       callback->Call(1, stateClient);
       // Needed for catch a specific error
-      obj->initializedFlag = false;
       delete callback;
       return;
     }
@@ -375,14 +372,12 @@ private:
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
       callback->Call(1, stateClient);
-      obj->initializedFlag = false;
       delete callback;
       return;
     }
 
     stateClient[1] = Nan::New<v8::Number>(1);
     callback->Call(2, stateClient);
-    callback->Reset();
     delete callback;
     callback = nullptr;
     return;
@@ -397,13 +392,14 @@ private:
 
     int state = ldap_start_tls_s(obj->ld, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(state);
       callback->Call(1, stateClient);
       delete callback;
       callback = nullptr;
       return;
     }
-    stateClient[1] = Nan::New<v8::Number>(1);
+
+    stateClient[1] = Nan::New<v8::Number>(1); //why the 1 ?:)
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;
@@ -421,9 +417,11 @@ private:
 
     char *username = *userArg;
     char *password = *passArg;
-    if (obj->ld == 0 || obj->initializedFlag == false) {
+    if (obj->ld ==nullptr) { 
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
@@ -448,22 +446,28 @@ private:
     Callback *progress = new Callback(info[4].As<v8::Function>());
 
     // Verify if the argument is a Number for scope
-    if (!info[1]->IsNumber()) {
+    if (!info[1]->IsNumber()) {   //wouldn't it be better to let it go through and just fail with a ldap error in the function call ?
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
-    int scopeSearch = info[1]->NumberValue();
+    int scopeSearch = info[1]->NumberValue(); //why not let it fail with ldap error ?
     if (scopeSearch <= 0 && scopeSearch >= 3) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
@@ -472,8 +476,10 @@ private:
                         nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 

@@ -40,3 +40,12 @@ openldapjs/lib/bindings/build/Release/.deps/Release/binding.node.d
 openldapjs/lib/bindings/build/Release/.deps/Release/obj.target/binding.node.d
 openldapjs/lib/bindings/build/Release/.deps/Release/obj.target/binding/binding.o.d
 openldapjs/lib/bindings/build/Release/obj.target/binding.node
+openldapjs/lib/bindings/build/*
+openldapjs/lib/bindings/build/config.gypi
+openldapjs/lib/bindings/build/binding.target.mk
+openldapjs/lib/bindings/build/Makefile
+openldapjs/lib/bindings/build/Release/binding.node
+openldapjs/lib/bindings/build/Release/.deps/Release/binding.node.d
+openldapjs/lib/bindings/build/Release/.deps/Release/obj.target/binding.node.d
+openldapjs/lib/bindings/build/Release/.deps/Release/obj.target/binding/binding.o.d
+openldapjs/lib/bindings/build/Release/obj.target/binding.node
