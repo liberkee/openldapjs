@@ -5,7 +5,9 @@ const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
 const OBJECT_NOT_FOUND = '32';
+const BAD_FILTER = 'Bad search filter';
 const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
+const PROTOCOL_ERR = '2';
 
 describe('Testing the async LDAP search ', () => {
 
@@ -181,4 +183,19 @@ describe('Testing the async LDAP search ', () => {
         })
         .then(() => { next(); });
   });
+
+  it('should return a bad filter error', (next) => {
+
+    adminLDAP.search(searchBase, 2, 'garbage')
+        .catch((err) => {err.message.should.be.BAD_FILTER})
+        .then(() => { next(); });
+  });
+
+  it('should return a protocol error', (next) => {
+    adminLDAP.search(searchBase, 5, 'objectClass=person')
+        .catch((err) => { err.message.should.be.PROTOCOL_ERR; })
+        .then(() => {next()});
+
+  });
+
 });

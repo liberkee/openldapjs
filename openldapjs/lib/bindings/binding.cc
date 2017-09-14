@@ -85,11 +85,13 @@ class LDAPClient : public Nan::ObjectWrap {
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
       return;
     }
 
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    callback->Reset();
     return;
   }
 
@@ -108,10 +110,12 @@ class LDAPClient : public Nan::ObjectWrap {
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<Number>(state);
       callback->Call(1, stateClient);
+      delete callback;
       return;
     }
     stateClient[1] = Nan::New<Number>(1);
     callback->Call(2, stateClient);
+    callback->Reset();
     return;
   }
 
@@ -129,6 +133,8 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld == 0 || obj->initializedFlag == false) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
     obj->msgid = ldap_simple_bind(obj->ld, username, password);
@@ -157,6 +163,8 @@ class LDAPClient : public Nan::ObjectWrap {
     if (!info[1]->IsNumber()) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
@@ -164,12 +172,16 @@ class LDAPClient : public Nan::ObjectWrap {
     if (scopeSearch <= 0 && scopeSearch >= 3) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
@@ -178,8 +190,10 @@ class LDAPClient : public Nan::ObjectWrap {
                         nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New(ldap_err2string(result)).ToLocalChecked();
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
 
@@ -211,8 +225,8 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld == 0) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
-      callback->Reset();
-      progress->Reset();
+      delete callback;
+      delete progress;
       return;
     }
 
@@ -259,6 +273,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld == nullptr || obj->initializedFlag == false) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(2, stateClient);
+      delete callback;
       return;
     }
 
@@ -267,6 +282,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     stateClient[1] = Nan::New<Number>(5);
     callback->Call(2, stateClient);
+    callback->Reset();
 
     return;
   }

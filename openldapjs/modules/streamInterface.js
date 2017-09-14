@@ -34,15 +34,15 @@ module.exports = class PagedSearchStream extends Readable {
         (err, page, morePages) => {
           if (err) {
             this.emit('err', err);
-            console.log(err);
+            // console.log(err);
             this.push(null);
           } else {
             if (!morePages) {
-              console.log('if:' + morePages);
+              //   console.log('if:' + morePages);
               this.push(null);
             } else {
               this.push(page);
-              console.log('else:' + morePages);
+              // console.log('else:' + morePages);
             }
           }
         });
