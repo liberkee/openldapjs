@@ -57,10 +57,10 @@ void LDAPPagedSearchProgress::Execute(
                            M_controls, nullptr, nullptr, 0, &msgId);
 
     if ((l_rc != LDAP_SUCCESS)) {
-      cout << "-------------" << __LINE__ << "----------" << endl;
-      status = -1;
-
-      // break;
+      std::cout << "-------------" << __LINE__ << l_rc << "----------"
+                << std::endl;
+      std::cout << "error is:" << ldap_err2string(l_rc) << std::endl;
+      status = l_rc;
       return;
     }
 
@@ -106,7 +106,7 @@ void LDAPPagedSearchProgress::Execute(
     pageControl = nullptr;
 
     /******************************************************************/
-    /* Disply the returned result                                     */
+    /* Build the result string                                        */
     /*                                                                */
     /* Determine how many entries have been found.                    */
     if (morePages == true) l_entries = ldap_count_entries(ld, l_result);
@@ -137,6 +137,7 @@ void LDAPPagedSearchProgress::Execute(
         }
         ldap_memfree(attribute);
       }
+      ber_free(ber, 0);
       pageResult += "\n";
     }
 
@@ -147,8 +148,6 @@ void LDAPPagedSearchProgress::Execute(
     pageResult += std::to_string(page_nbr);
     pageResult += "------\n";
   }
-  /* Free the cookie since all the pages for these search parameters   */
-  /* have been retrieved.                                              */
 }
 
 // Executes in event loop
