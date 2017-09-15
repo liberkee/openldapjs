@@ -109,11 +109,7 @@ module.exports = class LDAPAsyncWrap {
                        // consider dropping one.
             reject(new Error('Scope must be integer'));
           }
-          checkParameters.checkParametersIfString([
-            searchBase, searchFilter
-          ]);  // this throws an error but won't it go ahead and do the search
-               // before catching?
-
+          checkParameters.checkParametersIfString([searchBase, searchFilter]);
           this._binding.search(
               searchBase, scope, searchFilter, (err, result) => {
                 if (err) {
@@ -149,11 +145,7 @@ module.exports = class LDAPAsyncWrap {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([
-            dn, attr, value
-          ]);  // this throws an error but won't it go ahead and do the compare
-          // before catching ?
-
+          checkParameters.checkParametersIfString([dn, attr, value]);
 
           this._binding.compare(dn, attr, value, (err, result) => {
             if (err) {
@@ -185,16 +177,13 @@ module.exports = class LDAPAsyncWrap {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkModifyChangeArray(jsonChange);  // this throws an
-                                                               // error but
-                                                               // won't it go
-                                                               // ahead and do
-                                                               // the modify
-          // before catching ?
+          checkParameters.checkModifyChangeArray(jsonChange);
 
 
-          if (controls !== undefined)
-            checkParameters.checkControlArray(controls);  // as above
+          if (controls !== undefined) {
+            checkParameters.checkControlArray(controls);
+          }
+
 
           this._binding.newModify(
               dn, jsonChange, (controls !== undefined) ? controls : null,
@@ -230,14 +219,11 @@ module.exports = class LDAPAsyncWrap {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([
-            dn, newrdn, newparent
-          ]);  // throws error but calls rename before catching
+          checkParameters.checkParametersIfString([dn, newrdn, newparent]);
 
-          if (controls !== undefined)
-            checkParameters.checkControlArray(
-                controls);  // throws error but calls rename before catching
-
+          if (controls !== undefined) {
+            checkParameters.checkControlArray(controls);
+          }
           this._binding.rename(
               dn, newrdn, newparent, (controls !== undefined) ? controls : null,
               (err, result) => {
@@ -251,7 +237,7 @@ module.exports = class LDAPAsyncWrap {
           reject(new Error(error.message));
         }
       }
-    })
+    });
   }
 
   /**
@@ -268,13 +254,11 @@ module.exports = class LDAPAsyncWrap {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString(
-              [dn]);  // throws error but calls delete before catching
+          checkParameters.checkParametersIfString([dn]);
 
-          if (controls !== undefined)
-            checkParameters.checkControlArray(
-                controls);  // throws error but calls delete before catching
-
+          if (controls !== undefined) {
+            checkParameters.checkControlArray(controls);
+          }
           this._binding.del(
               dn, (controls !== undefined) ? controls : null, (err, result) => {
                 if (err) {
@@ -306,13 +290,10 @@ module.exports = class LDAPAsyncWrap {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString(
-              [dn]);  // throws error but tries to add before catching?
-
-          if (controls !== undefined)
-            checkParameters.checkControlArray(
-                controls);  // throws error but tries to add before catching?
-
+          checkParameters.checkParametersIfString([dn]);
+          if (controls !== undefined) {
+            checkParameters.checkControlArray(controls);
+          }
           const keys = Object.keys(entry);
           const entryArray = [];
 
@@ -334,7 +315,7 @@ module.exports = class LDAPAsyncWrap {
           reject(new Error(error.message));
         }
       }
-    })
+    });
   }
 
   /**

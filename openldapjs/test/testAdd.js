@@ -22,7 +22,7 @@ describe('Testing the async LDAP add operation', () => {
     objectClass: config.ldapAdd.objectClass,
     sn: config.ldapAdd.sn,
     description: config.ldapAdd.description,
-  }
+  };
 
   let clientLDAP = new LDAP(config.ldapAuthentification.host);
   let clientLDAP2 = new LDAP(config.ldapAuthentification.host);
@@ -79,19 +79,21 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should reject the add operation with a duplicated entry', (next) => {
-    clientLDAP.add(config.ldapAuthentification.dnUser, validEntry).catch((duplicatedEntryError) => {
-      duplicatedEntryError.message.should.be.deepEqual(alreadyExists);
+    clientLDAP.add(config.ldapAuthentification.dnUser, validEntry)
+        .catch((duplicatedEntryError) => {
+          duplicatedEntryError.message.should.be.deepEqual(alreadyExists);
+          personNr = personNr + 1;
+          next();
+        });
+  });
+
+  it('should add a single entry', (next) => {
+    clientLDAP.add(dnUser, validEntry).then((result) => {
+      result.should.be.deepEqual(0);
       personNr = personNr + 1;
       next();
     });
   });
-
-  it('should add a single entry',
-     (next) => {clientLDAP.add(dnUser, validEntry).then((result) => {
-       result.should.be.deepEqual(0);
-       personNr = personNr + 1;
-       next();
-     })});
 
   it('should add multiple entries sequentialy and reject to add a duplicate',
      (next) => {
