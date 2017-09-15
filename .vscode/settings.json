@@ -5,6 +5,14 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "array": "cpp",
-        "initializer_list": "cpp"
-    }
+        "initializer_list": "cpp",
+        "*.ipp": "cpp",
+        "chrono": "cpp"
+    },
+    "C_Cpp.clang_format_style": "Google",
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "C_Cpp.intelliSenseEngine": "Default",
+    "clang-format.style": "Google",
+    "git.enableSmartCommit": true,
+    "editor.formatOnSave": true
 }

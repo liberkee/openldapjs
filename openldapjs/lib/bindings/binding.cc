@@ -239,7 +239,7 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
         } else {
-          stateClient[1] = Nan::New<v8::Number>(0);
+          stateClient[1] = Nan::New<v8::Number>(0);  // 0 or empty string ?
           callback->Call(2, stateClient);
         }
       }
@@ -287,7 +287,7 @@ class LDAPRenameProgress : public Nan::AsyncProgressWorker {
     if (result == -1) {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
-    } else if (result == LDAP_RES_RENAME) {
+    } else {
       status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS) {
         stateClient[0] = Nan::New<v8::Number>(status);
@@ -298,16 +298,16 @@ class LDAPRenameProgress : public Nan::AsyncProgressWorker {
         if (modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;  // return with no cleanup
-        }
 
-        stateClient[1] = Nan::New<v8::Number>(0);
-        callback->Call(2, stateClient);
+        } else {
+          stateClient[1] = Nan::New<v8::Number>(0);  // 0 or empty string ?
+          callback->Call(2, stateClient);
+        }
       }
-      callback->Reset();
-      progress->Reset();
-      ldap_msgfree(resultMsg);
     }
+    callback->Reset();
+    progress->Reset();
+    ldap_msgfree(resultMsg);
   }
 
   void HandleProgressCallback(const char *data, size_t size) {}
@@ -369,10 +369,10 @@ class LDAPClient : public Nan::ObjectWrap {
     int protocol_version = LDAP_VERSION3;
 
     int state = ldap_initialize(&obj->ld, hostAddress);
-    if (state != LDAP_SUCCESS || obj->ld == 0) {
+    if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
       callback->Call(1, stateClient);
-      // Needed for catch a specific error
+      // Needed to catch a specific error
       delete callback;
       return;
     }
@@ -447,8 +447,10 @@ class LDAPClient : public Nan::ObjectWrap {
 
     char *DNbase = *baseArg;
     char *filterSearch = *filterArg;
-    int message, result;
-    struct timeval timeOut = {10, 0};
+    int message;
+    int result;
+    struct timeval timeOut = {10,
+                              0};  // if search exceeds 10 seconds, throws error
 
     Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
@@ -476,7 +478,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    if (obj->ld == 0) {
+    if (obj->ld == nullptr) {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -550,7 +552,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     LDAPMod **ldapmods = new LDAPMod *[nummods + 1];
 
-    if (obj->ld == 0 || obj->ld == nullptr) {
+    if (obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
       delete ldapmods;
@@ -598,7 +600,8 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     ldapmods[nummods] = nullptr;
-    int msgID, result;
+    int msgID;
+    int result;
 
     if (controlHandle == Nan::Null()) {
       result =
@@ -636,7 +639,8 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[4].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[5].As<v8::Function>());
 
-    int msgID, result;
+    int msgID;
+    int result;
 
     if (controlHandle == Nan::Null()) {
       result = ldap_rename(obj->ld, *dn, *newrdn, *newparent, 1, nullptr,
@@ -680,9 +684,11 @@ class LDAPClient : public Nan::ObjectWrap {
     int operationType = info[1]->NumberValue();
     int length = entryModify->Length();
 
-    if (length < 2 || obj->ld == 0) {
+    if (length < 2 || obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
+      delete progress;
+      delete callback;
       return;
     }
 
@@ -713,7 +719,7 @@ class LDAPClient : public Nan::ObjectWrap {
     char *dns = *dn;
     int msgID = 0;
 
-    if (obj->ld == 0) {
+    if (obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -749,7 +755,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
 
-    if (obj->ld == 0) {
+    if (obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       callback->Reset();
@@ -835,7 +841,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    if (obj->ld == 0) {
+    if (obj->ld == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -856,7 +862,10 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (result != 0) {
-      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      stateClient[0] =
+          Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);  // why insuficient
+                                                           // access instead of
+                                                           // result ?
       callback->Call(1, stateClient);
       delete newEntries;
       delete callback;
@@ -875,7 +884,6 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
 
     if (obj->ld == nullptr) {
-      std::cout << "unbind error?:" << std::endl;
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(2, stateClient);
       delete callback;
@@ -885,15 +893,12 @@ class LDAPClient : public Nan::ObjectWrap {
     int unbindResult = ldap_unbind(obj->ld);
 
     if (unbindResult != LDAP_SUCCESS) {
-      std::cout << "unbind failed with error code:" << unbindResult
-                << std::endl;
+      // nothing done in case unbind fails ?
     }
 
     stateClient[1] = Nan::New<v8::Number>(5);
     callback->Call(2, stateClient);
 
-    // freeing callbacks ?
-    // callback->Reset();set();
     delete callback;
     callback = nullptr;
 

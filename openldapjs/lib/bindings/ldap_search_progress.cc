@@ -9,7 +9,8 @@ void LDAPSearchProgress::Execute(
   struct timeval timeOut = {1, 0};
 
   BerElement *ber;
-  LDAPMessage *l_result, *l_entry;
+  LDAPMessage *l_result;
+  LDAPMessage *l_entry;
   char *attribute;
   char **values;
   char *l_dn;

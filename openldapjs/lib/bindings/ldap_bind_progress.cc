@@ -29,7 +29,8 @@ void LDAPBindProgress::HandleOKCallback() {
       stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
     } else {
-      stateClient[1] = Nan::New<Number>(2);
+      stateClient[1] =
+          Nan::New<Number>(2);  // any sense in providing 2 for bound ?..
       callback->Call(2, stateClient);
     }
   }
