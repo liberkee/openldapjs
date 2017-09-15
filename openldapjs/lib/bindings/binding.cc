@@ -225,13 +225,14 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
     if (result == -1) {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
-    } else if (result == LDAP_RES_MODIFY) {
+    } else {
       status = ldap_result2error(ld, resultMsg, 0);
       if (status != LDAP_SUCCESS) {
         stateClient[0] = Nan::New<v8::Number>(status);
         callback->Call(1, stateClient);
       } else {
-        const auto &ldap_controls = new LdapControls();
+        const auto &ldap_controls =
+            new LdapControls();  // does this  need a delete ?
         modifyResult = ldap_controls->PrintModificationControls(ld, resultMsg);
         if (modifyResult != "") {
           stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
@@ -241,11 +242,11 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
           callback->Call(2, stateClient);
         }
       }
-      callback->Reset();
-      progress->Reset();
-      ldap_mods_free(entries, 1);
-      ldap_msgfree(resultMsg);
     }
+    callback->Reset();
+    progress->Reset();
+    ldap_mods_free(entries, 1);
+    ldap_msgfree(resultMsg);
   }
 
   void HandleProgressCallback(const char *data, size_t size) {}
