@@ -95,7 +95,7 @@ describe('Testing the modify functionalities', () => {
     ldapAsyncWrap.unbind()
     .then(() => {
       ldapAsyncWrap
-          .newModify(
+          .modify(
               config.ldapModify.ldapModificationReplace.change_dn,
               changeAttirbutes)
           .catch((error) => {
@@ -107,7 +107,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should reject if attribute parameter is not defined', (next) => {
     const errorMSG = 'The json is not array';
-    ldapAsyncWrap.newModify(config.ldapModify.ldapModificationReplace.change_dn)
+    ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn)
         .catch((error) => {
           should.deepEqual(error.message, errorMSG);
           next();
@@ -125,7 +125,7 @@ describe('Testing the modify functionalities', () => {
        ];
 
        ldapAsyncWrap
-           .newModify(
+           .modify(
                config.ldapModify.ldapModificationReplace.change_dn, attribute)
            .catch((error) => {
              should.deepEqual(error.message, errorMSG);
@@ -140,7 +140,7 @@ describe('Testing the modify functionalities', () => {
     };
 
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, control)
         .catch((error) => {
@@ -156,7 +156,7 @@ describe('Testing the modify functionalities', () => {
       op: 'postread',
     }];
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, control)
         .catch((error) => {
@@ -166,7 +166,7 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject operation if the dn is empty', (next) => {
-    ldapAsyncWrap.newModify('', changeAttirbutes)
+    ldapAsyncWrap.modify('', changeAttirbutes)
     .catch((error) => {
       should.deepEqual(error.message, '53');
       next();
@@ -175,7 +175,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should replace the old attributes with new one from an entry', (next) => {
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesReplace)
         .then((result) => {
@@ -186,7 +186,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should add a new attributes from an existing entry', (next) => {
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesAdd)
         .then((result) => {
@@ -197,7 +197,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should delete an existing attribute from an entry', (next) => {
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesDelete)
         .then((result) => {
@@ -208,7 +208,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should make multiple modification to an entry', (next) => {
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes)
         .then((result) => {
@@ -219,7 +219,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should return the specific attribute from the entry', (next) => {
     ldapAsyncWrap
-        .newModify(
+        .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, controlOperation)
         .then((result) => {

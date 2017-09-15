@@ -102,17 +102,26 @@ module.exports = class LDAPWrapAsync {
 
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
-        this._binding.search(searchBase, scope, searchFilter, (err, result) => {
-          if (err) {
-            reject(new Error(err));
-          } else {
-            resolve(result);
-          }
-        });
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
       } else {
-        reject(
-            new Error('The Search operation can be done just in BOUND state'));
+        try {
+          if (Number.isInteger(scope) !== true) {
+            reject (new Error ('Scope must be integer'));
+          }
+          checkParameters.checkParametersIfString([searchBase, filter]);
+
+          this._binding.search(
+              searchBase, scope, searchFilter, (err, result) => {
+                if (err) {
+                  reject(new Error(err));
+                } else {
+                  resolve(result);
+                }
+              });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
 
     });
@@ -132,17 +141,22 @@ module.exports = class LDAPWrapAsync {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
-        this._binding.compare(dn, attr, value, (err, result) => {
-          if (err) {
-            reject(new Error(err));
-          } else {
-            resolve(result);
-          }
-        });
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
       } else {
-        reject(
-            new Error('The Compare operation can be done just in BOUND state'));
+        try {
+          checkParameters.checkParametersIfString([dn, attr, value]);
+
+          this._binding.compare(dn, attr, value, (err, result) => {
+            if (err) {
+              reject(new Error(err));
+            } else {
+              resolve(result);
+            }
+          });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
     });
   }
@@ -157,7 +171,7 @@ module.exports = class LDAPWrapAsync {
     * Reject if the LDAP rejects the operation or the client's state is not
    * BOUND
     */
-  newModify(dn, jsonChange, controls) {
+  modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== this._E_STATES.BOUND) {
         reject(new Error(bindErrorMessage));

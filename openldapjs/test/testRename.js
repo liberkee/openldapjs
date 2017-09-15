@@ -7,11 +7,11 @@ const should = require('should');
 describe('Testing the rename functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-  const dnError = 'The dn is not string ';
+  const dnError = 'The 1 is not string';
   const resStateRequired =
       'The operation failed. It could be done if the state of the client is BOUND';
-  const newrdnError = 'The newrdn is not string ';
-  const newparentError = 'The newparent is not string ';
+  const newrdnError = 'The 1 is not string';
+  const newparentError = 'The 1 is not string';
   const controlArrayError = 'The controls is not array';
   const controlPropError =
       'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: iscritical';
