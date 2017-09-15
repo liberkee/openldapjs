@@ -22,9 +22,9 @@
     "tv4-formats": "^3.0.0"
   },
   "scripts": {
-    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testModify.js",
+    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/testSearch.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./test/testModify.js"
+    "lint": "eslint ./modules/ldapAsyncWrap.js"
   },
   "author": "",
   "license": "ISC",
