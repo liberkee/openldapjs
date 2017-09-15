@@ -5,7 +5,12 @@ const Promise = require('bluebird');
 const validator = require('./json_validator/json_validator');
 const changeSchema = require('./schemas/change_schema');
 const controlSchema = require('./schemas/control_schema');
+const VerifyParameter = require('./checkVariableFormat/checkVariableFormat');
 
+const bindErrorMessage =
+    'The operation failed. It could be done if the state of the client is BOUND';
+
+const checkParameters = new VerifyParameter();
 /**
  * @module LDAPtranzition
  * @class LDAPWrapAsync
@@ -68,10 +73,9 @@ module.exports = class LDAPWrapAsync {
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED ||
-          this._stateClient === this._E_STATES.BOUND) {
+      if (this._stateClient === this._E_STATES.INITIALIZED) {
         this._binding.bind(bindDN, passwordUser, (err, state) => {
-          if (err || state !== this._E_STATES.BOUND) {
+          if (err || (state !== this._E_STATES.BOUND)) {
             this._stateClient = this._E_STATES.INITIALIZED;
             reject(new Error(err));
           } else {
@@ -143,162 +147,80 @@ module.exports = class LDAPWrapAsync {
     });
   }
 
-
-  /**
-    * Perform an LDAP modify operation
-    *
-    * @method modify
-    * @param{string} dn The dn of the entry to modify
-    * @param{object} mods An array that contains the fields that shall be
-   * changed
-    * @return {Promise} That resolves if LDAP modified successfully the entry.
-    * Reject if the LDAP rejects the operation or the client's state is not
-   * BOUND
-    */
-  modify(dn, json) {
-    return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.BOUND) {
-        if (json === null || json === '') {
-          reject(new Error('The passed JSON is invalid'));
-          return;
-        }
-
-        if (dn === null || dn === '') {
-          reject(new Error('The passed dn is invalid'));
-          return;
-        }
-
-        const entry = json.modification;
-        const keys = Object.keys(entry);
-        const res = [];
-
-        keys.forEach((elem) => {
-          res.push(elem);
-          res.push(entry[elem]);
-        });
-
-        this._binding.modify(dn, json.operation, res, (err, result) => {
-          if (err) {
-            reject(new Error(err));
-          } else {
-            resolve(result);
-          }
-        });
-      } else {
-        reject(
-            new Error(
-                'The operation failed. It could be done if the state of the client is BOUND'));
-      }
-    });
-  }
-
   /**
     * Perform an LDAP modify operation
     *
     * @method newModify
-    * @param{string} dn The dn of the entry to modify
-    * @param{object} json have to contain the value of changes and the
-   * attributes for the return
+    * @param {string} dn The dn of the entry to modify
+    * @param {array} jsonChange The attribute and value that request for change
     * @return {Promise} That resolves if LDAP modified successfully the entry.
     * Reject if the LDAP rejects the operation or the client's state is not
    * BOUND
     */
   newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
-      const PromiseArray = [];
-      if (Array.isArray(jsonChange) === false) {
-        PromiseArray.push(Promise.reject('The json is not array'));
+
+      checkParameters.checkModifyChangeArray(jsonChange).catch((error) => {
+        reject(new Error(error.message));
+      });
+
+      if (controls !== undefined) {
+        checkParameters.checkControlArray(controls).catch(
+            (error) => { reject(new Error(error.message)); });
+      }
+
+
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
       } else {
-        jsonChange.forEach((element) => {
-          const result = validator(element, changeSchema);
-          if (result.valid === true) {
-            PromiseArray.push(Promise.resolve(result));
-          } else {
-            PromiseArray.push(Promise.reject(result.errors || result.error));
-          }
-        });
+        this._binding.newModify(
+            dn, jsonChange, (controls !== undefined) ? controls : null,
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                reject(new Error(err));
+              } else {
+                resolve(result);
+              }
+            });
       }
-
-      if (Array.isArray(controls) === false && controls !== undefined) {
-        PromiseArray.push(Promise.reject('The controls is not array'));
-      } else if (controls !== undefined) {
-        controls.forEach((element) => {
-          const resultMessage = validator(element, controlSchema);
-          if (resultMessage.valid === true) {
-            PromiseArray.push(Promise.resolve(resultMessage));
-          } else {
-            PromiseArray.push(
-                Promise.reject(resultMessage.errors || resultMessage.error));
-          }
-        });
-      }
-
-      return Promise.all(PromiseArray)
-          .then((change) => {
-            if (this._stateClient !== this._E_STATES.BOUND) {
-              reject(
-                  new Error(
-                      'The operation failed. It could be done if the state of the client is BOUND'));
-            } else {
-              this._binding.newModify(
-                  dn, jsonChange, (controls !== undefined) ? controls : null,
-                  (err, result) => {
-                    if (err) {
-                      reject(new Error(err));
-                    } else {
-                      resolve(result);
-                    }
-                  });
-            }
-          })
-          .catch((error) => { reject(new Error(error)); });
-    });
+    })
   }
 
   /**
       * Perform an LDAP modify operation
       *
       * @method rename
-      * @param{string} dn The dn of the entry to rename
-      * @param{string} The new rdn for the dn
-      * @param{string} New parent for the rdn
-      * @param{array} Control that is send as a request to server
+      * @param {string} dn The dn of the entry to rename
+      * @param {string} newrdn The new rdn for the dn
+      * @param {string} newparent New parent for the rdn
+      * @param {array} controls Control that is send as a request to server
       * @return {Promise} Will return succes or a result from a control if the
       * operation is succesfull, else will return an error number.
       */
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      const parameter = typeof(dn) !== 'string' ?
-          'dn' :
-          typeof(newrdn) !== 'string' ?
-          'newrdn' :
-          typeof(newparent) !== 'string' ? 'newparent' : '';
 
-      if (parameter !== '') {
-        PromiseArray.push(Promise.reject(`The ${parameter} is not string `));
+      Promise.push(
+          this._stateClient !== this._E_STATES.BOUND ?
+              reject(new Error(bindErrorMessage)) :
+              resolve());
+
+      PromiseArray.push(
+          checkParameters.checkRenameStringValues([dn, newrdn, newparent])
+              .catch((error) => { reject(new Error(error.message)); }));
+
+      if (controls !== undefined) {
+        PromiseArray.push(
+            checkParameters.checkControlArray(controls).catch(
+                (error) => { reject(new Error(error.message)); }));
       }
 
-      if (Array.isArray(controls) === false && controls !== undefined) {
-        PromiseArray.push(Promise.reject('The controls is not array'));
-      } else if (controls !== undefined) {
-        controls.forEach((element) => {
-          const resultMessage = validator(element, controlSchema);
-          if (resultMessage.valid === true) {
-            PromiseArray.push(Promise.resolve(resultMessage));
-          } else {
-            PromiseArray.push(
-                Promise.reject(resultMessage.errors || resultMessage.error));
-          }
-        });
-      }
-
-      return Promise.all(PromiseArray)
+      Promise.all(PromiseArray)
           .then((change) => {
             if (this._stateClient !== this._E_STATES.BOUND) {
-              reject(
-                  new Error(
-                      'The operation failed. It could be done if the state of the client is BOUND'));
+              reject(new Error(bindErrorMessage));
             } else {
               this._binding.rename(
                   dn, newrdn, newparent,
@@ -326,37 +248,33 @@ module.exports = class LDAPWrapAsync {
   del(dn, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      if (Array.isArray(controls) === false && controls !== undefined) {
-        PromiseArray.push(Promise.reject('The controls is not array'));
-      } else if (controls !== undefined) {
-        controls.forEach((element) => {
-          const resultMessage = validator(element, controlSchema);
-          if (resultMessage.valid === true) {
-            PromiseArray.push(Promise.resolve(resultMessage));
-          } else {
-            PromiseArray.push(
-                Promise.reject(resultMessage.errors || resultMessage.error));
-          }
-        });
+
+      Promise.push(
+          this._stateClient !== this._E_STATES.BOUND ?
+              reject(new Error(bindErrorMessage)) :
+              resolve());
+
+      if (typeof(dn) !== 'string') {
+        PromiseArray.push(reject(new Error('The parameter dn is not string')));
+      }
+
+      if (controls !== undefined) {
+        PromiseArray.push(
+            checkParameters.checkControlArray(controls).catch(
+                (error) => { reject(new Error(error.message)); }));
       }
 
       return Promise.all(PromiseArray)
           .then((change) => {
-            if (this._stateClient !== this._E_STATES.BOUND) {
-              reject(
-                  new Error(
-                      'The Delete operation can be done just in BOUND state'));
-            } else {
-              this._binding.del(
-                  dn, (controls !== undefined) ? controls : null,
-                  (err, result) => {
-                    if (err) {
-                      reject(new Error(err));
-                    } else {
-                      resolve(result);
-                    }
-                  });
-            }
+            this._binding.del(
+                dn, (controls !== undefined) ? controls : null,
+                (err, result) => {
+                  if (err) {
+                    reject(new Error(err));
+                  } else {
+                    resolve(result);
+                  }
+                });
           })
           .catch((error) => { reject(new Error(error)); });
     });
@@ -373,46 +291,41 @@ module.exports = class LDAPWrapAsync {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       const PromiseArray = [];
-      if (Array.isArray(controls) === false && controls !== undefined) {
-        PromiseArray.push(Promise.reject('The controls is not array'));
-      } else if (controls !== undefined) {
-        controls.forEach((element) => {
-          const resultMessage = validator(element, controlSchema);
-          if (resultMessage.valid === true) {
-            PromiseArray.push(Promise.resolve(resultMessage));
-          } else {
-            PromiseArray.push(
-                Promise.reject(resultMessage.errors || resultMessage.error));
-          }
-        });
+
+      Promise.push(
+          this._stateClient !== this._E_STATES.BOUND ?
+              reject(new Error(bindErrorMessage)) :
+              resolve());
+
+      if (typeof(dn) !== 'string') {
+        PromiseArray.push(reject(new Error('The parameter dn is not string')));
+      }
+
+      if (controls !== undefined) {
+        PromiseArray.push(
+            checkParameters.checkControlArray(controls).catch(
+                (error) => { reject(new Error(error.message)); }));
       }
 
       return Promise.all(PromiseArray)
           .then((change) => {
-            if (this._stateClient === this._E_STATES.BOUND) {
-              // turn the json into an Array that can be easily parsed.
-              const keys = Object.keys(entry);
-              const entryArray = [];
+            // turn the json into an Array that can be easily parsed.
+            const keys = Object.keys(entry);
+            const entryArray = [];
 
-              for (const elem of keys) {
-                entryArray.push(elem);
-                entryArray.push(entry[elem]);
-              }
+            for (const elem of keys) {
+              entryArray.push(elem);
+              entryArray.push(entry[elem]);
 
               this._binding.add(
                   dn, entryArray, (controls !== undefined) ? controls : null,
                   (err, result) => {
                     if (err) {
                       reject(new Error(err));
-                      console.log(err);
                     } else {
                       resolve(result);
                     }
                   });
-            } else {
-              reject(
-                  new Error(
-                      'The add operation can be done just in BOUND state'));
             }
           })
           .catch((error) => { reject(new Error(error)); });
