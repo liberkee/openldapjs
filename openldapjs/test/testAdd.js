@@ -16,7 +16,7 @@ describe('Testing the async LDAP add operation', () => {
   const alreadyExists = '68';
   const insufficientAccess = '50';
   const succes = '0';
-  const rdnUser = 'cn=testUser';
+  const rdnUser = 'cn=testUsers';
 
   const validEntry = {
     objectClass: config.ldapAdd.objectClass,
@@ -79,7 +79,7 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should reject the add operation with a duplicated entry', (next) => {
-    clientLDAP.add(dnUser, validEntry).catch((duplicatedEntryError) => {
+    clientLDAP.add(config.ldapAuthentification.dnUser, validEntry).catch((duplicatedEntryError) => {
       duplicatedEntryError.message.should.be.deepEqual(alreadyExists);
       personNr = personNr + 1;
       next();
