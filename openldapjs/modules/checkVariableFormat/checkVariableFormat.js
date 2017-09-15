@@ -10,20 +10,17 @@ const controlSchema = require('../schemas/control_schema');
  * @class checkParam
  */
 module.exports = class checkParam {
-
   /**
     * Verify the rename parameters.
     *
     * @method checkModifyChangeArray
     * @param {array} change The array for the parameters
-    * @return {Promise} The pormise will return succesfull if evrey element of
-   * the json is defined corectly.
-    * Reject if some of the element is not corect defined.
+    * @return Throws an error in case the provided arguments aren't strings
     */
 
   checkParametersIfString(arrayParameter) {
     arrayParameter.forEach((element) => {
-      if (typeof (element) !== 'string') {
+      if (typeof(element) !== 'string') {
         throw new Error(`The ${element} is not string`);
       }
     });
@@ -33,14 +30,12 @@ module.exports = class checkParam {
     * Verify the modify change parameter.
     *
     * @method checkModifyChangeArray
-    * @param {array} change The json that is send for verification
-    * @return {Promise} The pormise will return succesfull if evrey element of
-   * the json is defined corectly.
-    * Reject if some of the element is not corect defined.
+    * @param {array} change The json that is sent for verification
+    * @return Throws error in case the json can't be validated
     */
   checkModifyChangeArray(change) {
     if (Array.isArray(change) === false) {
-      throw new Error('The json is not array');
+      throw new Error('The json is not an array');
     } else {
       change.forEach((element) => {
         const result = validator(element, changeSchema);
@@ -56,9 +51,7 @@ module.exports = class checkParam {
     *
     * @method checkControlArray
     * @param {array} controls The jsonControl that is send for verification
-    * @return {Promise} The pormise will return succesfull if evrey element of
-   * the jsonControl is defined corectly.
-    * Reject if some of the element is not corect defined.
+    * @return Throws error in case the controls can't be validated.
     */
   checkControlArray(controls) {
     if (Array.isArray(controls) === false) {

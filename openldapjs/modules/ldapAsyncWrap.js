@@ -13,9 +13,9 @@ const bindErrorMessage =
 const checkParameters = new VerifyParameter();
 /**
  * @module LDAPtranzition
- * @class LDAPWrapAsync
+ * @class LDAPAsyncWrap
  */
-module.exports = class LDAPWrapAsync {
+module.exports = class LDAPAsyncWrap {
   constructor(host, password) {
     this._hostAdress = host;
     this._E_STATES = {
@@ -35,11 +35,9 @@ module.exports = class LDAPWrapAsync {
     * Initialize to an LDAP server.
     *
     * @method initialize
-    * @param {string} host The host address of server LDAP.
-    * @return {Promise} That resolves if the LDAP initialize the structure to a
-   * specific server.
-    * Reject if the address is incorect.
-    */
+    * @return {Promise} That resolves if the LDAP initialize succeeds
+    * Rejects if the address is incorect or the client was not created.
+    **/
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === this._E_STATES.CREATED) {
@@ -65,11 +63,11 @@ module.exports = class LDAPWrapAsync {
     * Authentificate to LDAP server.
     *
     * @method bind
-    * @param {string} username The username of specific client.
-    * @param {string} password The password for authentification.
+    * @param {string} username The client username
+    * @param {string} password The client's password.
     * @return {Promise} That resolves if the credentials are correct.
-    * Reject dn or password are incorect.
-    */
+    * Rejects if dn or password are incorect or the client did not initialize.
+    **/
 
   bind(bindDN, passwordUser) {
     return new Promise((resolve, reject) => {
@@ -84,32 +82,37 @@ module.exports = class LDAPWrapAsync {
           }
         });
       } else {
-        reject(new Error('Can only bind from initialized or bound'));
+        reject(new Error('Can only bind if initialized'));
       }
     });
   }
 
   /**
-   * Search operation.
-   *
-   * @method search
-   * @param {string} base The base node where the search to start.
-   * @param {int} scope The mod how the search will return the entrys.
-   * @param {string} filter The specification for specific element.
-   * @return {Promise} That resolve and return the a string with search result.
-   * Reject if an error will occure.
-   */
-
+     * Search operation.
+     *
+     * @method search
+     * @param {string} searchBase the base for the search.
+     * @param {int} scope scope for the search, can be 0(BASE), 1(ONE) or
+     * 2(SUBTREE)
+     * @param {string} searchFilter  search filter.
+     * @return {Promise} That resolves and returns a string with the search
+     *results. Rejects in case of error.
+     **/
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== this._E_STATES.BOUND) {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          if (Number.isInteger(scope) !== true) {
+          if (Number.isInteger(scope) !==
+              true) {  // as of now we're checking both in js and in cpp..might
+                       // consider dropping one.
             reject(new Error('Scope must be integer'));
           }
-          checkParameters.checkParametersIfString([searchBase, filter]);
+          checkParameters.checkParametersIfString([
+            searchBase, searchFilter
+          ]);  // this throws an error but won't it go ahead and do the search
+               // before catching?
 
           this._binding.search(
               searchBase, scope, searchFilter, (err, result) => {
@@ -134,9 +137,10 @@ module.exports = class LDAPWrapAsync {
    * @param {string} dn The dn of the entry to compare.
    * @param {string} attr The attribute given for interogation.
    * @param {string} value Value send to verify.
-   * @return {Promise} That resolve and return True if the element are equal or
+   * @return {Promise} That resolves and returns True if the elements are equal
+   * or
    * False otherwise.
-   * Reject if an error will occure.
+   * Rejects if an error occurs.
    */
 
   compare(dn, attr, value) {
@@ -145,7 +149,11 @@ module.exports = class LDAPWrapAsync {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([dn, attr, value]);
+          checkParameters.checkParametersIfString([
+            dn, attr, value
+          ]);  // this throws an error but won't it go ahead and do the compare
+          // before catching ?
+
 
           this._binding.compare(dn, attr, value, (err, result) => {
             if (err) {
@@ -166,9 +174,9 @@ module.exports = class LDAPWrapAsync {
     *
     * @method newModify
     * @param {string} dn The dn of the entry to modify
-    * @param {array} jsonChange The attribute and value that request for change
+    * @param {array} jsonChange The attribute and value to be changed
     * @return {Promise} That resolves if LDAP modified successfully the entry.
-    * Reject if the LDAP rejects the operation or the client's state is not
+    * Reject if  LDAP rejects the operation or the client's state is not
    * BOUND
     */
   modify(dn, jsonChange, controls) {
@@ -177,10 +185,16 @@ module.exports = class LDAPWrapAsync {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkModifyChangeArray(jsonChange);
+          checkParameters.checkModifyChangeArray(jsonChange);  // this throws an
+                                                               // error but
+                                                               // won't it go
+                                                               // ahead and do
+                                                               // the modify
+          // before catching ?
+
 
           if (controls !== undefined)
-            checkParameters.checkControlArray(controls);
+            checkParameters.checkControlArray(controls);  // as above
 
           this._binding.newModify(
               dn, jsonChange, (controls !== undefined) ? controls : null,
@@ -199,15 +213,15 @@ module.exports = class LDAPWrapAsync {
   }
 
   /**
-      * Perform an LDAP modify operation
+      * Perform an LDAP rename  operation
       *
       * @method rename
       * @param {string} dn The dn of the entry to rename
       * @param {string} newrdn The new rdn for the dn
       * @param {string} newparent New parent for the rdn
-      * @param {array} controls Control that is send as a request to server
-      * @return {Promise} Will return succes or a result from a control if the
-      * operation is succesfull, else will return an error number.
+      * @param {array} controls Control that is sent as a request to the server
+      * @return {Promise} Will fulfil with a result from a control if the
+      * operation is succesful, else will reject with an LDAP error number.
       */
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
@@ -216,10 +230,13 @@ module.exports = class LDAPWrapAsync {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([dn, newrdn, newparent]);
+          checkParameters.checkParametersIfString([
+            dn, newrdn, newparent
+          ]);  // throws error but calls rename before catching
 
           if (controls !== undefined)
-            checkParameters.checkControlArray(controls);
+            checkParameters.checkControlArray(
+                controls);  // throws error but calls rename before catching
 
           this._binding.rename(
               dn, newrdn, newparent, (controls !== undefined) ? controls : null,
@@ -251,10 +268,12 @@ module.exports = class LDAPWrapAsync {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([dn]);
+          checkParameters.checkParametersIfString(
+              [dn]);  // throws error but calls delete before catching
 
           if (controls !== undefined)
-            checkParameters.checkControlArray(controls);
+            checkParameters.checkControlArray(
+                controls);  // throws error but calls delete before catching
 
           this._binding.del(
               dn, (controls !== undefined) ? controls : null, (err, result) => {
@@ -278,6 +297,8 @@ module.exports = class LDAPWrapAsync {
    * @param {Object} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
    * @param {Object} controls client& sever controls, OPTIONAL parameter
+   * @return {Promise} that fulfils if the add was succesfull, rejects
+   * otherwise.
    */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
@@ -285,10 +306,12 @@ module.exports = class LDAPWrapAsync {
         reject(new Error(bindErrorMessage));
       } else {
         try {
-          checkParameters.checkParametersIfString([dn]);
+          checkParameters.checkParametersIfString(
+              [dn]);  // throws error but tries to add before catching?
 
           if (controls !== undefined)
-            checkParameters.checkControlArray(controls);
+            checkParameters.checkControlArray(
+                controls);  // throws error but tries to add before catching?
 
           const keys = Object.keys(entry);
           const entryArray = [];
@@ -319,7 +342,7 @@ module.exports = class LDAPWrapAsync {
     *
     * @method unbind
     * @return {Promise} That resolves if the LDAP structure was unbound.
-    * Reject if the LDAP was not unbound.
+    * Reject if the LDAP could not unbind.
     */
   unbind() {
     return new Promise((resolve, reject) => {

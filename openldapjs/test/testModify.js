@@ -73,8 +73,7 @@ describe('Testing the modify functionalities', () => {
   beforeEach((next) => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-    ldapAsyncWrap.initialize()
-    .then(() => {
+    ldapAsyncWrap.initialize().then(() => {
       ldapAsyncWrap
           .bind(
               config.ldapAuthentification.dnAdmin,
@@ -84,16 +83,15 @@ describe('Testing the modify functionalities', () => {
   });
 
   afterEach(() => {
-    ldapAsyncWrap.unbind()
-    .then(() => {
+    ldapAsyncWrap.unbind().then(
+        () => {
 
-    });
+        });
   });
 
 
   it('should reject if the state is not BOUND', (next) => {
-    ldapAsyncWrap.unbind()
-    .then(() => {
+    ldapAsyncWrap.unbind().then(() => {
       ldapAsyncWrap
           .modify(
               config.ldapModify.ldapModificationReplace.change_dn,
@@ -106,7 +104,7 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject if attribute parameter is not defined', (next) => {
-    const errorMSG = 'The json is not array';
+    const errorMSG = 'The json is not an array';
     ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn)
         .catch((error) => {
           should.deepEqual(error.message, errorMSG);
@@ -114,7 +112,7 @@ describe('Testing the modify functionalities', () => {
         });
   });
 
-  it('should reject operation if the attribute parameter is not corectly defined',
+  it('should reject operation if the attribute parameter is not correctly defined',
      (next) => {
        const errorMSG =
            'ValidationError: Missing required property: op,ValidationError: Missing required property: attr,ValidationError: Missing required property: vals';
@@ -149,7 +147,7 @@ describe('Testing the modify functionalities', () => {
         });
   });
 
-  it('should reject if the control parameter is not corectly defined', (next) => {
+  it('should reject if the control parameter is not correctly defined', (next) => {
     const errorMSG =
         'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: iscritical';
     const control = [{
@@ -166,8 +164,7 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject operation if the dn is empty', (next) => {
-    ldapAsyncWrap.modify('', changeAttirbutes)
-    .catch((error) => {
+    ldapAsyncWrap.modify('', changeAttirbutes).catch((error) => {
       should.deepEqual(error.message, '53');
       next();
     });
