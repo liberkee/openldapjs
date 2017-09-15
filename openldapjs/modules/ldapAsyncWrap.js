@@ -159,32 +159,29 @@ module.exports = class LDAPWrapAsync {
     */
   newModify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
-
-      checkParameters.checkModifyChangeArray(jsonChange).catch((error) => {
-        reject(new Error(error.message));
-      });
-
-      if (controls !== undefined) {
-        checkParameters.checkControlArray(controls).catch(
-            (error) => { reject(new Error(error.message)); });
-      }
-
-
       if (this._stateClient !== this._E_STATES.BOUND) {
         reject(new Error(bindErrorMessage));
       } else {
-        this._binding.newModify(
-            dn, jsonChange, (controls !== undefined) ? controls : null,
-            (err, result) => {
-              if (err) {
-                console.log(err);
-                reject(new Error(err));
-              } else {
-                resolve(result);
-              }
-            });
+        try {
+          checkParameters.checkModifyChangeArray(jsonChange);
+
+          if (controls !== undefined)
+            checkParameters.checkControlArray(controls);
+
+          this._binding.newModify(
+              dn, jsonChange, (controls !== undefined) ? controls : null,
+              (err, result) => {
+                if (err) {
+                  reject(new Error(err));
+                } else {
+                  resolve(result);
+                }
+              });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
-    })
+    });
   }
 
   /**
@@ -200,41 +197,30 @@ module.exports = class LDAPWrapAsync {
       */
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
-      const PromiseArray = [];
 
-      Promise.push(
-          this._stateClient !== this._E_STATES.BOUND ?
-              reject(new Error(bindErrorMessage)) :
-              resolve());
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
+      } else {
+        try {
+          checkParameters.checkParametersIfString([dn, newrdn, newparent]);
 
-      PromiseArray.push(
-          checkParameters.checkRenameStringValues([dn, newrdn, newparent])
-              .catch((error) => { reject(new Error(error.message)); }));
+          if (controls !== undefined)
+            checkParameters.checkControlArray(controls);
 
-      if (controls !== undefined) {
-        PromiseArray.push(
-            checkParameters.checkControlArray(controls).catch(
-                (error) => { reject(new Error(error.message)); }));
+          this._binding.rename(
+              dn, newrdn, newparent, (controls !== undefined) ? controls : null,
+              (err, result) => {
+                if (err) {
+                  reject(new Error(err));
+                } else {
+                  resolve(result);
+                }
+              });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
-
-      Promise.all(PromiseArray)
-          .then((change) => {
-            if (this._stateClient !== this._E_STATES.BOUND) {
-              reject(new Error(bindErrorMessage));
-            } else {
-              this._binding.rename(
-                  dn, newrdn, newparent,
-                  (controls !== undefined) ? controls : null, (err, result) => {
-                    if (err) {
-                      reject(new Error(err));
-                    } else {
-                      resolve(result);
-                    }
-                  });
-            }
-          })
-          .catch((error) => { reject(new Error(error)); });
-    });
+    })
   }
 
   /**
@@ -247,46 +233,37 @@ module.exports = class LDAPWrapAsync {
    */
   del(dn, controls) {
     return new Promise((resolve, reject) => {
-      const PromiseArray = [];
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
+      } else {
+        try {
+          checkParameters.checkParametersIfString([dn]);
 
-      Promise.push(
-          this._stateClient !== this._E_STATES.BOUND ?
-              reject(new Error(bindErrorMessage)) :
-              resolve());
+          if (controls !== undefined)
+            checkParameters.checkControlArray(controls);
 
-      if (typeof(dn) !== 'string') {
-        PromiseArray.push(reject(new Error('The parameter dn is not string')));
+          this._binding.del(
+              dn, (controls !== undefined) ? controls : null, (err, result) => {
+                if (err) {
+                  reject(new Error(err));
+                } else {
+                  resolve(result);
+                }
+              });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
-
-      if (controls !== undefined) {
-        PromiseArray.push(
-            checkParameters.checkControlArray(controls).catch(
-                (error) => { reject(new Error(error.message)); }));
-      }
-
-      return Promise.all(PromiseArray)
-          .then((change) => {
-            this._binding.del(
-                dn, (controls !== undefined) ? controls : null,
-                (err, result) => {
-                  if (err) {
-                    reject(new Error(err));
-                  } else {
-                    resolve(result);
-                  }
-                });
-          })
-          .catch((error) => { reject(new Error(error)); });
     });
   }
   /**
    * ldap add operation
-   * @param{String}dn  dn of the entry to add Ex: 'cn=foo, o=example..,
+   * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
    * exist';
-   * @param{Object} entry ldif format to be added, needs to have a
+   * @param {Object} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param{Object} controls client& sever controls, OPTIONAL parameter
+   * @param {Object} controls client& sever controls, OPTIONAL parameter
    */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
