@@ -12,7 +12,6 @@ void LDAPBindProgress::Execute(
   struct timeval timeOut = {0, 1};
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
-    progress.Send(reinterpret_cast<const char *>(&result), sizeof(int));
   }
 }
 
@@ -27,7 +26,7 @@ void LDAPBindProgress::HandleOKCallback() {
   } else {
     int status = ldap_result2error(ld, resultMsg, 0);
     if (status != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<Number>(status);
+      stateClient[0] = Nan::New<Number>(0);
       callback->Call(1, stateClient);
     } else {
       stateClient[1] = Nan::New<Number>(2);
