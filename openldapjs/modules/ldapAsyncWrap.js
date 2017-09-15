@@ -107,7 +107,7 @@ module.exports = class LDAPWrapAsync {
       } else {
         try {
           if (Number.isInteger(scope) !== true) {
-            reject (new Error ('Scope must be integer'));
+            reject(new Error('Scope must be integer'));
           }
           checkParameters.checkParametersIfString([searchBase, filter]);
 
@@ -281,46 +281,37 @@ module.exports = class LDAPWrapAsync {
    */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
-      const PromiseArray = [];
+      if (this._stateClient !== this._E_STATES.BOUND) {
+        reject(new Error(bindErrorMessage));
+      } else {
+        try {
+          checkParameters.checkParametersIfString([dn]);
 
-      Promise.push(
-          this._stateClient !== this._E_STATES.BOUND ?
-              reject(new Error(bindErrorMessage)) :
-              resolve());
+          if (controls !== undefined)
+            checkParameters.checkControlArray(controls);
 
-      if (typeof(dn) !== 'string') {
-        PromiseArray.push(reject(new Error('The parameter dn is not string')));
+          const keys = Object.keys(entry);
+          const entryArray = [];
+
+          for (const elem of keys) {
+            entryArray.push(elem);
+            entryArray.push(entry[elem]);
+          }
+
+          this._binding.add(
+              dn, entryArray, (controls !== undefined) ? controls : null,
+              (err, result) => {
+                if (err) {
+                  reject(new Error(err));
+                } else {
+                  resolve(result);
+                }
+              });
+        } catch (error) {
+          reject(new Error(error.message));
+        }
       }
-
-      if (controls !== undefined) {
-        PromiseArray.push(
-            checkParameters.checkControlArray(controls).catch(
-                (error) => { reject(new Error(error.message)); }));
-      }
-
-      return Promise.all(PromiseArray)
-          .then((change) => {
-            // turn the json into an Array that can be easily parsed.
-            const keys = Object.keys(entry);
-            const entryArray = [];
-
-            for (const elem of keys) {
-              entryArray.push(elem);
-              entryArray.push(entry[elem]);
-
-              this._binding.add(
-                  dn, entryArray, (controls !== undefined) ? controls : null,
-                  (err, result) => {
-                    if (err) {
-                      reject(new Error(err));
-                    } else {
-                      resolve(result);
-                    }
-                  });
-            }
-          })
-          .catch((error) => { reject(new Error(error)); });
-    });
+    })
   }
 
   /**
