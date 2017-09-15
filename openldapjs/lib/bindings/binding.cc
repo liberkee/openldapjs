@@ -59,10 +59,11 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
         if (addResult != "") {
           stateClient[1] = Nan::New(addResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;  // Potential memory leak if returning with no cleanup ?
+
+        } else {
+          stateClient[1] = Nan::New<v8::Number>(0);
+          callback->Call(2, stateClient);
         }
-        stateClient[1] = Nan::New<v8::Number>(0);
-        callback->Call(2, stateClient);
       }
     }
     ldap_msgfree(resultMsg);
@@ -115,10 +116,10 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
         if (deleteResult != "") {
           stateClient[1] = Nan::New(deleteResult).ToLocalChecked();
           callback->Call(2, stateClient);
-          return;  // returning with no cleanup ?
+        } else {
+          stateClient[1] = Nan::New<v8::Number>(0);
+          callback->Call(2, stateClient);
         }
-        stateClient[1] = Nan::New<v8::Number>(0);
-        callback->Call(2, stateClient);
       }
     }
     callback->Reset();
