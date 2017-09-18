@@ -2,12 +2,15 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+const config = require('./config.json');
 
 describe('Testing the async LDAP authentification', () => {
-  const host = 'ldap://10.16.0.194:389';
-  const dn = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
-  const password = 'secret';
-  const clientLDAP = new LDAPWrap();
+  const host = config.ldapAuthentification.host;  
+  const dn = config.ldapAuthentification.dnAdmin;
+  const password = config.ldapAuthentification.passwordAdmin;
+  let clientLDAP = new LDAPWrap(host);
+
+  const invalidCredentials = '49';
 
   const E_STATES = {
     ERROR: 0,
@@ -17,7 +20,8 @@ describe('Testing the async LDAP authentification', () => {
   };
 
   beforeEach((next) => {
-    clientLDAP.initialize(host)
+    clientLDAP = new LDAPWrap(host);
+    clientLDAP.initialize()
     .then(() => {
       next();
     });
@@ -26,7 +30,6 @@ describe('Testing the async LDAP authentification', () => {
   });
 
   it('should bind to server', (next) => {
-    const progress = 0;
     clientLDAP.bind(dn, password)
     .then((result) => {
       should.deepEqual(result, E_STATES.BOUND);
@@ -35,11 +38,10 @@ describe('Testing the async LDAP authentification', () => {
   });
 
   it('should not bind to server', (next) => {
-    const newDN = 'cn=rmim,ou=users,o=myhost,dc=demoApp,dc=com';
-    clientLDAP.bind(newDN, password)
+    clientLDAP.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
     .catch((err) => {
       // Give the specific error not the state of the operation
-      should.deepEqual(err, 49);
+      should.deepEqual(err.message, invalidCredentials);
       next();
     });
   });
@@ -52,16 +54,5 @@ describe('Testing the async LDAP authentification', () => {
     });
   });
 
-  it('should return error for uninitialized', (next) => {
-    clientLDAP.unbind()
-    .then(() => {
-      // I will repet the operation for test porpes
-      clientLDAP.unbind()
-      .catch((err) => {
-        should.deepEqual(err, E_STATES.ERROR);
-        next();
-      });
-    });
-  });
 
 });

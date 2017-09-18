@@ -68,10 +68,13 @@ function objectLDAPEntry(LDAPentry) {
     const value = attributeArray[1];
 
     // Verify if is an attribute or the DN
+    if(value === '') {
+      return -1;
+    }
+
     if (type !== '' && type !== undefined) {
 
       const currentType = alreadyExist(entryObject.attribute, type);
-
       // Verify if the type alreadyExist
       if (currentType) {
         currentType.value.push(value);
@@ -139,6 +142,9 @@ class stringJSON {
 
       for (let i = 1; i < lengthEntryArray; i += 1) {
         const entryObject = objectLDAPEntry(entryArray[i]);
+        if (entryObject == -1) {
+          reject(new Error('The string is not a LDAP structure'));
+        }
         this.JSONobject.entry.push(entryObject);
       }
       resolve(this.JSONobject);

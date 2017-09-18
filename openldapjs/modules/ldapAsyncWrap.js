@@ -110,6 +110,7 @@ module.exports = class LDAPAsyncWrap {
             reject(new Error('Scope must be integer'));
           }
           checkParameters.checkParametersIfString([searchBase, searchFilter]);
+
           this._binding.search(
               searchBase, scope, searchFilter, (err, result) => {
                 if (err) {

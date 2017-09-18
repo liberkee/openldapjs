@@ -19,7 +19,6 @@ describe('String to JSON#searchTest', () => {
       '\ndn:ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:organizationalUnit1\nou:users1\n\ndn:ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:organizationalUnit2\nou:users2';
   const noValueLdif =
       '\ndn:ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:organizationalUnit\nou:\nobjectClass:userUnit';
-  const noAttrLdif = '\ndn:ou=users,o=myhost,dc=demoApp,dc=com';
   const noDnLdif =
       '\nobjectClass:organizationalUnit\nou:\nobjectClass:userUnit';
   const emptyDnLdif = '\ndn:\nobjectClass:organizationalUnit\nou:users';
@@ -143,14 +142,6 @@ describe('String to JSON#searchTest', () => {
       next();
     });
   });
-
-  it('should return an error if the ldif does not have any attributes',
-     (next) => {
-       JSONStruct.stringLDAPtoJSON(noAttrLdif).catch((err) => {
-         should.deepEqual(err.message, 'The string is not a LDAP structure');
-         next();
-       });
-     });
 
   it('should return an error if the dn is missing', (next) => {
     JSONStruct.stringLDAPtoJSON(noDnLdif).catch((err) => {

@@ -2,18 +2,19 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+const config = require('./config.json');
 
 describe('Testing the async LDAP connection', () => {
-  const host = 'ldap://10.16.0.194:389';
 
-  const dn = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
-  const password = 'secret';
+  const hostAddress = config.ldapAuthentification.host;
+  const dn = config.ldapAuthentification.dnAdmin;
+  const password = config.ldapAuthentification.passwordAdmin;
 
-  const dn2 = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
-  const password2 = 'secret';
+  const dn2 = config.ldapAuthentification.dnUser;
+  const password2 = config.ldapAuthentification.passwordUser;
 
-  const clientLDAP = new LDAPWrap();
-  const clientLDAP2 = new LDAPWrap();
+  let clientLDAP = new LDAPWrap(hostAddress);
+  let clientLDAP2 = new LDAPWrap(hostAddress);
 
   const E_STATES = {
     ERROR: 0,
@@ -23,6 +24,8 @@ describe('Testing the async LDAP connection', () => {
   };
 
   beforeEach((next) => {
+    clientLDAP = new LDAPWrap(hostAddress);
+    clientLDAP2 = new LDAPWrap(hostAddress);
     next();
   });
 
@@ -31,9 +34,9 @@ describe('Testing the async LDAP connection', () => {
 
   it('should bind multiple clients on the same time', (next) => {
     const progress = 0;
-    clientLDAP.initialize(host)
+    clientLDAP.initialize()
     .then(() => {
-      clientLDAP2.initialize(host)
+      clientLDAP2.initialize()
       .then(() => {
         clientLDAP.bind(dn, password)
         .then((result) => {

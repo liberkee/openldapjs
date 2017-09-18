@@ -7,6 +7,7 @@ const config = require('./config.json');
 describe('Testing the async initialization', () => {
 
   const host = config.ldapAuthentification.host;
+  let ldapWrap;
 
   const E_STATES = {
     ERROR: 0,
@@ -16,28 +17,16 @@ describe('Testing the async initialization', () => {
   };
 
   beforeEach((next) => {
+    ldapWrap = new LDAPWrap(host);
+
     next();
   });
 
-  afterEach(() => {
-  });
+  afterEach(() => {});
 
   it('should be INITIALIZED', (next) => {
-    const ldapWrap = new LDAPWrap(host);
-    ldapWrap.initialize()
-    .then((result) => {
+    ldapWrap.initialize().then((result) => {
       should.deepEqual(result, E_STATES.INITIALIZED);
-      next();
-    });
-  });
-
-  it('should be not INITIALIZED', (next) => {
-    const host = 'lp://10.16.0.194:389';
-    const ldapWrap = new LDAPWrap(host);
-
-    ldapWrap.initialize()
-    .catch((err) => {
-      should.deepEqual(err, E_STATES.ERROR);
       next();
     });
   });
