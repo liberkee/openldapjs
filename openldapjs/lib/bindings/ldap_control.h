@@ -1,9 +1,10 @@
-#ifndef LDAP_CONTROL_H
-#define LDAP_CONTROL_H
+#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
+#define OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
 #include <lber.h>
 #include <ldap.h>
 #include <nan.h>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #define LBER_ALIGNED_BUFFER(uname, size) \
@@ -29,4 +30,4 @@ class LdapControls {
   std::string PrintModificationControls(LDAP* ld, LDAPMessage* resultMsg);
 };
 
-#endif  // LDAP_CONTROLs_H
+#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_

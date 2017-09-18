@@ -1,11 +1,12 @@
 #include "ldap_search_progress.h"
 
-LDAPSearchProgress::LDAPSearchProgress(Callback *callback, Callback *progress,
-                                       LDAP *ld, int msgID)
-    : AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {}
+LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
+                                       Nan::Callback *progress, LDAP *ld,
+                                       int msgID)
+    : Nan::AsyncProgressWorker(callback), progress(progress), ld(ld), msgID(msgID) {}
 
 void LDAPSearchProgress::Execute(
-    const AsyncProgressWorker::ExecutionProgress &progress) {
+    const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {1, 0};
 
   BerElement *ber;

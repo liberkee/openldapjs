@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_ 
+#define OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_ 
 #include <iostream>
 namespace constants {
 char postread[] = "postread";
@@ -9,4 +9,4 @@ char changeOidMember[] = "oid";
 char changeIsCriticalMember[] = "iscritical";
 }
 
-#endif  // CONSTANTS_H
+#endif  // OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
