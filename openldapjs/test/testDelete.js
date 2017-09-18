@@ -136,12 +136,16 @@ describe('Testing the async LDAP delete operation', () => {
     personNr = personNr + 1;
     dnUser = `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
     const third = clientLDAP.del(dnUser);
-    personNr = personNr + 1;    
+    personNr = personNr + 1;
+    dnUser = `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+    const four = clientLDAP.del(dnUser);
+    personNr = personNr + 1;      
 
-    Promise.all([first, second, third]).then((values) => {
+    Promise.all([first, second, third, four]).then((values) => {
       should.deepEqual(values[0], successResult);
       should.deepEqual(values[1], successResult);
       should.deepEqual(values[2], successResult);
+      should.deepEqual(values[3], successResult);
       next();
     });
   });

@@ -2,22 +2,23 @@
 
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
+const config = require('./config.json');
 
 describe('Testing the Compare functionalities', () => {
-  const hostAddress = 'ldap://10.16.0.194:389';
-  const dn = 'cn=admin,dc=demoApp,dc=com';
-  const password = 'secret';
+  const hostAddress = config.ldapAuthentification.host;
+  const dn = config.ldapAuthentification.dnAdmin;
+  const password = config.ldapAuthentification.passwordAdmin;
   let ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
   /* Attributes and Values */
-  const attr = 'cn';
-  const val = 'admin';
-  const searchBase = 'dc=demoApp,dc=com';
+  const attr = config.ldapCompare.attribute;
+  const val = config.ldapCompare.value;
+  const searchBase = config.ldapSearch.searchBase;
 
   const nonVal = 'nonExistingValue';
   const nonAttr = 'nonExistingAttr';
-  const nonObj = 'cn=cghitea,ou=user55s,o=myhost,dc=demoApp,dc=com';
-  const noPass = 'wrongPass';
+  const nonObj = config.ldapCompare.invalidUser;
+  const noPass = config.ldapCompare.invalidPassword;
 
   const comparisonResTrue = 'The Comparison Result: true';
   const comparisonResFalse = 'The Comparison Result: false';
@@ -44,18 +45,25 @@ describe('Testing the Compare functionalities', () => {
 
   it(
       'should search and comparte 10 times sequential', (next) => {
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000')
-            .then((result1) => { should.deepEqual(result1, searchResult); })
+        ldapAsyncWrap
+            .search(searchBase, 2, config.ldapSearch.filterObjSpecific4)
+            .then((result1) => { 
+                should.deepEqual(result1, searchResult); 
+            })
             .then(
                 () => {
-                  ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000')
+                  ldapAsyncWrap
+                      .search(
+                          searchBase, 2, config.ldapSearch.filterObjSpecific4)
                       .then((result2) => {
                         should.deepEqual(result2, searchResult);
                       })
                       .then(
                           () => {
                             ldapAsyncWrap
-                                .search(searchBase, 2, 'cn=newPointChild10000')
+                                .search(
+                                    searchBase, 2,
+                                    config.ldapSearch.filterObjSpecific4)
                                 .then((result3) => {
                                   should.deepEqual(result3, searchResult);
                                 })
@@ -64,7 +72,8 @@ describe('Testing the Compare functionalities', () => {
                                       ldapAsyncWrap
                                           .search(
                                               searchBase, 2,
-                                              'cn=newPointChild10000')
+                                              config.ldapSearch
+                                                  .filterObjSpecific4)
                                           .then((result4) => {
                                             should.deepEqual(
                                                 result4, searchResult);
@@ -74,7 +83,8 @@ describe('Testing the Compare functionalities', () => {
                                                 ldapAsyncWrap
                                                     .search(
                                                         searchBase, 2,
-                                                        'cn=newPointChild10000')
+                                                        config.ldapSearch
+                                                            .filterObjSpecific4)
                                                     .then((result5) => {
                                                       should.deepEqual(
                                                           result5,
@@ -85,7 +95,9 @@ describe('Testing the Compare functionalities', () => {
                                                           ldapAsyncWrap
                                                               .search(
                                                                   searchBase, 2,
-                                                                  'cn=newPointChild10000')
+                                                                  config
+                                                                      .ldapSearch
+                                                                      .filterObjSpecific4)
                                                               .then((result6) => {
                                                                 should.deepEqual(
                                                                     result6,
@@ -97,7 +109,9 @@ describe('Testing the Compare functionalities', () => {
                                                                         .search(
                                                                             searchBase,
                                                                             2,
-                                                                            'cn=newPointChild10000')
+                                                                            config
+                                                                                .ldapSearch
+                                                                                .filterObjSpecific4)
                                                                         .then((result7) => {
                                                                           should.deepEqual(
                                                                               result7,
@@ -109,39 +123,45 @@ describe('Testing the Compare functionalities', () => {
                                                                                   .search(
                                                                                       searchBase,
                                                                                       2,
-                                                                                      'cn=newPointChild10000')
+                                                                                      config
+                                                                                          .ldapSearch
+                                                                                          .filterObjSpecific4)
                                                                                   .then((result8) => {
                                                                                     should
                                                                                         .deepEqual(
                                                                                             result8,
                                                                                             searchResult);
                                                                                   })
-                                                                                  .then(
-                                                                                      () => {
-                                                                                        ldapAsyncWrap
-                                                                                            .search(
-                                                                                                searchBase,
-                                                                                                2,
-                                                                                                'cn=newPointChild10000')
-                                                                                            .then((result9) => {
-                                                                                              should
-                                                                                                  .deepEqual(
-                                                                                                      result9,
-                                                                                                      searchResult);
-                                                                                            })
-                                                                                            .then(() => {
-                                                                                              ldapAsyncWrap
-                                                                                                  .search(
-                                                                                                      searchBase,
-                                                                                                      2,
-                                                                                                      'cn=newPointChild10000')
-                                                                                                  .then((result10) => {
-                                                                                                    should
-                                                                                                        .deepEqual(
-                                                                                                            result10,
-                                                                                                            searchResult);
-                                                                                                  })
-                                                                                                  .then(() => {
+                                                                                  .then(() => {
+                                                                                    ldapAsyncWrap
+                                                                                        .search(
+                                                                                            searchBase,
+                                                                                            2,
+                                                                                            config
+                                                                                                .ldapSearch
+                                                                                                .filterObjSpecific4)
+                                                                                        .then((result9) => {
+                                                                                          should
+                                                                                              .deepEqual(
+                                                                                                  result9,
+                                                                                                  searchResult);
+                                                                                        })
+                                                                                        .then(() => {
+                                                                                          ldapAsyncWrap
+                                                                                              .search(
+                                                                                                  searchBase,
+                                                                                                  2,
+                                                                                                  config
+                                                                                                      .ldapSearch
+                                                                                                      .filterObjSpecific4)
+                                                                                              .then((result10) => {
+                                                                                                should
+                                                                                                    .deepEqual(
+                                                                                                        result10,
+                                                                                                        searchResult);
+                                                                                              })
+                                                                                              .then(
+                                                                                                  () => {
                                                                                                     ldapAsyncWrap
                                                                                                         .compare(
                                                                                                             dn,
@@ -279,8 +299,8 @@ describe('Testing the Compare functionalities', () => {
                                                                                                                       });
                                                                                                             });
                                                                                                   });
-                                                                                            });
-                                                                                      });
+                                                                                        });
+                                                                                  });
                                                                             });
                                                                   });
                                                         });
@@ -293,26 +313,26 @@ describe('Testing the Compare functionalities', () => {
   it('should search and compare 10 times each in parallel', (next) => {
 
     // Bench of Search querries
-    const search1 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search2 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search3 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search4 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search5 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search6 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search7 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search8 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search9 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
-    const search10 =
-        ldapAsyncWrap.search(searchBase, 2, 'cn=newPointChild10000');
+    const search1 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search2 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search3 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search4 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search5 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search6 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search7 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search8 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search9 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
+    const search10 = ldapAsyncWrap.search(
+        searchBase, 2, config.ldapSearch.filterObjSpecific4);
 
     // Bench of Compare querries
     const compare1 = ldapAsyncWrap.compare(dn, attr, val);
