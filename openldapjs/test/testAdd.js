@@ -100,12 +100,13 @@ describe('Testing the async LDAP add operation', () => {
         });
   });
 
-  it('should add a single entry',
-     (next) => {clientLDAP.add(dnUser, validEntry).then((result) => {
-       result.should.be.deepEqual(0);
-       personNr = personNr + 1;
-       next();
-     })});
+  it('should add a single entry', (next) => {
+    clientLDAP.add(dnUser, validEntry).then((result) => {
+      result.should.be.deepEqual(0);
+      personNr = personNr + 1;
+      next();
+    });
+  });
 
   it('should add multiple entries sequentialy and reject to add a duplicate',
      (next) => {

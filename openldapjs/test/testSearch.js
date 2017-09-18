@@ -47,12 +47,7 @@ describe('Testing the async LDAP search ', () => {
    */
   it('should return the root node', (next) => {
     adminLDAP.search('', 0, 'objectclass=*')
-        .then((result) => {
-
-
-          should.deepEqual(result, ROOT_NODE);
-
-        })
+        .then((result) => { should.deepEqual(result, ROOT_NODE); })
         .then(() => { next(); });
 
   });
@@ -82,8 +77,8 @@ describe('Testing the async LDAP search ', () => {
 
   /**
    * test case with multiple results on the same level( scope argument 1?)
-   * unfinished
-   */
+   *
+   **/
   it('should return multiple results located on the same level', (next) => {
     adminLDAP.search(searchBase, 1, 'objectClass=*')
         .then((result) => {

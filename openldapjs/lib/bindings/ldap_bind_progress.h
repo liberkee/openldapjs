@@ -9,25 +9,22 @@
 #include <string>
 #include <thread>
 
-using namespace Nan;
-using namespace v8;
-using namespace std;
-
-class LDAPBindProgress : public AsyncProgressWorker {
+class LDAPBindProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld;
-  Callback *progress;
+  Nan::Callback *progress;
   int result = 0;
   LDAPMessage *resultMsg;
   int msgID;
 
  public:
-  LDAPBindProgress(Callback *callback, Callback *progress, LDAP *ld, int msgID);
+  LDAPBindProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
+                   int msgID);
 
   /**
    ** Execute Method, runs outside the event loop.
    **/
-  void Execute(const AsyncProgressWorker::ExecutionProgress &progress);
+  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);
 
   /**
    ** HandleOkCallback method, gets called when the execute method finishes.
@@ -38,4 +35,4 @@ class LDAPBindProgress : public AsyncProgressWorker {
   void HandleProgressCallback(const char *data, size_t size);
 };
 
-#endif  // BINDINGS_LDAP_BIND_PROGRESS_H_
+#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_BIND_PROGRESS_H_
