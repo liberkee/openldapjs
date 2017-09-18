@@ -7,12 +7,12 @@
 
 class LDAPAddProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *_ld{};
-  Nan::Callback *_progress{};
-  int _result = 0;
-  LDAPMessage *_resultMsg{};
-  int _msgID{};
-  LDAPMod **_entries{};
+  LDAP *ld_{};
+  Nan::Callback *progress_{};
+  int result_ = 0;
+  LDAPMessage *resultMsg_{};
+  int msgID_{};
+  LDAPMod **entries_{};
 
  public:
   LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
