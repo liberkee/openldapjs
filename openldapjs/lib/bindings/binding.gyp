@@ -8,8 +8,8 @@
         '/usr/local/include'
       ],
       'sources': [ 'binding.cc', 'ldap_control.cc','ldap_bind_progress.cc',
-      'ldap_search_progress.cc','ldap_add_progress.cc','ldap_delete_progress.cc',
-      'ldap_modify_progress.cc','ldap_rename_progress.cc','ldap_compare_progress.cc'],
+            'ldap_search_progress.cc','ldap_add_progress.cc','ldap_delete_progress.cc',
+            'ldap_modify_progress.cc','ldap_rename_progress.cc','ldap_compare_progress.cc'],
       'ldflags': [
             '-Wl,-z,defs'
       ],

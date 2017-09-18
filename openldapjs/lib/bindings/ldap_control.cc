@@ -19,7 +19,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
         controls->Get(Nan::New(constants::changeValueMember).ToLocalChecked()));
     int value_controles_length = value_controles->Length();
     BerElementBuffer berbuf{};
-    BerElement *ber = (BerElement *)&berbuf;
+    BerElement *ber = reinterpret_cast<BerElement *>(&berbuf);
     std::vector<char *> attrs(value_controles_length);
 
     for (auto &attr : attrs) {
