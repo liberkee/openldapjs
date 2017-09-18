@@ -21,6 +21,7 @@ describe('Testing the Compare functionalities', () => {
 
   const bindErrorMessage =
       'The operation failed. It could be done if the state of the client is BOUND';
+  const dnEntryError = 'The 1 is not string';
 
   const comparisonResTrue = 'The Comparison Result: true';
   const comparisonResFalse = 'The Comparison Result: false';
@@ -39,6 +40,14 @@ describe('Testing the Compare functionalities', () => {
         () => {
 
         });
+  });
+
+
+  it('should reject if dn is not string', (next) => {
+    ldapAsyncWrap.compare(1, attr, val).catch((error) => {
+      should.deepEqual(error.message, dnEntryError);
+      next();
+    });
   });
 
   it('should compare existing attribute', (next) => {
