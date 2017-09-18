@@ -42,7 +42,6 @@ void LDAPCompareProgress::HandleOKCallback() {
     }
   }
 }
-}
 
 void LDAPCompareProgress::HandleProgressCallback(const char *data,
                                                  size_t size) {
