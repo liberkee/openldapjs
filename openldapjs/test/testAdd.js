@@ -22,7 +22,21 @@ describe('Testing the async LDAP add operation', () => {
     objectClass: config.ldapAdd.objectClass,
     sn: config.ldapAdd.sn,
     description: config.ldapAdd.description,
-  };
+  }
+
+  const controlOperation = [
+    {
+      oid: config.ldapControls.ldapModificationControlPostRead.oid,
+      value: config.ldapControls.ldapModificationControlPostRead.value,
+      iscritical:
+          config.ldapControls.ldapModificationControlPostRead.iscritical,
+    },
+    {
+      oid: config.ldapControls.ldapModificationControlPreRead.oid,
+      value: config.ldapControls.ldapModificationControlPreRead.value,
+      iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+    },
+  ];
 
   let clientLDAP = new LDAP(config.ldapAuthentification.host);
   let clientLDAP2 = new LDAP(config.ldapAuthentification.host);
@@ -82,18 +96,16 @@ describe('Testing the async LDAP add operation', () => {
     clientLDAP.add(config.ldapAuthentification.dnUser, validEntry)
         .catch((duplicatedEntryError) => {
           duplicatedEntryError.message.should.be.deepEqual(alreadyExists);
-          personNr = personNr + 1;
           next();
         });
   });
 
-  it('should add a single entry', (next) => {
-    clientLDAP.add(dnUser, validEntry).then((result) => {
-      result.should.be.deepEqual(0);
-      personNr = personNr + 1;
-      next();
-    });
-  });
+  it('should add a single entry',
+     (next) => {clientLDAP.add(dnUser, validEntry).then((result) => {
+       result.should.be.deepEqual(0);
+       personNr = personNr + 1;
+       next();
+     })});
 
   it('should add multiple entries sequentialy and reject to add a duplicate',
      (next) => {
@@ -156,9 +168,21 @@ describe('Testing the async LDAP add operation', () => {
     personNr = personNr + 1;
     dnUser = `${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
     const third = clientLDAP.add(dnUser, validEntry);
+    personNr = personNr + 1;
 
     Promise.all([first, second, third]).then((values) => {
       values.forEach((result) => { result.should.be.deepEqual(0); });
+      next();
+    });
+  });
+
+  it('should add a new entry and return the control', (next) => {
+    clientLDAP.add(dnUser, validEntry, controlOperation).then((result) => {
+      let resultOperation;
+      resultOperation = result.split('\n');
+      resultOperation = resultOperation[1].split(':');
+      resultOperation = resultOperation[1];
+      should.deepEqual(resultOperation, ` ${dnUser}`);
       next();
     });
   });
