@@ -25,12 +25,12 @@ void LDAPBindProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result == -1) {
-    stateClient[0] = Nan::New<v8::Number>(0);
+    stateClient[0] = Nan::New<v8::Number>(result);
     callback->Call(1, stateClient);
   } else {
     int status = ldap_result2error(ld, resultMsg, 0);
     if (status != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
       stateClient[1] =
