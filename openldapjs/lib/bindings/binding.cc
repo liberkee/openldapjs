@@ -15,10 +15,6 @@
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
 
-// using namespace Nan;
-// using namespace v8;
-// using namespace std;
-
 class LDAPClient : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init) {
@@ -127,14 +123,14 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
 
-    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Callback *callback = new Callback(info[2].As<Function>());
-    Callback *progress = new Callback(info[3].As<v8::Function>());
+    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
 
     char *username = *userArg;
     char *password = *passArg;
     if (obj->ld == nullptr) {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -158,16 +154,16 @@ class LDAPClient : public Nan::ObjectWrap {
     struct timeval timeOut = {10,
                               0};  // if search exceeds 10 seconds, throws error
 
-    Local<Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Callback *callback = new Callback(info[3].As<Function>());
-    Callback *progress = new Callback(info[4].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     // Verify if the argument is a Number for scope
     if (!info[1]->IsNumber()) {  // wouldn't it be better to let it go through
                                  // and just fail with a ldap error in the
                                  // function call ?
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -177,7 +173,7 @@ class LDAPClient : public Nan::ObjectWrap {
     int scopeSearch =
         info[1]->NumberValue();  // why not let it fail with ldap error ?
     if (scopeSearch <= 0 && scopeSearch >= 3) {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -185,7 +181,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (obj->ld == nullptr) {
-      stateClient[0] = Nan::New<Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -204,7 +200,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPSearchProgress(callback, progress, obj->ld, message));
   }
 
@@ -238,7 +234,7 @@ class LDAPClient : public Nan::ObjectWrap {
       callback->Call(1, stateClient);
       return;
     }
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPCompareProgress(callback, progress, obj->ld, message));
   }
 
@@ -283,7 +279,8 @@ class LDAPClient : public Nan::ObjectWrap {
       } else {
         stateClient[0] = Nan::New<v8::Number>(LDAP_INVALID_SYNTAX);
         callback->Call(1, stateClient);
-        delete ldapmods;
+        delete ldapmods;  // shouldn't it be delete[] ? or better yet use
+                          // ldap_modsfree?
         delete callback;
         delete progress;
         return;
@@ -328,7 +325,7 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPModifyProgress(callback, progress, obj->ld, msgID, ldapmods));
   }
 
@@ -367,7 +364,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPRenameProgress(callback, progress, obj->ld, msgID));
   }
 
@@ -443,7 +440,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPModifyProgress(callback, progress, obj->ld, msgID, newEntries));
   }
 
@@ -489,7 +486,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPDeleteProgress(callback, progress, obj->ld, msgID));
   }
 
@@ -579,7 +576,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(
+    Nan::AsyncQueueWorker(
         new LDAPAddProgress(callback, progress, obj->ld, msgID, newEntries));
   }
 

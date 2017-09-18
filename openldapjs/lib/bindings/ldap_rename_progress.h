@@ -1,5 +1,5 @@
-#ifndef BINDINGS_LDAP_RENAME_PROGRESS_H_
-#define BINDINGS_LDAP_RENAME_PROGRESS_H_
+#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_
+#define OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_
 
 #include <ldap.h>
 #include <nan.h>
@@ -36,4 +36,4 @@ class LDAPRenameProgress : public Nan::AsyncProgressWorker {
   void HandleProgressCallback(const char *data, size_t size);
 };
 
-#endif  // BINDINGS_LDAP_RENAME_PROGRESS_H_
+#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_

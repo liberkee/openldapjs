@@ -9,28 +9,22 @@
 #include <string>
 #include <thread>
 
-using namespace Nan;
-using namespace v8;
-using namespace std;
-
-class LDAPSearchProgress : public AsyncProgressWorker {
+class LDAPSearchProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld;
-  Callback *progress;
+  Nan::Callback *progress;
   int result = 0;
   int finished = 0;
-  bool flagVerification = false;
-  string resultSearch;
-  int i = 0;
+  std::string resultSearch;
   int msgID;
   int status = 0;
 
  public:
-  LDAPSearchProgress(Callback *callback, Callback *progress, LDAP *ld,
+  LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                      int msgID);
 
   // Executes in worker thread
-  void Execute(const AsyncProgressWorker::ExecutionProgress &progress);
+  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);
 
   // Executes in event loop
   void HandleOKCallback();
