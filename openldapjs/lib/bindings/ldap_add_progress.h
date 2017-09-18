@@ -4,7 +4,6 @@
 #include <ldap.h>
 #include <nan.h>
 
-
 class LDAPAddProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld_{};

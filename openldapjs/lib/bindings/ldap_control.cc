@@ -44,7 +44,8 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
         controls->Get(Nan::New(constants::changeOidMember).ToLocalChecked()));
 
     if (std::strcmp(*controlOperation, constants::postread) == 0) {
-      ctrl->ldctl_oid = reinterpret_cast<const char *>(LDAP_CONTROL_POST_READ);  //  compiler warning though...
+      ctrl->ldctl_oid = reinterpret_cast<const char *>(
+          LDAP_CONTROL_POST_READ);  //  compiler warning though...
     } else if (std::strcmp(*controlOperation, constants::preread) == 0) {
       ctrl->ldctl_oid = reinterpret_cast<const char *>(LDAP_CONTROL_PRE_READ);
     } else {
@@ -62,7 +63,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
 
 std::string LdapControls::PrintModificationControls(LDAP *ld,
                                                     LDAPMessage *resultMsg) {
-  struct berval bv{};
+  struct berval bv {};
   BerElement *ber{};
   LDAPControl **serverCTL = nullptr;
   BerVarray vals = nullptr;

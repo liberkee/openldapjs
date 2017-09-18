@@ -12,11 +12,11 @@ LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
 // Executes in worker thread
 void LDAPCompareProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-    struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
+  struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
   while (result_ == 0) {
-    result_ = ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
-  
+    result_ =
+        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
 }
 // Executes in event loop

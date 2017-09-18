@@ -1,11 +1,13 @@
 #include "ldap_search_progress.h"
 #include "constants.h"
 
-
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
                                        int msgID)
-    : Nan::AsyncProgressWorker(callback), progress_(progress), ld_(ld), msgID_(msgID) {}
+    : Nan::AsyncProgressWorker(callback),
+      progress_(progress),
+      ld_(ld),
+      msgID_(msgID) {}
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {

@@ -3,7 +3,7 @@
 
 #include <ldap.h>
 #include <nan.h>
-#include<string>
+#include <string>
 
 class LDAPSearchProgress : public Nan::AsyncProgressWorker {
  private:

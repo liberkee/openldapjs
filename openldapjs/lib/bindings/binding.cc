@@ -5,6 +5,7 @@
 #include <string.h>
 #include <chrono>
 #include <iostream>
+#include "constants.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
 #include "ldap_compare_progress.h"
@@ -13,7 +14,6 @@
 #include "ldap_modify_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
-#include "constants.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -125,7 +125,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     char *username = *userArg;
     char *password = *passArg;
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -133,8 +133,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
     int msgID = ldap_simple_bind(obj->ld_, username, password);
-    AsyncQueueWorker(
-        new LDAPBindProgress(callback, progress, obj->ld_, msgID));
+    AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld_, msgID));
   }
 
   static NAN_METHOD(search) {
@@ -148,7 +147,9 @@ class LDAPClient : public Nan::ObjectWrap {
     int message{};
     int result{};
     struct timeval timeOut = {constants::TEN_SECONDS,
-                               constants::ZERO_USECONDS};  // if search exceeds 10 seconds, throws error
+                              constants::ZERO_USECONDS};  // if search exceeds
+                                                          // 10 seconds, throws
+                                                          // error
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
@@ -176,7 +177,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -217,7 +218,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    struct berval bvalue{};
+    struct berval bvalue {};
 
     bvalue.bv_val = value;
     bvalue.bv_len = strlen(value);
@@ -250,7 +251,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     LDAPMod **ldapmods = new LDAPMod *[nummods + 1];
 
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
       callback->Call(1, stateClient);
       delete ldapmods;
@@ -378,7 +379,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
 
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       callback->Reset();
@@ -464,7 +465,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(1, stateClient);
       delete callback;
@@ -475,13 +476,14 @@ class LDAPClient : public Nan::ObjectWrap {
     int result{};
 
     if (controlHandle == Nan::Null()) {
-      result = ldap_add_ext(obj->ld_, dns, newEntries, nullptr, nullptr, &msgID);
+      result =
+          ldap_add_ext(obj->ld_, dns, newEntries, nullptr, nullptr, &msgID);
     } else {
       const auto &ldap_controls = new LdapControls();
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(nullptr);
-      result =
-          ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr, &msgID);
+      result = ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr,
+                            &msgID);
     }
 
     if (result != 0) {
@@ -506,7 +508,7 @@ class LDAPClient : public Nan::ObjectWrap {
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
 
-    if (obj->ld_== nullptr) {
+    if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(0);
       callback->Call(2, stateClient);
       delete callback;
