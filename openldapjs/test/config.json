@@ -71,6 +71,21 @@
     "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
   },
 
+  "ldapCompare": {
+    "attribute": "cn",
+    "value": "admin",
+    "invalidUser":"cn=cghitea,ou=user55s,o=myhost,dc=demoApp,dc=com",
+    "invalidPassword": "wrongPass"
+  },
+
+  "ldapSearch": {
+    "searchBase": "dc=demoApp,dc=com",
+    "filterObjAll": "objectclass=*",
+    "filterObjSpecific": "objectclass=aliens",
+    "filterObjSpecific2": "objectClass=simpleSecurityObject",
+    "filterObjSpecific3": "objectClass=inetOrgPerson"
+  },
+
   "ldapDelete": {
     "rdnUser": "cn=testUsers",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"

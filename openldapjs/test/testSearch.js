@@ -3,6 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
+const config = require('./config.json');
 
 const OBJECT_NOT_FOUND = '32';
 const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
@@ -10,12 +11,12 @@ const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
 describe('Testing the async LDAP search ', () => {
 
 
-  const host = 'ldap://localhost:389';
-  const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
-  const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
-  const searchBase = 'dc=demoApp,dc=com';
+  const host = config.ldapAuthentification.host;
+  const dnAdmin = config.ldapAuthentification.dnAdmin;
+  const dnUser = config.ldapAuthentification.dnUser;
+  const searchBase = config.ldapSearch.searchBase;
 
-  const password = 'secret';
+  const password = config.ldapAuthentification.passwordAdmin;
   let adminLDAP = new LDAPWrap(host);
   let userLDAP = new LDAPWrap(host);
 
@@ -38,7 +39,7 @@ describe('Testing the async LDAP search ', () => {
   });
 
   it('should return an empty search', (next) => {
-    adminLDAP.search(searchBase, 2, 'objectclass=aliens')
+    adminLDAP.search(searchBase, 2,  config.ldapSearch.filterObjSpecific)
         .then((result) => { result.should.be.empty; })
         .then(() => { next(); });
   });
@@ -46,7 +47,7 @@ describe('Testing the async LDAP search ', () => {
    * case for search with non existing search base
    */
   it('should return the root node', (next) => {
-    adminLDAP.search('', 0, 'objectclass=*')
+    adminLDAP.search('', 0, config.ldapSearch.filterObjAll)
         .then((result) => { should.deepEqual(result, ROOT_NODE); })
         .then(() => { next(); });
 
@@ -56,7 +57,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', (next) => {
-    userLDAP.search(searchBase, 2, 'objectClass=*')
+    userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
         .catch((err) => { err.message.should.be.deepEqual(OBJECT_NOT_FOUND); })
         .then(() => { next(); });
   });
@@ -67,7 +68,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return a single result', (next) => {
-    adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2)
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.eql(1);
@@ -80,7 +81,7 @@ describe('Testing the async LDAP search ', () => {
    *
    **/
   it('should return multiple results located on the same level', (next) => {
-    adminLDAP.search(searchBase, 1, 'objectClass=*')
+    adminLDAP.search(searchBase, 1, config.ldapSearch.filterObjAll)
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.above(1);
@@ -94,9 +95,9 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return the same result', (next) => {
 
-    adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2)
         .then((res1) => {
-          adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
+          adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2)
               .then((res2) => {
                 should.deepEqual(res1, res2);
                 next();
@@ -110,12 +111,12 @@ describe('Testing the async LDAP search ', () => {
    */
   it('should return sequential different results and errors', (next) => {
 
-    adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject')
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2)
         .then((result1) => {
-          adminLDAP.search(searchBase, 2, 'objectClass=aliens')
+          adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific)
               .then((result2) => {
                 should.notDeepEqual(result1, result2);
-                adminLDAP.search(searchBase, 1, 'objectClass=*')
+                adminLDAP.search(searchBase, 1, config.ldapSearch.filterObjAll)
                     .then((result3) => {
                       should.notDeepEqual(result1, result3);
                       should.notDeepEqual(result2, result3);
@@ -137,10 +138,10 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return search results done in parallel', (next) => {
     const firstResult =
-        adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
+        adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
     const secondResult =
-        adminLDAP.search(searchBase, 2, 'objectClass=simpleSecurityObject');
-    const thirdResult = adminLDAP.search(searchBase, 2, 'objectClass=aliens');
+        adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
+    const thirdResult = adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific);
 
     Promise.all([firstResult, secondResult, thirdResult])
         .then((values) => {
@@ -157,7 +158,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return >10k entries', function(next) {
     this.timeout(0);
 
-    adminLDAP.search(searchBase, 2, 'objectClass=*')
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.above(10000);
@@ -166,8 +167,7 @@ describe('Testing the async LDAP search ', () => {
   });
 
   it('should return results in entire subtree', (next) => {
-
-    adminLDAP.search(searchBase, 2, 'objectClass=inetOrgPerson')
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific3)
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.above(1);
