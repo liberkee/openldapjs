@@ -4,9 +4,9 @@
 LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
                                    Nan::Callback *progress, LDAP *ld, int msgID)
     : Nan::AsyncProgressWorker(callback),
-      progress(progress),
-      ld(ld),
-      msgID(msgID) {}
+      progress_(progress),
+      ld_(ld),
+      msgID_(msgID) {}
 
 /**
 ** Execute Method, runs outside the event loop.
@@ -14,8 +14,8 @@ LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
 void LDAPBindProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
     struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result == 0) {
-    result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+  while (result_ == 0) {
+    result_ = ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
 }
 
@@ -25,11 +25,11 @@ void LDAPBindProgress::Execute(
 void LDAPBindProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-  if (result == -1) {
-    stateClient[0] = Nan::New<v8::Number>(result);
+  if (result_ == -1) {
+    stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    int status = ldap_result2error(ld, resultMsg, 0);
+    int status = ldap_result2error(ld_, resultMsg_, 0);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
@@ -39,9 +39,9 @@ void LDAPBindProgress::HandleOKCallback() {
       callback->Call(2, stateClient);
     }
   }
-  ldap_msgfree(resultMsg);  // this was missing, added it recently
+  ldap_msgfree(resultMsg_);  // this was missing, added it recently
   callback->Reset();
-  progress->Reset();
+  progress_->Reset();
 }
 
 void LDAPBindProgress::HandleProgressCallback(const char *data, size_t size) {}

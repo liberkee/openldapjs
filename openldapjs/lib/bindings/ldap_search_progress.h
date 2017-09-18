@@ -7,13 +7,11 @@
 
 class LDAPSearchProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld{};
-  Nan::Callback *progress{};
-  int result = 0;
-  int finished = 0;
-  std::string resultSearch{};
-  int msgID{};
-  int status = 0;
+  LDAP *ld_{};
+  Nan::Callback *progress_{};
+  std::string resultSearch_{};
+  int msgID_{};
+  int status_ = 0;
 
  public:
   LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,

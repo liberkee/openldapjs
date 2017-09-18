@@ -6,11 +6,11 @@
 
 class LDAPCompareProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld{};
-  Nan::Callback *progress{};
-  int result = 0;
-  LDAPMessage *resultMsg{};
-  int msgID{};
+  LDAP *ld_{};
+  Nan::Callback *progress_{};
+  int result_ = 0;
+  LDAPMessage *resultMsg_{};
+  int msgID_{};
 
  public:
   LDAPCompareProgress(Nan::Callback *callback, Nan::Callback *progress,

@@ -7,15 +7,15 @@ LDAPRenameProgress::LDAPRenameProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
                                        int msgID)
     : Nan::AsyncProgressWorker(callback),
-      progress(progress),
-      ld(ld),
-      msgID(msgID) {}
+      progress_(progress),
+      ld_(ld),
+      msgID_(msgID) {}
 
 void LDAPRenameProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
     struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result == 0) {
-    result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
+  while (result_ == 0) {
+    result_ = ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
 }
 
@@ -26,18 +26,18 @@ void LDAPRenameProgress::HandleOKCallback() {
 
   std::string modifyResult;
 
-  if (result == -1) {
-    stateClient[0] = Nan::New<v8::Number>(result);
+  if (result_ == constants::LDAP_ERROR) {
+    stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    status = ldap_result2error(ld, resultMsg, 0);
+    status = ldap_result2error(ld_, resultMsg_, 0);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
       const auto &ldap_controls = new LdapControls();
-      modifyResult = ldap_controls->PrintModificationControls(ld, resultMsg);
-      if (modifyResult != "") {
+      modifyResult = ldap_controls->PrintModificationControls(ld_, resultMsg_);
+      if (!modifyResult.empty()) {
         stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
         callback->Call(2, stateClient);
 
@@ -48,8 +48,8 @@ void LDAPRenameProgress::HandleOKCallback() {
     }
   }
   callback->Reset();
-  progress->Reset();
-  ldap_msgfree(resultMsg);
+  progress_->Reset();
+  ldap_msgfree(resultMsg_);
 }
 
 void LDAPRenameProgress::HandleProgressCallback(const char *data, size_t size) {
