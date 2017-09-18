@@ -49,9 +49,9 @@ class LDAPClient : public Nan::ObjectWrap {
   LDAPMessage *result;
   unsigned int stateClient = 0;
   int msgid;
-  explicit LDAPClient(){};
+  explicit LDAPClient() {}
 
-  ~LDAPClient(){};
+  ~LDAPClient() {}
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {

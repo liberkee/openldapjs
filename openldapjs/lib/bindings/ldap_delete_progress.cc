@@ -1,15 +1,16 @@
 #include "ldap_delete_progress.h"
 
-LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-  int msgID)
-: Nan::AsyncProgressWorker(callback),
-progress(progress),
-ld(ld),
-msgID(msgID) {}
+LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback,
+                                       Nan::Callback *progress, LDAP *ld,
+                                       int msgID)
+    : Nan::AsyncProgressWorker(callback),
+      progress(progress),
+      ld(ld),
+      msgID(msgID) {}
 
-
- // Executes in worker thread
- void LDAPDeleteProgress::Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
+// Executes in worker thread
+void LDAPDeleteProgress::Execute(
+    const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {0, 1};
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
@@ -48,4 +49,3 @@ void LDAPDeleteProgress::HandleOKCallback() {
 void LDAPDeleteProgress::HandleProgressCallback(const char *data, size_t size) {
   // progress.send what ?
 }
-
