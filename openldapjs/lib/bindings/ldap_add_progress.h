@@ -3,21 +3,16 @@
 
 #include <ldap.h>
 #include <nan.h>
-#include <chrono>
-#include <iostream>
-#include <map>
-#include <string>
-#include <thread>
-#include "ldap_control.h"
+
 
 class LDAPAddProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld;
-  Nan::Callback *progress;
+  LDAP *ld{};
+  Nan::Callback *progress{};
   int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID;
-  LDAPMod **entries;
+  LDAPMessage *resultMsg{};
+  int msgID{};
+  LDAPMod **entries{};
 
  public:
   LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,

@@ -1,4 +1,7 @@
 #include "ldap_add_progress.h"
+#include "ldap_control.h"
+#include "string"
+#include "constants.h"
 
 LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
                                  Nan::Callback *progress, LDAP *ld, int msgID,
@@ -11,7 +14,7 @@ LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
 
 void LDAPAddProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {0, 1};
+  struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);

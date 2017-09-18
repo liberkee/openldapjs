@@ -184,9 +184,7 @@ module.exports = class LDAPAsyncWrap {
           if (controls !== undefined) {
             checkParameters.checkControlArray(controls);
           }
-
-
-          this._binding.newModify(
+          this._binding.modify(
               dn, jsonChange, (controls !== undefined) ? controls : null,
               (err, result) => {
                 if (err) {

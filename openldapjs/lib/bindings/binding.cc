@@ -5,7 +5,6 @@
 #include <string.h>
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
 #include "ldap_compare_progress.h"
@@ -14,6 +13,7 @@
 #include "ldap_modify_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
+#include "constants.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -27,7 +27,6 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "bind", bind);
     Nan::SetPrototypeMethod(tpl, "search", search);
     Nan::SetPrototypeMethod(tpl, "modify", modify);
-    Nan::SetPrototypeMethod(tpl, "newModify", newModify);
     Nan::SetPrototypeMethod(tpl, "compare", compare);
     Nan::SetPrototypeMethod(tpl, "rename", ldaprename);
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
@@ -41,10 +40,10 @@ class LDAPClient : public Nan::ObjectWrap {
 
  protected:
  private:
-  LDAP *ld;
-  LDAPMessage *result;
+  LDAP *ld{};
+  LDAPMessage *result{};
   unsigned int stateClient = 0;
-  int msgid;
+  int msgid{};
   explicit LDAPClient() {}
 
   ~LDAPClient() {}
@@ -149,10 +148,10 @@ class LDAPClient : public Nan::ObjectWrap {
 
     char *DNbase = *baseArg;
     char *filterSearch = *filterArg;
-    int message;
-    int result;
-    struct timeval timeOut = {10,
-                              0};  // if search exceeds 10 seconds, throws error
+    int message{};
+    int result{};
+    struct timeval timeOut = {constants::TEN_SECONDS,
+                               constants::ZERO_USECONDS};  // if search exceeds 10 seconds, throws error
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
@@ -221,7 +220,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    struct berval bvalue;
+    struct berval bvalue{};
 
     bvalue.bv_val = value;
     bvalue.bv_len = strlen(value);
@@ -238,7 +237,7 @@ class LDAPClient : public Nan::ObjectWrap {
         new LDAPCompareProgress(callback, progress, obj->ld, message));
   }
 
-  static NAN_METHOD(newModify) {
+  static NAN_METHOD(modify) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String dn(info[0]);
 
@@ -303,8 +302,8 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     ldapmods[nummods] = nullptr;
-    int msgID;
-    int result;
+    int msgID{};
+    int result{};
 
     if (controlHandle == Nan::Null()) {
       result =
@@ -342,8 +341,8 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[4].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[5].As<v8::Function>());
 
-    int msgID;
-    int result;
+    int msgID{};
+    int result{};
 
     if (controlHandle == Nan::Null()) {
       result = ldap_rename(obj->ld, *dn, *newrdn, *newparent, 1, nullptr,
@@ -366,82 +365,6 @@ class LDAPClient : public Nan::ObjectWrap {
 
     Nan::AsyncQueueWorker(
         new LDAPRenameProgress(callback, progress, obj->ld, msgID));
-  }
-
-  static NAN_METHOD(modify) {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    Nan::Utf8String dn(info[0]);
-    v8::Local<v8::Array> entryModify = v8::Local<v8::Array>::Cast(info[2]);
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-
-    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
-
-    if (!info[1]->IsNumber()) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      return;
-    }
-
-    int operationType = info[1]->NumberValue();
-    int length = entryModify->Length();
-
-    if (length < 2 || obj->ld == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete progress;
-      delete callback;
-      return;
-    }
-
-    LDAPMod **newEntries = new LDAPMod *[length / 2 + 1];
-    for (int i = 0; i < length / 2; i++) {
-      Nan::Utf8String type(entryModify->Get(2 * i));
-      std::string typeString(*type);
-      Nan::Utf8String value(entryModify->Get(2 * i + 1));
-      std::string valueString(*value);
-
-      newEntries[i] = new LDAPMod;
-
-      if (typeString.length() > 0 && valueString.length() > 0) {
-        newEntries[i]->mod_type = new char[typeString.length() + 1];
-        newEntries[i]->mod_values = new char *[2];
-        newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
-
-        newEntries[i]->mod_op = operationType;
-        memcpy(newEntries[i]->mod_type, typeString.c_str(),
-               typeString.length() + 1);
-        memcpy(newEntries[i]->mod_values[0], valueString.c_str(),
-               valueString.length() + 1);
-        newEntries[i]->mod_values[1] = NULL;
-      }
-    }
-
-    newEntries[length / 2] = NULL;
-    char *dns = *dn;
-    int msgID = 0;
-
-    if (obj->ld == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-
-    int result = ldap_modify_ext(obj->ld, dns, newEntries, NULL, NULL, &msgID);
-
-    if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-
-    Nan::AsyncQueueWorker(
-        new LDAPModifyProgress(callback, progress, obj->ld, msgID, newEntries));
   }
 
   static NAN_METHOD(del) {
@@ -468,7 +391,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    int result;
+    int result{};
     if (controlHandle == Nan::Null()) {
       result = ldap_delete_ext(obj->ld, dns, nullptr, nullptr, &msgID);
     } else {
@@ -552,7 +475,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    int result;
+    int result{};
 
     if (controlHandle == Nan::Null()) {
       result = ldap_add_ext(obj->ld, dns, newEntries, nullptr, nullptr, &msgID);

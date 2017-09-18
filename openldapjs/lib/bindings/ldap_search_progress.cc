@@ -1,4 +1,6 @@
 #include "ldap_search_progress.h"
+#include "constants.h"
+
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -7,14 +9,14 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {1, 0};
+  struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
-  BerElement *ber;
-  LDAPMessage *l_result;
-  LDAPMessage *l_entry;
-  char *attribute;
-  char **values;
-  char *l_dn;
+  BerElement *ber{};
+  LDAPMessage *l_result{};
+  LDAPMessage *l_entry{};
+  char *attribute{};
+  char **values{};
+  char *l_dn{};
   int result = 0;
 
   while (result == 0) {

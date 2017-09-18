@@ -1,4 +1,5 @@
 #include "ldap_compare_progress.h"
+#include "constants.h"
 
 LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
                                          Nan::Callback *progress, LDAP *ld,
@@ -11,7 +12,7 @@ LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
 // Executes in worker thread
 void LDAPCompareProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {0, 1};
+    struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);

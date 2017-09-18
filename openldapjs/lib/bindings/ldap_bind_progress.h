@@ -3,19 +3,14 @@
 
 #include <ldap.h>
 #include <nan.h>
-#include <chrono>
-#include <iostream>
-#include <map>
-#include <string>
-#include <thread>
 
 class LDAPBindProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld;
-  Nan::Callback *progress;
+  LDAP *ld{};
+  Nan::Callback *progress{};
   int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID;
+  LDAPMessage *resultMsg{};
+  int msgID{};
 
  public:
   LDAPBindProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,

@@ -1,4 +1,7 @@
 #include "ldap_rename_progress.h"
+#include<string>
+#include"ldap_control.h"
+#include "constants.h"
 
 LDAPRenameProgress::LDAPRenameProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -10,7 +13,7 @@ LDAPRenameProgress::LDAPRenameProgress(Nan::Callback *callback,
 
 void LDAPRenameProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {0, 1};
+    struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
   }

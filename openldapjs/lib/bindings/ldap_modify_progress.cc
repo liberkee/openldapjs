@@ -1,4 +1,7 @@
 #include "ldap_modify_progress.h"
+#include<string>
+#include"ldap_control.h"
+#include "constants.h"
 
 LDAPModifyProgress::LDAPModifyProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -11,14 +14,14 @@ LDAPModifyProgress::LDAPModifyProgress(Nan::Callback *callback,
 
 void LDAPModifyProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {0, 1};
+    struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
   while (result == 0) {
     result = ldap_result(ld, msgID, 1, &timeOut, &resultMsg);
   }
 }
 
 void LDAPModifyProgress::HandleOKCallback() {
-  int status;
+  int status{};
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 

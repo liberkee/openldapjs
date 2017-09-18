@@ -3,7 +3,6 @@
 #include <lber.h>
 #include <ldap.h>
 #include <nan.h>
-#include <iostream>
 #include <string>
 #include <vector>
 
