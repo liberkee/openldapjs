@@ -7,6 +7,10 @@ const config = require('./config.json');
 
 const OBJECT_NOT_FOUND = '32';
 const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
+const resStateRequired =
+    'The operation failed. It could be done if the state of the client is BOUND';
+const scopeError = 'Scope must be integer';
+const searchBseError = 'The 1 is not string';
 
 describe('Testing the async LDAP search ', () => {
 
@@ -38,8 +42,18 @@ describe('Testing the async LDAP search ', () => {
 
   });
 
+  it('should reject if the state is not BOUND', (next) => {
+    adminLDAP.unbind().then(() => {
+      adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific)
+          .catch((error) => {
+            should.deepEqual(error.message, resStateRequired);
+            next();
+          });
+    });
+  });
+
   it('should return an empty search', (next) => {
-    adminLDAP.search(searchBase, 2,  config.ldapSearch.filterObjSpecific)
+    adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific)
         .then((result) => { result.should.be.empty; })
         .then(() => { next(); });
   });
@@ -59,6 +73,18 @@ describe('Testing the async LDAP search ', () => {
   it('should return an LDAP_OBJECT_NOT_FOUND error', (next) => {
     userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
         .catch((err) => { err.message.should.be.deepEqual(OBJECT_NOT_FOUND); })
+        .then(() => { next(); });
+  });
+
+  it('should reject if scope is not integer', (next) => {
+    userLDAP.search(searchBase, '2', config.ldapSearch.filterObjAll)
+        .catch((err) => { err.message.should.be.deepEqual(scopeError); })
+        .then(() => { next(); });
+  });
+
+  it('should reject if searchBase is not string', (next) => {
+    userLDAP.search(1, 2, config.ldapSearch.filterObjAll)
+        .catch((err) => { err.message.should.be.deepEqual(searchBseError); })
         .then(() => { next(); });
   });
 
@@ -141,7 +167,8 @@ describe('Testing the async LDAP search ', () => {
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
     const secondResult =
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
-    const thirdResult = adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific);
+    const thirdResult =
+        adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific);
 
     Promise.all([firstResult, secondResult, thirdResult])
         .then((values) => {
