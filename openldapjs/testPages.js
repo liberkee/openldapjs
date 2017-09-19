@@ -12,7 +12,7 @@ let clientLDAP = new LDAPWrap(host);
 
 clientLDAP.initialize().then(() => {
   clientLDAP.bind(dnAdmin, password).then(() => {
-    clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 100)
+    clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 1)
         .pipe(process.stdout);
   });
 
