@@ -9,7 +9,6 @@ describe('Testing multiple operations functionalities', () => {
   const dn = config.ldapAuthentification.dnAdmin;
   const password = config.ldapAuthentification.passwordAdmin;
   let ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
-  let ldapAsyncWrap2 = new LdapAsyncWrap(hostAddress);
 
   /* Attributes and Values */
   const attr = config.ldapCompare.attribute;
@@ -82,24 +81,11 @@ describe('Testing multiple operations functionalities', () => {
   beforeEach((next) => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize().then(() => {
-      ldapAsyncWrap.bind(dn, password).then(() => {
-        ldapAsyncWrap2 = new LdapAsyncWrap(hostAddress);
-        ldapAsyncWrap2.initialize().then(() => {
-          ldapAsyncWrap2.bind(dn, password).then(() => { next(); });
-        });
-      });
-    });
+    ldapAsyncWrap.initialize().then(
+        () => { ldapAsyncWrap.bind(dn, password).then(() => { next(); }); });
   });
 
-  afterEach(() => {
-    ldapAsyncWrap.unbind().then(() => {
-      ldapAsyncWrap.unbind().then(
-          () => {
-
-          });
-    });
-  });
+  afterEach(() => { ldapAsyncWrap.unbind().then(() => {}); });
 
 
   it('should add, search, comparte, modify and delete  in multiple times sequential',
@@ -237,35 +223,21 @@ describe('Testing multiple operations functionalities', () => {
            });
      });
 
-  it.only('should make multiple operation in parallel', (next) => {
+  it('should make multiple operation in parallel', (next) => {
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
     let searchEntry = config.ldapAuthentification.dnUser.split(',');
     searchEntry = searchEntry[0];
 
-    const add1 = ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
-    const delete1 = ldapAsyncWrap.del(dnUser, controlOperation);
-    const search1 =
+    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
+    const deleteOP = ldapAsyncWrap.del(dnUser, controlOperation);
+    const searchOP =
         ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
-    const compare1 = ldapAsyncWrap.compare(dn, attr, val);
-    const modify1 = ldapAsyncWrap.modify(
+    const compareOP = ldapAsyncWrap.compare(dn, attr, val);
+    const modifyOP = ldapAsyncWrap.modify(
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
-    const add2 = ldapAsyncWrap2.add(dnUserNew, validEntry, controlOperation);
-    const delete2 = ldapAsyncWrap2.del(dnUserNew, controlOperation);
-    const search2 =
-        ldapAsyncWrap2.search(searchBase, searchScope.subtree, searchEntry);
-    const modify2 = ldapAsyncWrap2.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
-        controlOperation);
-    const compare2 = ldapAsyncWrap.compare(dn, attr, val);
-    let i = 0;
-    Promise
-        .all([
-          add1, add2, delete1, delete2, modify1, modify2, search1, search2,
-          compare1, compare2
-        ])
+    Promise.all([addOP, deleteOP, searchOP, compareOP, modifyOP])
         .then((results) => {
-          i++;
           results.forEach((element) => {
             if (element === comparisonResTrue) {
               should.deepEqual(comparisonResTrue, element);
