@@ -5,7 +5,7 @@ const should = require('should');
 // Require the library that is used for the test
 const JSONmap = require('../modules/mappingJsonObject/mappingStringJson.js');
 
-describe('String to JSON#searchTest', () => {
+describe('Test string to Json library', () => {
   const JSONStruct = new JSONmap();
   const simpleLdif =
       '\ndn:ou=users,o=myhost,dc=demoApp,dc=com\nobjectClass:organizationalUnit\nou:users';
