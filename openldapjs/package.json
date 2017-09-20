@@ -24,7 +24,8 @@
   "scripts": {
     "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./test/*.js"
+    "lint": "eslint ./test/*.js",
+    "install": "cd lib/bindings && node-gyp rebuild"
   },
   "author": "",
   "license": "ISC",

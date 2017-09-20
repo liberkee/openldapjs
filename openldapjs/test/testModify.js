@@ -3,6 +3,7 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
+const Promise = require('bluebird');
 
 describe('Testing the modify functionalities', () => {
 
@@ -212,6 +213,38 @@ describe('Testing the modify functionalities', () => {
           should.deepEqual(result, 0);
           next();
         });
+  });
+
+  it('should modify in paralel', (next) => {
+    const modify1 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
+    const modify2 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
+    const modify3 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
+    const modify4 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
+    const modify5 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
+    
+    Promise.all([modify1, modify2, modify3, modify4, modify5])
+    .then((results) => {
+      results.forEach((element) => {
+        let resultOperation;
+        resultOperation = element.split('\n');
+        resultOperation = resultOperation[1].split(':');
+        resultOperation = resultOperation[1];
+        should.deepEqual(resultOperation, ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+      });
+    })
+    .then(() => {
+      next();
+    })
   });
 
   it('should return the specific attribute from the entry', (next) => {
