@@ -31,6 +31,10 @@ static_server_npm_helper.pid
 .vscode/
 .modify.ldfi.swp
 modify.ldif
+*.gypi
+*.mk
+*.Makefile
+**/Release/*
 openldapjs/lib/bindings/nano.save
 openldapjs/lib/bindings/build/binding.target.mk
 openldapjs/lib/bindings/build/config.gypi
