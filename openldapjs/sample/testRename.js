@@ -50,21 +50,21 @@ const controlOperation = [
 const searchScope = {
   base: 0,
   oneLevel: 1,
-  subtree: 2
-}
+  subtree: 2,
+};
 
 const validEntry = {
   objectClass: config.ldapAdd.objectClass,
   sn: config.ldapAdd.sn,
   description: config.ldapAdd.description,
-}
+};
 
 const attr = config.ldapCompare.attribute;
 const val = config.ldapCompare.value;
 const searchBase = config.ldapSearch.searchBase;
 
 const comparisonResTrue = 'The Comparison Result: true';
-let entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
+const entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
 const newEntry = 'cn=newPointChild111';
 const dnUser = `${newEntry}${config.ldapAdd.dnNewEntry}`;
 
@@ -74,8 +74,10 @@ const searchResult =
     `\ndn:${newEntry}${config.ldapAdd.dnNewEntry}\nobjectClass:person\nsn:Entry\ndescription:Tesst\ncn:${attributeEntry}\n\n`;
 
 
-newClient.initialize().then(() => {
-  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret').then(() => {
+newClient.initialize()
+.then(() => {
+  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret')
+  .then(() => {
     const add1 = newClient.add(dnUser, validEntry, controlOperation);
     const delete1 = newClient.del(dnUser, controlOperation);
     const search1 =
@@ -85,7 +87,7 @@ newClient.initialize().then(() => {
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
-        
+
     const add2 = newClient.add(dnUserNew, validEntry, controlOperation);
     const delete2 = newClient.del(dnUserNew, controlOperation);
     const search2 =
@@ -98,7 +100,7 @@ newClient.initialize().then(() => {
     Promise
         .all([
           add1, add2, modify1, modify2, delete1, delete2, compare1, compare2,
-          search1, search2
+          search1, search2,
         ])
         .then((results) => {
           results.forEach((element) => {
@@ -111,16 +113,16 @@ newClient.initialize().then(() => {
               resultOperation = element.split('\n');
               resultOperation = resultOperation[1].split(':');
               resultOperation = resultOperation[1];
-              if (resultOperation ===
-                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`)
-                  console.log(element);
-              else
+              if (resultOperation === ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
                 console.log(element);
+              } else {
+                console.log(element);
+              }
             }
           });
         })
         .catch((error) => {
           console.log(error);
-        })
+        });
   });
 });

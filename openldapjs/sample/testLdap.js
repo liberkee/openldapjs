@@ -12,20 +12,13 @@ function search() {
   const clientLDAP = new LDAPWrap(host);
 
   clientLDAP.initialize()
-    .then(() => {
-      clientLDAP.bind(dnUser, password)
-        .then(() => {
-          clientLDAP.search(searchBase, 2, searchFilter)
-            .then((result) => {
-              console.log(result);
-              console.log(result.length);
-            });
-        });
-
-    });
+      .then(() => { return clientLDAP.bind(dnUser, password); })
+      .then(() => { return clientLDAP.search(searchBase, 2, searchFilter); })
+      .then((result) => { console.log(result); });
 }
 
-/* node testLdap.js modify "ldap://10.16.0.194:389" "cn=admin,dc=demoApp,dc=com" "secret"
+/* node testLdap.js modify "ldap://10.16.0.194:389" "cn=admin,dc=demoApp,dc=com"
+ "secret"
  * Example of JSON to pass to method modify
  * JSON = {
  *  operation: 'add' || 'replace' || 'delete'
@@ -75,24 +68,24 @@ function modify() {
   const attributeArray = ['cn', 'entryCSN', 'description', 'entryUUID'];
 
   clientLDAP.initialize()
-    .then(() => {
-      clientLDAP.bind(dnUser, password)
-        .then(() => {
-          clientLDAP.newModify(userDnModify, changes)
-            .then((result) => {
-              console.log(result);
-            });
-        });
-    });
+      .then(() => {
+        return clientLDAP.bind(dnUser, password);
+      })
+      .then(() => {
+        return clientLDAP.newModify(userDnModify, changes);
+      })
+      .then((result) => { console.log(result); });
 }
 
 /**
  * an example of program ussage would be:
  * 1. SEARCH
- * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret' 'dc=demoApp,dc=com' 'objectClass=*'
+ * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com'
+ * 'secret' 'dc=demoApp,dc=com' 'objectClass=*'
  *
  * 2. MODIFY
- * node testLdap.js modify 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret'
+ * node testLdap.js modify 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com'
+ * 'secret'
  */
 
 const method = process.argv[2];
