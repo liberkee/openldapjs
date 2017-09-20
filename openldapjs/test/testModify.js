@@ -133,7 +133,7 @@ describe('Testing the modify functionalities', () => {
      });
 
   it('should reject if control parameter is not an array', (next) => {
-    const errorMSG = 'The controls is not array';
+    const errorMSG = 'The control is not an array';
     const control = {
       op: 'postread',
     };
@@ -231,20 +231,20 @@ describe('Testing the modify functionalities', () => {
     const modify5 = ldapAsyncWrap.modify(
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
-    
+
     Promise.all([modify1, modify2, modify3, modify4, modify5])
-    .then((results) => {
-      results.forEach((element) => {
-        let resultOperation;
-        resultOperation = element.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
-        should.deepEqual(resultOperation, ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-      });
-    })
-    .then(() => {
-      next();
-    })
+        .then((results) => {
+          results.forEach((element) => {
+            let resultOperation;
+            resultOperation = element.split('\n');
+            resultOperation = resultOperation[1].split(':');
+            resultOperation = resultOperation[1];
+            should.deepEqual(
+                resultOperation,
+                ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+          });
+        })
+        .then(() => { next(); })
   });
 
   it('should return the specific attribute from the entry', (next) => {

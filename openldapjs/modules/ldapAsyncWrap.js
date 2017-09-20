@@ -5,31 +5,38 @@ const Promise = require('bluebird');
 const validator = require('./json_validator/json_validator');
 const changeSchema = require('./schemas/change_schema');
 const controlSchema = require('./schemas/control_schema');
-const VerifyParameter = require('./checkVariableFormat/checkVariableFormat');
+const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 
-const bindErrorMessage =
+const E_STATES = {
+  CREATED: 0,
+  INITIALIZED: 1,
+  BOUND: 2,
+  UNBOUND: 5,
+};
+
+const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
 
-const checkParameters = new VerifyParameter();
+const INITIALIZATION_ERROR = new Error('Initialize failed!');
+const BIND_ERROR = new Error('Bind failed!');
+
+
+
 /**
  * @module LDAPtranzition
  * @class LDAPAsyncWrap
  */
-module.exports = class LDAPAsyncWrap {
+class LDAPAsyncWrap {
   constructor(host, password) {
     this._hostAdress = host;
-    this._E_STATES = {
-      CREATED: 0,
-      INITIALIZED: 1,
-      BOUND: 2,
-      UNBOUND: 5,
-    };
     this._binding = new binding.LDAPClient();
-    this._stateClient = this._E_STATES.CREATED;
+    this._stateClient = E_STATES.CREATED;
   }
-  set config(value) { this._hostAdress = value; }
+  set hostAddress(value) {
+    this._hostAdress = value;
+  }  // not sure if we even need these
 
-  get config() { return this._hostAdress; }
+  get hostAddress() { return this._hostAdress; }  // might be useful
 
   /**
     * Initialize to an LDAP server.
@@ -40,21 +47,21 @@ module.exports = class LDAPAsyncWrap {
     **/
   initialize() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.CREATED) {
+      if (this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAdress, (err, result) => {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
                 reject(new Error(errTls));
               } else {
-                this._stateClient = this._E_STATES.INITIALIZED;
+                this._stateClient = E_STATES.INITIALIZED;
                 resolve(stateTls);
               }
             });
           }
         });
       } else {
-        reject(new Error('Can initialize only if created'));
+        reject(INITIALIZATION_ERROR);
       }
     });
   }
@@ -69,12 +76,12 @@ module.exports = class LDAPAsyncWrap {
     * Rejects if dn or password are incorect or the client did not initialize.
     **/
 
-  bind(bindDN, passwordUser) {
+  bind(bindDn, passwordUser) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient === this._E_STATES.INITIALIZED) {
-        this._binding.bind(bindDN, passwordUser, (err, state) => {
-          if (err || (state !== this._E_STATES.BOUND)) {
-            this._stateClient = this._E_STATES.INITIALIZED;
+      if (this._stateClient === E_STATES.INITIALIZED) {
+        this._binding.bind(bindDn, passwordUser, (err, state) => {
+          if (err) {
+            this._stateClient = E_STATES.INITIALIZED;
             reject(new Error(err));
           } else {
             this._stateClient = state;
@@ -82,7 +89,7 @@ module.exports = class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(new Error('Can only bind if initialized'));
+        reject(BIND_ERROR);
       }
     });
   }
@@ -100,32 +107,27 @@ module.exports = class LDAPAsyncWrap {
      **/
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        try {
-          if (Number.isInteger(scope) !==
-              true) {  // as of now we're checking both in js and in cpp..might
-                       // consider dropping one.
-            reject(new Error('Scope must be integer'));
-          }
-          checkParameters.checkParametersIfString([searchBase, searchFilter]);
-
-          this._binding.search(
-              searchBase, scope, searchFilter, (err, result) => {
-                if (err) {
-                  reject(new Error(err));
-                } else {
-                  resolve(result);
-                }
-              });
-        } catch (error) {
-          reject(new Error(error.message));
+        if (!Number.isInteger(scope)) {  // as of now we're checking both in js
+                                         // and in cpp..might
+                                         // consider dropping one.
+          reject(new Error('Scope must be integer'));
         }
-      }
+        checkParameters.checkParametersIfString([searchBase, searchFilter]);
 
+        this._binding.search(searchBase, scope, searchFilter, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
+      }
     });
   }
+
 
   /**
    * Compare operation.
@@ -134,7 +136,8 @@ module.exports = class LDAPAsyncWrap {
    * @param {string} dn The dn of the entry to compare.
    * @param {string} attr The attribute given for interogation.
    * @param {string} value Value send to verify.
-   * @return {Promise} That resolves and returns True if the elements are equal
+   * @return {Promise} That resolves and returns True if the elements are
+   * equal
    * or
    * False otherwise.
    * Rejects if an error occurs.
@@ -142,23 +145,21 @@ module.exports = class LDAPAsyncWrap {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(BIND_ERROR_MESSAGE);
       } else {
-        try {
-          checkParameters.checkParametersIfString([dn, attr, value]);
+        checkParameters.checkParametersIfString(
+            [dn, attr, value]);  // throws in case of typeError.
 
-          this._binding.compare(dn, attr, value, (err, result) => {
-            if (err) {
-              reject(new Error(err));
-            } else {
-              resolve(result);
-            }
-          });
-        } catch (error) {
-          reject(new Error(error.message));
-        }
+        this._binding.compare(dn, attr, value, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
       }
+
     });
   }
 
@@ -168,74 +169,61 @@ module.exports = class LDAPAsyncWrap {
     * @method newModify
     * @param {string} dn The dn of the entry to modify
     * @param {array} jsonChange The attribute and value to be changed
-    * @return {Promise} That resolves if LDAP modified successfully the entry.
+    * @return {Promise} That resolves if LDAP modified successfully the
+   * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
    * BOUND
     */
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        try {
-          checkParameters.checkModifyChangeArray(jsonChange);
+        let ctrls = controls !== undefined ? controls : null;
+        checkParameters.checkModifyChangeArray(jsonChange);
+        checkParameters.checkControlArray(ctrls);
 
-
-          if (controls !== undefined) {
-            checkParameters.checkControlArray(controls);
+        this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
           }
-          this._binding.modify(
-              dn, jsonChange, (controls !== undefined) ? controls : null,
-              (err, result) => {
-                if (err) {
-                  reject(new Error(err));
-                } else {
-                  resolve(result);
-                }
-              });
-        } catch (error) {
-          reject(new Error(error.message));
-        }
+        });
       }
     });
   }
 
   /**
-      * Perform an LDAP rename  operation
-      *
-      * @method rename
-      * @param {string} dn The dn of the entry to rename
-      * @param {string} newrdn The new rdn for the dn
-      * @param {string} newparent New parent for the rdn
-      * @param {array} controls Control that is sent as a request to the server
-      * @return {Promise} Will fulfil with a result from a control if the
-      * operation is succesful, else will reject with an LDAP error number.
-      */
+   * Perform an LDAP rename  operation
+   *
+   * @method rename
+   * @param {string} dn The dn of the entry to rename
+   * @param {string} newrdn The new rdn for the dn
+   * @param {string} newparent New parent for the rdn
+   * @param {array} controls Control that is sent as a request to the
+   * server
+   * @return {Promise} Will fulfil with a result from a control if the
+   * operation is succesful, else will reject with an LDAP error number.
+   **/
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
-
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        try {
-          checkParameters.checkParametersIfString([dn, newrdn, newparent]);
+        let ctrls = controls !== undefined ? controls : null;
+        checkParameters.checkParametersIfString([dn, newrdn, newparent]);
+        checkParameters.checkControlArray(controls);
 
-          if (controls !== undefined) {
-            checkParameters.checkControlArray(controls);
+        this._binding.rename(dn, newrdn, newparent, ctrls, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
           }
-          this._binding.rename(
-              dn, newrdn, newparent, (controls !== undefined) ? controls : null,
-              (err, result) => {
-                if (err) {
-                  reject(new Error(err));
-                } else {
-                  resolve(result);
-                }
-              });
-        } catch (error) {
-          reject(new Error(error.message));
-        }
+        });
       }
+
     });
   }
 
@@ -244,31 +232,26 @@ module.exports = class LDAPAsyncWrap {
    * @param {String} dn the dn entry to be deleted.
    * @param {String array} controls Optional controll aray parameter, can be
    * NULL.
-   * @return {Promise} promise that resolves if the element provided was deleted
+   * @return {Promise} promise that resolves if the element provided was
+   * deleted
    * or rejects if not.
-   */
-  del(dn, controls) {
+   **/
+  delete (dn, controls) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        try {
-          checkParameters.checkParametersIfString([dn]);
+        let ctrls = controls !== undefined ? controls : null;
+        checkParameters.checkParametersIfString([dn]);
+        checkParameters.checkControlArray(controls);
 
-          if (controls !== undefined) {
-            checkParameters.checkControlArray(controls);
+        this._binding.del(dn, ctrls, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
           }
-          this._binding.del(
-              dn, (controls !== undefined) ? controls : null, (err, result) => {
-                if (err) {
-                  reject(new Error(err));
-                } else {
-                  resolve(result);
-                }
-              });
-        } catch (error) {
-          reject(new Error(error.message));
-        }
+        });
       }
     });
   }
@@ -285,34 +268,27 @@ module.exports = class LDAPAsyncWrap {
    */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.BOUND) {
-        reject(new Error(bindErrorMessage));
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        try {
-          checkParameters.checkParametersIfString([dn]);
-          if (controls !== undefined) {
-            checkParameters.checkControlArray(controls);
-          }
-          const keys = Object.keys(entry);
-          const entryArray = [];
+        let ctrls = controls !== undefined ? controls : null;
+        checkParameters.checkParametersIfString([dn]);
+        checkParameters.checkControlArray(controls);
+        const keys = Object.keys(entry);
+        const entryArray = [];
 
-          for (const elem of keys) {
-            entryArray.push(elem);
-            entryArray.push(entry[elem]);
-          }
-
-          this._binding.add(
-              dn, entryArray, (controls !== undefined) ? controls : null,
-              (err, result) => {
-                if (err) {
-                  reject(new Error(err));
-                } else {
-                  resolve(result);
-                }
-              });
-        } catch (error) {
-          reject(new Error(error.message));
+        for (const elem of keys) {
+          entryArray.push(elem);
+          entryArray.push(entry[elem]);
         }
+
+        this._binding.add(dn, entryArray, ctrls, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
       }
     });
   }
@@ -326,10 +302,10 @@ module.exports = class LDAPAsyncWrap {
     */
   unbind() {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== this._E_STATES.UNBOUND) {
+      if (this._stateClient !== E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
-          if (state !== this._E_STATES.UNBOUND) {
-            reject(new Error(err));
+          if (state !== E_STATES.UNBOUND) {
+            reject(err);
           } else {
             this._stateClient = state;
             resolve(this._stateClient);
@@ -341,3 +317,5 @@ module.exports = class LDAPAsyncWrap {
     });
   }
 };
+
+module.exports = LDAPAsyncWrap;

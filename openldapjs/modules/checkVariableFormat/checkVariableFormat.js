@@ -7,9 +7,9 @@ const controlSchema = require('../schemas/control_schema');
 
 /**
  * @module checkVariableFormat
- * @class checkParam
+ * @class CheckParam
  */
-module.exports = class checkParam {
+class CheckParam {
   /**
     * Verify the rename parameters.
     *
@@ -18,10 +18,10 @@ module.exports = class checkParam {
     * @return Throws an error in case the provided arguments aren't strings
     */
 
-  checkParametersIfString(arrayParameter) {
+  static checkParametersIfString(arrayParameter) {
     arrayParameter.forEach((element) => {
       if (typeof(element) !== 'string') {
-        throw new Error(`The ${element} is not string`);
+        throw new TypeError('Wrong type');
       }
     });
   }
@@ -33,9 +33,9 @@ module.exports = class checkParam {
     * @param {array} change The json that is sent for verification
     * @return Throws error in case the json can't be validated
     */
-  checkModifyChangeArray(change) {
+  static checkModifyChangeArray(change) {
     if (Array.isArray(change) === false) {
-      throw new Error('The json is not an array');
+      throw new TypeError('The json is not an array');
     } else {
       change.forEach((element) => {
         const result = validator(element, changeSchema);
@@ -53,16 +53,21 @@ module.exports = class checkParam {
     * @param {array} controls The jsonControl that is send for verification
     * @return Throws error in case the controls can't be validated.
     */
-  checkControlArray(controls) {
-    if (Array.isArray(controls) === false) {
-      throw new Error('The controls is not array');
-    } else {
-      controls.forEach((element) => {
-        const result = validator(element, controlSchema);
-        if (result.valid !== true) {
-          throw new Error(result.errors || result.errors);
-        }
-      });
+  static checkControlArray(controls) {
+    if (controls !== undefined) {
+      if (Array.isArray(controls) === false) {
+        throw new TypeError('The control is not  an array');
+      } else {
+        controls.forEach((element) => {
+          const result = validator(element, controlSchema);
+          if (result.valid !== true) {
+            throw new Error(result.errors || result.errors);
+          }
+        });
+      }
     }
+    // does nothing in case controls isn't defined.
   }
 }
+
+module.exports = CheckParam;

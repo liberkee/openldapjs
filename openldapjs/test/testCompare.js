@@ -19,9 +19,10 @@ describe('Testing the Compare functionalities', () => {
   const nonObj = config.ldapCompare.invalidUser;
   const noPass = config.ldapCompare.invalidPassword;
 
+
   const bindErrorMessage =
       'The operation failed. It could be done if the state of the client is BOUND';
-  const dnEntryError = 'The 1 is not string';
+  const dnEntryError = new TypeError('Wrong type');
 
   const comparisonResTrue = 'The Comparison Result: true';
   const comparisonResFalse = 'The Comparison Result: false';
@@ -43,9 +44,9 @@ describe('Testing the Compare functionalities', () => {
   });
 
 
-  it('should reject if dn is not string', (next) => {
+  it.only('should reject if dn is not string', (next) => {
     ldapAsyncWrap.compare(1, attr, val).catch((error) => {
-      should.deepEqual(error.message, dnEntryError);
+      should.deepEqual(error, dnEntryError);
       next();
     });
   });
