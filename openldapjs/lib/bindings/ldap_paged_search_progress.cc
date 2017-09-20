@@ -1,4 +1,5 @@
 #include "ldap_paged_search_progress.h"
+#include <iostream>
 
 LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
@@ -46,6 +47,7 @@ void LDAPPagedSearchProgress::Execute(
   // do
   {
     pageResult_ += "\n";
+    // std::cout << "cookieID is:" << cookieID_ << std::endl;
 
     l_rc = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
                                     pagingCriticality, &pageControl);
@@ -59,7 +61,6 @@ void LDAPPagedSearchProgress::Execute(
                            0, M_controls, nullptr, nullptr, 0, &msgId);
 
     if ((l_rc != LDAP_SUCCESS)) {
-      // ldap_err2string(l_rc)
       status_ = l_rc;
       return;
     }
@@ -70,6 +71,14 @@ void LDAPPagedSearchProgress::Execute(
       pagedResult = ldap_result(ld_, msgId, 1, &timeOut, &l_result);
     }
 
+    /**
+    ** Check for errors and return
+    **/
+    if (pagedResult != LDAP_RES_SEARCH_RESULT) {
+      status_ = pagedResult;
+      return;
+    }
+
     /* Parse the results to retrieve the contols being returned.      */
 
     l_rc = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
@@ -77,6 +86,7 @@ void LDAPPagedSearchProgress::Execute(
 
     if ((*cookies_)[cookieID_] != nullptr) {
       ber_bvfree((*cookies_)[cookieID_]);
+
       (*cookies_)[cookieID_] = nullptr;
     }
 
@@ -89,11 +99,11 @@ void LDAPPagedSearchProgress::Execute(
     /* Determine if the cookie is not empty, indicating there are more pages
      */
     /* for these search parameters. */
-    if ((*cookies_)[cookieID_] && (*cookies_)[cookieID_]->bv_val != 0 &&
-        (strlen((*cookies_)[cookieID_]->bv_val) > 0)) {
-      morePages_ = true;
-    } else {
+
+    if ((*cookies_)[cookieID_]->bv_len == 0) {
       morePages_ = false;
+    } else {
+      morePages_ = true;
     }
 
     /* Cleanup the controls used. */
@@ -109,7 +119,9 @@ void LDAPPagedSearchProgress::Execute(
     /* Build the result string                                        */
     /*                                                                */
     /* Determine how many entries have been found.                    */
-    if (morePages_ == true) l_entries = ldap_count_entries(ld_, l_result);
+    if (morePages_ == true) {
+      l_entries = ldap_count_entries(ld_, l_result);
+    }
 
     if (l_entries > 0) {
       l_entry_count = l_entry_count + l_entries;
