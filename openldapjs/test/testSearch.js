@@ -8,12 +8,12 @@ const errList = require('./errorlist.json');
 describe('Testing the async LDAP search ', () => {
 
 
-  const host = config.ldapAuthentification.host;
-  const dnAdmin = config.ldapAuthentification.dnAdmin;
-  const dnUser = config.ldapAuthentification.dnUser;
+  const host = config.ldapAuthentication.host;
+  const dnAdmin = config.ldapAuthentication.dnAdmin;
+  const dnUser = config.ldapAuthentication.dnUser;
   const searchBase = config.ldapSearch.searchBase;
 
-  const password = config.ldapAuthentification.passwordAdmin;
+  const password = config.ldapAuthentication.passwordAdmin;
   let adminLDAP = new LDAPWrap(host);
   let userLDAP = new LDAPWrap(host);
 
@@ -25,19 +25,18 @@ describe('Testing the async LDAP search ', () => {
     const init1 = adminLDAP.initialize();
     const init2 = userLDAP.initialize();
     const bind1 = adminLDAP.bind(
-        config.ldapAuthentification.dnAdmin,
-        config.ldapAuthentification.passwordAdmin);
+        config.ldapAuthentication.dnAdmin,
+        config.ldapAuthentication.passwordAdmin);
     const bind2 = userLDAP.bind(
-        config.ldapAuthentification.dnUser,
-        config.ldapAuthentification.passwordUser);
+        config.ldapAuthentication.dnUser,
+        config.ldapAuthentication.passwordUser);
 
     return Promise.all([init1, init2, bind1, bind2]);
 
   });
 
   afterEach(() => {
-    return adminLDAP.unbind()
-    .then(() => { return userLDAP.unbind(); });
+    return adminLDAP.unbind().then(() => { return userLDAP.unbind(); });
   });
 
   it('should reject if the state is not BOUND', () => {
@@ -46,8 +45,9 @@ describe('Testing the async LDAP search ', () => {
           return adminLDAP.search(
               searchBase, 2, config.ldapSearch.filterObjSpecific);
         })
-        .catch(
-            (error) => { should.deepEqual(error.message, errList.bindErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.bindErrorMessage);
+        });
   });
 
   it('should return an empty search', () => {
@@ -73,12 +73,16 @@ describe('Testing the async LDAP search ', () => {
 
   it('should reject if scope is not integer', () => {
     return userLDAP.search(searchBase, '2', config.ldapSearch.filterObjAll)
-        .catch((err) => { err.message.should.be.deepEqual(errList.scopeSearchError); });
+        .catch((err) => {
+          err.message.should.be.deepEqual(errList.scopeSearchError);
+        });
   });
 
   it('should reject if searchBase is not string', () => {
     return userLDAP.search(1, 2, config.ldapSearch.filterObjAll)
-        .catch((err) => { err.message.should.be.deepEqual(errList.typeErrorMessage); });
+        .catch((err) => {
+          err.message.should.be.deepEqual(errList.typeErrorMessage);
+        });
   });
 
 
@@ -117,8 +121,7 @@ describe('Testing the async LDAP search ', () => {
     const search2 =
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
 
-    return Promise.all([search1, search2])
-    .then((results) => {
+    return Promise.all([search1, search2]).then((results) => {
       should.notDeepEqual(results[0], results[1]);
     });
 
@@ -151,9 +154,7 @@ describe('Testing the async LDAP search ', () => {
           return adminLDAP.search(
               'dc=wrongBase,dc=err', 2, 'objectClass=errors');
         })
-        .catch((err) => {
-          err.should.not.be.empty;
-        });
+        .catch((err) => { err.should.not.be.empty; });
   });
 
 

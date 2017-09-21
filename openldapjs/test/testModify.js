@@ -8,7 +8,7 @@ const errList = require('./errorlist.json');
 
 describe('Testing the modify functionalities', () => {
 
-  let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
+  let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
   const resStateRequired =
       'The operation failed. It could be done if the state of the client is BOUND';
@@ -37,7 +37,7 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
-  const changeAttirbutes = [
+  const changeAttributes = [
     {
       op: config.ldapModify.ldapModificationReplace.operation,
       attr: config.ldapModify.ldapModificationReplace.attribute,
@@ -59,24 +59,23 @@ describe('Testing the modify functionalities', () => {
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      iscritical:
-          config.ldapControls.ldapModificationControlPostRead.iscritical,
+      isCritical:
+          config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
       value: config.ldapControls.ldapModificationControlPreRead.value,
-      iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+      isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },
   ];
 
   beforeEach(() => {
-    ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
+    ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
-    return ldapAsyncWrap.initialize()
-    .then(() => {
+    return ldapAsyncWrap.initialize().then(() => {
       return ldapAsyncWrap.bind(
-          config.ldapAuthentification.dnAdmin,
-          config.ldapAuthentification.passwordAdmin);
+          config.ldapAuthentication.dnAdmin,
+          config.ldapAuthentication.passwordAdmin);
     });
   });
 
@@ -88,10 +87,11 @@ describe('Testing the modify functionalities', () => {
         .then(() => {
           return ldapAsyncWrap.modify(
               config.ldapModify.ldapModificationReplace.change_dn,
-              changeAttirbutes);
+              changeAttributes);
         })
-        .catch(
-            (error) => { should.deepEqual(error.message, errList.bindErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.bindErrorMessage);
+        });
   });
 
   it('should reject if attribute parameter is not defined', () => {
@@ -126,26 +126,25 @@ describe('Testing the modify functionalities', () => {
     return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttirbutes, control)
+            changeAttributes, control)
         .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject if the control parameter is not correctly defined', () => {
     const errorMSG =
-        'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: iscritical';
+        'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: isCritical';
     const control = [{
       op: 'postread',
     }];
     return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttirbutes, control)
+            changeAttributes, control)
         .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the dn is empty', () => {
-    return ldapAsyncWrap.modify('', changeAttirbutes)
-    .catch((error) => {
+    return ldapAsyncWrap.modify('', changeAttributes).catch((error) => {
       should.deepEqual(error, errList.unwillingToPerform);
     });
   });
@@ -178,25 +177,25 @@ describe('Testing the modify functionalities', () => {
     return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttirbutes)
+            changeAttributes)
         .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should modify in paralel', () => {
+  it('should modify in parallel', () => {
     const modify1 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const modify2 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const modify3 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const modify4 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const modify5 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
 
     return Promise.all([modify1, modify2, modify3, modify4, modify5])
@@ -217,7 +216,7 @@ describe('Testing the modify functionalities', () => {
     return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttirbutes, controlOperation)
+            changeAttributes, controlOperation)
         .then((result) => {
           let resultOperation;
           resultOperation = result.split('\n');

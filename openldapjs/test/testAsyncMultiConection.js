@@ -6,12 +6,12 @@ const config = require('./config.json');
 
 describe('Testing the async LDAP connection', () => {
 
-  const hostAddress = config.ldapAuthentification.host;
-  const dn = config.ldapAuthentification.dnAdmin;
-  const password = config.ldapAuthentification.passwordAdmin;
+  const hostAddress = config.ldapAuthentication.host;
+  const dn = config.ldapAuthentication.dnAdmin;
+  const password = config.ldapAuthentication.passwordAdmin;
 
-  const dn2 = config.ldapAuthentification.dnUser;
-  const password2 = config.ldapAuthentification.passwordUser;
+  const dn2 = config.ldapAuthentication.dnUser;
+  const password2 = config.ldapAuthentication.passwordUser;
 
   let clientLDAP = new LDAPWrap(hostAddress);
   let clientLDAP2 = new LDAPWrap(hostAddress);
@@ -36,8 +36,7 @@ describe('Testing the async LDAP connection', () => {
     const bind1 = clientLDAP.bind(dn, password);
     const bind2 = clientLDAP2.bind(dn2, password2);
 
-    return Promise.all([init1, init2, bind1, bind2])
-    .then((result) => {
+    return Promise.all([init1, init2, bind1, bind2]).then((result) => {
       result.forEach((element) => {
         const valueElement = (element === E_STATES.INITIALIZED) ?
             E_STATES.INITIALIZED :

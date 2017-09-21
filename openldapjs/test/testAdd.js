@@ -22,47 +22,44 @@ describe('Testing the async LDAP add operation', () => {
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      iscritical:
-          config.ldapControls.ldapModificationControlPostRead.iscritical,
+      isCritical:
+          config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
       value: config.ldapControls.ldapModificationControlPreRead.value,
-      iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+      isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },
   ];
 
-  let clientLDAP = new LDAP(config.ldapAuthentification.host);
-  let clientLDAP2 = new LDAP(config.ldapAuthentification.host);
+  let clientLDAP = new LDAP(config.ldapAuthentication.host);
+  let clientLDAP2 = new LDAP(config.ldapAuthentication.host);
 
   beforeEach(() => {
-    clientLDAP = new LDAP(config.ldapAuthentification.host);
-    clientLDAP2 = new LDAP(config.ldapAuthentification.host);
+    clientLDAP = new LDAP(config.ldapAuthentication.host);
+    clientLDAP2 = new LDAP(config.ldapAuthentication.host);
 
     const init1 = clientLDAP.initialize();
     const init2 = clientLDAP2.initialize();
     const bind1 = clientLDAP.bind(
-        config.ldapAuthentification.dnAdmin,
-        config.ldapAuthentification.passwordAdmin);
+        config.ldapAuthentication.dnAdmin,
+        config.ldapAuthentication.passwordAdmin);
     const bind2 = clientLDAP2.bind(
-        config.ldapAuthentification.dnUser,
-        config.ldapAuthentification.passwordUser);
+        config.ldapAuthentication.dnUser,
+        config.ldapAuthentication.passwordUser);
 
-    return Promise.all([init1, init2, bind1, bind2])
-    .then((result) => {
+    return Promise.all([init1, init2, bind1, bind2]).then((result) => {
       dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
     });
   });
 
   afterEach(() => {
-    return clientLDAP.unbind()
-    .then(() => { return clientLDAP2.unbind(); });
+    return clientLDAP.unbind().then(() => { return clientLDAP2.unbind(); });
   });
 
   it('should reject the add operation with a wrong dn', () => {
 
-    return clientLDAP.add('garbage', validEntry)
-    .catch((invalidDnError) => {
+    return clientLDAP.add('garbage', validEntry).catch((invalidDnError) => {
       should.deepEqual(invalidDnError, errList.invalidDnSyntax);
     });
 
@@ -76,15 +73,14 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    return clientLDAP.add(dnUser, invalidEntry)
-    .catch((undefinedTypeErr) => {
+    return clientLDAP.add(dnUser, invalidEntry).catch((undefinedTypeErr) => {
       should.deepEqual(undefinedTypeErr, errList.undefinedType);
     });
 
   });
 
   it('should reject the add operation with a duplicated entry', () => {
-    return clientLDAP.add(config.ldapAuthentification.dnUser, validEntry)
+    return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
         .catch((duplicatedEntryError) => {
           should.deepEqual(duplicatedEntryError, errList.alreadyExists);
         });
@@ -92,15 +88,14 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should add a single entry', () => {
-    return clientLDAP.add(dnUser, validEntry)
-    .then((result) => {
+    return clientLDAP.add(dnUser, validEntry).then((result) => {
       result.should.be.deepEqual(0);
       personNr += 1;
     });
 
   });
 
-  it('should add multiple entries sequentialy and reject to add a duplicate',
+  it('should add multiple entries sequentially and reject to add a duplicate',
      () => {
        return clientLDAP.add(dnUser, validEntry)
            .then((res1) => {
@@ -128,8 +123,7 @@ describe('Testing the async LDAP add operation', () => {
   // is null the same with '' ? for '' the  resulting error code was 68
   it('should reject add request with empty(null) DN', () => {
     const dnEntryError = new TypeError('Wrong type');
-    return clientLDAP.add(null, validEntry)
-    .catch((err) => {
+    return clientLDAP.add(null, validEntry).catch((err) => {
       should.deepEqual(err, dnEntryError);
     });
   });
@@ -166,8 +160,7 @@ describe('Testing the async LDAP add operation', () => {
     const third = clientLDAP.add(dnUser, validEntry);
     personNr += 1;
 
-    return Promise.all([first, second, third])
-    .then((values) => {
+    return Promise.all([first, second, third]).then((values) => {
       values.forEach((result) => { result.should.be.deepEqual(0); });
     });
   });

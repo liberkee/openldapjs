@@ -6,7 +6,7 @@ const config = require('./config.json');
 
 describe('Testing the async initialization', () => {
 
-  const host = config.ldapAuthentification.host;
+  const host = config.ldapAuthentication.host;
   let ldapWrap;
 
   const E_STATES = {
@@ -16,17 +16,13 @@ describe('Testing the async initialization', () => {
     UNBOUND: 5,
   };
 
-  beforeEach(() => {
-    ldapWrap = new LDAPWrap(host);
-  });
+  beforeEach(() => { ldapWrap = new LDAPWrap(host); });
 
   afterEach(() => {});
 
   it('should be INITIALIZED', () => {
-    return ldapWrap.initialize()
-    .then((result) => {
-      should.deepEqual(result, E_STATES.INITIALIZED);
-    });
+    return ldapWrap.initialize().then(
+        (result) => { should.deepEqual(result, E_STATES.INITIALIZED); });
   });
 
 });

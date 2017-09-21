@@ -15,7 +15,7 @@ function search() {
   clientLDAP.initialize()
       .then(() => { return clientLDAP.bind(dnUser, password); })
       .then(() => { return clientLDAP.search(searchBase, 2, searchFilter); })
-      .then((result) => { console.log(ldif.parse(result)) });
+      .then((result) => {console.log(ldif.parse(result))});
 }
 
 /* node testLdap.js modify "ldap://10.16.0.194:389" "cn=admin,dc=demoApp,dc=com"
@@ -69,19 +69,16 @@ function modify() {
   const attributeArray = ['cn', 'entryCSN', 'description', 'entryUUID'];
 
   clientLDAP.initialize()
-      .then(() => {
-        return clientLDAP.bind(dnUser, password);
-      })
-      .then(() => {
-        return clientLDAP.newModify(userDnModify, changes);
-      })
+      .then(() => { return clientLDAP.bind(dnUser, password); })
+      .then(() => { return clientLDAP.newModify(userDnModify, changes); })
       .then((result) => { console.log(result); });
 }
 
 /**
- * an example of program ussage would be:
+ * an example of program usage would be:
  * 1. SEARCH
- * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com' 'secret' 'dc=demoApp,dc=com' 'objectClass=*'
+ * node testLdap.js search 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com'
+ * 'secret' 'dc=demoApp,dc=com' 'objectClass=*'
  *
  * 2. MODIFY
  * node testLdap.js modify 'ldap://localhost:389' 'cn=admin,dc=demoApp,dc=com'

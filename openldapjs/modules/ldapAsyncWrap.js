@@ -19,32 +19,32 @@ const BIND_ERROR = 'Bind failed!';
 
 
 /**
- * @module LDAPtranzition
+ * @module LDAPTranzition
  * @class LDAPAsyncWrap
  */
 class LDAPAsyncWrap {
   constructor(host, password) {
-    this._hostAdress = host;
+    this._hostAddress = host;
     this._binding = new binding.LDAPClient();
     this._stateClient = E_STATES.CREATED;
   }
   set hostAddress(value) {
-    this._hostAdress = value;
+    this._hostAddress = value;
   }  // not sure if we even need these
 
-  get hostAddress() { return this._hostAdress; }  // might be useful
+  get hostAddress() { return this._hostAddress; }  // might be useful
 
   /**
     * Initialize to an LDAP server.
     *
     * @method initialize
     * @return {Promise} That resolves if the LDAP initialize succeeds
-    * Rejects if the address is incorect or the client was not created.
-    **/
+    * Rejects if the address is incorrect or the client was not created.
+    * */
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
-        this._binding.initialize(this._hostAdress, (err, result) => {
+        this._binding.initialize(this._hostAddress, (err, result) => {
           if (result) {
             this._binding.startTls((errTls, stateTls) => {
               if (errTls) {
@@ -63,14 +63,14 @@ class LDAPAsyncWrap {
   }
 
   /**
-    * Authentificate to LDAP server.
+    * Authenticate to LDAP server.
     *
     * @method bind
     * @param {string} username The client username
     * @param {string} password The client's password.
     * @return {Promise} That resolves if the credentials are correct.
-    * Rejects if dn or password are incorect or the client did not initialize.
-    **/
+    * Rejects if dn or password are incorrect or the client did not initialize.
+    * */
 
   bind(bindDn, passwordUser) {
     return new Promise((resolve, reject) => {
@@ -100,15 +100,15 @@ class LDAPAsyncWrap {
      * @param {string} searchFilter  search filter.
      * @return {Promise} That resolves and returns a string with the search
      *results. Rejects in case of error.
-     **/
+     * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         if (!Number.isInteger(scope)) {  // as of now we're checking both in js
-                                         // and in cpp..might
-                                         // consider dropping one.
+          // and in cpp..might
+          // consider dropping one.
           reject(new Error('Scope must be integer'));
         }
         checkParameters.checkParametersIfString(searchBase, searchFilter);
@@ -130,7 +130,7 @@ class LDAPAsyncWrap {
    *
    * @method search
    * @param {string} dn The dn of the entry to compare.
-   * @param {string} attr The attribute given for interogation.
+   * @param {string} attr The attribute given for interrogation.
    * @param {string} value Value send to verify.
    * @return {Promise} That resolves and returns True if the elements are
    * equal
@@ -175,7 +175,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        let ctrls = controls !== undefined ? controls : null;
+        const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkModifyChangeArray(jsonChange);
         checkParameters.checkControlArray(controls);
 
@@ -200,14 +200,14 @@ class LDAPAsyncWrap {
    * @param {array} controls Control that is sent as a request to the
    * server
    * @return {Promise} Will fulfil with a result from a control if the
-   * operation is succesful, else will reject with an LDAP error number.
-   **/
+   * operation is successful, else will reject with an LDAP error number.
+   * */
   rename(dn, newrdn, newparent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        let ctrls = controls !== undefined ? controls : null;
+        const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn, newrdn, newparent);
         checkParameters.checkControlArray(controls);
 
@@ -226,18 +226,18 @@ class LDAPAsyncWrap {
   /**
    * ldap delete operation
    * @param {String} dn the dn entry to be deleted.
-   * @param {String array} controls Optional controll aray parameter, can be
+   * @param {String array} controls Optional control array parameter, can be
    * NULL.
    * @return {Promise} promise that resolves if the element provided was
    * deleted
    * or rejects if not.
-   **/
+   * */
   delete (dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        let ctrls = controls !== undefined ? controls : null;
+        const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
 
@@ -255,19 +255,19 @@ class LDAPAsyncWrap {
    * ldap add operation
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
-   * exist';
+   * exist'
    * @param {Object} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param {Object} controls client& sever controls, OPTIONAL parameter
-   * @return {Promise} that fulfils if the add was succesfull, rejects
+   * @param {Object} controls client & sever controls, OPTIONAL parameter
+   * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
-   */
+   * */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
-        let ctrls = controls !== undefined ? controls : null;
+        const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
         const keys = Object.keys(entry);
@@ -312,6 +312,7 @@ class LDAPAsyncWrap {
       }
     });
   }
-};
+}
+
 
 module.exports = LDAPAsyncWrap;
