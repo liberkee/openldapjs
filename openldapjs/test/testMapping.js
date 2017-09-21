@@ -6,9 +6,9 @@ const config = require('./config.json');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 
 describe('Test mapping string to JSON', () => {
-  const host = config.ldapAuthentification.host;
-  const dnAdmin = config.ldapAuthentification.dnAdmin;
-  const dnUser = config.ldapAuthentification.dnUser;
+  const host = config.ldapAuthentication.host;
+  const dnAdmin = config.ldapAuthentication.dnAdmin;
+  const dnUser = config.ldapAuthentication.dnUser;
   let adminLDAP = new LDAPWrap(host);
 
   const searchBase = config.ldapSearch.searchBase;
@@ -19,8 +19,8 @@ describe('Test mapping string to JSON', () => {
 
     const init = adminLDAP.initialize();
     const bind = adminLDAP.bind(
-        config.ldapAuthentification.dnAdmin,
-        config.ldapAuthentification.passwordAdmin);
+        config.ldapAuthentication.dnAdmin,
+        config.ldapAuthentication.passwordAdmin);
     return Promise.all([init, bind]);
   });
 
@@ -29,8 +29,7 @@ describe('Test mapping string to JSON', () => {
   it('should return the string as JSON', () => {
     const expectResult =
         '{"type":"content","version":null,"entries":[{"type":"record","dn":"cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com","attributes":[{"attribute":{"type":"attribute","options":[],"attribute":"objectClass"},"value":{"type":"value","value":"person"}},{"attribute":{"type":"attribute","options":[],"attribute":"sn"},"value":{"type":"value","value":"Ghitea Cosmin"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=T1"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=T3"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=HTML"}},{"attribute":{"type":"attribute","options":[],"attribute":"cn"},"value":{"type":"value","value":"cghitea"}},{"attribute":{"type":"attribute","options":[],"attribute":"userPassword"},"value":{"type":"value","value":"{SSHA}xeVf6D9ZroxW0jfqcaslTie0WYzV/Prn"}},{"attribute":{"type":"attribute","options":[],"attribute":"description"},"value":{"type":"value","value":"1Modification"}},{"attribute":{"type":"attribute","options":[],"attribute":"description"},"value":{"type":"value","value":"2Modification"}},{"attribute":{"type":"attribute","options":[],"attribute":"description"},"value":{"type":"value","value":"3Modification"}}]}]}';
-    return adminLDAP.search(searchBase, 2, filterSpecificUser)
-    .then((res) => {
+    return adminLDAP.search(searchBase, 2, filterSpecificUser).then((res) => {
       const jsonRes = ldif.parse(res);
       should.deepEqual(JSON.stringify(jsonRes), expectResult);
     });
@@ -43,8 +42,7 @@ describe('Test mapping string to JSON', () => {
     const search3 = adminLDAP.search(searchBase, 2, filterSpecificUser);
 
 
-    return Promise.all([search1, search2, search3])
-    .then((results) => {
+    return Promise.all([search1, search2, search3]).then((results) => {
       results.forEach((element) => {
         const jsonRes = ldif.parse(element);
         jsonRes.should.be.json;

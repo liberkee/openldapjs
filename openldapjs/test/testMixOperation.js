@@ -6,9 +6,9 @@ const config = require('./config.json');
 const errList = require('./errorlist.json');
 
 describe('Testing multiple operations functionalities', () => {
-  const hostAddress = config.ldapAuthentification.host;
-  const dn = config.ldapAuthentification.dnAdmin;
-  const password = config.ldapAuthentification.passwordAdmin;
+  const hostAddress = config.ldapAuthentication.host;
+  const dn = config.ldapAuthentication.dnAdmin;
+  const password = config.ldapAuthentication.passwordAdmin;
   let ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
   /* Attributes and Values */
@@ -161,7 +161,7 @@ describe('Testing multiple operations functionalities', () => {
 
   it('should make multiple operation in parallel', () => {
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
-    let searchEntry = config.ldapAuthentification.dnUser.split(',');
+    let searchEntry = config.ldapAuthentication.dnUser.split(',');
     searchEntry = searchEntry[0];
 
     const addOP =
@@ -195,9 +195,9 @@ describe('Testing multiple operations functionalities', () => {
               resultOperation = resultOperation[1].split(':');
               resultOperation = resultOperation[1];
 
-              if (resultOperation === config.ldapAuthentification.dnUser) {
+              if (resultOperation === config.ldapAuthentication.dnUser) {
                 should.deepEqual(
-                    resultOperation, `${config.ldapAuthentification.dnUser}`);
+                    resultOperation, `${config.ldapAuthentication.dnUser}`);
               } else if (
                   resultOperation ===
                   ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {

@@ -6,29 +6,29 @@ const should = require('should');
 const errList = require('./errorlist.json');
 
 describe('Testing the rename functionalities', () => {
-  let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
+  let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
   const controlOperation = [
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      iscritical:
-          config.ldapControls.ldapModificationControlPostRead.iscritical,
+      isCritical:
+          config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
       value: config.ldapControls.ldapModificationControlPreRead.value,
-      iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+      isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },
   ];
 
   beforeEach(() => {
-    ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
+    ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize().then(() => {
       return ldapAsyncWrap.bind(
-          config.ldapAuthentification.dnAdmin,
-          config.ldapAuthentification.passwordAdmin);
+          config.ldapAuthentication.dnAdmin,
+          config.ldapAuthentication.passwordAdmin);
     });
   });
 
