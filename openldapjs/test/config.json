@@ -1,5 +1,5 @@
 {
-  "ldapAuthentification": {
+  "ldapAuthentication": {
     "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
@@ -45,7 +45,7 @@
         "entryCSN",
         "entryUUID"
       ],
-      "iscritical": false
+      "isCritical": false
     },
     "ldapModificationControlPreRead": {
       "oid": "preread",
@@ -53,10 +53,9 @@
         "cn",
         "sn"
       ],
-      "iscritical": false
+      "isCritical": false
     }
   },
-
   "ldapAdd": {
     "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnNewEntryAdmin": ",dc=demoApp,dc=com",
@@ -64,20 +63,17 @@
     "sn": "Entry",
     "description": "Tesst"
   },
-
   "ldapRename": {
     "dnChange": "cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com",
     "newrdn": "cn=mrotaru",
     "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
   },
-
   "ldapCompare": {
     "attribute": "cn",
     "value": "admin",
-    "invalidUser":"cn=cghitea,ou=user55s,o=myhost,dc=demoApp,dc=com",
+    "invalidUser": "cn=cghitea,ou=user55s,o=myhost,dc=demoApp,dc=com",
     "invalidPassword": "wrongPass"
   },
-
   "ldapSearch": {
     "searchBase": "dc=demoApp,dc=com",
     "rdnUser": "cn=cghitea",
@@ -86,7 +82,6 @@
     "filterObjSpecific2": "objectClass=simpleSecurityObject",
     "filterObjSpecific3": "objectClass=inetOrgPerson"
   },
-
   "ldapDelete": {
     "rdnUser": "cn=testUsers",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"

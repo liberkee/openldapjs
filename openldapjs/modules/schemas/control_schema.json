@@ -10,14 +10,14 @@
       "id": "https://www.hufsm.com/openldap/controlJson/value",
       "type": "array"
     },
-    "iscritical": {
-      "id": "https://www.hufsm.com/openldap/controlJson/iscritical",
+    "isCritical": {
+      "id": "https://www.hufsm.com/openldap/controlJson/isCritical",
       "type": "boolean"
     }
   },
   "required": [
     "oid",
     "value",
-    "iscritical"
+    "isCritical"
   ]
 }

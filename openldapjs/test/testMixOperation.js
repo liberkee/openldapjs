@@ -30,7 +30,7 @@ describe('Testing multiple operations functionalities', () => {
     description: config.ldapAdd.description,
   };
 
-  const changeAttirbutes = [
+  const changeAttributes = [
     {
       op: config.ldapModify.ldapModificationReplace.operation,
       attr: config.ldapModify.ldapModificationReplace.attribute,
@@ -52,13 +52,13 @@ describe('Testing multiple operations functionalities', () => {
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      iscritical:
-          config.ldapControls.ldapModificationControlPostRead.iscritical,
+      isCritical:
+          config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
       value: config.ldapControls.ldapModificationControlPreRead.value,
-      iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+      isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },
   ];
 
@@ -79,7 +79,7 @@ describe('Testing multiple operations functionalities', () => {
   afterEach(() => { return ldapAsyncWrap.unbind(); });
 
 
-  it('should add, search, comparte, modify and delete  in multiple times sequential',
+  it('should add, search, compare, modify and delete  in multiple times sequential',  // wtf ?
      () => {
        return ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
            .then((result1) => {
@@ -95,7 +95,7 @@ describe('Testing multiple operations functionalities', () => {
              should.deepEqual(result2, searchResult);
              return ldapAsyncWrap.modify(
                  config.ldapModify.ldapModificationReplace.change_dn,
-                 changeAttirbutes, controlOperation);
+                 changeAttributes, controlOperation);
            })
            .then((result3) => {
              let resultOperation;
@@ -117,7 +117,7 @@ describe('Testing multiple operations functionalities', () => {
            })
 
            .then((result5) => {
-             should.deepEqual(result5, errList.comparationResTrue);
+             should.deepEqual(result5, errList.comparisonResTrue);
              return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
            })
            .then((result6) => {
@@ -141,7 +141,7 @@ describe('Testing multiple operations functionalities', () => {
              should.deepEqual(resultOperation, ` ${dnUser}`);
              return ldapAsyncWrap.modify(
                  config.ldapModify.ldapModificationReplace.change_dn,
-                 changeAttirbutes, controlOperation);
+                 changeAttributes, controlOperation);
            })
            .then((result9) => {
              let resultOperation;
@@ -155,7 +155,7 @@ describe('Testing multiple operations functionalities', () => {
            })
 
            .then((result10) => {
-             should.deepEqual(result10, errList.comparationResTrue);
+             should.deepEqual(result10, errList.comparisonResTrue);
            });
      });
 
@@ -175,10 +175,10 @@ describe('Testing multiple operations functionalities', () => {
     const compareOP = ldapAsyncWrap.compare(dn, attr, val);
     const compareOP2 = ldapAsyncWrap.compare(dn, attr, val);
     const modifyOP = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const modifyOP2 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
 
     return Promise
@@ -187,8 +187,8 @@ describe('Testing multiple operations functionalities', () => {
         ])
         .then((results) => {
           results.forEach((element) => {
-            if (element === errList.comparationResTrue) {
-              should.deepEqual(errList.comparationResTrue, element);
+            if (element === errList.comparisonResTrue) {
+              should.deepEqual(errList.comparisonResTrue, element);
             } else {
               let resultOperation;
               resultOperation = element.split('\n');

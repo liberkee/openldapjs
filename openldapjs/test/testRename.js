@@ -42,7 +42,7 @@ describe('Testing the rename functionalities', () => {
         });
   });
 
-  it('should reject if newrdn is not a string', () => {
+  it('should reject if newRdn is not a string', () => {
     return ldapAsyncWrap
         .rename(config.ldapRename.dnChange, 1, config.ldapRename.newparent)
         .catch((error) => {
@@ -50,9 +50,11 @@ describe('Testing the rename functionalities', () => {
         });
   });
 
-  it('should reject if newparent is not a string', () => {
+  it('should reject if newParent is not a string', () => {
     return ldapAsyncWrap
-        .rename(config.ldapRename.dnChange, config.ldapRename.newrdn, 1)
+        .rename(
+            config.ldapRename.dnChange, config.ldapRename.newrdn,
+            1)  // consider using camelCase for variables
         .catch((error) => {
           should.deepEqual(error.message, errList.typeErrorMessage);
         });
@@ -78,7 +80,7 @@ describe('Testing the rename functionalities', () => {
         });
   });
 
-  it('should reject if dn not corectly defined', () => {
+  it('should reject if dn not correctly defined', () => {
     const badDn = 'not good dn';
     return ldapAsyncWrap
         .rename(badDn, config.ldapRename.newrdn, config.ldapRename.newparent)
@@ -86,7 +88,7 @@ describe('Testing the rename functionalities', () => {
             (error) => { should.deepEqual(error, errList.invalidDnSyntax); });
   });
 
-  it('should reject if newparent not corectly defined', () => {
+  it('should reject if newparent not correctly defined', () => {
     const badNewParent = 'not good dn';
     return ldapAsyncWrap
         .rename(
@@ -95,25 +97,26 @@ describe('Testing the rename functionalities', () => {
             (error) => { should.deepEqual(error, errList.invalidDnSyntax); });
   });
 
-  it('should reject if dn not corectly defined', () => {
-    const notCorectDefinedDn = 'cn=admin';
+  it('should reject if dn not correctly defined', () => {
+    const incorrectDefinedDn = 'cn=admin';
     return ldapAsyncWrap
         .rename(
-            notCorectDefinedDn, config.ldapRename.newrdn,
+            incorrectDefinedDn, config.ldapRename.newrdn,
             config.ldapRename.newparent)
         .catch((error) => {
           should.deepEqual(error, errList.unwillingToPerform);
         });
   });
 
-  it('should reject if newparent not corectly defined', () => {
-    const notCorectDefinedNewParent = 'ou=users';
+  it('should reject if newparent not correctly defined', () => {
+    const incorrectDefinedNewParent = 'ou=users';
     return ldapAsyncWrap
         .rename(
             config.ldapRename.dnChange, config.ldapRename.newrdn,
-            notCorectDefinedNewParent)
-        .catch(
-            (error) => { should.deepEqual(error, errList.affectMutipleDsas); });
+            incorrectDefinedNewParent)
+        .catch((error) => {
+          should.deepEqual(error, errList.affectMultipleDsas);  // dsas?
+        });
   });
 
   it('should reject if the state is not BOUND', () => {

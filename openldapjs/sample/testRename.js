@@ -16,7 +16,7 @@ const newClient = new LDAPCLIENT(host);
 const config = require('./config.json');
 const Promise = require('bluebird');
 
-const changeAttirbutes = [
+const changeAttributes = [
   {
     op: config.ldapModify.ldapModificationReplace.operation,
     attr: config.ldapModify.ldapModificationReplace.attribute,
@@ -38,12 +38,12 @@ const controlOperation = [
   {
     oid: config.ldapControls.ldapModificationControlPostRead.oid,
     value: config.ldapControls.ldapModificationControlPostRead.value,
-    iscritical: config.ldapControls.ldapModificationControlPostRead.iscritical,
+    isCritical: config.ldapControls.ldapModificationControlPostRead.isCritical,
   },
   {
     oid: config.ldapControls.ldapModificationControlPreRead.oid,
     value: config.ldapControls.ldapModificationControlPreRead.value,
-    iscritical: config.ldapControls.ldapModificationControlPreRead.iscritical,
+    isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
   },
 ];
 
@@ -64,7 +64,11 @@ const val = config.ldapCompare.value;
 const searchBase = config.ldapSearch.searchBase;
 
 const comparisonResTrue = 'The Comparison Result: true';
-const entry = {objectClass: 'inetOrgPerson', sn: 'Entryz', description: 'Testz'};
+const entry = {
+  objectClass: 'inetOrgPerson',
+  sn: 'Entryz',
+  description: 'Testz'
+};
 const newEntry = 'cn=newPointChild111';
 const dnUser = `${newEntry}${config.ldapAdd.dnNewEntry}`;
 
@@ -74,33 +78,37 @@ const searchResult =
     `\ndn:${newEntry}${config.ldapAdd.dnNewEntry}\nobjectClass:person\nsn:Entry\ndescription:Tesst\ncn:${attributeEntry}\n\n`;
 
 
-newClient.initialize()
-.then(() => {
-  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret')
-  .then(() => {
+newClient.initialize().then(() => {
+  newClient.bind('cn=admin,dc=demoApp,dc=com', 'secret').then(() => {
     const add1 = newClient.add(dnUser, validEntry, controlOperation);
     const delete1 = newClient.del(dnUser, controlOperation);
-    const search1 =
-        newClient.search(searchBase, searchScope.subtree, newEntry);
+    const search1 = newClient.search(searchBase, searchScope.subtree, newEntry);
     const compare1 = newClient.compare(dn, attr, val);
     const modify1 = newClient.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
 
     const add2 = newClient.add(dnUserNew, validEntry, controlOperation);
     const delete2 = newClient.del(dnUserNew, controlOperation);
-    const search2 =
-        newClient.search(searchBase, searchScope.subtree, newEntry);
+    const search2 = newClient.search(searchBase, searchScope.subtree, newEntry);
     const modify2 = newClient.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
     const compare2 = newClient.compare(dn, attr, val);
 
     Promise
         .all([
-          add1, add2, modify1, modify2, delete1, delete2, compare1, compare2,
-          search1, search2,
+          add1,
+          add2,
+          modify1,
+          modify2,
+          delete1,
+          delete2,
+          compare1,
+          compare2,
+          search1,
+          search2,
         ])
         .then((results) => {
           results.forEach((element) => {
@@ -113,7 +121,8 @@ newClient.initialize()
               resultOperation = element.split('\n');
               resultOperation = resultOperation[1].split(':');
               resultOperation = resultOperation[1];
-              if (resultOperation === ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
+              if (resultOperation ===
+                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
                 console.log(element);
               } else {
                 console.log(element);
@@ -121,8 +130,6 @@ newClient.initialize()
             }
           });
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch((error) => { console.log(error); });
   });
 });
