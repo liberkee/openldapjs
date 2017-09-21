@@ -11,10 +11,10 @@ describe('Testing the async LDAP add operation', () => {
       'The operation failed. It could be done if the state of the client is BOUND';
   let personNr = 1;
   let dnUser;
-  const invalidDnSyntax = '34';
-  const undefinedType = '17';
-  const alreadyExists = '68';
-  const insufficientAccess = '50';
+  const invalidDnSyntax = 34;
+  const undefinedType = 17;
+  const alreadyExists = 68;
+  const insufficientAccess = 50;
   const succes = '0';
   const rdnUser = 'cn=testUsers';
 
@@ -45,33 +45,28 @@ describe('Testing the async LDAP add operation', () => {
     clientLDAP = new LDAP(config.ldapAuthentification.host);
     clientLDAP2 = new LDAP(config.ldapAuthentification.host);
 
-    return clientLDAP.initialize()
-        .then(() => {
-          return clientLDAP.bind(
-              config.ldapAuthentification.dnAdmin,
-              config.ldapAuthentification.passwordAdmin);
-        })
-        .then(() => { return clientLDAP2.initialize(); })
-        .then(() => {
-          return clientLDAP2.bind(
-              config.ldapAuthentification.dnUser,
-              config.ldapAuthentification.passwordUser);
-        })
-        .then(() => {
-          dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
-        });
+    const init1 = clientLDAP.initialize();
+    const init2 = clientLDAP2.initialize();
+    const bind1 = clientLDAP.bind(
+        config.ldapAuthentification.dnAdmin,
+        config.ldapAuthentification.passwordAdmin);
+    const bind2 = clientLDAP2.bind(
+        config.ldapAuthentification.dnUser,
+        config.ldapAuthentification.passwordUser);
+
+    return Promise.all([init1, init2, bind1, bind2]).then((result) => {
+      dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
+    });
   });
 
   afterEach(() => {
-    return clientLDAP.unbind()
-    .then(() => { return clientLDAP2.unbind(); });
+    return clientLDAP.unbind().then(() => { return clientLDAP2.unbind(); });
   });
 
   it('should reject the add operation with a wrong dn', () => {
 
-    return clientLDAP.add('garbage', validEntry, [])
-    .catch((invalidDnError) => {
-      invalidDnError.message.should.be.deepEqual(invalidDnSyntax);
+    return clientLDAP.add('garbage', validEntry).catch((invalidDnError) => {
+      should.deepEqual(invalidDnError, invalidDnSyntax);
     });
 
   });
@@ -84,24 +79,22 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    return clientLDAP.add(dnUser, invalidEntry)
-        .catch((undefinedTypeErr) => {
-          undefinedTypeErr.message.should.be.deepEqual(undefinedType);
-        });
+    return clientLDAP.add(dnUser, invalidEntry).catch((undefinedTypeErr) => {
+      should.deepEqual(undefinedTypeErr, undefinedType);
+    });
 
   });
 
   it('should reject the add operation with a duplicated entry', () => {
     return clientLDAP.add(config.ldapAuthentification.dnUser, validEntry)
         .catch((duplicatedEntryError) => {
-          duplicatedEntryError.message.should.be.deepEqual(alreadyExists);
+          should.deepEqual(duplicatedEntryError, alreadyExists);
         });
 
   });
 
   it('should add a single entry', () => {
-    return clientLDAP.add(dnUser, validEntry)
-    .then((result) => {
+    return clientLDAP.add(dnUser, validEntry).then((result) => {
       result.should.be.deepEqual(0);
       personNr += 1;
     });
@@ -128,17 +121,16 @@ describe('Testing the async LDAP add operation', () => {
              return clientLDAP.add(dnUser, validEntry);
            })
            .catch((err) => {
-             err.message.should.be.deepEqual(alreadyExists);
+             should.deepEqual(err, alreadyExists);
              personNr += 1;
            });
      });
 
   // is null the same with '' ? for '' the  resulting error code was 68
   it('should reject add request with empty(null) DN', () => {
-    const errorMessage = 'The null is not string';
-    return clientLDAP.add(null, validEntry)
-    .catch((err) => {
-      err.message.should.be.deepEqual(errorMessage);
+    const dnEntryError = new TypeError('Wrong type');
+    return clientLDAP.add(null, validEntry).catch((err) => {
+      should.deepEqual(err, dnEntryError);
     });
   });
 
@@ -147,7 +139,8 @@ describe('Testing the async LDAP add operation', () => {
     return clientLDAP2
         .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
         .catch((accessError) => {
-          accessError.message.should.be.deepEqual(insufficientAccess);
+          should.deepEqual(accessError, insufficientAccess);
+
         });
   });
 
@@ -158,8 +151,7 @@ describe('Testing the async LDAP add operation', () => {
               `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
         })
         .catch((stateError) => {
-          stateError.message.should.be.deepEqual(bindErrorMessage);
-          return stateError;
+          should.deepEqual(stateError.message, bindErrorMessage);
         });
   });
 
@@ -174,8 +166,7 @@ describe('Testing the async LDAP add operation', () => {
     const third = clientLDAP.add(dnUser, validEntry);
     personNr += 1;
 
-    return Promise.all([first, second, third])
-    .then((values) => {
+    return Promise.all([first, second, third]).then((values) => {
       values.forEach((result) => { result.should.be.deepEqual(0); });
     });
   });

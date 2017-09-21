@@ -19,38 +19,31 @@ describe('Testing the async LDAP authentification', () => {
     UNBOUND: 5,
   };
 
-  beforeEach((next) => {
+  beforeEach(() => {
     clientLDAP = new LDAPWrap(host);
-    clientLDAP.initialize()
-    .then(() => {
-      next();
-    });
+    return clientLDAP.initialize();
   });
   afterEach(() => {
   });
 
-  it('should bind to server', (next) => {
-    clientLDAP.bind(dn, password)
+  it('should bind to server', () => {
+    return clientLDAP.bind(dn, password)
     .then((result) => {
       should.deepEqual(result, E_STATES.BOUND);
-      next();
     });
   });
 
-  it('should not bind to server', (next) => {
-    clientLDAP.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
+  it('should not bind to server', () => {
+    return clientLDAP.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
     .catch((err) => {
-      // Give the specific error not the state of the operation
       should.deepEqual(err.message, invalidCredentials);
-      next();
     });
   });
 
-  it('should unbind from server', (next) => {
-    clientLDAP.unbind()
+  it('should unbind from server', () => {
+    return clientLDAP.unbind()
     .then((result) => {
       should.deepEqual(result, E_STATES.UNBOUND);
-      next();
     });
   });
 

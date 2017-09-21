@@ -181,7 +181,7 @@ class LDAPAsyncWrap {
       } else {
         let ctrls = controls !== undefined ? controls : null;
         checkParameters.checkModifyChangeArray(jsonChange);
-        checkParameters.checkControlArray(ctrls);
+        checkParameters.checkControlArray(controls);
 
         this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
           if (err) {
