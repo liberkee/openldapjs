@@ -80,6 +80,7 @@
 
   "ldapSearch": {
     "searchBase": "dc=demoApp,dc=com",
+    "rdnUser": "cn=cghitea",
     "filterObjAll": "objectclass=*",
     "filterObjSpecific": "objectclass=aliens",
     "filterObjSpecific2": "objectClass=simpleSecurityObject",
