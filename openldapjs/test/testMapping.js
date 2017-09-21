@@ -5,7 +5,7 @@ const ldif = require('ldif');
 const config = require('./config.json');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 
-describe('Test string to Json library', () => {
+describe('Test mapping string to JSON', () => {
   const host = config.ldapAuthentification.host;
   const dnAdmin = config.ldapAuthentification.dnAdmin;
   const dnUser = config.ldapAuthentification.dnUser;
@@ -33,7 +33,8 @@ describe('Test string to Json library', () => {
   it('should return the string as JSON', () => {
     const expectResult =
         '{"type":"content","version":null,"entries":[{"type":"record","dn":"cn=mrotaru,ou=users,o=myhost,dc=demoApp,dc=com","attributes":[{"attribute":{"type":"attribute","options":[],"attribute":"objectClass"},"value":{"type":"value","value":"person"}},{"attribute":{"type":"attribute","options":[],"attribute":"sn"},"value":{"type":"value","value":"Rotariu Maxim"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=T1"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=T2"}},{"attribute":{"type":"attribute","options":[],"attribute":"seeAlso"},"value":{"type":"value","value":"cn=T3"}},{"attribute":{"type":"attribute","options":[],"attribute":"description"},"value":{"type":"value","value":"OurNewObject"}},{"attribute":{"type":"attribute","options":[],"attribute":"description"},"value":{"type":"value","value":"OurNewObjecta"}},{"attribute":{"type":"attribute","options":[],"attribute":"userPassword"},"value":{"type":"value","value":"parolanoua"}},{"attribute":{"type":"attribute","options":[],"attribute":"cn"},"value":{"type":"value","value":"mrotaru"}}]}]}';
-    return adminLDAP.search(searchBase, 2, filterSpecificUser).then((res) => {
+    return adminLDAP.search(searchBase, 2, filterSpecificUser)
+    .then((res) => {
       const jsonRes = ldif.parse(res);
       should.deepEqual(JSON.stringify(jsonRes), expectResult);
     });
@@ -46,12 +47,13 @@ describe('Test string to Json library', () => {
     const search3 = adminLDAP.search(searchBase, 2, filterSpecificUser);
 
 
-    return Promise.all([search1, search2, search3]).then((results) => {
-      results.forEach((element) => { 
+    return Promise.all([search1, search2, search3])
+    .then((results) => {
+      results.forEach((element) => {
         const jsonRes = ldif.parse(element);
-        jsonRes.should.be.json; 
+        jsonRes.should.be.json;
       });
     });
   });
-  
+
 });

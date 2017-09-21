@@ -4,6 +4,7 @@ const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
 const config = require('./config.json');
+const errList = require('./errorlist.json');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -11,15 +12,7 @@ describe('Testing the async LDAP delete operation', () => {
   const dnAdmin = config.ldapAuthentification.dnAdmin;
   let dnUser;
   const password = config.ldapAuthentification.passwordAdmin;
-  const stringError = new TypeError('Wrong type');
-  const successResult = 0;
-  const invalidDnSyntax = 34;
-  const unwillingToPerform = 53;
-  const noSuchObject = 32;
-  const notAllowedOnNonleaf = 66;
   let personNr = 1;
-  const bindErrorMessage = new Error(
-      'The operation failed. It could be done if the state of the client is BOUND');
 
   const controlOperation = [
     {
@@ -53,31 +46,31 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject the request with invalidDN error code', () => {
     return clientLDAP.delete('garbage')
     .catch(
-        (err) => { err.should.be.deepEqual(invalidDnSyntax); });
+        (err) => { err.should.be.deepEqual(errList.invalidDnSyntax); });
   });
 
   it('should reject the request for passing an empty DN', () => {
     return clientLDAP.delete('')
     .catch(
-        (err) => { err.should.be.deepEqual(unwillingToPerform); });
+        (err) => { err.should.be.deepEqual(errList.unwillingToPerform); });
   });
 
   it('should reject the request for passing a null DN', () => {
     return clientLDAP.delete(null)
     .catch(
-        (err) => { err.should.be.deepEqual(stringError); });
+        (err) => { err.message.should.be.deepEqual(errList.typeErrorMessage); });
   });
 
   it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
     return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
-        .catch((err) => { err.should.be.deepEqual(noSuchObject); });
+        .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
   });
 
   it('should delete the given leaf entry', () => {
     return clientLDAP.delete(dnUser)
     .then((result) => {
-      should.deepEqual(result, successResult);
+      should.deepEqual(result, errList.resultSucces);
       personNr += 1;
     });
   });
@@ -86,32 +79,32 @@ describe('Testing the async LDAP delete operation', () => {
     const stringLength = config.ldapDelete.dn.length;
     const parentDn = config.ldapDelete.dn.slice(1, stringLength);
     return clientLDAP.delete(parentDn)
-    .catch((err) => { err.should.be.deepEqual(notAllowedOnNonleaf); });
+    .catch((err) => { err.should.be.deepEqual(errList.notAllowedOnNonLeaf); });
   });
 
 
   it('should reject because BOUND state is required', () => {
     return clientLDAP.unbind()
         .then(() => { return clientLDAP.delete(dnUser); })
-        .catch((err) => { should.deepEqual(err, bindErrorMessage); });
+        .catch((err) => { should.deepEqual(err.message, errList.bindErrorMessage); });
   });
 
   it('should delete sequential requests with one error', () => {
     return clientLDAP.delete(dnUser)
         .then((res1) => {
-          should.deepEqual(res1, successResult);
+          should.deepEqual(res1, errList.resultSucces);
           return clientLDAP.delete(dnUser);
         })
         .catch((err) => {
           personNr += 1;
           dnUser =
               `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-          should.deepEqual(err, noSuchObject);
+          should.deepEqual(err, errList.ldapNoSuchObject);
           return clientLDAP.delete(dnUser);
         })
         .then((res3) => {
           personNr += 1;
-          should.deepEqual(res3, successResult);
+          should.deepEqual(res3, errList.resultSucces);
         });
   });
 
@@ -131,10 +124,10 @@ describe('Testing the async LDAP delete operation', () => {
 
     return Promise.all([first, second, third, four])
     .then((values) => {
-      should.deepEqual(values[0], successResult);
-      should.deepEqual(values[1], successResult);
-      should.deepEqual(values[2], successResult);
-      should.deepEqual(values[3], successResult);
+      should.deepEqual(values[0], errList.resultSucces);
+      should.deepEqual(values[1], errList.resultSucces);
+      should.deepEqual(values[2], errList.resultSucces);
+      should.deepEqual(values[3], errList.resultSucces);
     });
   });
 

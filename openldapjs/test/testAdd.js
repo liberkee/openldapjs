@@ -4,18 +4,12 @@ const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
 const Promise = require('bluebird');
+const errList = require('./errorlist.json');
 
 describe('Testing the async LDAP add operation', () => {
 
-  const bindErrorMessage =
-      'The operation failed. It could be done if the state of the client is BOUND';
   let personNr = 1;
   let dnUser;
-  const invalidDnSyntax = 34;
-  const undefinedType = 17;
-  const alreadyExists = 68;
-  const insufficientAccess = 50;
-  const succes = '0';
   const rdnUser = 'cn=testUsers';
 
   const validEntry = {
@@ -69,7 +63,7 @@ describe('Testing the async LDAP add operation', () => {
 
     return clientLDAP.add('garbage', validEntry)
     .catch((invalidDnError) => {
-      should.deepEqual(invalidDnError, invalidDnSyntax);
+      should.deepEqual(invalidDnError, errList.invalidDnSyntax);
     });
 
   });
@@ -84,7 +78,7 @@ describe('Testing the async LDAP add operation', () => {
 
     return clientLDAP.add(dnUser, invalidEntry)
     .catch((undefinedTypeErr) => {
-      should.deepEqual(undefinedTypeErr, undefinedType);
+      should.deepEqual(undefinedTypeErr, errList.undefinedType);
     });
 
   });
@@ -92,7 +86,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should reject the add operation with a duplicated entry', () => {
     return clientLDAP.add(config.ldapAuthentification.dnUser, validEntry)
         .catch((duplicatedEntryError) => {
-          should.deepEqual(duplicatedEntryError, alreadyExists);
+          should.deepEqual(duplicatedEntryError, errList.alreadyExists);
         });
 
   });
@@ -126,7 +120,7 @@ describe('Testing the async LDAP add operation', () => {
              return clientLDAP.add(dnUser, validEntry);
            })
            .catch((err) => {
-             should.deepEqual(err, alreadyExists);
+             should.deepEqual(err, errList.alreadyExists);
              personNr += 1;
            });
      });
@@ -145,7 +139,7 @@ describe('Testing the async LDAP add operation', () => {
     return clientLDAP2
         .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
         .catch((accessError) => {
-          should.deepEqual(accessError, insufficientAccess);
+          should.deepEqual(accessError, errList.insufficientAccess);
 
         });
   });
@@ -157,7 +151,7 @@ describe('Testing the async LDAP add operation', () => {
               `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
         })
         .catch((stateError) => {
-          should.deepEqual(stateError.message, bindErrorMessage);
+          should.deepEqual(stateError.message, errList.bindErrorMessage);
         });
   });
 

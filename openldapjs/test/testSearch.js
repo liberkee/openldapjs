@@ -3,13 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-
-const OBJECT_NOT_FOUND = 32;
-const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
-const resStateRequired =
-    'The operation failed. It could be done if the state of the client is BOUND';
-const scopeError = 'Scope must be integer';
-const searchBseError = 'Wrong type';
+const errList = require('./errorlist.json');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -53,7 +47,7 @@ describe('Testing the async LDAP search ', () => {
               searchBase, 2, config.ldapSearch.filterObjSpecific);
         })
         .catch(
-            (error) => { should.deepEqual(error.message, resStateRequired); });
+            (error) => { should.deepEqual(error.message, errList.bindErrorMessage); });
   });
 
   it('should return an empty search', () => {
@@ -64,6 +58,7 @@ describe('Testing the async LDAP search ', () => {
    * case for search with non existing search base
    */
   it('should return the root node', () => {
+    const ROOT_NODE = '\ndn:\nobjectClass:top\nobjectClass:OpenLDAProotDSE\n\n';
     return adminLDAP.search('', 0, config.ldapSearch.filterObjAll)
         .then((result) => { should.deepEqual(result, ROOT_NODE); });
   });
@@ -73,17 +68,17 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
-        .catch((err) => { err.should.be.deepEqual(OBJECT_NOT_FOUND); });
+        .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
   });
 
   it('should reject if scope is not integer', () => {
     return userLDAP.search(searchBase, '2', config.ldapSearch.filterObjAll)
-        .catch((err) => { err.message.should.be.deepEqual(scopeError); });
+        .catch((err) => { err.message.should.be.deepEqual(errList.scopeSearchError); });
   });
 
   it('should reject if searchBase is not string', () => {
     return userLDAP.search(1, 2, config.ldapSearch.filterObjAll)
-        .catch((err) => { err.message.should.be.deepEqual(searchBseError); });
+        .catch((err) => { err.message.should.be.deepEqual(errList.typeErrorMessage); });
   });
 
 

@@ -3,14 +3,13 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
+const errList = require('./errorlist.json');
 
 describe('Testing the async LDAP authentification', () => {
   const host = config.ldapAuthentification.host;
   const dn = config.ldapAuthentification.dnAdmin;
   const password = config.ldapAuthentification.passwordAdmin;
   let clientLDAP = new LDAPWrap(host);
-
-  const invalidCredentials = '49';
 
   const E_STATES = {
     ERROR: 0,
@@ -36,7 +35,7 @@ describe('Testing the async LDAP authentification', () => {
   it('should not bind to server', () => {
     return clientLDAP.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
     .catch((err) => {
-      should.deepEqual(err.message, invalidCredentials);
+      should.deepEqual(err, errList.invalidCredentials);
     });
   });
 

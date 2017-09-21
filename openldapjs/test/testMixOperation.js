@@ -3,6 +3,7 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
+const errList = require('./errorlist.json');
 
 describe('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentification.host;
@@ -15,15 +16,6 @@ describe('Testing multiple operations functionalities', () => {
   const val = config.ldapCompare.value;
   const searchBase = config.ldapSearch.searchBase;
 
-  const nonVal = 'nonExistingValue';
-  const nonAttr = 'nonExistingAttr';
-  const nonObj = config.ldapCompare.invalidUser;
-  const noPass = config.ldapCompare.invalidPassword;
-
-  const comparisonResTrue = 'The Comparison Result: true';
-  const comparisonResFalse = 'The Comparison Result: false';
-  const LDAP_UNDEFINED_TYPE = '17';
-  const LDAP_NO_SUCH_OBJECT = '32';
   const newEntry = 'cn=newPointChild111';
 
   const searchScope = {
@@ -125,7 +117,7 @@ describe('Testing multiple operations functionalities', () => {
            })
 
            .then((result5) => {
-             should.deepEqual(result5, comparisonResTrue);
+             should.deepEqual(result5, errList.comparationResTrue);
              return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
            })
            .then((result6) => {
@@ -163,7 +155,7 @@ describe('Testing multiple operations functionalities', () => {
            })
 
            .then((result10) => {
-             should.deepEqual(result10, comparisonResTrue);
+             should.deepEqual(result10, errList.comparationResTrue);
            });
      });
 
@@ -184,8 +176,8 @@ describe('Testing multiple operations functionalities', () => {
     return Promise.all([addOP, deleteOP, searchOP, compareOP, modifyOP])
         .then((results) => {
           results.forEach((element) => {
-            if (element === comparisonResTrue) {
-              should.deepEqual(comparisonResTrue, element);
+            if (element === errList.comparationResTrue) {
+              should.deepEqual(errList.comparationResTrue, element);
             } else {
               let resultOperation;
               resultOperation = element.split('\n');
