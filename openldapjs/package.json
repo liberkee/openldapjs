@@ -13,6 +13,7 @@
     "eslint-plugin-jsx-a11y": "3.0.2",
     "eslint-plugin-react": "6.9.0",
     "html-pdf": "2.1.0",
+    "ldif": "0.5.1",
     "nan": "2.6.0",
     "nodemon": "1.10.2",
     "nunjucks": "2.4.2",

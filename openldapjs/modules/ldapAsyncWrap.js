@@ -78,7 +78,7 @@ class LDAPAsyncWrap {
         this._binding.bind(bindDn, passwordUser, (err, state) => {
           if (err) {
             this._stateClient = E_STATES.INITIALIZED;
-            reject(new Error(err));
+            reject(err);
           } else {
             this._stateClient = state;
             resolve(this._stateClient);

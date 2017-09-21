@@ -4,6 +4,7 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
+const errList = require('./errorlist.json');
 
 describe('Testing the modify functionalities', () => {
 
@@ -11,10 +12,6 @@ describe('Testing the modify functionalities', () => {
 
   const resStateRequired =
       'The operation failed. It could be done if the state of the client is BOUND';
-  const resInvalidOp = 'Invalid Operation';
-  const resJsonInvalid = 'The passed JSON is invalid';
-  const resDnInvalid = 'The passed dn is invalid';
-  const unwillingToPerform = 53;
 
   const changeAttributesAdd = [
     {
@@ -94,7 +91,7 @@ describe('Testing the modify functionalities', () => {
               changeAttirbutes);
         })
         .catch(
-            (error) => { should.deepEqual(error.message, resStateRequired); });
+            (error) => { should.deepEqual(error.message, errList.bindErrorMessage); });
   });
 
   it('should reject if attribute parameter is not defined', () => {
@@ -149,7 +146,7 @@ describe('Testing the modify functionalities', () => {
   it('should reject operation if the dn is empty', () => {
     return ldapAsyncWrap.modify('', changeAttirbutes)
     .catch((error) => {
-      should.deepEqual(error, unwillingToPerform);
+      should.deepEqual(error, errList.unwillingToPerform);
     });
   });
 
