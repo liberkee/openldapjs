@@ -164,8 +164,10 @@ describe('Testing multiple operations functionalities', () => {
     let searchEntry = config.ldapAuthentification.dnUser.split(',');
     searchEntry = searchEntry[0];
 
-    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
-    const deleteOP = ldapAsyncWrap.delete(dnUser, controlOperation);
+    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
+                  .then(() => {
+                    return ldapAsyncWrap.delete(dnUser, controlOperation);
+                  });
     const searchOP =
         ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const compareOP = ldapAsyncWrap.compare(dn, attr, val);
@@ -173,7 +175,7 @@ describe('Testing multiple operations functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
 
-    return Promise.all([addOP, deleteOP, searchOP, compareOP, modifyOP])
+    return Promise.all([addOP, searchOP, compareOP, modifyOP])
         .then((results) => {
           results.forEach((element) => {
             if (element === errList.comparationResTrue) {
