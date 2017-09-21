@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
-const validator = require('../json_validator/json_validator');
+const validator = require('tv4');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 
@@ -39,9 +39,9 @@ class CheckParam {
       throw new TypeError('The json is not an array');
     } else {
       change.forEach((element) => {
-        const result = validator(element, changeSchema);
+        const result = validator.validateMultiple(element, changeSchema);
         if (result.valid !== true) {
-          throw new Error (result.error || result.errors);
+          throw new Error(result.error || result.errors);
         }
       });
     }
@@ -60,9 +60,9 @@ class CheckParam {
         throw new TypeError('The control is not an array');
       } else {
         controls.forEach((element) => {
-          const result = validator(element, controlSchema);
+          const result = validator.validateMultiple(element, controlSchema);
           if (result.valid !== true) {
-            throw new Error (result.error || result.errors);
+            throw new Error(result.error || result.errors);
           }
         });
       }

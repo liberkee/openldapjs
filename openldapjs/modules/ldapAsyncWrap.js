@@ -2,9 +2,6 @@
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
-const validator = require('./json_validator/json_validator');
-const changeSchema = require('./schemas/change_schema');
-const controlSchema = require('./schemas/control_schema');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 
 const E_STATES = {
@@ -16,8 +13,6 @@ const E_STATES = {
 
 const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
-
-
 
 const INITIALIZATION_ERROR = new Error('Initialize failed!');
 const BIND_ERROR = new Error('Bind failed!');
