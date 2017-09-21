@@ -54,18 +54,21 @@ describe('Testing the async LDAP add operation', () => {
         config.ldapAuthentification.dnUser,
         config.ldapAuthentification.passwordUser);
 
-    return Promise.all([init1, init2, bind1, bind2]).then((result) => {
+    return Promise.all([init1, init2, bind1, bind2])
+    .then((result) => {
       dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
     });
   });
 
   afterEach(() => {
-    return clientLDAP.unbind().then(() => { return clientLDAP2.unbind(); });
+    return clientLDAP.unbind()
+    .then(() => { return clientLDAP2.unbind(); });
   });
 
   it('should reject the add operation with a wrong dn', () => {
 
-    return clientLDAP.add('garbage', validEntry).catch((invalidDnError) => {
+    return clientLDAP.add('garbage', validEntry)
+    .catch((invalidDnError) => {
       should.deepEqual(invalidDnError, invalidDnSyntax);
     });
 
@@ -79,7 +82,8 @@ describe('Testing the async LDAP add operation', () => {
       description: 'Test',
     };
 
-    return clientLDAP.add(dnUser, invalidEntry).catch((undefinedTypeErr) => {
+    return clientLDAP.add(dnUser, invalidEntry)
+    .catch((undefinedTypeErr) => {
       should.deepEqual(undefinedTypeErr, undefinedType);
     });
 
@@ -94,7 +98,8 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should add a single entry', () => {
-    return clientLDAP.add(dnUser, validEntry).then((result) => {
+    return clientLDAP.add(dnUser, validEntry)
+    .then((result) => {
       result.should.be.deepEqual(0);
       personNr += 1;
     });
@@ -129,7 +134,8 @@ describe('Testing the async LDAP add operation', () => {
   // is null the same with '' ? for '' the  resulting error code was 68
   it('should reject add request with empty(null) DN', () => {
     const dnEntryError = new TypeError('Wrong type');
-    return clientLDAP.add(null, validEntry).catch((err) => {
+    return clientLDAP.add(null, validEntry)
+    .catch((err) => {
       should.deepEqual(err, dnEntryError);
     });
   });
@@ -166,7 +172,8 @@ describe('Testing the async LDAP add operation', () => {
     const third = clientLDAP.add(dnUser, validEntry);
     personNr += 1;
 
-    return Promise.all([first, second, third]).then((values) => {
+    return Promise.all([first, second, third])
+    .then((values) => {
       values.forEach((result) => { result.should.be.deepEqual(0); });
     });
   });

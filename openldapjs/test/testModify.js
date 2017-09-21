@@ -75,7 +75,8 @@ describe('Testing the modify functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-    return ldapAsyncWrap.initialize().then(() => {
+    return ldapAsyncWrap.initialize()
+    .then(() => {
       return ldapAsyncWrap.bind(
           config.ldapAuthentification.dnAdmin,
           config.ldapAuthentification.passwordAdmin);
@@ -146,7 +147,8 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject operation if the dn is empty', () => {
-    return ldapAsyncWrap.modify('', changeAttirbutes).catch((error) => {
+    return ldapAsyncWrap.modify('', changeAttirbutes)
+    .catch((error) => {
       should.deepEqual(error, unwillingToPerform);
     });
   });

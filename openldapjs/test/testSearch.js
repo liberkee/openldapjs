@@ -43,7 +43,8 @@ describe('Testing the async LDAP search ', () => {
   });
 
   afterEach(() => {
-    return adminLDAP.unbind().then(() => { return userLDAP.unbind(); });
+    return adminLDAP.unbind()
+    .then(() => { return userLDAP.unbind(); });
   });
 
   it('should reject if the state is not BOUND', () => {
@@ -99,10 +100,10 @@ describe('Testing the async LDAP search ', () => {
         });
   });
 
-  /**
+  /* *
    * test case with multiple results on the same level( scope argument 1?)
    *
-   **/
+   * */
   it('should return multiple results located on the same level', () => {
     return adminLDAP.search(searchBase, 1, config.ldapSearch.filterObjAll)
         .then((result) => {
@@ -122,7 +123,8 @@ describe('Testing the async LDAP search ', () => {
     const search2 =
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
 
-    return Promise.all([search1, search2]).then((results) => {
+    return Promise.all([search1, search2])
+    .then((results) => {
       should.notDeepEqual(results[0], results[1]);
     });
 
@@ -132,18 +134,24 @@ describe('Testing the async LDAP search ', () => {
    * case with sequential different searches(including error cases)
    */
   it('should return sequential different results and errors', () => {
+    let result1;
+    let result2;
+    let result3;
 
     return adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2)
-        .then((result1) => {
+        .then((res1) => {
+          result1 = res1;
           return adminLDAP.search(
               searchBase, 2, config.ldapSearch.filterObjSpecific);
         })
-        .then((result2) => {
+        .then((res2) => {
+          result2 = res2;
           should.notDeepEqual(result1, result2);
           return adminLDAP.search(
               searchBase, 1, config.ldapSearch.filterObjAll);
         })
-        .then((result3) => {
+        .then((res3) => {
+          result3 = res3;
           should.notDeepEqual(result1, result3);
           should.notDeepEqual(result2, result3);
           return adminLDAP.search(
@@ -178,14 +186,12 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-  it('should return >10k entries', function() {
-    this.timeout(0);
-
+  it('should return >10k entries', () => {
     return adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
         .then((result) => {
           const count = (result.match(/\ndn:/g) || []).length;
           count.should.be.above(10000);
-        })
+        });
   });
 
   it('should return results in entire subtree', () => {

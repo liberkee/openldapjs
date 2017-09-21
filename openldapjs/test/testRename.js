@@ -40,7 +40,8 @@ describe('Testing the rename functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-    return ldapAsyncWrap.initialize().then(() => {
+    return ldapAsyncWrap.initialize()
+    .then(() => {
       return ldapAsyncWrap.bind(
           config.ldapAuthentification.dnAdmin,
           config.ldapAuthentification.passwordAdmin);

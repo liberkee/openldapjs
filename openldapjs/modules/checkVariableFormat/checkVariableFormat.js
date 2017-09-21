@@ -41,7 +41,7 @@ class CheckParam {
       change.forEach((element) => {
         const result = validator(element, changeSchema);
         if (result.valid !== true) {
-          throw new Error(result.errors || result.errors);
+          throw new Error (result.error || result.errors);
         }
       });
     }
@@ -62,7 +62,7 @@ class CheckParam {
         controls.forEach((element) => {
           const result = validator(element, controlSchema);
           if (result.valid !== true) {
-            throw new Error(result.errors || result.errors);
+            throw new Error (result.error || result.errors);
           }
         });
       }

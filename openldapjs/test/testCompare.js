@@ -32,7 +32,8 @@ describe('Testing the Compare functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    return ldapAsyncWrap.initialize().then(
+    return ldapAsyncWrap.initialize()
+    .then(
         () => { return ldapAsyncWrap.bind(dn, password); });
   });
 
@@ -40,34 +41,39 @@ describe('Testing the Compare functionalities', () => {
 
 
   it('should reject if dn is not string', () => {
-    return ldapAsyncWrap.compare(1, attr, val).catch((error) => {
+    return ldapAsyncWrap.compare(1, attr, val)
+    .catch((error) => {
       should.deepEqual(error, dnEntryError);
     });
   });
 
   it('should compare existing attribute', () => {
-    return ldapAsyncWrap.compare(dn, attr, val).then((result) => {
+    return ldapAsyncWrap.compare(dn, attr, val)
+    .then((result) => {
       should.deepEqual(result, comparisonResTrue);
     });
   });
 
 
   it('should compare not existing value for attribute', () => {
-    return ldapAsyncWrap.compare(dn, attr, nonVal).then((result) => {
+    return ldapAsyncWrap.compare(dn, attr, nonVal)
+    .then((result) => {
       should.deepEqual(result, comparisonResFalse);
     });
   });
 
 
   it('should compare not existing attribute', () => {
-    return ldapAsyncWrap.compare(dn, nonAttr, val).catch((err) => {
+    return ldapAsyncWrap.compare(dn, nonAttr, val)
+    .catch((err) => {
       should.deepEqual(err, LDAP_UNDEFINED_TYPE);
     });
   });
 
 
   it('should compare not existing object', () => {
-    return ldapAsyncWrap.compare(nonObj, attr, val).catch((err) => {
+    return ldapAsyncWrap.compare(nonObj, attr, val)
+    .catch((err) => {
       should.deepEqual(err, LDAP_NO_SUCH_OBJECT);
     });
   });
@@ -106,7 +112,7 @@ describe('Testing the Compare functionalities', () => {
 
   it('should not compare if the client is unbound', () => {
     return ldapAsyncWrap.unbind()
-        .then(() => {return ldapAsyncWrap.compare(dn, attr, val)})
+        .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
         .catch((err) => { should.deepEqual(err, bindErrorMessage); });
   });
 
