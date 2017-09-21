@@ -25,8 +25,7 @@ describe('Testing the rename functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-    return ldapAsyncWrap.initialize()
-    .then(() => {
+    return ldapAsyncWrap.initialize().then(() => {
       return ldapAsyncWrap.bind(
           config.ldapAuthentification.dnAdmin,
           config.ldapAuthentification.passwordAdmin);
@@ -38,19 +37,25 @@ describe('Testing the rename functionalities', () => {
   it('should reject if dn is not a string', () => {
     return ldapAsyncWrap
         .rename(1, config.ldapRename.newrdn, config.ldapRename.newparent)
-        .catch((error) => { should.deepEqual(error.message, errList.typeErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.typeErrorMessage);
+        });
   });
 
   it('should reject if newrdn is not a string', () => {
     return ldapAsyncWrap
         .rename(config.ldapRename.dnChange, 1, config.ldapRename.newparent)
-        .catch((error) => { should.deepEqual(error.message, errList.typeErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.typeErrorMessage);
+        });
   });
 
   it('should reject if newparent is not a string', () => {
     return ldapAsyncWrap
         .rename(config.ldapRename.dnChange, config.ldapRename.newrdn, 1)
-        .catch((error) => { should.deepEqual(error.message, errList.typeErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.typeErrorMessage);
+        });
   });
 
   it('should reject if control is not an array or undefined', () => {
@@ -58,8 +63,9 @@ describe('Testing the rename functionalities', () => {
         .rename(
             config.ldapRename.dnChange, config.ldapRename.newrdn,
             config.ldapRename.newparent, {test: 'test'})
-        .catch(
-            (error) => { should.deepEqual(error.message, errList.controlArrayError); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.controlArrayError);
+        });
   });
 
   it('should reject if control is not properly defined', () => {
@@ -67,8 +73,9 @@ describe('Testing the rename functionalities', () => {
         .rename(
             config.ldapRename.dnChange, config.ldapRename.newrdn,
             config.ldapRename.newparent, [{test: 'test'}])
-        .catch(
-            (error) => { should.deepEqual(error.message, errList.controlPropError); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.controlPropError);
+        });
   });
 
   it('should reject if dn not corectly defined', () => {
@@ -105,9 +112,8 @@ describe('Testing the rename functionalities', () => {
         .rename(
             config.ldapRename.dnChange, config.ldapRename.newrdn,
             notCorectDefinedNewParent)
-        .catch((error) => {
-          should.deepEqual(error, errList.affectMutipleDsas);
-        });
+        .catch(
+            (error) => { should.deepEqual(error, errList.affectMutipleDsas); });
   });
 
   it('should reject if the state is not BOUND', () => {
@@ -117,8 +123,9 @@ describe('Testing the rename functionalities', () => {
               config.ldapRename.dnChange, config.ldapRename.newrdn,
               config.ldapRename.newparent);
         })
-        .catch(
-            (error) => { should.deepEqual(error.message, errList.bindErrorMessage); });
+        .catch((error) => {
+          should.deepEqual(error.message, errList.bindErrorMessage);
+        });
   });
 
   it('should reject if dn don\'t exist ', () => {
@@ -127,16 +134,32 @@ describe('Testing the rename functionalities', () => {
         .rename(
             existDn, config.ldapRename.newrdn, config.ldapRename.newparent,
             controlOperation)
-        .catch((error) => { should.deepEqual(error, errList.ldapNoSuchObject); });
+        .catch(
+            (error) => { should.deepEqual(error, errList.ldapNoSuchObject); });
   });
 
   it('should make the modification of dn', () => {
-    // If you run multiple time remember to change the ldapRename from
-    // config.json
+    const validEntry = {
+      objectClass: config.ldapAdd.objectClass,
+      sn: config.ldapAdd.sn,
+      description: config.ldapAdd.description,
+    };
+
     return ldapAsyncWrap
-        .rename(
-            config.ldapRename.dnChange, config.ldapRename.newrdn,
-            config.ldapRename.newparent, controlOperation)
+        .delete(`${config.ldapRename.newrdn},${config.ldapRename.newparent}`)
+        .then(() => {
+          return ldapAsyncWrap.add(config.ldapRename.dnChange, validEntry);
+        })
+        .then(() => {
+          return ldapAsyncWrap.rename(
+              config.ldapRename.dnChange, config.ldapRename.newrdn,
+              config.ldapRename.newparent, controlOperation);
+        })
+        .catch(() => {
+          return ldapAsyncWrap.rename(
+              config.ldapRename.dnChange, config.ldapRename.newrdn,
+              config.ldapRename.newparent, controlOperation);
+        })
         .then((result) => {
           let resultOperation;
           resultOperation = result.split('\n');

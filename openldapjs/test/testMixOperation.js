@@ -72,8 +72,8 @@ describe('Testing multiple operations functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    return ldapAsyncWrap.initialize()
-    .then(() => { return ldapAsyncWrap.bind(dn, password); });
+    return ldapAsyncWrap.initialize().then(
+        () => { return ldapAsyncWrap.bind(dn, password); });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
@@ -164,18 +164,27 @@ describe('Testing multiple operations functionalities', () => {
     let searchEntry = config.ldapAuthentification.dnUser.split(',');
     searchEntry = searchEntry[0];
 
-    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
-                  .then(() => {
-                    return ldapAsyncWrap.delete(dnUser, controlOperation);
-                  });
+    const addOP =
+        ldapAsyncWrap.add(dnUser, validEntry, controlOperation).then(() => {
+          return ldapAsyncWrap.delete(dnUser, controlOperation);
+        });
     const searchOP =
         ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
+    const searchOP2 =
+        ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const compareOP = ldapAsyncWrap.compare(dn, attr, val);
+    const compareOP2 = ldapAsyncWrap.compare(dn, attr, val);
     const modifyOP = ldapAsyncWrap.modify(
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
+    const modifyOP2 = ldapAsyncWrap.modify(
+        config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
+        controlOperation);
 
-    return Promise.all([addOP, searchOP, compareOP, modifyOP])
+    return Promise
+        .all([
+          addOP, searchOP, compareOP, modifyOP, searchOP2, compareOP2, modifyOP2
+        ])
         .then((results) => {
           results.forEach((element) => {
             if (element === errList.comparationResTrue) {
