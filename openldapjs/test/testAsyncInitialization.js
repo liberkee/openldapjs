@@ -23,7 +23,8 @@ describe('Testing the async initialization', () => {
   afterEach(() => {});
 
   it('should be INITIALIZED', () => {
-    return ldapWrap.initialize().then((result) => {
+    return ldapWrap.initialize()
+    .then((result) => {
       should.deepEqual(result, E_STATES.INITIALIZED);
     });
   });

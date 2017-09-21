@@ -5,7 +5,7 @@ const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 
 describe('Testing the async LDAP authentification', () => {
-  const host = config.ldapAuthentification.host;  
+  const host = config.ldapAuthentification.host;
   const dn = config.ldapAuthentification.dnAdmin;
   const password = config.ldapAuthentification.passwordAdmin;
   let clientLDAP = new LDAPWrap(host);

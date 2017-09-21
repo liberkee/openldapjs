@@ -29,14 +29,14 @@ describe('Testing multiple operations functionalities', () => {
   const searchScope = {
     base: 0,
     oneLevel: 1,
-    subtree: 2
-  }
+    subtree: 2,
+  };
 
   const validEntry = {
     objectClass: config.ldapAdd.objectClass,
     sn: config.ldapAdd.sn,
     description: config.ldapAdd.description,
-  }
+  };
 
   const changeAttirbutes = [
     {
@@ -80,8 +80,8 @@ describe('Testing multiple operations functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    return ldapAsyncWrap.initialize().then(
-        () => { return ldapAsyncWrap.bind(dn, password); });
+    return ldapAsyncWrap.initialize()
+    .then(() => { return ldapAsyncWrap.bind(dn, password); });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
@@ -149,7 +149,7 @@ describe('Testing multiple operations functionalities', () => {
              should.deepEqual(resultOperation, ` ${dnUser}`);
              return ldapAsyncWrap.modify(
                  config.ldapModify.ldapModificationReplace.change_dn,
-                 changeAttirbutes, controlOperation)
+                 changeAttirbutes, controlOperation);
            })
            .then((result9) => {
              let resultOperation;
@@ -192,21 +192,22 @@ describe('Testing multiple operations functionalities', () => {
               resultOperation = resultOperation[1].split(':');
               resultOperation = resultOperation[1];
 
-              if (resultOperation === config.ldapAuthentification.dnUser)
+              if (resultOperation === config.ldapAuthentification.dnUser) {
                 should.deepEqual(
                     resultOperation, `${config.ldapAuthentification.dnUser}`);
-              else if (
+              } else if (
                   resultOperation ===
-                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`)
+                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
                 should.deepEqual(
                     resultOperation,
                     ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-              else if (resultOperation === ` ${dnUser}`)
+              } else if (resultOperation === ` ${dnUser}`) {
                 should.deepEqual(resultOperation, ` ${dnUser}`);
-              else
+              } else {
                 should.deepEqual(
                     resultOperation,
                     ` ${newEntry}1${config.ldapAdd.dnNewEntry}`);
+              }
             }
           });
         });
