@@ -151,7 +151,7 @@ class LDAPAsyncWrap {
         reject(BIND_ERROR_MESSAGE);
       } else {
         checkParameters.checkParametersIfString(
-            [dn, attr, value]);  // throws in case of typeError.
+            dn, attr, value);  // throws in case of typeError.
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
@@ -214,7 +214,7 @@ class LDAPAsyncWrap {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         let ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString([dn, newrdn, newparent]);
+        checkParameters.checkParametersIfString(dn, newrdn, newparent);
         checkParameters.checkControlArray(controls);
 
         this._binding.rename(dn, newrdn, newparent, ctrls, (err, result) => {
@@ -244,7 +244,7 @@ class LDAPAsyncWrap {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         let ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString([dn]);
+        checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
 
         this._binding.del(dn, ctrls, (err, result) => {
@@ -274,7 +274,7 @@ class LDAPAsyncWrap {
         reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         let ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString([dn]);
+        checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
         const keys = Object.keys(entry);
         const entryArray = [];
