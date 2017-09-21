@@ -1,4 +1,5 @@
 #include "ldap_control.h"
+#include <nan.h>
 #include "constants.h"
 
 LdapControls::LdapControls() {}
