@@ -17,6 +17,8 @@ const E_STATES = {
 const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
 
+
+
 const INITIALIZATION_ERROR = new Error('Initialize failed!');
 const BIND_ERROR = new Error('Bind failed!');
 
@@ -115,7 +117,7 @@ class LDAPAsyncWrap {
                                          // consider dropping one.
           reject(new Error('Scope must be integer'));
         }
-        checkParameters.checkParametersIfString([searchBase, searchFilter]);
+        checkParameters.checkParametersIfString(searchBase, searchFilter);
 
         this._binding.search(searchBase, scope, searchFilter, (err, result) => {
           if (err) {

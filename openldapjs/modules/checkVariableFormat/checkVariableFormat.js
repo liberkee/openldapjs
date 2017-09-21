@@ -18,8 +18,9 @@ class CheckParam {
     * @return Throws an error in case the provided arguments aren't strings
     */
 
-  static checkParametersIfString(arrayParameter) {
-    arrayParameter.forEach((element) => {
+  static checkParametersIfString() {
+    let args = Array.from(arguments);
+    args.forEach((element) => {
       if (typeof(element) !== 'string') {
         throw new TypeError('Wrong type');
       }
