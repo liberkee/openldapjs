@@ -14,9 +14,8 @@ const E_STATES = {
 const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
 
-const INITIALIZATION_ERROR = new Error('Initialize failed!');
-const BIND_ERROR = new Error('Bind failed!');
-
+const INITIALIZATION_ERROR = 'Initialize failed!';
+const BIND_ERROR = 'Bind failed!';
 
 
 /**

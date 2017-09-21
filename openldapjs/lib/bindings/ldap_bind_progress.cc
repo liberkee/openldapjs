@@ -14,7 +14,7 @@ LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
 void LDAPBindProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result_ == 0) {
+  while (result_ == LDAP_SUCCESS) {
     result_ =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
@@ -26,7 +26,7 @@ void LDAPBindProgress::Execute(
 void LDAPBindProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-  if (result_ == -1) {
+  if (result_ == constants::LDAP_ERROR) {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
@@ -40,7 +40,7 @@ void LDAPBindProgress::HandleOKCallback() {
       callback->Call(2, stateClient);
     }
   }
-  ldap_msgfree(resultMsg_);  // this was missing, added it recently
+  ldap_msgfree(resultMsg_);
   callback->Reset();
   progress_->Reset();
 }
