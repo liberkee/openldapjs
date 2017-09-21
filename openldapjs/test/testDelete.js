@@ -37,98 +37,82 @@ describe('Testing the async LDAP delete operation', () => {
 
   let clientLDAP = new LDAP(host);
 
-  beforeEach((next) => {
+  beforeEach(() => {
     clientLDAP = new LDAP(host);
 
-    clientLDAP.initialize().then(() => {
-      clientLDAP.bind(dnAdmin, password).then(() => {
-        dnUser =
-            `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-        next();
-      });
-    });
+    return clientLDAP.initialize()
+        .then(() => { return clientLDAP.bind(dnAdmin, password); })
+        .then(() => {
+          dnUser =
+              `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+        });
   });
-  afterEach((next) => {
-    clientLDAP.unbind().then(() => { next(); });
-
-  });
+  afterEach(() => { return clientLDAP.unbind(); });
 
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
-  it('should reject the request with invalidDN error code', (next) => {
-    clientLDAP.delete('garbage').catch((err) => {
-      err.should.be.deepEqual(invalidDnSyntax);
-      next();
-    });
+  it('should reject the request with invalidDN error code', () => {
+    return clientLDAP.delete('garbage').catch(
+        (err) => { err.should.be.deepEqual(invalidDnSyntax); });
   });
 
-  it('should reject the request for passing an empty DN', (next) => {
-    clientLDAP.delete('').catch((err) => {
-      err.should.be.deepEqual(unwillingToPerform);
-      next();
-    });
+  it('should reject the request for passing an empty DN', () => {
+    return clientLDAP.delete('').catch(
+        (err) => { err.should.be.deepEqual(unwillingToPerform); });
   });
 
-  it('should reject the request for passing a null DN', (next) => {
-    clientLDAP.delete(null).catch((err) => {
-      err.should.be.deepEqual(stringError);
-      next();
-    });
+  it('should reject the request for passing a null DN', () => {
+    return clientLDAP.delete(null).catch(
+        (err) => { err.should.be.deepEqual(stringError); });
   });
 
-  it('should reject the request with no such object error code', (next) => {
+  it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
-    clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`).catch((err) => {
-      err.should.be.deepEqual(noSuchObject);
-      next();
+    return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
+        .catch((err) => { err.should.be.deepEqual(noSuchObject); });
+  });
+
+  it('should delete the given leaf entry', () => {
+    return clientLDAP.delete(dnUser).then((result) => {
+      should.deepEqual(result, successResult);
+      personNr = personNr + 1;
     });
   });
 
-  it('should delete the given leaf entry', (next) => {
-    clientLDAP.delete(dnUser)
-        .then((result) => { should.deepEqual(result, successResult); })
-        .then(() => {
-          personNr = personNr + 1;
-          next();
-        });
-  });
-
-  it('should reject the request to delete non-leaf node', (next) => {
+  it('should reject the request to delete non-leaf node', () => {
     const stringLength = config.ldapDelete.dn.length;
     let parentDn = config.ldapDelete.dn.slice(1, stringLength);
-    clientLDAP.delete(parentDn).catch((err) => {
-      err.should.be.deepEqual(notAllowedOnNonleaf);
-      next();
-    });
+    return clientLDAP.delete(parentDn).catch(
+        (err) => { err.should.be.deepEqual(notAllowedOnNonleaf); });
   });
 
 
-  it('should reject because BOUND state is required', (next) => {
-    clientLDAP.unbind().then(() => {
-      clientLDAP.delete(dnUser).catch((err) => {
-        should.deepEqual(err, bindErrorMessage);
-        next();
-      });
-    });
+  it('should reject because BOUND state is required', () => {
+    return clientLDAP.unbind()
+        .then(() => { return clientLDAP.delete(dnUser); })
+        .catch((err) => { should.deepEqual(err, bindErrorMessage); });
   });
 
-  it('should delete sequential requests with one error', (next) => {
-    clientLDAP.delete(dnUser).then((res1) => {
-      should.deepEqual(res1, successResult);
-      clientLDAP.delete(dnUser).catch((err2) => {
-        personNr = personNr + 1;
-        dnUser =
-            `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-        should.deepEqual(err2.message, noSuchObject);
-        clientLDAP.delete(dnUser).then((res3) => {
+  it('should delete sequential requests with one error', () => {
+    return clientLDAP.delete(dnUser)
+        .then((res1) => {
+          should.deepEqual(res1, successResult);
+          return clientLDAP.delete(dnUser);
+        })
+        .catch((err) => {
+          personNr = personNr + 1;
+          dnUser =
+              `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+          should.deepEqual(err, noSuchObject);
+          return clientLDAP.delete(dnUser);
+        })
+        .then((res3) => {
           personNr = personNr + 1;
           should.deepEqual(res3, successResult);
-          next();
         });
-      });
-    });
   });
 
-  it('should delete in paralel requests with one error', (next) => {
+
+  it('should delete in paralel requests with one error', () => {
     const first = clientLDAP.delete(dnUser);
     personNr = personNr + 1;
     dnUser = `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
@@ -141,23 +125,21 @@ describe('Testing the async LDAP delete operation', () => {
     const four = clientLDAP.delete(dnUser);
     personNr = personNr + 1;
 
-    Promise.all([first, second, third, four]).then((values) => {
+    return Promise.all([first, second, third, four]).then((values) => {
       should.deepEqual(values[0], successResult);
       should.deepEqual(values[1], successResult);
       should.deepEqual(values[2], successResult);
       should.deepEqual(values[3], successResult);
-      next();
     });
   });
 
-  it('should delete an exist entry and return the control', (next) => {
-    clientLDAP.delete(dnUser, controlOperation).then((result) => {
+  it('should delete an exist entry and return the control', () => {
+    return clientLDAP.delete(dnUser, controlOperation).then((result) => {
       let resultOperation;
       resultOperation = result.split('\n');
       resultOperation = resultOperation[1].split(':');
       resultOperation = resultOperation[1];
       should.deepEqual(resultOperation, ` ${dnUser}`);
-      next();
     });
   });
 

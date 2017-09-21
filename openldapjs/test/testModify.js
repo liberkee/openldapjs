@@ -14,6 +14,7 @@ describe('Testing the modify functionalities', () => {
   const resInvalidOp = 'Invalid Operation';
   const resJsonInvalid = 'The passed JSON is invalid';
   const resDnInvalid = 'The passed dn is invalid';
+  const unwillingToPerform = 53;
 
   const changeAttributesAdd = [
     {
@@ -71,50 +72,39 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
-  beforeEach((next) => {
+  beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentification.host);
 
-    ldapAsyncWrap.initialize().then(() => {
-      ldapAsyncWrap
-          .bind(
-              config.ldapAuthentification.dnAdmin,
-              config.ldapAuthentification.passwordAdmin)
-          .then(() => { next(); });
+    return ldapAsyncWrap.initialize().then(() => {
+      return ldapAsyncWrap.bind(
+          config.ldapAuthentification.dnAdmin,
+          config.ldapAuthentification.passwordAdmin);
     });
   });
 
-  afterEach(() => {
-    ldapAsyncWrap.unbind().then(
-        () => {
-
-        });
-  });
+  afterEach(() => { return ldapAsyncWrap.unbind(); });
 
 
-  it('should reject if the state is not BOUND', (next) => {
-    ldapAsyncWrap.unbind().then(() => {
-      ldapAsyncWrap
-          .modify(
+  it('should reject if the state is not BOUND', () => {
+    return ldapAsyncWrap.unbind()
+        .then(() => {
+          return ldapAsyncWrap.modify(
               config.ldapModify.ldapModificationReplace.change_dn,
-              changeAttirbutes)
-          .catch((error) => {
-            should.deepEqual(error.message, resStateRequired);
-            next();
-          });
-    });
+              changeAttirbutes);
+        })
+        .catch(
+            (error) => { should.deepEqual(error.message, resStateRequired); });
   });
 
-  it('should reject if attribute parameter is not defined', (next) => {
+  it('should reject if attribute parameter is not defined', () => {
     const errorMSG = 'The json is not an array';
-    ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn)
-        .catch((error) => {
-          should.deepEqual(error.message, errorMSG);
-          next();
-        });
+    return ldapAsyncWrap
+        .modify(config.ldapModify.ldapModificationReplace.change_dn)
+        .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the attribute parameter is not correctly defined',
-     (next) => {
+     () => {
        const errorMSG =
            'ValidationError: Missing required property: op,ValidationError: Missing required property: attr,ValidationError: Missing required property: vals';
        const attribute = [
@@ -123,99 +113,77 @@ describe('Testing the modify functionalities', () => {
          },
        ];
 
-       ldapAsyncWrap
+       return ldapAsyncWrap
            .modify(
                config.ldapModify.ldapModificationReplace.change_dn, attribute)
-           .catch((error) => {
-             should.deepEqual(error.message, errorMSG);
-             next();
-           });
+           .catch((error) => { should.deepEqual(error.message, errorMSG); });
      });
 
-  it('should reject if control parameter is not an array', (next) => {
+  it('should reject if control parameter is not an array', () => {
     const errorMSG = 'The control is not an array';
     const control = {
       op: 'postread',
     };
 
-    ldapAsyncWrap
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, control)
-        .catch((error) => {
-          should.deepEqual(error.message, errorMSG);
-          next();
-        });
+        .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
-  it('should reject if the control parameter is not correctly defined', (next) => {
+  it('should reject if the control parameter is not correctly defined', () => {
     const errorMSG =
         'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: iscritical';
     const control = [{
       op: 'postread',
     }];
-    ldapAsyncWrap
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, control)
-        .catch((error) => {
-          should.deepEqual(error.message, errorMSG);
-          next();
-        });
+        .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
-  it('should reject operation if the dn is empty', (next) => {
-    ldapAsyncWrap.modify('', changeAttirbutes).catch((error) => {
-      should.deepEqual(error.message, '53');
-      next();
+  it('should reject operation if the dn is empty', () => {
+    return ldapAsyncWrap.modify('', changeAttirbutes).catch((error) => {
+      should.deepEqual(error, unwillingToPerform);
     });
   });
 
-  it('should replace the old attributes with new one from an entry', (next) => {
-    ldapAsyncWrap
+  it('should replace the old attributes with new one from an entry', () => {
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesReplace)
-        .then((result) => {
-          should.deepEqual(result, 0);
-          next();
-        });
+        .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should add a new attributes from an existing entry', (next) => {
-    ldapAsyncWrap
+  it('should add a new attributes from an existing entry', () => {
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesAdd)
-        .then((result) => {
-          should.deepEqual(result, 0);
-          next();
-        });
+        .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should delete an existing attribute from an entry', (next) => {
-    ldapAsyncWrap
+  it('should delete an existing attribute from an entry', () => {
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributesDelete)
-        .then((result) => {
-          should.deepEqual(result, 0);
-          next();
-        });
+        .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should make multiple modification to an entry', (next) => {
-    ldapAsyncWrap
+  it('should make multiple modification to an entry', () => {
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes)
-        .then((result) => {
-          should.deepEqual(result, 0);
-          next();
-        });
+        .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should modify in paralel', (next) => {
+  it('should modify in paralel', () => {
     const modify1 = ldapAsyncWrap.modify(
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
@@ -232,7 +200,7 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn, changeAttirbutes,
         controlOperation);
 
-    Promise.all([modify1, modify2, modify3, modify4, modify5])
+    return Promise.all([modify1, modify2, modify3, modify4, modify5])
         .then((results) => {
           results.forEach((element) => {
             let resultOperation;
@@ -243,12 +211,11 @@ describe('Testing the modify functionalities', () => {
                 resultOperation,
                 ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
           });
-        })
-        .then(() => { next(); })
+        });
   });
 
-  it('should return the specific attribute from the entry', (next) => {
-    ldapAsyncWrap
+  it('should return the specific attribute from the entry', () => {
+    return ldapAsyncWrap
         .modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttirbutes, controlOperation)
@@ -260,7 +227,6 @@ describe('Testing the modify functionalities', () => {
           should.deepEqual(
               resultOperation,
               ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-          next();
         });
   });
 

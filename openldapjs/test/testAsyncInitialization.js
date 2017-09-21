@@ -16,18 +16,15 @@ describe('Testing the async initialization', () => {
     UNBOUND: 5,
   };
 
-  beforeEach((next) => {
+  beforeEach(() => {
     ldapWrap = new LDAPWrap(host);
-
-    next();
   });
 
   afterEach(() => {});
 
-  it('should be INITIALIZED', (next) => {
-    ldapWrap.initialize().then((result) => {
+  it('should be INITIALIZED', () => {
+    return ldapWrap.initialize().then((result) => {
       should.deepEqual(result, E_STATES.INITIALIZED);
-      next();
     });
   });
 

@@ -57,7 +57,7 @@ class CheckParam {
   static checkControlArray(controls) {
     if (controls !== undefined) {
       if (Array.isArray(controls) === false) {
-        throw new TypeError('The control is not  an array');
+        throw new TypeError('The control is not an array');
       } else {
         controls.forEach((element) => {
           const result = validator(element, controlSchema);
