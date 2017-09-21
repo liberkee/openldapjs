@@ -27,7 +27,15 @@
     "lint": "eslint ./test/*.js",
     "install": "cd lib/bindings && node-gyp rebuild"
   },
-  "author": "",
+  "author": {
+    "name": "Huf Secure Mobile GmbH",
+    "email": "info@hufsm.com",
+    "url": "https://hufsm.com"
+  },
+  "maintainers": [
+    "Radu Aribasoiu",
+    "Cosmin Ghitea"
+  ],
   "license": "ISC",
   "gypfile": true,
   "directories": {
