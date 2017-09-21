@@ -2,7 +2,6 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
-const jsonMap = require('../modules/mappingJsonObject/mappingStringJson.js');
 const config = require('./config.json');
 
 const OBJECT_NOT_FOUND = 32;
