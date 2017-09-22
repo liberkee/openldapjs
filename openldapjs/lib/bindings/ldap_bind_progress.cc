@@ -2,7 +2,8 @@
 #include "constants.h"
 
 LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
-                                   Nan::Callback *progress, LDAP *ld, int msgID)
+                                   Nan::Callback *progress, LDAP *ld,
+                                   const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -24,19 +25,17 @@ void LDAPBindProgress::Execute(
 ** HandleOkCallback method, gets called when the execute method finishes.
 **/
 void LDAPBindProgress::HandleOKCallback() {
-  Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result_ == constants::LDAP_ERROR) {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    int status = ldap_result2error(ld_, resultMsg_, 0);
+    const auto status = ldap_result2error(ld_, resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
-      stateClient[1] =
-          Nan::New<v8::Number>(2);  // any sense in providing 2 for bound ?..
+      stateClient[1] = Nan::New<v8::Number>(constants::BIND_STATE);
       callback->Call(2, stateClient);
     }
   }

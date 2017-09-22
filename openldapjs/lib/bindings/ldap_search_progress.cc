@@ -3,7 +3,7 @@
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
-                                       int msgID)
+                                       const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -19,10 +19,11 @@ void LDAPSearchProgress::Execute(
   char *attribute{};
   char **values{};
   char *l_dn{};
-  int result = 0;
+  int result{};
 
   while (result == 0) {
-    result = ldap_result(ld_, msgID_, 1, &timeOut, &l_result);
+    result =
+        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
   }
 
   for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
@@ -48,11 +49,11 @@ void LDAPSearchProgress::Execute(
       }
       ldap_memfree(attribute);
     }
-    ber_free(ber, 0);
+    ber_free(ber, false);
     resultSearch_ += "\n";
   }
 
-  status_ = ldap_result2error(ld_, l_result, 0);
+  status_ = ldap_result2error(ld_, l_result, false);
 
   /* Free the search results.                                       */
   ldap_msgfree(l_result);

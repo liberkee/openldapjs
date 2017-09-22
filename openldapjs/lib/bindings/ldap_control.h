@@ -5,6 +5,7 @@
 #include <nan.h>
 #include <string>
 #include <vector>
+#include <nan.h>
 
 #define LBER_ALIGNED_BUFFER(uname, size) \
   union uname {                          \

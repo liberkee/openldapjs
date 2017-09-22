@@ -5,7 +5,7 @@
 
 LDAPRenameProgress::LDAPRenameProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
-                                       int msgID)
+                                       const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -22,7 +22,6 @@ void LDAPRenameProgress::Execute(
 
 void LDAPRenameProgress::HandleOKCallback() {
   int status;
-  Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
   std::string modifyResult;
@@ -31,7 +30,7 @@ void LDAPRenameProgress::HandleOKCallback() {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    status = ldap_result2error(ld_, resultMsg_, 0);
+    status = ldap_result2error(ld_, resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
@@ -43,7 +42,7 @@ void LDAPRenameProgress::HandleOKCallback() {
         callback->Call(2, stateClient);
 
       } else {
-        stateClient[1] = Nan::New<v8::Number>(0);  // 0 or empty string ?
+        stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
     }

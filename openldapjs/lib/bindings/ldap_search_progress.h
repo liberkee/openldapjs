@@ -11,11 +11,11 @@ class LDAPSearchProgress : public Nan::AsyncProgressWorker {
   Nan::Callback *progress_{};
   std::string resultSearch_{};
   int msgID_{};
-  int status_ = 0;
+  int status_{};
 
  public:
   LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     int msgID);
+                     const int msgID);
 
   // Executes in worker thread
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);
