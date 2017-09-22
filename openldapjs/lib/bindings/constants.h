@@ -14,6 +14,7 @@ const int ZERO_USECONDS = 0;
 const int ONE_USECOND = 1;
 const int ALL_RESULTS = 1;
 const int LDAP_ERROR = -1;
+const int BIND_STATE = 2;
 }  // namespace constants
 
 #endif  // OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_

@@ -5,7 +5,7 @@
 
 LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
-                                       int msgID)
+                                       const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -22,14 +22,13 @@ void LDAPDeleteProgress::Execute(
 }
 
 void LDAPDeleteProgress::HandleOKCallback() {
-  Nan::HandleScope scope;
   std::string deleteResult;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result_ == constants::LDAP_ERROR) {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    int status = ldap_result2error(ld_, resultMsg_, 0);
+    int status = ldap_result2error(ld_, resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
@@ -40,7 +39,7 @@ void LDAPDeleteProgress::HandleOKCallback() {
         stateClient[1] = Nan::New(deleteResult).ToLocalChecked();
         callback->Call(2, stateClient);
       } else {
-        stateClient[1] = Nan::New<v8::Number>(0);
+        stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
     }

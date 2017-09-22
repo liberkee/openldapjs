@@ -4,8 +4,8 @@
 #include "ldap_control.h"
 
 LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
-                                 Nan::Callback *progress, LDAP *ld, int msgID,
-                                 LDAPMod **newEntries)
+                                 Nan::Callback *progress, LDAP *ld,
+                                 const int msgID, LDAPMod **newEntries)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -23,14 +23,13 @@ void LDAPAddProgress::Execute(
 }
 
 void LDAPAddProgress::HandleOKCallback() {
-  Nan::HandleScope scope;
   std::string addResult;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result_ == constants::LDAP_ERROR) {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    int status = ldap_result2error(ld_, resultMsg_, 0);
+    const auto status = ldap_result2error(ld_, resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
@@ -42,13 +41,13 @@ void LDAPAddProgress::HandleOKCallback() {
         callback->Call(2, stateClient);
 
       } else {
-        stateClient[1] = Nan::New<v8::Number>(0);
+        stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
     }
   }
   ldap_msgfree(resultMsg_);
-  ldap_mods_free(entries_, 1);
+  ldap_mods_free(entries_, true);
   callback->Reset();
   progress_->Reset();
 }

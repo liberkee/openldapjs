@@ -8,13 +8,13 @@ class LDAPBindProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld_{};
   Nan::Callback *progress_{};
-  int result_ = 0;
+  int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
 
  public:
   LDAPBindProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                   int msgID);
+                   const int msgID);
 
   /**
    ** Execute Method, runs outside the event loop.

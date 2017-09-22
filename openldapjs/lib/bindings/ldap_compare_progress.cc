@@ -3,7 +3,7 @@
 
 LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
                                          Nan::Callback *progress, LDAP *ld,
-                                         int msgID)
+                                         const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -26,7 +26,7 @@ void LDAPCompareProgress::HandleOKCallback() {
     stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
     callback->Call(2, stateClient);
   } else {
-    int status = ldap_result2error(ld_, resultMsg_, 0);
+    const auto status = ldap_result2error(ld_, resultMsg_, false);
     if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE) {
       if (status == LDAP_COMPARE_TRUE) {
         stateClient[1] =

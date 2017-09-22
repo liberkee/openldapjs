@@ -8,14 +8,14 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld_{};
   Nan::Callback *progress_{};
-  int result_ = 0;
+  int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
   LDAPMod **entries_{};
 
  public:
   LDAPModifyProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     int msgID, LDAPMod **newEntries);
+                     const int msgID, LDAPMod **newEntries);
 
   /**
    ** Execute Method, runs outside the event loop.

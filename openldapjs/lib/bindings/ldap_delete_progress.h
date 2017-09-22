@@ -14,7 +14,7 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
 
  public:
   LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     int msgID);
+                     const int msgID);
 
   // Executes in worker thread
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);

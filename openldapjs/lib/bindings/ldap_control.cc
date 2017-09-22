@@ -17,7 +17,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
         control_handle->Get(Nan::New(static_cast<uint>(index))));
     const auto value_controles = v8::Local<v8::Array>::Cast(
         controls->Get(Nan::New(constants::changeValueMember).ToLocalChecked()));
-    int value_controles_length = value_controles->Length();
+    const auto value_controles_length = value_controles->Length();
     BerElementBuffer berBuffer{};
     BerElement *ber = reinterpret_cast<BerElement *>(&berBuffer);
     std::vector<char *> attributes(value_controles_length);
@@ -52,9 +52,9 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
       return std::vector<LDAPControl *>();
     }
 
-    auto isCritical = v8::Local<v8::Number>::Cast(controls->Get(
+    const auto isCritical = v8::Local<v8::Number>::Cast(controls->Get(
         Nan::New(constants::changeIsCriticalMember).ToLocalChecked()));
-    int isC = isCritical->NumberValue();
+    const auto isC = isCritical->NumberValue();
     ctrl->ldctl_iscritical = isC;
   }
 
