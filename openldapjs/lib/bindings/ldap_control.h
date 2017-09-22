@@ -2,6 +2,7 @@
 #define OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
 #include <lber.h>
 #include <ldap.h>
+#include <nan.h>
 #include <string>
 #include <vector>
 
