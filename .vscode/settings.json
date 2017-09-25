@@ -7,11 +7,12 @@
         "array": "cpp",
         "initializer_list": "cpp",
         "*.ipp": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "string": "cpp"
     },
     "C_Cpp.clang_format_style": "Google",
     "C_Cpp.clang_format_fallbackStyle": "Google",
-    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
     "clang-format.style": "Google",
     "git.enableSmartCommit": true,
     "editor.formatOnSave": true
