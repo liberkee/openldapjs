@@ -5,16 +5,15 @@
 
 namespace ldif_formatting {
 
-BerElement *ber{};
-LDAPMessage *l_entry{};
-char *attribute{};
-char **values{};
-char *l_dn{};
-std::map<std::string, std::string> ldifEntry{};
-std::vector<std::map<std::string, std::string>> ldifEntryList{};
-
 std::vector<std::map<std::string, std::string>> getLdif(
     LDAP *ld, LDAPMessage **resultMsg) {
+  BerElement *ber{};
+  LDAPMessage *l_entry{};
+  char *attribute{};
+  char **values{};
+  char *l_dn{};
+  std::map<std::string, std::string> ldifEntry{};
+  std::vector<std::map<std::string, std::string>> ldifEntryList{};
   std::string key = "dn";
   std::string value{};
 

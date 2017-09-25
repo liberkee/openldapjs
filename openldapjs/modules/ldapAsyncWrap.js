@@ -51,7 +51,7 @@ class LDAPAsyncWrap {
                 reject(new Error(errTls));
               } else {
                 this._stateClient = E_STATES.INITIALIZED;
-                resolve(stateTls);
+                resolve(E_STATES.INITIALIZED);
               }
             });
           }
@@ -80,7 +80,7 @@ class LDAPAsyncWrap {
             this._stateClient = E_STATES.INITIALIZED;
             reject(err);
           } else {
-            this._stateClient = state;
+            this._stateClient = E_STATES.BOUND;
             resolve(this._stateClient);
           }
         });
@@ -300,10 +300,10 @@ class LDAPAsyncWrap {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
-          if (state !== E_STATES.UNBOUND) {
+          if (err) {
             reject(err);
           } else {
-            this._stateClient = state;
+            this._stateClient = E_STATES.UNBOUND;
             resolve(this._stateClient);
           }
         });

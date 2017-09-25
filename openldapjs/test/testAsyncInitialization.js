@@ -10,7 +10,7 @@ describe('Testing the async initialization', () => {
   let ldapWrap;
 
   const E_STATES = {
-    ERROR: 0,
+    CREATED: 0,
     INITIALIZED: 1,
     BOUND: 2,
     UNBOUND: 5,

@@ -82,7 +82,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::New<v8::Number>(1);
+    stateClient[1] = Nan::True();
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;
@@ -105,7 +105,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::New<v8::Number>(1);  // why the 1 ?:)
+    stateClient[1] = Nan::True();  // replaced 1 with True
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;
@@ -124,7 +124,7 @@ class LDAPClient : public Nan::ObjectWrap {
     char *username = *userArg;
     char *password = *passArg;
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::False();
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -176,7 +176,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::False();
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -225,8 +225,10 @@ class LDAPClient : public Nan::ObjectWrap {
                               &message);
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(2);
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
       return;
     }
     Nan::AsyncQueueWorker(
@@ -250,7 +252,7 @@ class LDAPClient : public Nan::ObjectWrap {
     LDAPMod **ldapmods = new LDAPMod *[nummods + 1];
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete ldapmods;
       delete callback;
@@ -313,7 +315,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
       delete ldapmods;
       delete callback;
@@ -354,7 +356,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -414,11 +416,11 @@ class LDAPClient : public Nan::ObjectWrap {
   /**
 ** Method that calls the ldap_add_ext routine.
 ** The entries are taken from a string array 2 by 2 in a for loop
-*(LDAPMods.mod_type and LDAPMods.mod_values respectively)
-** entries are placed in the LDAPMod *newEntries[] array alocating memory in
-*each iteration.
+**(LDAPMods.mod_type and LDAPMods.mod_values respectively)
+** entries are placed in the LDAPMod *newEntries[] array allocating memory in
+**each iteration.
 ** Note: both the last value in mod_values array and in the newEntries array
-*has to be NULL
+**has to be NULL
 **/
 
   static NAN_METHOD(add) {
@@ -466,7 +468,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -486,11 +488,10 @@ class LDAPClient : public Nan::ObjectWrap {
                             &msgID);
     }
 
-    if (result != 0) {
-      stateClient[0] =
-          Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);  // why insuficient
-                                                           // access instead of
-                                                           // result ?
+    if (result != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(result);  // why insuficient
+                                                      // access instead of
+                                                      // result ?
       callback->Call(1, stateClient);
       delete newEntries;
       delete callback;
@@ -511,7 +512,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(2, stateClient);
       delete callback;
       return;
@@ -523,7 +524,7 @@ class LDAPClient : public Nan::ObjectWrap {
       // nothing done in case unbind fails ?
     }
 
-    stateClient[1] = Nan::New<v8::Number>(5);
+    stateClient[1] = Nan::True();
     callback->Call(2, stateClient);
 
     delete callback;

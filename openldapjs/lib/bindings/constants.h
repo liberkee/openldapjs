@@ -21,6 +21,7 @@ const int BER_ERROR = -1;
 const int STR_COMPARE_TRUE = 0;
 const int FREE_MSG_FALSE = 0;
 const int CONTROL_NO_VAL = 0;
+const int INVALID_LD = -1;
 
 const int LDAP_NOT_FINISHED = 0;  // ldap_ext op not finished yet.
 }  // namespace constants
