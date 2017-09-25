@@ -3,8 +3,6 @@
 #include <nan.h>
 #include <node.h>
 #include <string.h>
-#include <chrono>
-#include <iostream>
 #include "constants.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
@@ -142,7 +140,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String baseArg(info[0]);
     Nan::Utf8String filterArg(info[2]);
 
-    char *DNbase = *baseArg;
+    char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
     int message{};
     int result{};
@@ -186,7 +184,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     result =
-        ldap_search_ext(obj->ld_, DNbase, scopeSearch, filterSearch, nullptr, 0,
+        ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch, nullptr, 0,
                         nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
@@ -322,7 +320,7 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
-    
+
     ldap_mods_free(ldapmods, true);
     Nan::AsyncQueueWorker(
         new LDAPModifyProgress(callback, progress, obj->ld_, msgID));

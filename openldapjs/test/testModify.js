@@ -103,8 +103,7 @@ describe('Testing the modify functionalities', () => {
 
   it('should reject operation if the attribute parameter is not correctly defined',
      () => {
-       const errorMSG =
-           'ValidationError: Missing required property: op,ValidationError: Missing required property: attr,ValidationError: Missing required property: vals';
+       const errorMSG = 'Invalid JSON';
        const attribute = [
          {
            add: 'add',
@@ -131,8 +130,7 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject if the control parameter is not correctly defined', () => {
-    const errorMSG =
-        'ValidationError: Missing required property: oid,ValidationError: Missing required property: value,ValidationError: Missing required property: isCritical';
+    const errorMSG = 'Invalid control array';
     const control = [{
       op: 'postread',
     }];

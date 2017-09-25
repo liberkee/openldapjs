@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const validator = require('tv4');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
+const ValidationError = require('./custom_errors.js');
 
 /**
  * @module checkVariableFormat
@@ -41,7 +42,8 @@ class CheckParam {
       change.forEach((element) => {
         const result = validator.validateMultiple(element, changeSchema);
         if (result.valid !== true) {
-          throw new Error(result.error || result.errors);
+          throw new ValidationError(
+              'Invalid JSON', result.error, result.errors);
         }
       });
     }
@@ -62,7 +64,8 @@ class CheckParam {
         controls.forEach((element) => {
           const result = validator.validateMultiple(element, controlSchema);
           if (result.valid !== true) {
-            throw new Error(result.error || result.errors);
+            throw new ValidationError(
+                'Invalid control array', result.error, result.errors);
           }
         });
       }
