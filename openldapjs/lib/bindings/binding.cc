@@ -322,8 +322,10 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
+    
+    ldap_mods_free(ldapmods, true);
     Nan::AsyncQueueWorker(
-        new LDAPModifyProgress(callback, progress, obj->ld_, msgID, ldapmods));
+        new LDAPModifyProgress(callback, progress, obj->ld_, msgID));
   }
 
   static NAN_METHOD(ldaprename) {
@@ -498,8 +500,10 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
+    ldap_mods_free(newEntries, true);
+
     Nan::AsyncQueueWorker(
-        new LDAPAddProgress(callback, progress, obj->ld_, msgID, newEntries));
+        new LDAPAddProgress(callback, progress, obj->ld_, msgID));
   }
 
   static NAN_METHOD(unbind) {
