@@ -45,9 +45,8 @@ describe('Testing the async LDAP search ', () => {
           return adminLDAP.search(
               searchBase, 2, config.ldapSearch.filterObjSpecific);
         })
-        .catch((error) => {
-          should.deepEqual(error.message, errList.bindErrorMessage);
-        });
+        .catch(
+            (error) => { should.deepEqual(error, errList.bindErrorMessage); });
   });
 
   it('should return an empty search', () => {
@@ -71,14 +70,12 @@ describe('Testing the async LDAP search ', () => {
         .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
   });
 
-  it('should reject if scope is not integer', () => {
+  it('should reject if the scope is not a integer', () => {
     return userLDAP.search(searchBase, '2', config.ldapSearch.filterObjAll)
-        .catch((err) => {
-          err.message.should.be.deepEqual(errList.scopeSearchError);
-        });
+        .catch((err) => { err.should.be.deepEqual(errList.scopeSearchError); });
   });
 
-  it('should reject if searchBase is not string', () => {
+  it('should reject if the searchBase is not a string', () => {
     return userLDAP.search(1, 2, config.ldapSearch.filterObjAll)
         .catch((err) => {
           err.message.should.be.deepEqual(errList.typeErrorMessage);

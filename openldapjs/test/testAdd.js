@@ -145,7 +145,7 @@ describe('Testing the async LDAP add operation', () => {
               `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
         })
         .catch((stateError) => {
-          should.deepEqual(stateError.message, errList.bindErrorMessage);
+          should.deepEqual(stateError, errList.bindErrorMessage);
         });
   });
 

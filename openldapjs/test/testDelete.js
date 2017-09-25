@@ -83,9 +83,7 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject because BOUND state is required', () => {
     return clientLDAP.unbind()
         .then(() => { return clientLDAP.delete(dnUser); })
-        .catch((err) => {
-          should.deepEqual(err.message, errList.bindErrorMessage);
-        });
+        .catch((err) => { should.deepEqual(err, errList.bindErrorMessage); });
   });
 
   it('should delete sequential requests with one error', () => {

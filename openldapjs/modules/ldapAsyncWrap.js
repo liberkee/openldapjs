@@ -38,9 +38,11 @@ class LDAPAsyncWrap {
     * Initialize to an LDAP server.
     *
     * @method initialize
-    * @return {Promise} That resolves if the LDAP initialize succeeds
-    * Rejects if the address is incorrect or the client was not created.
-    * */
+    * @return {Promise} That resolves with the initialize state code(1) if the
+    *LDAP
+    ** initialize succeeds
+    ** Rejects if the address is incorrect or the client was not created.
+    **/
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
@@ -54,6 +56,8 @@ class LDAPAsyncWrap {
                 resolve(E_STATES.INITIALIZED);
               }
             });
+          } else {
+            reject(err);
           }
         });
       } else {
@@ -104,12 +108,12 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(BIND_ERROR_MESSAGE);
       } else {
         if (!Number.isInteger(scope)) {  // as of now we're checking both in js
           // and in cpp..might
           // consider dropping one.
-          reject(new Error('Scope must be integer'));
+          reject('Scope must be integer');
         }
         checkParameters.checkParametersIfString(searchBase, searchFilter);
 
@@ -173,7 +177,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkModifyChangeArray(jsonChange);
@@ -195,23 +199,23 @@ class LDAPAsyncWrap {
    *
    * @method rename
    * @param {string} dn The dn of the entry to rename
-   * @param {string} newrdn The new rdn for the dn
-   * @param {string} newparent New parent for the rdn
+   * @param {string} newRdn The new rdn for the dn
+   * @param {string} newParent New parent for the rdn
    * @param {array} controls Control that is sent as a request to the
    * server
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
-  rename(dn, newrdn, newparent, controls) {
+  rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn, newrdn, newparent);
+        checkParameters.checkParametersIfString(dn, newRdn, newParent);
         checkParameters.checkControlArray(controls);
 
-        this._binding.rename(dn, newrdn, newparent, ctrls, (err, result) => {
+        this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
           if (err) {
             reject(err);
           } else {
@@ -235,7 +239,7 @@ class LDAPAsyncWrap {
   delete (dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
@@ -265,7 +269,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);

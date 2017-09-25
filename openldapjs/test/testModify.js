@@ -89,9 +89,8 @@ describe('Testing the modify functionalities', () => {
               config.ldapModify.ldapModificationReplace.change_dn,
               changeAttributes);
         })
-        .catch((error) => {
-          should.deepEqual(error.message, errList.bindErrorMessage);
-        });
+        .catch(
+            (error) => { should.deepEqual(error, errList.bindErrorMessage); });
   });
 
   it('should reject if attribute parameter is not defined', () => {

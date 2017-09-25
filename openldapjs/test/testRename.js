@@ -126,9 +126,8 @@ describe('Testing the rename functionalities', () => {
               config.ldapRename.dnChange, config.ldapRename.newrdn,
               config.ldapRename.newparent);
         })
-        .catch((error) => {
-          should.deepEqual(error.message, errList.bindErrorMessage);
-        });
+        .catch(
+            (error) => { should.deepEqual(error, errList.bindErrorMessage); });
   });
 
   it('should reject if dn don\'t exist ', () => {
