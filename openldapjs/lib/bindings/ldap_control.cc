@@ -31,11 +31,12 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     attributes.push_back(nullptr);
 
     ber_init2(ber, nullptr, LBER_USE_DER);
-    if (ber_printf(ber, "{v}", attributes.data()) == -1) {
+    if (ber_printf(ber, "{v}", attributes.data()) == constants::BER_ERROR) {
       return std::vector<LDAPControl *>();
     }
 
-    const auto error = ber_flatten2(ber, &ctrl->ldctl_value, 0);
+    const auto error = ber_flatten2(ber, &ctrl->ldctl_value,
+                                    constants::BER_ALLOC_FALSE);
     if (error < 0) {
       return std::vector<LDAPControl *>();
     }
@@ -43,10 +44,12 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     v8::String::Utf8Value controlOperation(
         controls->Get(Nan::New(constants::changeOidMember).ToLocalChecked()));
 
-    if (std::strcmp(*controlOperation, constants::postread) == 0) {
+    if (std::strcmp(*controlOperation, constants::postread) ==
+                    constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = reinterpret_cast<const char *>(
           LDAP_CONTROL_POST_READ);  //  compiler warning though...
-    } else if (std::strcmp(*controlOperation, constants::preread) == 0) {
+    } else if (std::strcmp(*controlOperation, constants::preread) ==
+                           constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = reinterpret_cast<const char *>(LDAP_CONTROL_PRE_READ);
     } else {
       return std::vector<LDAPControl *>();
@@ -70,13 +73,13 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
   std::string modifyResult{};
 
   ldap_parse_result(ld, resultMsg, nullptr, nullptr, nullptr, nullptr,
-                    &serverControls, 0);
+                    &serverControls, constants::FREE_MSG_FALSE);
   auto i = 0;
 
   if (serverControls == nullptr) {
     return modifyResult;
   }
-  while (serverControls[i] != 0) {
+  while (serverControls[i] != constants::CONTROL_NO_VAL) {
     berElement = ber_init(&serverControls[i]->ldctl_value);
     if (berElement == nullptr) {
       return modifyResult;

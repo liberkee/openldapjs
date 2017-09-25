@@ -15,6 +15,12 @@ const int ONE_USECOND = 1;
 const int ALL_RESULTS = 1;
 const int LDAP_ERROR = -1;
 const int BIND_STATE = 2;
+const int BER_ALLOC_TRUE = 1;
+const int BER_ALLOC_FALSE = 0;
+const int BER_ERROR = -1;
+const int STR_COMPARE_TRUE = 0;
+const int FREE_MSG_FALSE = 0;
+const int CONTROL_NO_VAL = 0;
 }  // namespace constants
 
 #endif  // OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
