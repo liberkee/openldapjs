@@ -35,8 +35,8 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
       return std::vector<LDAPControl *>();
     }
 
-    const auto error = ber_flatten2(ber, &ctrl->ldctl_value,
-                                    constants::BER_ALLOC_FALSE);
+    const auto error =
+        ber_flatten2(ber, &ctrl->ldctl_value, constants::BER_ALLOC_FALSE);
     if (error < 0) {
       return std::vector<LDAPControl *>();
     }
@@ -45,11 +45,11 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
         controls->Get(Nan::New(constants::changeOidMember).ToLocalChecked()));
 
     if (std::strcmp(*controlOperation, constants::postread) ==
-                    constants::STR_COMPARE_TRUE) {
+        constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = reinterpret_cast<const char *>(
           LDAP_CONTROL_POST_READ);  //  compiler warning though...
     } else if (std::strcmp(*controlOperation, constants::preread) ==
-                           constants::STR_COMPARE_TRUE) {
+               constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = reinterpret_cast<const char *>(LDAP_CONTROL_PRE_READ);
     } else {
       return std::vector<LDAPControl *>();

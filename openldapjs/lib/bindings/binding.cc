@@ -39,7 +39,7 @@ class LDAPClient : public Nan::ObjectWrap {
  protected:
  private:
   LDAP *ld_{};
-  explicit LDAPClient() {}
+  LDAPClient() {}
 
   ~LDAPClient() {}
 
