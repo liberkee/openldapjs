@@ -15,6 +15,8 @@ const int ONE_USECOND = 1;
 const int ALL_RESULTS = 1;
 const int LDAP_ERROR = -1;
 const int BIND_STATE = 2;
+
+const int LDAP_NOT_FINISHED = 0;  // ldap ext operation not finished yet
 }  // namespace constants
 
 #endif  // OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
