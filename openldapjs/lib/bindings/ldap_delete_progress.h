@@ -8,7 +8,7 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld_{};
   Nan::Callback *progress_{};
-  int result_ = 0;
+  int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
 

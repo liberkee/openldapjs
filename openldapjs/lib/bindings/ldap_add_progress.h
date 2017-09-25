@@ -11,11 +11,10 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
   int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
-  LDAPMod **entries_{};
 
  public:
   LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                  const int msgID, LDAPMod **newEntries);
+                  const int msgID);
 
   /**
    **@brief Execute Method, runs outside the event loop.

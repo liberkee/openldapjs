@@ -2,9 +2,7 @@
   "ldapAuthentication": {
     "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
-    "dnUser": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
-    "passwordAdmin": "secret",
-    "passwordUser": "secret"
+    "passwordAdmin": "secret"
   },
   "ldapAdd": {
     "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",

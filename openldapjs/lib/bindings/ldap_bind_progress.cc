@@ -15,7 +15,7 @@ LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
 void LDAPBindProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result_ == LDAP_SUCCESS) {
+  while (result_ == LDAP_RES_UNSOLICITED) {
     result_ =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
