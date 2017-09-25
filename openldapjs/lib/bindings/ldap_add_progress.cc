@@ -5,18 +5,17 @@
 
 LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
                                  Nan::Callback *progress, LDAP *ld,
-                                 const int msgID, LDAPMod **newEntries)
+                                 const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
-      msgID_(msgID),
-      entries_(newEntries) {}
+      msgID_(msgID) {}
 
 void LDAPAddProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
-  while (result_ == LDAP_SUCCESS) {
+  while (result_ == LDAP_RES_UNSOLICITED) {
     result_ =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
@@ -44,10 +43,9 @@ void LDAPAddProgress::HandleOKCallback() {
         stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
+      delete ldap_controls;
     }
   }
-  ldap_msgfree(resultMsg_);
-  ldap_mods_free(entries_, true);
   callback->Reset();
   progress_->Reset();
 }

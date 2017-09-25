@@ -5,17 +5,18 @@
 
 LDAPModifyProgress::LDAPModifyProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
-                                       int msgID, LDAPMod **newEntries)
+                                       const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
-      msgID_(msgID),
-      entries_(newEntries) {}
+      msgID_(msgID) {}
 
 void LDAPModifyProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result_ == 0) {
+  
+
+  while (result_ == LDAP_RES_UNSOLICITED) {
     result_ =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
@@ -32,26 +33,25 @@ void LDAPModifyProgress::HandleOKCallback() {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    status = ldap_result2error(ld_, resultMsg_, 0);
+    status = ldap_result2error(ld_, resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
-      const auto &ldap_controls =
-          new LdapControls();  // does this  need a delete ?
+      const auto &ldap_controls = new LdapControls();
       modifyResult = ldap_controls->PrintModificationControls(ld_, resultMsg_);
       if (!modifyResult.empty()) {
         stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
         callback->Call(2, stateClient);
       } else {
-        stateClient[1] = Nan::New<v8::Number>(0);  // 0 or empty string ?
+        stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
+      delete ldap_controls;
     }
   }
   callback->Reset();
   progress_->Reset();
-  ldap_mods_free(entries_, 1);
   ldap_msgfree(resultMsg_);
 }
 

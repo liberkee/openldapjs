@@ -15,7 +15,7 @@ LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback,
 void LDAPDeleteProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
-  while (result_ == LDAP_SUCCESS) {
+  while (result_ == LDAP_RES_UNSOLICITED) {
     result_ =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
@@ -42,6 +42,7 @@ void LDAPDeleteProgress::HandleOKCallback() {
         stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
         callback->Call(2, stateClient);
       }
+      delete ldap_controls;
     }
   }
   callback->Reset();

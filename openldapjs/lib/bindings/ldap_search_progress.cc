@@ -21,7 +21,7 @@ void LDAPSearchProgress::Execute(
   char *l_dn{};
   int result{};
 
-  while (result == 0) {
+  while (result == LDAP_RES_UNSOLICITED) {
     result =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
   }
