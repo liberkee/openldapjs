@@ -17,8 +17,11 @@ class LDAPBindProgress : public Nan::AsyncProgressWorker {
                    const int msgID);
 
   /**
-   ** Execute Method, runs outside the event loop.
-   **/
+    **@brief Execute Method, runs outside the event loop.
+    **@param progress, used to send data back to js during execution, currently
+    **unused
+    **
+    **/
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);
 
   /**
@@ -27,6 +30,12 @@ class LDAPBindProgress : public Nan::AsyncProgressWorker {
    **/
   void HandleOKCallback();
 
+  /**
+ **@brief HandleProgressCallback method. Used for sending intermediary data to
+ **js
+ **@param data, intermediary data
+ **@param size, size of the data sent (in bytes).
+ **/
   void HandleProgressCallback(const char *data, size_t size);
 };
 
