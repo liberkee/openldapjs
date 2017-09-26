@@ -124,13 +124,14 @@ class LDAPClient : public Nan::ObjectWrap {
     char *username = *userArg;
     char *password = *passArg;
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::False();
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
       return;
     }
     int msgID = ldap_simple_bind(obj->ld_, username, password);
+
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld_, msgID));
   }
 
@@ -142,33 +143,29 @@ class LDAPClient : public Nan::ObjectWrap {
 
     char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
+
     int message{};
     int result{};
     struct timeval timeOut = {constants::TEN_SECONDS,
                               constants::ZERO_USECONDS};  // if search exceeds
                                                           // 10 seconds, throws
                                                           // error
-
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    // Verify if the argument is a Number for scope
-    if (!info[1]->IsNumber()) {  // wouldn't it be better to let it go through
-                                 // and just fail with a ldap error in the
-                                 // function call ?
-      stateClient[0] = Nan::New<v8::Number>(0);
+    if (!info[1]->IsNumber()) {
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
       return;
     }
 
-    int scopeSearch =
-        info[1]->NumberValue();  // why not let it fail with ldap error ?
+    int scopeSearch = info[1]->NumberValue();
     if (scopeSearch <= 0 && scopeSearch >= 3) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -176,16 +173,16 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::False();
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
       return;
     }
 
-    result =
-        ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch, nullptr, 0,
-                        nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
+    result = ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch,
+                             nullptr, constants::ATTR_WANTED, nullptr, nullptr,
+                             &timeOut, LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(result);
@@ -267,17 +264,16 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::String::Utf8Value mod_op(
           modHandle->Get(Nan::New("op").ToLocalChecked()));
 
-      if (std::strcmp(*mod_op, "add") == 0) {
+      if (std::strcmp(*mod_op, "add") == constants::STRING_EQUAL) {
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
-      } else if (std::strcmp(*mod_op, "delete") == 0) {
+      } else if (std::strcmp(*mod_op, "delete") == constants::STRING_EQUAL) {
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;
-      } else if (std::strcmp(*mod_op, "replace") == 0) {
+      } else if (std::strcmp(*mod_op, "replace") == constants::STRING_EQUAL) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
       } else {
         stateClient[0] = Nan::New<v8::Number>(LDAP_INVALID_SYNTAX);
         callback->Call(1, stateClient);
-        delete ldapmods;  // shouldn't it be delete[] ? or better yet use
-                          // ldap_modsfree?
+        delete[] ldapmods;
         delete callback;
         delete progress;
         return;
@@ -376,13 +372,13 @@ class LDAPClient : public Nan::ObjectWrap {
 
     char *dns = *dn;
 
-    int msgID = 0;
+    int msgID{};
 
     Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       callback->Reset();
       delete callback;
@@ -401,8 +397,8 @@ class LDAPClient : public Nan::ObjectWrap {
       result = ldap_delete_ext(obj->ld_, dns, ctrls.data(), nullptr, &msgID);
     }
 
-    if (result != 0) {
-      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+    if (result != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -462,7 +458,7 @@ class LDAPClient : public Nan::ObjectWrap {
     newEntries[length / 2] = nullptr;
 
     char *dns = *dn;
-    int msgID = 0;
+    int msgID{};
 
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
@@ -489,9 +485,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(result);  // why insuficient
-                                                      // access instead of
-                                                      // result ?
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
       delete newEntries;
       delete callback;
@@ -513,7 +507,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
-      callback->Call(2, stateClient);
+      callback->Call(1, stateClient);
       delete callback;
       return;
     }
@@ -521,7 +515,10 @@ class LDAPClient : public Nan::ObjectWrap {
     int unbindResult = ldap_unbind(obj->ld_);
 
     if (unbindResult != LDAP_SUCCESS) {
-      // nothing done in case unbind fails ?
+      stateClient[0] = Nan::New<v8::Number>(unbindResult);
+      callback->Call(1, stateClient);
+      delete callback;
+      return;
     }
 
     stateClient[1] = Nan::True();

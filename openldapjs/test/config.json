@@ -64,8 +64,8 @@
     "description": "Tesst"
   },
   "ldapRename": {
-    "dnChange": "cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com",
-    "newrdn": "cn=mrotaru",
+    "dnChange": "cn=mrotaru,ou=users,o=myhost,dc=demoApp,dc=com",
+    "newrdn": "cn=rmaxim",
     "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapCompare": {

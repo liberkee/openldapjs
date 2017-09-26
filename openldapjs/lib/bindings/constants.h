@@ -22,6 +22,9 @@ const int STR_COMPARE_TRUE = 0;
 const int FREE_MSG_FALSE = 0;
 const int CONTROL_NO_VAL = 0;
 const int INVALID_LD = -1;
+const int DELETE_OLD_RDN_TRUE = 1;
+const int ATTR_WANTED = 0;
+const int STRING_EQUAL = 0;
 
 const int LDAP_NOT_FINISHED = 0;  // ldap_ext op not finished yet.
 }  // namespace constants
