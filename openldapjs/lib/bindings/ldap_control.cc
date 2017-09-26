@@ -92,7 +92,7 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
       while (ber_scanf(berElement, "{m" /*}*/, &berValue) != LBER_ERROR) {
         if (ber_scanf(berElement, "[W]", &vals) == LBER_ERROR ||
             vals == nullptr) {
-          modifyResult = "";
+          modifyResult.clear();
           return modifyResult;
         }
         auto j = 0;
