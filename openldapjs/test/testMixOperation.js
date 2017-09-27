@@ -164,10 +164,8 @@ describe('Testing multiple operations functionalities', () => {
     let searchEntry = config.ldapAuthentication.dnUser.split(',');
     searchEntry = searchEntry[0];
 
-    const addOP =
-        ldapAsyncWrap.add(dnUser, validEntry, controlOperation).then(() => {
-          return ldapAsyncWrap.delete(dnUser, controlOperation);
-        });
+    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
+    const deleteOp = ldapAsyncWrap.delete(dnUser, controlOperation);
     const searchOP =
         ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const searchOP2 =
@@ -183,11 +181,15 @@ describe('Testing multiple operations functionalities', () => {
 
     return Promise
         .all([
-          addOP, searchOP, compareOP, modifyOP, searchOP2, compareOP2, modifyOP2
-        ])
+          addOP, searchOP, deleteOp, compareOP, modifyOP, searchOP2, compareOP2, modifyOP2
+        ].map(p => p.catch(e => e)))
         .then((results) => {
           results.forEach((element) => {
-            if (element === errList.comparisonResTrue) {
+            if (element === errList.ldapNoSuchObject) {
+              should.deepEqual(element, errList.alreadyExists);
+            } else if (element === errList.alreadyExists) {
+              should.deepEqual(element, errList.alreadyExists);
+            } else if (element === errList.comparisonResTrue) {
               should.deepEqual(errList.comparisonResTrue, element);
             } else {
               let resultOperation;

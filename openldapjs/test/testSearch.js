@@ -118,9 +118,8 @@ describe('Testing the async LDAP search ', () => {
     const search2 =
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific2);
 
-    return Promise.all([search1, search2]).then((results) => {
-      should.notDeepEqual(results[0], results[1]);
-    });
+    return Promise.all([search1, search2].map(p => p.catch(e => e)))
+        .then((results) => { should.notDeepEqual(results[0], results[1]); });
 
   });
 
@@ -167,7 +166,8 @@ describe('Testing the async LDAP search ', () => {
     const thirdResult =
         adminLDAP.search(searchBase, 2, config.ldapSearch.filterObjSpecific);
 
-    return Promise.all([firstResult, secondResult, thirdResult])
+    return Promise.all([firstResult, secondResult, thirdResult]
+        .map(p => p.catch(e => e)))
         .then((values) => {
           should.deepEqual(values[0], values[1]);
           should.notDeepEqual(values[0], values[2]);

@@ -140,7 +140,7 @@ describe('Testing the Compare functionalities', () => {
     const secondCompare = ldapAsyncWrap.compare(dn, attr, val);
     const thirdCompare = ldapAsyncWrap.compare(dn, attr, val);
 
-    return Promise.all([firstCompare, secondCompare, thirdCompare])
+    return Promise.all([firstCompare, secondCompare, thirdCompare].map(p => p.catch(e => e)))
         .then((values) => {
           should.deepEqual(values[0], errList.comparisonResTrue);
           should.deepEqual(values[1], errList.comparisonResTrue);

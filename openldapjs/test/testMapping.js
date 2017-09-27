@@ -42,12 +42,13 @@ describe('Test mapping string to JSON', () => {
     const search3 = adminLDAP.search(searchBase, 2, filterSpecificUser);
 
 
-    return Promise.all([search1, search2, search3]).then((results) => {
-      results.forEach((element) => {
-        const jsonRes = ldif.parse(element);
-        jsonRes.should.be.json;
-      });
-    });
+    return Promise.all([search1, search2, search3].map(p => p.catch(e => e)))
+        .then((results) => {
+          results.forEach((element) => {
+            const jsonRes = ldif.parse(element);
+            jsonRes.should.be.json;
+          });
+        });
   });
 
 });

@@ -113,7 +113,7 @@ class LDAPAsyncWrap {
         if (!Number.isInteger(scope)) {  // as of now we're checking both in js
           // and in cpp..might
           // consider dropping one.
-          reject('Scope must be integer');
+          return reject('Scope must be integer');
         }
         checkParameters.checkParametersIfString(searchBase, searchFilter);
 
