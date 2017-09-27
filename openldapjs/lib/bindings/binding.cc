@@ -155,22 +155,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    if (!info[1]->IsNumber()) {
-      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-
     int scopeSearch = info[1]->NumberValue();
-    if (scopeSearch <= 0 && scopeSearch >= 3) {
-      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
 
     if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);

@@ -1,6 +1,6 @@
 'use strict';
 
-const LDAPCLIENT = require('../modules/ldapAsyncWrap.js');
+const LDAPCLIENT = require('./sampleLdapWrap.js');
 const config = require('./configError.json');
 const Promise = require('bluebird');
 const host = config.ldapAuthentication.host;
@@ -15,9 +15,6 @@ const validEntry = {
 
 const newEntry = 'cn=newPointChild111';
 let dnUser = `${newEntry}${config.ldapAdd.dnNewEntry}`;
-console.log('-------------------------------------');
-console.log(`The entry to add is: ${dnUser}`);
-console.log('-------------------------------------');
 const int1 = newClient2.initialize();
 const int2 = newClient.initialize();
 
@@ -29,12 +26,22 @@ Promise.all([int1, int2])
   return Promise.all([bind1, bind2]);
 })
 .then(() => {
-  const add = newClient.add(dnUser, validEntry);
+  const add1 = newClient.add(dnUser, validEntry);
+  const add2 = newClient.add(dnUser, validEntry);
+  const add3 = newClient.add(dnUser, validEntry);
+  const add4 = newClient.add(dnUser, validEntry);
+  const add5 = newClient.add(dnUser, validEntry);
+  const add6 = newClient.add(dnUser, validEntry);
 
   const delete1 = newClient2.delete(config.ldapDelete.dn);
+  const delete2 = newClient2.delete(config.ldapDelete.dn);
+  const delete3 = newClient2.delete(config.ldapDelete.dn);
+  const delete4 = newClient2.delete(config.ldapDelete.dn);
+  const delete5 = newClient2.delete(config.ldapDelete.dn);
+  const delete6 = newClient2.delete(config.ldapDelete.dn);
                   
 
-  return Promise.all([add, delete1]);
+  return Promise.all([add1, add2, add3, add4, add5, add6, delete1, delete2, delete3 ,delete4, delete5, delete6]);
 })
 .then((res) => {
   console.log(`Operation Promise Resorses -> ${res}`);
@@ -43,13 +50,16 @@ Promise.all([int1, int2])
   console.log(`Unbind Promise Resorses -> ${res}`);
 })
 .catch((err) => {
-  console.log(`Error -> ${err}`);
+  console.log(`Error ------------------> [${err}]`);
 })
 .then(() => {
   const unbind1 = newClient.unbind();
   const unbind2 = newClient2.unbind();
 
   return Promise.all([unbind1]);
+})
+.then((res) => {
+  console.log(res);
 })
 .catch((err) => {
   console.log(`Unbind Error -> ${err}`);
