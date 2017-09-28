@@ -160,9 +160,10 @@ describe('Testing the async LDAP add operation', () => {
     const third = clientLDAP.add(dnUser, validEntry);
     personNr += 1;
 
-    return Promise.all([first, second, third]).then((values) => {
-      values.forEach((result) => { result.should.be.deepEqual(0); });
-    });
+    return Promise.all([first, second, third].map(p => p.catch(e => e)))
+        .then((values) => {
+          values.forEach((result) => { result.should.be.deepEqual(0); });
+        });
   });
 
   it('should add a new entry and return the control', () => {

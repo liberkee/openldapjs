@@ -119,12 +119,13 @@ describe('Testing the async LDAP delete operation', () => {
     const four = clientLDAP.delete(dnUser);
     personNr += 1;
 
-    return Promise.all([first, second, third, four]).then((values) => {
-      should.deepEqual(values[0], errList.resultSuccess);
-      should.deepEqual(values[1], errList.resultSuccess);
-      should.deepEqual(values[2], errList.resultSuccess);
-      should.deepEqual(values[3], errList.resultSuccess);
-    });
+    return Promise.all([first, second, third, four].map(p => p.catch(e => e)))
+        .then((values) => {
+          should.deepEqual(values[0], errList.resultSuccess);
+          should.deepEqual(values[1], errList.resultSuccess);
+          should.deepEqual(values[2], errList.resultSuccess);
+          should.deepEqual(values[3], errList.resultSuccess);
+        });
   });
 
   it('should delete an exist entry and return the control', () => {

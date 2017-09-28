@@ -195,7 +195,8 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
         controlOperation);
 
-    return Promise.all([modify1, modify2, modify3, modify4, modify5])
+    return Promise.all([modify1, modify2, modify3, modify4, modify5]
+        .map(p => p.catch(e => e)))
         .then((results) => {
           results.forEach((element) => {
             let resultOperation;

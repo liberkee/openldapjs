@@ -2,7 +2,7 @@
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
-const checkParameters = require('./checkVariableFormat/checkVariableFormat');
+const checkParameters = require('../modules/checkVariableFormat/checkVariableFormat');
 
 const E_STATES = {
   CREATED: 0,
@@ -27,6 +27,8 @@ class LDAPAsyncWrap {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
     this._stateClient = E_STATES.CREATED;
+    this._operationRunning = 0;
+    this._timeoutVal = 0;
   }
   set hostAddress(value) {
     this._hostAddress = value;
@@ -107,17 +109,20 @@ class LDAPAsyncWrap {
      * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
-        if (!Number.isInteger(scope)) {  // as of now we're checking both in js
-          // and in cpp..might
-          // consider dropping one.
+        if (!Number.isInteger(scope)) {
+          this._operationRunning -= 1;
           return reject('Scope must be integer');
         }
+        this._operationRunning -= 1;
         checkParameters.checkParametersIfString(searchBase, searchFilter);
-
+        this._operationRunning += 1;
         this._binding.search(searchBase, scope, searchFilter, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -145,13 +150,17 @@ class LDAPAsyncWrap {
 
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
+        this._operationRunning -= 1;
         checkParameters.checkParametersIfString(
             dn, attr, value);  // throws in case of typeError.
-
+        this._operationRunning += 1;
         this._binding.compare(dn, attr, value, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -176,14 +185,19 @@ class LDAPAsyncWrap {
     */
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
+        this._operationRunning -= 1;
         checkParameters.checkModifyChangeArray(jsonChange);
         checkParameters.checkControlArray(controls);
+        this._operationRunning += 1;
 
         this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -208,14 +222,19 @@ class LDAPAsyncWrap {
    * */
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
+        this._operationRunning -= 1;
         checkParameters.checkParametersIfString(dn, newRdn, newParent);
         checkParameters.checkControlArray(controls);
+        this._operationRunning += 1;
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -238,14 +257,19 @@ class LDAPAsyncWrap {
    * */
   delete (dn, controls) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
+        this._operationRunning -= 1;
         checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
+        this._operationRunning += 1;
 
         this._binding.del(dn, ctrls, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -268,12 +292,16 @@ class LDAPAsyncWrap {
    * */
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
+      this._operationRunning += 1;
       if (this._stateClient !== E_STATES.BOUND) {
+        this._operationRunning -= 1;
         reject(BIND_ERROR_MESSAGE);
       } else {
         const ctrls = controls !== undefined ? controls : null;
+        this._operationRunning -= 1;
         checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
+        this._operationRunning += 1;
         const keys = Object.keys(entry);
         const entryArray = [];
 
@@ -283,6 +311,7 @@ class LDAPAsyncWrap {
         }
 
         this._binding.add(dn, entryArray, ctrls, (err, result) => {
+          this._operationRunning -= 1;
           if (err) {
             reject(err);
           } else {
@@ -301,16 +330,27 @@ class LDAPAsyncWrap {
     * Reject if the LDAP could not unbind.
     */
   unbind() {
+    const timeout = 100;
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.UNBOUND) {
-        this._binding.unbind((err, state) => {
-          if (err) {
-            reject(err);
-          } else {
-            this._stateClient = E_STATES.UNBOUND;
-            resolve(this._stateClient);
-          }
-        });
+        console.log(this._timeoutVal);
+        if (this._operationRunning <= 0 || this._timeoutVal === timeout) {
+          this._binding.unbind((err, state) => {
+            if (err) {
+              reject(err);
+            } else {
+              this._stateClient = E_STATES.UNBOUND;
+              resolve(this._stateClient);
+            }
+          });
+        } else {
+          this._timeoutVal += 1;
+          setTimeout(() => {
+            this.unbind()
+                .then((res) => {resolve(res)})
+                .catch((err) => {reject(err)});
+          }, this._timeoutVal);
+        }
       } else {
         resolve(this._stateClient);
       }

@@ -36,14 +36,16 @@ describe('Testing the async LDAP connection', () => {
     const bind1 = clientLDAP.bind(dn, password);
     const bind2 = clientLDAP2.bind(dn2, password2);
 
-    return Promise.all([init1, init2, bind1, bind2]).then((result) => {
-      result.forEach((element) => {
-        const valueElement = (element === E_STATES.INITIALIZED) ?
-            E_STATES.INITIALIZED :
-            E_STATES.BOUND;
-        should.deepEqual(element, valueElement);
-      });
-    });
+    return Promise.all([init1, init2, bind1, bind2]
+        .map(p => p.catch(e => e)))
+        .then((result) => {
+          result.forEach((element) => {
+            const valueElement = (element === E_STATES.INITIALIZED) ?
+                E_STATES.INITIALIZED :
+                E_STATES.BOUND;
+            should.deepEqual(element, valueElement);
+          });
+        });
   });
 
 });
