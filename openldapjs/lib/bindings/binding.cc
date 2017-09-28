@@ -416,11 +416,11 @@ class LDAPClient : public Nan::ObjectWrap {
   /**
 ** Method that calls the ldap_add_ext routine.
 ** The entries are taken from a string array 2 by 2 in a for loop
-**(LDAPMods.mod_type and LDAPMods.mod_values respectively)
+** (LDAPMods.mod_type and LDAPMods.mod_values respectively)
 ** entries are placed in the LDAPMod *newEntries[] array allocating memory in
-**each iteration.
+** each iteration.
 ** Note: both the last value in mod_values array and in the newEntries array
-**has to be NULL
+** has to be NULL
 **/
 
   static NAN_METHOD(add) {
@@ -489,7 +489,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(result);  // why insuficient
+      stateClient[0] = Nan::New<v8::Number>(result);  // why insufficient
                                                       // access instead of
                                                       // result ?
       callback->Call(1, stateClient);
