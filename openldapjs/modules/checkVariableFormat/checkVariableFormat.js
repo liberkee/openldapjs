@@ -15,7 +15,7 @@ class CheckParam {
     * Verify the rename parameters.
     *
     * @method checkModifyChangeArray
-    * @param {array} change The array for the parameters
+    * @param {Array} elements The array of parameters
     * @return Throws an error in case the provided arguments aren't strings
     */
 
@@ -23,7 +23,7 @@ class CheckParam {
     let args = Array.from(arguments);
     args.forEach((element) => {
       if (typeof(element) !== 'string') {
-        throw new TypeError('Wrong type');
+        throw new TypeError(element.toString() + 'is of a wrong type');
       }
     });
   }
@@ -32,16 +32,17 @@ class CheckParam {
     * Verify the modify change parameter.
     *
     * @method checkModifyChangeArray
-    * @param {array} change The json that is sent for verification
+    * @param {Array} changes The Array of json Objects that is sent for
+   * verification
     * @return Throws error in case the json can't be validated
     */
-  static checkModifyChangeArray(change) {
-    if (Array.isArray(change) === false) {
+  static checkModifyChangeArray(changes) {
+    if (Array.isArray(changes) === false) {
       throw new TypeError('The json is not an array');
     } else {
-      change.forEach((element) => {
+      changes.forEach((element) => {
         const result = validator.validateMultiple(element, changeSchema);
-        if (result.valid !== true) {
+        if (!result.valid) {
           throw new ValidationError(
               'Invalid JSON', result.error, result.errors);
         }
@@ -53,17 +54,17 @@ class CheckParam {
     * Verify the control parameter.
     *
     * @method checkControlArray
-    * @param {array} controls The jsonControl that is send for verification
+    * @param {Array} controls The jsonControl that is send for verification
     * @return Throws error in case the controls can't be validated.
     */
   static checkControlArray(controls) {
     if (controls !== undefined) {
-      if (Array.isArray(controls) === false) {
+      if (!Array.isArray(controls)) {
         throw new TypeError('The control is not an array');
       } else {
         controls.forEach((element) => {
           const result = validator.validateMultiple(element, controlSchema);
-          if (result.valid !== true) {
+          if (!result.valid) {
             throw new ValidationError(
                 'Invalid control array', result.error, result.errors);
           }
