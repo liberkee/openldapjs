@@ -2,6 +2,7 @@
 
 const Promise = require('bluebird');
 const validator = require('tv4');
+const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 const ValidationError = require('./custom_errors.js');
@@ -22,8 +23,8 @@ class CheckParam {
   static checkParametersIfString() {
     let args = Array.from(arguments);
     args.forEach((element) => {
-      if (typeof(element) !== 'string') {
-        throw new TypeError(element.toString() + 'is of a wrong type');
+      if (!_.isString(element)) {
+        throw new TypeError('Expected String parameter');
       }
     });
   }

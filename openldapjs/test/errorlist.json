@@ -6,7 +6,7 @@
   "insufficientAccess": 50,
   "invalidCredentials": 49,
   "resultSuccess": 0,
-  "typeErrorMessage": "Wrong type",
+  "typeErrorMessage": "Expected String parameter",
   "comparisonResTrue": "The Comparison Result: true",
   "comparisonResFalse": "The Comparison Result: false",
   "ldapNoSuchObject": 32,
