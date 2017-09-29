@@ -23,18 +23,12 @@ void LDAPCompareProgress::Execute(
 void LDAPCompareProgress::HandleOKCallback() {
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result_ == constants::LDAP_ERROR) {
-    stateClient[1] = Nan::New("The Comparison Result: false").ToLocalChecked();
-    callback->Call(2, stateClient);
+    stateClient[0] = Nan::New(result_).ToLocalChecked();
+    callback->Call(1, stateClient);
   } else {
     const auto status = ldap_result2error(ld_, resultMsg_, false);
     if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE) {
-      if (status == LDAP_COMPARE_TRUE) {
-        stateClient[1] =
-            Nan::New("The Comparison Result: true").ToLocalChecked();
-      } else {
-        stateClient[1] =
-            Nan::New("The Comparison Result: false").ToLocalChecked();
-      }
+      stateClient[1] = Nan::New(status).ToLocalChecked();
       callback->Call(2, stateClient);
     } else {
       // Return ERROR
