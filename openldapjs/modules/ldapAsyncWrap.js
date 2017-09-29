@@ -11,6 +11,12 @@ const E_STATES = {
   UNBOUND: 5,
 };
 
+const scopeObject = {
+  0: 'base',
+  1: 'one',
+  2: 'subtree',
+};
+
 const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
 
@@ -28,11 +34,6 @@ class LDAPAsyncWrap {
     this._binding = new binding.LDAPClient();
     this._stateClient = E_STATES.CREATED;
   }
-  set hostAddress(value) {
-    this._hostAddress = value;
-  }  // not sure if we even need these
-
-  get hostAddress() { return this._hostAddress; }  // might be useful
 
   /**
     * Initialize to an LDAP server.
@@ -61,7 +62,7 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(INITIALIZATION_ERROR);
+        reject(new Error(INITIALIZATION_ERROR));
       }
     });
   }
@@ -70,8 +71,8 @@ class LDAPAsyncWrap {
     * Authenticate to LDAP server.
     *
     * @method bind
-    * @param {string} username The client username
-    * @param {string} password The client's password.
+    * @param {String} bindDn The client user DN.
+    * @param {String} passwordUser The client's password.
     * @return {Promise} That resolves if the credentials are correct.
     * Rejects if dn or password are incorrect or the client did not initialize.
     * */
@@ -89,35 +90,42 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR));
       }
     });
   }
+
+
 
   /**
      * Search operation.
      *
      * @method search
-     * @param {string} searchBase the base for the search.
-     * @param {int} scope scope for the search, can be 0(BASE), 1(ONE) or
-     * 2(SUBTREE)
-     * @param {string} searchFilter  search filter.
+     * @param {String} searchBase the base for the search.
+     * @param {String} scope  scope for the search, can be BASE, ONE or
+     * SUBTREE
+     * @param {String} searchFilter  search filter.
      * @return {Promise} That resolves and returns a string with the search
      *results. Rejects in case of error.
      * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
+      const object = {
+        BASE: 0,
+        ONE: 1,
+        SUBTREE: 2,
+      };
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR_MESSAGE);
       } else {
-        if (!Number.isInteger(scope)) {  // as of now we're checking both in js
-          // and in cpp..might
-          // consider dropping one.
-          return reject('Scope must be integer');
-        }
-        checkParameters.checkParametersIfString(searchBase, searchFilter);
+        checkParameters.checkParametersIfString(
+            searchBase, searchFilter, scope);
 
-        this._binding.search(searchBase, scope, searchFilter, (err, result) => {
+        if (object[scope] === undefined) {
+          throw new Error('There is no such scope');
+        }
+
+        this._binding.search(searchBase, object[scope], searchFilter, (err, result) => {
           if (err) {
             reject(err);
           } else {
@@ -133,9 +141,9 @@ class LDAPAsyncWrap {
    * Compare operation.
    *
    * @method search
-   * @param {string} dn The dn of the entry to compare.
-   * @param {string} attr The attribute given for interrogation.
-   * @param {string} value Value send to verify.
+   * @param {String} dn The dn of the entry to compare.
+   * @param {String} attr The attribute given for interrogation.
+   * @param {String} value Value send to verify.
    * @return {Promise} That resolves and returns True if the elements are
    * equal
    * or
@@ -167,8 +175,8 @@ class LDAPAsyncWrap {
     * Perform an LDAP modify operation
     *
     * @method newModify
-    * @param {string} dn The dn of the entry to modify
-    * @param {array} jsonChange The attribute and value to be changed
+    * @param {String} dn The dn of the entry to modify
+    * @param {Array} jsonChange The attribute and value to be changed
     * @return {Promise} That resolves if LDAP modified successfully the
    * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
@@ -198,10 +206,10 @@ class LDAPAsyncWrap {
    * Perform an LDAP rename  operation
    *
    * @method rename
-   * @param {string} dn The dn of the entry to rename
-   * @param {string} newRdn The new rdn for the dn
-   * @param {string} newParent New parent for the rdn
-   * @param {array} controls Control that is sent as a request to the
+   * @param {String} dn The dn of the entry to rename
+   * @param {String} newRdn The new rdn for the dn
+   * @param {String} newParent New parent for the rdn
+   * @param {Array} controls Control that is sent as a request to the
    * server
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
@@ -230,7 +238,7 @@ class LDAPAsyncWrap {
   /**
    * ldap delete operation
    * @param {String} dn the dn entry to be deleted.
-   * @param {String array} controls Optional control array parameter, can be
+   * @param {Array} controls Optional control array parameter, can be
    * NULL.
    * @return {Promise} promise that resolves if the element provided was
    * deleted
@@ -245,7 +253,7 @@ class LDAPAsyncWrap {
         checkParameters.checkParametersIfString(dn);
         checkParameters.checkControlArray(controls);
 
-        this._binding.del(dn, ctrls, (err, result) => {
+        this._binding.delete(dn, ctrls, (err, result) => {
           if (err) {
             reject(err);
           } else {
@@ -262,7 +270,7 @@ class LDAPAsyncWrap {
    * exist'
    * @param {Object} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param {Object} controls client & sever controls, OPTIONAL parameter
+   * @param {Array} controls client & sever controls, OPTIONAL parameter
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
@@ -308,11 +316,11 @@ class LDAPAsyncWrap {
             reject(err);
           } else {
             this._stateClient = E_STATES.UNBOUND;
-            resolve(this._stateClient);
+            resolve();
           }
         });
       } else {
-        resolve(this._stateClient);
+        resolve();
       }
     });
   }
