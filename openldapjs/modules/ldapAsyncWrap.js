@@ -12,9 +12,9 @@ const E_STATES = {
 };
 
 const scopeObject = {
-  0: 'base',
-  1: 'one',
-  2: 'subtree',
+  BASE: 0,
+  ONE: 1,
+  SUBTREE: 2,
 };
 
 const BIND_ERROR_MESSAGE =
@@ -110,22 +110,17 @@ class LDAPAsyncWrap {
      * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
-      const object = {
-        BASE: 0,
-        ONE: 1,
-        SUBTREE: 2,
-      };
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR_MESSAGE);
       } else {
         checkParameters.checkParametersIfString(
             searchBase, searchFilter, scope);
 
-        if (object[scope] === undefined) {
+        if (scopeObject[scope] === undefined) {
           throw new Error('There is no such scope');
         }
 
-        this._binding.search(searchBase, object[scope], searchFilter, (err, result) => {
+        this._binding.search(searchBase, scopeObject[scope], searchFilter, (err, result) => {
           if (err) {
             reject(err);
           } else {
