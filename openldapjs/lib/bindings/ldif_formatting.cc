@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+/**
+ * Work in progress. UNFINISHED.
+ */
 namespace ldif_formatting {
 
 std::vector<std::map<std::string, std::string>> getLdif(

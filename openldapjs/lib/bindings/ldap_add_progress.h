@@ -13,6 +13,13 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
   int msgID_{};
 
  public:
+  /**
+   **@brief Constructor
+   **@param callback, callback used to pass the final result to js
+   **@param progress, callback used to pass intermediate results to js
+   **@param ld, LDAP structure that holds ldap internal data.
+   **@param msgID, operation identifier.
+   **/
   LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                   const int msgID);
 
@@ -33,11 +40,11 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
   void HandleOKCallback();
 
   /**
-  **@brief HandleProgressCallback method. Used for sending intermediary data to
-  **js
-  **@param data, intermediary data
-  **@param size, size of the data sent (in bytes).
-  **/
+   **@brief HandleProgressCallback method. Used for sending intermediary data to
+   **js
+   **@param data, intermediary data
+   **@param size, size of the data sent (in bytes).
+   **/
   void HandleProgressCallback(const char *data, size_t size);
 };
 

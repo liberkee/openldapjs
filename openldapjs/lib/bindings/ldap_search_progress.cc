@@ -29,10 +29,10 @@ void LDAPSearchProgress::Execute(
   for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
        l_entry = ldap_next_entry(ld_, l_entry)) {
     l_dn = ldap_get_dn(ld_, l_entry);
-    resultSearch_ += "\n";
-    resultSearch_ += "dn:";
+    resultSearch_ += constants::newLine;
+    resultSearch_ += constants::dn;
     resultSearch_ += l_dn;
-    resultSearch_ += "\n";
+    resultSearch_ += constants::newLine;
     ldap_memfree(l_dn);
 
     for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
@@ -41,16 +41,16 @@ void LDAPSearchProgress::Execute(
       if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
         for (int i = 0; values[i] != nullptr; i++) {
           resultSearch_ += attribute;
-          resultSearch_ += ":";
+          resultSearch_ += constants::separator;
           resultSearch_ += values[i];
-          resultSearch_ += "\n";
+          resultSearch_ += constants::newLine;
         }
         ldap_value_free(values);
       }
       ldap_memfree(attribute);
     }
     ber_free(ber, false);
-    resultSearch_ += "\n";
+    resultSearch_ += constants::newLine;
   }
 
   status_ = ldap_result2error(ld_, l_result, false);

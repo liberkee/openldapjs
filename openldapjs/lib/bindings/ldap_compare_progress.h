@@ -13,6 +13,13 @@ class LDAPCompareProgress : public Nan::AsyncProgressWorker {
   int msgID_{};
 
  public:
+  /**
+   **@brief Constructor
+   **@param callback, callback used to pass the final result to js
+   **@param progress, callback used to pass intermediate results to js
+   **@param ld, LDAP structure that holds ldap internal data.
+   **@param msgID, operation identifier.
+   **/
   LDAPCompareProgress(Nan::Callback *callback, Nan::Callback *progress,
                       LDAP *ld, const int msgID);
 

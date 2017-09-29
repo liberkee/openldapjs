@@ -86,8 +86,8 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
     } else if (ber_scanf(berElement, "{m{" /*}}*/, &berValue) == LBER_ERROR) {
       return modifyResult;
     } else {
-      modifyResult += "\n";
-      modifyResult += "dn: ";
+      modifyResult += constants::newLine;
+      modifyResult += constants::dn;
       modifyResult += berValue.bv_val;
       while (ber_scanf(berElement, "{m" /*}*/, &berValue) != LBER_ERROR) {
         if (ber_scanf(berElement, "[W]", &vals) == LBER_ERROR ||
@@ -97,14 +97,14 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
         }
         auto j = 0;
         while (vals[j].bv_val != NULL) {
-          modifyResult += "\n";
+          modifyResult += constants::newLine;
           modifyResult += berValue.bv_val;
-          modifyResult += ": ";
+          modifyResult += constants::separator;
           modifyResult += vals[j].bv_val;
           j++;
         }
       }
-      modifyResult += "\n";
+      modifyResult += constants::newLine;
     }
     i++;
   }

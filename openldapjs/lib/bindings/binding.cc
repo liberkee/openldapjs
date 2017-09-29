@@ -249,7 +249,8 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::String::Utf8Value mod_op(
           modHandle->Get(Nan::New("op").ToLocalChecked()));
 
-      if (std::strcmp(*mod_op, "add") == constants::STRING_EQUAL) {
+      if (std::strcmp(*mod_op, "add") ==
+          constants::STRING_EQUAL) {  // can't we just use !std::strcmp(..,..)?
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
       } else if (std::strcmp(*mod_op, "delete") == constants::STRING_EQUAL) {
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;
@@ -298,7 +299,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
-      delete ldapmods;
+      delete ldapmods;  // missed a [] ? as in delete[] ldapmods ?
       delete callback;
       delete progress;
       return;
@@ -395,15 +396,14 @@ class LDAPClient : public Nan::ObjectWrap {
   }
 
   /**
-** Method that calls the ldap_add_ext routine.
-** The entries are taken from a string array 2 by 2 in a for loop
-**(LDAPMods.mod_type and LDAPMods.mod_values respectively)
-** entries are placed in the LDAPMod *newEntries[] array allocating memory in
-**each iteration.
-** Note: both the last value in mod_values array and in the newEntries array
-**has to be NULL
-**/
-
+   ** Method that calls the ldap_add_ext routine.
+   ** The entries are taken from a string array 2 by 2 in a for loop
+   **(LDAPMods.mod_type and LDAPMods.mod_values respectively)
+   ** entries are placed in the LDAPMod *newEntries[] array allocating memory in
+   **each iteration.
+   ** Note: both the last value in mod_values array and in the newEntries array
+   **has to be NULL
+   **/
   static NAN_METHOD(add) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
@@ -413,7 +413,7 @@ class LDAPClient : public Nan::ObjectWrap {
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     int length = entries->Length();
-    if (length < 2) {
+    if (length < 2) {  // checks if we have a malformed array
       return;
     }
 

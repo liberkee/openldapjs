@@ -17,18 +17,16 @@ const scopeObject = {
   SUBTREE: 2,
 };
 
-const BIND_ERROR_MESSAGE =
-    'The operation failed. It could be done if the state of the client is BOUND';
-
-const INITIALIZATION_ERROR = 'Initialize failed!';
-const BIND_ERROR = 'Bind failed!';
+const INITIALIZATION_ERROR = new Error('Initialize failed!');
+const BIND_ERROR = new Error(
+    'The operation failed. It could be done if the state of the client is BOUND')
 
 
-/**
- * @module LDAPTranzition
- * @class LDAPAsyncWrap
- */
-class LDAPAsyncWrap {
+    /**
+     * @module LDAPTranzition
+     * @class LDAPAsyncWrap
+     */
+    class LDAPAsyncWrap {
   constructor(host, password) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
@@ -86,11 +84,11 @@ class LDAPAsyncWrap {
             reject(err);
           } else {
             this._stateClient = E_STATES.BOUND;
-            resolve(this._stateClient);
+            resolve();
           }
         });
       } else {
-        reject(new Error(BIND_ERROR));
+        reject(BIND_ERROR);
       }
     });
   }
@@ -111,7 +109,7 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
             searchBase, searchFilter, scope);
@@ -120,13 +118,14 @@ class LDAPAsyncWrap {
           throw new Error('There is no such scope');
         }
 
-        this._binding.search(searchBase, scopeObject[scope], searchFilter, (err, result) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        });
+        this._binding.search(
+            searchBase, scopeObject[scope], searchFilter, (err, result) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            });
       }
     });
   }
@@ -135,10 +134,10 @@ class LDAPAsyncWrap {
   /**
    * Compare operation.
    *
-   * @method search
+   * @method compare
    * @param {String} dn The dn of the entry to compare.
-   * @param {String} attr The attribute given for interrogation.
-   * @param {String} value Value send to verify.
+   * @param {String} attr The attribute given for comparison.
+   * @param {String} value Value send to compare.
    * @return {Promise} That resolves and returns True if the elements are
    * equal
    * or
@@ -149,7 +148,7 @@ class LDAPAsyncWrap {
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
             dn, attr, value);  // throws in case of typeError.
@@ -169,7 +168,7 @@ class LDAPAsyncWrap {
   /**
     * Perform an LDAP modify operation
     *
-    * @method newModify
+    * @method modify
     * @param {String} dn The dn of the entry to modify
     * @param {Array} jsonChange The attribute and value to be changed
     * @return {Promise} That resolves if LDAP modified successfully the
@@ -180,7 +179,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkModifyChangeArray(jsonChange);
@@ -212,7 +211,7 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn, newRdn, newParent);
@@ -242,7 +241,7 @@ class LDAPAsyncWrap {
   delete (dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
@@ -272,7 +271,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR_MESSAGE);
+        reject(BIND_ERROR);
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
