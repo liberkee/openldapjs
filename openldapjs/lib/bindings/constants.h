@@ -25,6 +25,9 @@ const int INVALID_LD = -1;
 const int DELETE_OLD_RDN_TRUE = 1;
 const int ATTR_WANTED = 0;
 const int STRING_EQUAL = 0;
+const char dn[] = "dn";
+const char separator[] = ": ";
+const char newLine[] = "\n";
 
 const int LDAP_NOT_FINISHED = 0;  // ldap_ext op not finished yet.
 }  // namespace constants
