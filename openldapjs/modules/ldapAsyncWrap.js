@@ -4,6 +4,7 @@ const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 
+
 const E_STATES = {
   CREATED: 0,
   INITIALIZED: 1,
@@ -23,7 +24,7 @@ const BIND_ERROR = new Error(
 
 
     /**
-     * @module LDAPTranzition
+     * @module LDAPTransition
      * @class LDAPAsyncWrap
      */
     class LDAPAsyncWrap {
@@ -38,7 +39,7 @@ const BIND_ERROR = new Error(
     *
     * @method initialize
     * @return {Promise} That resolves with the initialize state code(1) if the
-    *LDAP
+    * LDAP
     ** initialize succeeds
     ** Rejects if the address is incorrect or the client was not created.
     **/

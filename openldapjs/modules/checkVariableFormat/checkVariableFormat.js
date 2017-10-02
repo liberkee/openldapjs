@@ -38,7 +38,7 @@ class CheckParam {
     * @return Throws error in case the json can't be validated
     */
   static checkModifyChangeArray(changes) {
-    if (Array.isArray(changes) === false) {
+    if (!_.isArray(changes)) {
       throw new TypeError('The json is not an array');
     } else {
       changes.forEach((element) => {
@@ -60,7 +60,7 @@ class CheckParam {
     */
   static checkControlArray(controls) {
     if (controls !== undefined) {
-      if (!Array.isArray(controls)) {
+      if (!_.isArray(controls)) {
         throw new TypeError('The control is not an array');
       } else {
         controls.forEach((element) => {
