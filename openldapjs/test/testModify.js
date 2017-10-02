@@ -11,7 +11,7 @@ describe('Testing the modify functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
   const resStateRequired =
-      'The operation failed. It could be done if the state of the client is BOUND';
+    'The operation failed. It could be done if the state of the client is BOUND';
 
   const changeAttributesAdd = [
     {
@@ -72,11 +72,12 @@ describe('Testing the modify functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
-    return ldapAsyncWrap.initialize().then(() => {
-      return ldapAsyncWrap.bind(
+    return ldapAsyncWrap.initialize()
+      .then(() => {
+        return ldapAsyncWrap.bind(
           config.ldapAuthentication.dnAdmin,
           config.ldapAuthentication.passwordAdmin);
-    });
+      });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
@@ -84,36 +85,37 @@ describe('Testing the modify functionalities', () => {
 
   it('should reject if the state is not BOUND', () => {
     return ldapAsyncWrap.unbind()
-        .then(() => {
-          return ldapAsyncWrap.modify(
-              config.ldapModify.ldapModificationReplace.change_dn,
-              changeAttributes);
-        })
-        .catch(
-            (error) => { should.deepEqual(error, errList.bindErrorMessage); });
+      .then(() => {
+        return ldapAsyncWrap.modify(
+          config.ldapModify.ldapModificationReplace.change_dn,
+          changeAttributes);
+      })
+      .catch((error) => {
+        should.deepEqual(error.message, errList.bindErrorMessage);
+      });
   });
 
   it('should reject if attribute parameter is not defined', () => {
     const errorMSG = 'The json is not an array';
     return ldapAsyncWrap
-        .modify(config.ldapModify.ldapModificationReplace.change_dn)
-        .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .modify(config.ldapModify.ldapModificationReplace.change_dn)
+      .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the attribute parameter is not correctly defined',
-     () => {
-       const errorMSG = 'Invalid JSON';
-       const attribute = [
-         {
-           add: 'add',
-         },
-       ];
+    () => {
+      const errorMSG = 'Invalid JSON';
+      const attribute = [
+        {
+          add: 'add',
+        },
+      ];
 
-       return ldapAsyncWrap
-           .modify(
-               config.ldapModify.ldapModificationReplace.change_dn, attribute)
-           .catch((error) => { should.deepEqual(error.message, errorMSG); });
-     });
+      return ldapAsyncWrap
+        .modify(
+          config.ldapModify.ldapModificationReplace.change_dn, attribute)
+        .catch((error) => { should.deepEqual(error.message, errorMSG); });
+    });
 
   it('should reject if control parameter is not an array', () => {
     const errorMSG = 'The control is not an array';
@@ -122,10 +124,10 @@ describe('Testing the modify functionalities', () => {
     };
 
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes, control)
-        .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributes, control)
+      .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject if the control parameter is not correctly defined', () => {
@@ -134,96 +136,99 @@ describe('Testing the modify functionalities', () => {
       op: 'postread',
     }];
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes, control)
-        .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributes, control)
+      .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the dn is empty', () => {
-    return ldapAsyncWrap.modify('', changeAttributes).catch((error) => {
-      should.deepEqual(error, errList.unwillingToPerform);
-    });
+    return ldapAsyncWrap.modify('', changeAttributes)
+      .catch((error) => {
+        should.deepEqual(error, errList.unwillingToPerform);
+      });
   });
 
   it('should replace the old attributes with new one from an entry', () => {
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributesReplace)
-        .then((result) => { should.deepEqual(result, 0); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesReplace)
+      .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should add a new attributes from an existing entry', () => {
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributesAdd)
-        .then((result) => { should.deepEqual(result, 0); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesAdd)
+      .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should delete an existing attribute from an entry', () => {
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributesDelete)
-        .then((result) => { should.deepEqual(result, 0); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesDelete)
+      .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should make multiple modification to an entry', () => {
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes)
-        .then((result) => { should.deepEqual(result, 0); });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributes)
+      .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should modify in parallel', () => {
     const modify1 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-        controlOperation);
+      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
+      controlOperation);
     const modify2 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-        controlOperation);
+      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
+      controlOperation);
     const modify3 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-        controlOperation);
+      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
+      controlOperation);
     const modify4 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-        controlOperation);
+      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
+      controlOperation);
     const modify5 = ldapAsyncWrap.modify(
-        config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-        controlOperation);
+      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
+      controlOperation);
 
-    return Promise.all([modify1, modify2, modify3, modify4, modify5]
-        .map(p => p.catch(e => e)))
-        .then((results) => {
-          results.forEach((element) => {
-            let resultOperation;
-            resultOperation = element.split('\n');
-            resultOperation = resultOperation[1].split(':');
-            resultOperation = resultOperation[1];
-            should.deepEqual(
-                resultOperation,
-                ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-          });
+    return Promise
+      .all([
+        modify1, modify2, modify3, modify4, modify5,
+      ])
+      .then((results) => {
+        results.forEach((element) => {
+          let resultOperation;
+          resultOperation = element.split('\n');
+          resultOperation = resultOperation[1].split(':');
+          resultOperation = resultOperation[1];
+          should.deepEqual(
+            resultOperation,
+            ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
         });
+      });
   });
 
   it('should return the specific attribute from the entry', () => {
     return ldapAsyncWrap
-        .modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes, controlOperation)
-        .then((result) => {
-          let resultOperation;
-          resultOperation = result.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(
-              resultOperation,
-              ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-        });
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributes, controlOperation)
+      .then((result) => {
+        let resultOperation;
+        resultOperation = result.split('\n');
+        resultOperation = resultOperation[1].split(':');
+        resultOperation = resultOperation[1];
+        should.deepEqual(
+          resultOperation,
+          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+      });
   });
 
 });

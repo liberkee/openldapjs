@@ -14,7 +14,7 @@ function search() {
 
   clientLDAP.initialize()
       .then(() => { return clientLDAP.bind(dnUser, password); })
-      .then(() => { return clientLDAP.search(searchBase, 2, searchFilter); })
+      .then(() => { return clientLDAP.search(searchBase, 'SUBTREE', searchFilter); })
       .then((result) => {console.log(ldif.parse(result))});
 }
 

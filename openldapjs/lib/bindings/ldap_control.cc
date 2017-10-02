@@ -88,6 +88,7 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
     } else {
       modifyResult += constants::newLine;
       modifyResult += constants::dn;
+      modifyResult += constants::separator;
       modifyResult += berValue.bv_val;
       while (ber_scanf(berElement, "{m" /*}*/, &berValue) != LBER_ERROR) {
         if (ber_scanf(berElement, "[W]", &vals) == LBER_ERROR ||

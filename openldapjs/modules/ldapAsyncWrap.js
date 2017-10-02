@@ -19,14 +19,15 @@ const scopeObject = {
 
 const INITIALIZATION_ERROR = new Error('Initialize failed!');
 const BIND_ERROR = new Error(
-    'The operation failed. It could be done if the state of the client is BOUND')
+  'The operation failed. It could be done if the state of the client is BOUND');
 
 
-    /**
-     * @module LDAPTranzition
-     * @class LDAPAsyncWrap
-     */
-    class LDAPAsyncWrap {
+/**
+ * @module LDAPTranzition
+ * @class LDAPAsyncWrap
+ */
+class LDAPAsyncWrap {
+
   constructor(host, password) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
@@ -41,7 +42,7 @@ const BIND_ERROR = new Error(
     *LDAP
     ** initialize succeeds
     ** Rejects if the address is incorrect or the client was not created.
-    **/
+    * */
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
@@ -52,7 +53,7 @@ const BIND_ERROR = new Error(
                 reject(new Error(errTls));
               } else {
                 this._stateClient = E_STATES.INITIALIZED;
-                resolve(E_STATES.INITIALIZED);
+                resolve();
               }
             });
           } else {
@@ -60,7 +61,7 @@ const BIND_ERROR = new Error(
           }
         });
       } else {
-        reject(new Error(INITIALIZATION_ERROR));
+        reject(INITIALIZATION_ERROR);
       }
     });
   }
@@ -93,8 +94,6 @@ const BIND_ERROR = new Error(
     });
   }
 
-
-
   /**
      * Search operation.
      *
@@ -112,20 +111,20 @@ const BIND_ERROR = new Error(
         reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
-            searchBase, searchFilter, scope);
+          searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error('There is no such scope');
         }
 
         this._binding.search(
-            searchBase, scopeObject[scope], searchFilter, (err, result) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(result);
-              }
-            });
+          searchBase, scopeObject[scope], searchFilter, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
       }
     });
   }
@@ -151,7 +150,7 @@ const BIND_ERROR = new Error(
         reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
-            dn, attr, value);  // throws in case of typeError.
+          dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
@@ -238,7 +237,7 @@ const BIND_ERROR = new Error(
    * deleted
    * or rejects if not.
    * */
-  delete (dn, controls) {
+  delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR);
@@ -318,6 +317,7 @@ const BIND_ERROR = new Error(
       }
     });
   }
+
 }
 
 
