@@ -31,6 +31,7 @@ void LDAPSearchProgress::Execute(
     l_dn = ldap_get_dn(ld_, l_entry);
     resultSearch_ += constants::newLine;
     resultSearch_ += constants::dn;
+    resultSearch_ += constants::separator;
     resultSearch_ += l_dn;
     resultSearch_ += constants::newLine;
     ldap_memfree(l_dn);

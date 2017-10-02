@@ -12,6 +12,7 @@ const ValidationError = require('./custom_errors.js');
  * @class CheckParam
  */
 class CheckParam {
+
   /**
     * Verify the rename parameters.
     *
@@ -21,7 +22,7 @@ class CheckParam {
     */
 
   static checkParametersIfString() {
-    let args = Array.from(arguments);
+    const args = Array.from(arguments);
     args.forEach((element) => {
       if (!_.isString(element)) {
         throw new TypeError('Expected String parameter');
@@ -45,7 +46,7 @@ class CheckParam {
         const result = validator.validateMultiple(element, changeSchema);
         if (!result.valid) {
           throw new ValidationError(
-              'Invalid JSON', result.error, result.errors);
+            'Invalid JSON', result.error, result.errors);
         }
       });
     }
@@ -67,13 +68,14 @@ class CheckParam {
           const result = validator.validateMultiple(element, controlSchema);
           if (!result.valid) {
             throw new ValidationError(
-                'Invalid control array', result.error, result.errors);
+              'Invalid control array', result.error, result.errors);
           }
         });
       }
     }
     // does nothing in case controls isn't defined.
   }
+
 }
 
 module.exports = CheckParam;
