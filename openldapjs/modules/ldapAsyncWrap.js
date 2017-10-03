@@ -179,6 +179,7 @@ class LDAPAsyncWrap {
         reject(BIND_ERROR);
       } else {
         const ctrls = controls !== undefined ? controls : null;
+        checkParameters.checkParametersIfString(dn);
         checkParameters.checkModifyChangeArray(jsonChange);
         checkParameters.checkControlArray(controls);
 
@@ -271,16 +272,10 @@ class LDAPAsyncWrap {
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
+        checkParameters.checkEntryObject(entry);
         checkParameters.checkControlArray(controls);
-        const keys = Object.keys(entry);
-        const entryArray = [];
 
-        for (const elem of keys) {
-          entryArray.push(elem);
-          entryArray.push(entry[elem]);
-        }
-
-        this._binding.add(dn, entryArray, ctrls, (err, result) => {
+        this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
             reject(err);
           } else {

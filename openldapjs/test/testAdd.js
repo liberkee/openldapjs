@@ -2,9 +2,9 @@
 
 const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
-const config = require('./config.json');
+const config = require('./config');
 const Promise = require('bluebird');
-const errList = require('./errorlist.json');
+const errList = require('./errorlist');
 
 describe('Testing the async LDAP add operation', () => {
 
@@ -12,12 +12,9 @@ describe('Testing the async LDAP add operation', () => {
   let dnUser;
   const rdnUser = 'cn=testUsers';
 
-  const validEntry = {
-    objectClass: config.ldapAdd.objectClass,
-    sn: config.ldapAdd.sn,
-    description: config.ldapAdd.description,
-  };
-
+  const validEntry = [
+    config.ldapAdd.firstAttr, config.ldapAdd.secondAttr, config.ldapAdd.lastAttr,
+  ];
   const controlOperation = [
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
@@ -70,15 +67,15 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should reject the add operation with an invalid entry Object', () => {
 
-    const invalidEntry = {
+    const invalidEntry = [{
       wrong: 'garbage',
       sn: 'Entry',
       description: 'Test',
-    };
+    }];
 
     return clientLDAP.add(dnUser, invalidEntry)
       .catch((undefinedTypeErr) => {
-        should.deepEqual(undefinedTypeErr, errList.undefinedType);
+        should.deepEqual(undefinedTypeErr.message, errList.entryObjectError);
       });
 
   });
@@ -127,10 +124,9 @@ describe('Testing the async LDAP add operation', () => {
 
   // is null the same with '' ? for '' the  resulting error code was 68
   it('should reject add request with empty(null) DN', () => {
-    const dnEntryError = new TypeError('Expected String parameter');
     return clientLDAP.add(null, validEntry)
       .catch((err) => {
-        should.deepEqual(err, dnEntryError);
+        should.deepEqual(err.message, errList.typeErrorMessage);
       });
   });
 

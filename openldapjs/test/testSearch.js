@@ -62,7 +62,9 @@ describe('Testing the async LDAP search ', () => {
       .search(
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific)
-      .then((result) => { result.should.be.empty; });
+      .then((result) => {
+        const resShouldBe = result.should.be.empty;
+      });
   });
   /**
    * case for search with non existing search base
@@ -175,7 +177,9 @@ describe('Testing the async LDAP search ', () => {
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
-      .catch((err) => { err.should.not.be.empty; });
+      .catch((err) => {
+        const resShouldBe = err.should.not.be.empty;
+      });
   });
 
 
@@ -214,7 +218,7 @@ describe('Testing the async LDAP search ', () => {
   /**
    * Test case with a large number of results (>10k)
    */
-  it('should return >50k entries', function () {
+  it('should return >10k entries', function searchTime() {
     this.timeout(0);
     return adminLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)

@@ -142,11 +142,9 @@ describe('Testing the rename functionalities', () => {
   });
 
   it('should make the modification of dn', () => {
-    const validEntry = {
-      objectClass: config.ldapAdd.objectClass,
-      sn: config.ldapAdd.sn,
-      description: config.ldapAdd.description,
-    };
+    const validEntry = [
+      config.ldapAdd.firstAttr, config.ldapAdd.secondAttr, config.ldapAdd.lastAttr,
+    ];
 
     return ldapAsyncWrap
       .delete(`${config.ldapRename.newrdn},${config.ldapRename.newparent}`)
