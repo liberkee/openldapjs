@@ -13,6 +13,7 @@ const ValidationError = require('./custom_errors.js');
  * @class CheckParam
  */
 class CheckParam {
+
   /**
     * Verify the rename parameters.
     *
@@ -46,7 +47,7 @@ class CheckParam {
         const result = validator.validateMultiple(element, changeSchema);
         if (!result.valid) {
           throw new ValidationError(
-              'Invalid JSON', result.error, result.errors);
+            'Invalid JSON', result.error, result.errors);
         }
       });
     }
@@ -68,7 +69,7 @@ class CheckParam {
           const result = validator.validateMultiple(element, controlSchema);
           if (!result.valid) {
             throw new ValidationError(
-                'Invalid control array', result.error, result.errors);
+              'Invalid control array', result.error, result.errors);
           }
         });
       }
@@ -91,11 +92,12 @@ class CheckParam {
         const result = validator.validateMultiple(element, addEntrySchema);
         if (!result.valid) {
           throw new ValidationError(
-              'Invalid entryObject array', result.error, result.errors);
+            'Invalid entryObject array', result.error, result.errors);
         }
       });
     }
   }
+
 }
 
 module.exports = CheckParam;

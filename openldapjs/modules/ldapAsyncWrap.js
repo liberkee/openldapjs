@@ -1,4 +1,5 @@
 'use strict';
+
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
@@ -19,7 +20,7 @@ const scopeObject = {
 
 const INITIALIZATION_ERROR = new Error('Initialize failed!');
 const BIND_ERROR = new Error(
-    'The operation failed. It could be done if the state of the client is BOUND');
+  'The operation failed. It could be done if the state of the client is BOUND');
 
 
 /**
@@ -27,6 +28,7 @@ const BIND_ERROR = new Error(
  * @class LDAPAsyncWrap
  */
 class LDAPAsyncWrap {
+
   constructor(host, password) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
@@ -110,20 +112,20 @@ class LDAPAsyncWrap {
         reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
-            searchBase, searchFilter, scope);
+          searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error('There is no such scope');
         }
 
         this._binding.search(
-            searchBase, scopeObject[scope], searchFilter, (err, result) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(result);
-              }
-            });
+          searchBase, scopeObject[scope], searchFilter, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
       }
     });
   }
@@ -234,7 +236,7 @@ class LDAPAsyncWrap {
    * deleted
    * or rejects if not.
    * */
-  delete (dn, controls) {
+  delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR);
@@ -308,6 +310,7 @@ class LDAPAsyncWrap {
       }
     });
   }
+
 }
 
 
