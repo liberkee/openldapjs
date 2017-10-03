@@ -21,7 +21,7 @@ void LDAPRenameProgress::Execute(
 }
 
 void LDAPRenameProgress::HandleOKCallback() {
-  int status;
+  int status{};
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
   std::string modifyResult;

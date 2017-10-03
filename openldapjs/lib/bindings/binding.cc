@@ -105,7 +105,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::True();  // replaced 1 with True
+    stateClient[1] = Nan::True();   
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;

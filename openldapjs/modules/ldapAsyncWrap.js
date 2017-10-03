@@ -1,5 +1,4 @@
-
-
+'use strict';
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
