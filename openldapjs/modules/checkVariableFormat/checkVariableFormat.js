@@ -5,6 +5,7 @@ const validator = require('tv4');
 const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
+const addEntrySchema = require('../schemas/add_entry_schema');
 const ValidationError = require('./custom_errors.js');
 
 /**
@@ -74,6 +75,27 @@ class CheckParam {
       }
     }
     // does nothing in case controls isn't defined.
+  }
+
+  /**
+    * Verify the entry parameter.
+    *
+    * @method checkControlArray
+    * @param {Object} entry The object that is send for verification
+    * @return Throws error in case the entry can't be validated.
+    */
+  static checkEntryObject(entry) {
+    if (!Array.isArray(entry)) {
+      throw new TypeError('The entryObject is not an array');
+    } else {
+      entry.forEach((element) => {
+        const result = validator.validateMultiple(element, addEntrySchema);
+        if (!result.valid) {
+          throw new ValidationError(
+            'Invalid entryObject array', result.error, result.errors);
+        }
+      });
+    }
   }
 
 }

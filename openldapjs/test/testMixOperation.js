@@ -24,11 +24,9 @@ describe('Testing multiple operations functionalities', () => {
     subtree: 'SUBTREE',
   };
 
-  const validEntry = {
-    objectClass: config.ldapAdd.objectClass,
-    sn: config.ldapAdd.sn,
-    description: config.ldapAdd.description,
-  };
+  const validEntry = [
+    config.ldapAdd.firstAttr, config.ldapAdd.secondAttr, config.ldapAdd.lastAttr,
+  ];
 
   const changeAttributes = [
     {
@@ -66,8 +64,15 @@ describe('Testing multiple operations functionalities', () => {
 
   let attributeEntry = newEntry.split('=');
   attributeEntry = attributeEntry[1];
+
   const searchResult =
-    `\ndn: ${newEntry}${config.ldapAdd.dnNewEntry}\nobjectClass: person\nsn: Entry\ndescription: Tesst\ncn: ${attributeEntry}\n\n`;
+    `\ndn: ${newEntry}${config.ldapAdd.dnNewEntry}
+${config.ldapAdd.firstAttr.attr}: ${config.ldapAdd.firstAttr.vals[0]}
+${config.ldapAdd.secondAttr.attr}: ${config.ldapAdd.secondAttr.vals[0]}
+${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[0]}
+${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[1]}
+${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[2]}
+cn: ${attributeEntry}\n\n`;
 
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);

@@ -15,7 +15,7 @@ describe('Testing the async initialization', () => {
 
   it('should be INITIALIZED', () => {
     return ldapWrap.initialize()
-    .then((result) => { should.deepEqual(result, undefined); });
+      .then((result) => { should.deepEqual(result, undefined); });
   });
 
 });

@@ -299,7 +299,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
-      delete ldapmods;  // missed a [] ? as in delete[] ldapmods ?
+      delete[] ldapmods;
       delete callback;
       delete progress;
       return;
@@ -395,15 +395,6 @@ class LDAPClient : public Nan::ObjectWrap {
         new LDAPDeleteProgress(callback, progress, obj->ld_, msgID));
   }
 
-  /**
-   ** Method that calls the ldap_add_ext routine.
-   ** The entries are taken from a string array 2 by 2 in a for loop
-   **(LDAPMods.mod_type and LDAPMods.mod_values respectively)
-   ** entries are placed in the LDAPMod *newEntries[] array allocating memory in
-   **each iteration.
-   ** Note: both the last value in mod_values array and in the newEntries array
-   **has to be NULL
-   **/
   static NAN_METHOD(add) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
@@ -412,35 +403,30 @@ class LDAPClient : public Nan::ObjectWrap {
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[2]);
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    int length = entries->Length();
-    if (length < 2) {  // checks if we have a malformed array
-      return;
-    }
+    unsigned int nummods = entries->Length();
 
-    LDAPMod **newEntries = new LDAPMod *[length / 2 + 1];
-    for (int i = 0; i < length / 2; i++) {
-      Nan::Utf8String type(entries->Get(2 * i));
-      std::string typeString(*type);
-      Nan::Utf8String value(entries->Get(2 * i + 1));
-      std::string valueString(*value);
+    LDAPMod **newEntries = new LDAPMod *[nummods + 1];
 
+    for (unsigned int i = 0; i < nummods; i++) {
+      v8::Local<v8::Object> modHandle =
+          v8::Local<v8::Object>::Cast(entries->Get(Nan::New(i)));
       newEntries[i] = new LDAPMod;
+      newEntries[i]->mod_op = LDAP_MOD_ADD;
 
-      if (typeString.length() > 0 && valueString.length() > 0) {
-        newEntries[i]->mod_type = new char[typeString.length() + 1];
-        newEntries[i]->mod_values = new char *[2];
-        newEntries[i]->mod_values[0] = new char[valueString.length() + 1];
-
-        newEntries[i]->mod_op = LDAP_MOD_ADD;
-        memcpy(newEntries[i]->mod_type, typeString.c_str(),
-               typeString.length() + 1);
-        memcpy(newEntries[i]->mod_values[0], valueString.c_str(),
-               valueString.length() + 1);
-        newEntries[i]->mod_values[1] = nullptr;
+      v8::String::Utf8Value mod_type(
+          modHandle->Get(Nan::New("attr").ToLocalChecked()));
+      newEntries[i]->mod_type = strdup(*mod_type);
+      v8::Local<v8::Array> modValsHandle = v8::Local<v8::Array>::Cast(
+          modHandle->Get(Nan::New("vals").ToLocalChecked()));
+      int modValsLength = modValsHandle->Length();
+      newEntries[i]->mod_values = new char *[modValsLength + 1];
+      for (int j = 0; j < modValsLength; j++) {
+        Nan::Utf8String modValue(modValsHandle->Get(Nan::New(j)));
+        newEntries[i]->mod_values[j] = strdup(*modValue);
       }
+      newEntries[i]->mod_values[modValsLength] = nullptr;
     }
-
-    newEntries[length / 2] = nullptr;
+    newEntries[nummods] = nullptr;
 
     char *dns = *dn;
     int msgID{};
@@ -451,6 +437,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
+      delete[] newEntries
       delete callback;
       delete progress;
       return;
@@ -472,7 +459,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
-      delete newEntries;
+      delete[] newEntries;
       delete callback;
       delete progress;
       return;
