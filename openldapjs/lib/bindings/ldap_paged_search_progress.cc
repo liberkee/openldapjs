@@ -1,5 +1,4 @@
 #include "ldap_paged_search_progress.h"
-#include <iostream>
 
 LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
@@ -47,7 +46,6 @@ void LDAPPagedSearchProgress::Execute(
   // do
   {
     pageResult_ += "\n";
-    // std::cout << "cookieID is:" << cookieID_ << std::endl;
 
     l_rc = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
                                     pagingCriticality, &pageControl);
@@ -79,7 +77,7 @@ void LDAPPagedSearchProgress::Execute(
       return;
     }
 
-    /* Parse the results to retrieve the contols being returned.      */
+    /* Parse the results to retrieve the controls being returned.      */
 
     l_rc = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
                              nullptr, &returnedControls, false);
@@ -155,9 +153,8 @@ void LDAPPagedSearchProgress::Execute(
 
     /* Free the search results.                                       */
     ldap_msgfree(l_result);
-    // page_nbr += 1;
+
     pageResult_ += "---------";
-    // pageResult_ += std::to_string(page_nbr);
     pageResult_ += "------\n";
   }
 }
