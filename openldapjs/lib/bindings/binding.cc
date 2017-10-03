@@ -437,7 +437,7 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
-      delete[] newEntries
+      delete[] newEntries;
       delete callback;
       delete progress;
       return;
