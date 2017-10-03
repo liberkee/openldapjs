@@ -4,6 +4,7 @@ const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 
+
 const E_STATES = {
   CREATED: 0,
   INITIALIZED: 1,
@@ -22,12 +23,20 @@ const BIND_ERROR = new Error(
   'The operation failed. It could be done if the state of the client is BOUND');
 
 
+<<<<<<< HEAD
+    /**
+     * @module LDAPTransition
+     * @class LDAPAsyncWrap
+     */
+    class LDAPAsyncWrap {
+=======
 /**
  * @module LDAPTranzition
  * @class LDAPAsyncWrap
  */
 class LDAPAsyncWrap {
 
+>>>>>>> 800245ee4ffd4b2ed6aa4b3baf36f65c57b69a74
   constructor(host, password) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
@@ -39,7 +48,7 @@ class LDAPAsyncWrap {
     *
     * @method initialize
     * @return {Promise} That resolves with the initialize state code(1) if the
-    *LDAP
+    * LDAP
     ** initialize succeeds
     ** Rejects if the address is incorrect or the client was not created.
     * */

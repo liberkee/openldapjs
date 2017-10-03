@@ -1,6 +1,5 @@
 #ifndef OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
 #define OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
-#include <iostream>
 namespace constants {
 const char postread[] = "postread";
 const char preread[] = "preread";
