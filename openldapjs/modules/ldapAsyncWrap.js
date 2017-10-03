@@ -1,4 +1,4 @@
-'use strict';
+
 
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
@@ -20,23 +20,14 @@ const scopeObject = {
 
 const INITIALIZATION_ERROR = new Error('Initialize failed!');
 const BIND_ERROR = new Error(
-  'The operation failed. It could be done if the state of the client is BOUND');
+    'The operation failed. It could be done if the state of the client is BOUND');
 
 
-<<<<<<< HEAD
-    /**
-     * @module LDAPTransition
-     * @class LDAPAsyncWrap
-     */
-    class LDAPAsyncWrap {
-=======
 /**
- * @module LDAPTranzition
+ * @module LDAPTransition
  * @class LDAPAsyncWrap
  */
 class LDAPAsyncWrap {
-
->>>>>>> 800245ee4ffd4b2ed6aa4b3baf36f65c57b69a74
   constructor(host, password) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
@@ -120,20 +111,20 @@ class LDAPAsyncWrap {
         reject(BIND_ERROR);
       } else {
         checkParameters.checkParametersIfString(
-          searchBase, searchFilter, scope);
+            searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error('There is no such scope');
         }
 
         this._binding.search(
-          searchBase, scopeObject[scope], searchFilter, (err, result) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          });
+            searchBase, scopeObject[scope], searchFilter, (err, result) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            });
       }
     });
   }
@@ -145,7 +136,7 @@ class LDAPAsyncWrap {
    * @method compare
    * @param {String} dn The dn of the entry to compare.
    * @param {String} attr The attribute given for comparison.
-   * @param {String} value Value send to compare.
+   * @param {String} value Value sent to compare.
    * @return {Promise} That resolves and returns True if the elements are
    * equal
    * or
@@ -158,8 +149,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR);
       } else {
-        checkParameters.checkParametersIfString(
-          dn, attr, value);
+        checkParameters.checkParametersIfString(dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
@@ -169,7 +159,6 @@ class LDAPAsyncWrap {
           }
         });
       }
-
     });
   }
 
@@ -233,7 +222,6 @@ class LDAPAsyncWrap {
           }
         });
       }
-
     });
   }
 
@@ -246,7 +234,7 @@ class LDAPAsyncWrap {
    * deleted
    * or rejects if not.
    * */
-  delete(dn, controls) {
+  delete (dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(BIND_ERROR);
@@ -326,7 +314,6 @@ class LDAPAsyncWrap {
       }
     });
   }
-
 }
 
 
