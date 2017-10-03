@@ -17,25 +17,22 @@ describe('Testing the async LDAP authentication', () => {
   });
   afterEach(() => {});
 
-  it('should bind to server', () => {
-    return clientLDAP.bind(dn, password)
-      .then((result) => {
-        should.deepEqual(result, undefined);
-      });
+  it('should bind to the server with valid credentials', () => {
+    return clientLDAP.bind(dn, password).then((result) => {
+      should.deepEqual(result, undefined);
+    });
   });
 
-  it('should not bind to server', () => {
+  it('should not bind to the server using invalid credentials', () => {
     return clientLDAP
-      .bind(
-        config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .catch((err) => { should.deepEqual(err, errList.invalidCredentials); });
+        .bind(
+            config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
+        .catch((err) => { should.deepEqual(err, errList.invalidCredentials); });
   });
 
-  it('should unbind from server', () => {
-    return clientLDAP.unbind()
-      .then((result) => {
-        should.deepEqual(result, undefined);
-      });
+  it('should unbind from the server', () => {
+    return clientLDAP.unbind().then(
+        (result) => { should.deepEqual(result, undefined); });
   });
 
 });

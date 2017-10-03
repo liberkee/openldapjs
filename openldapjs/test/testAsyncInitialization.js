@@ -13,9 +13,9 @@ describe('Testing the async initialization', () => {
 
   afterEach(() => {});
 
-  it('should be INITIALIZED', () => {
-    return ldapWrap.initialize()
-      .then((result) => { should.deepEqual(result, undefined); });
+  it('should  initialize the connection', () => {
+    return ldapWrap.initialize().then(
+        (result) => { should.deepEqual(result, undefined); });
   });
 
 });

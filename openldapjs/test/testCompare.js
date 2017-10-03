@@ -25,17 +25,18 @@ describe('Testing the Compare functionalities', () => {
   afterEach(() => { return ldapAsyncWrap.unbind(); });
 
 
-  it('should reject if dn is not string', () => {
+  it('should reject if dn is not a string', () => {
     return ldapAsyncWrap.compare(1, attr, val).catch((error) => {
       should.deepEqual(error.message, errList.typeErrorMessage);
     });
   });
 
-  it('should compare existing attribute', () => {
-    return ldapAsyncWrap.compare(dn, attr, val).then((result) => {
-      should.deepEqual(result, errList.comparisonResTrue);
-    });
-  });
+  it('should compare existing attribute',
+     () => {  // rename it into should compare two attributes maybe ?
+       return ldapAsyncWrap.compare(dn, attr, val).then((result) => {
+         should.deepEqual(result, errList.comparisonResTrue);
+       });
+     });
 
 
   it('should compare non existing value for attribute', () => {
