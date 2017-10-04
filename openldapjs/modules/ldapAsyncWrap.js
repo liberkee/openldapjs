@@ -18,9 +18,9 @@ const scopeObject = {
   SUBTREE: 2,
 };
 
-const INITIALIZATION_ERROR = new Error('Initialize failed!');
-const BIND_ERROR = new Error(
-  'The operation failed. It could be done if the state of the client is BOUND');
+const INITIALIZATION_ERROR_MESSAGE = 'Initialize failed!';
+const BIND_ERROR_MESSAGE =
+  'The operation failed. It could be done if the state of the client is BOUND';
 
 
 /**
@@ -62,7 +62,7 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(INITIALIZATION_ERROR);
+        reject(new Error(INITIALIZATION_ERROR_MESSAGE));
       }
     });
   }
@@ -90,7 +90,7 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       }
     });
   }
@@ -109,7 +109,7 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         checkParameters.checkParametersIfString(
           searchBase, searchFilter, scope);
@@ -148,7 +148,7 @@ class LDAPAsyncWrap {
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         checkParameters.checkParametersIfString(dn, attr, value);
 
@@ -177,7 +177,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
@@ -210,7 +210,7 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn, newRdn, newParent);
@@ -239,7 +239,7 @@ class LDAPAsyncWrap {
   delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
@@ -269,7 +269,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(BIND_ERROR);
+        reject(new Error(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
