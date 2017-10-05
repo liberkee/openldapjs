@@ -255,6 +255,37 @@ class LDAPAsyncWrap {
       }
     });
   }
+
+  /**
+    * Perform an LDAP password change operation
+    *
+    * @method changePassword
+    * @param {String} userDN The user dn which the password will be changed
+    * @param {String} oldPassword Old password of user 
+    * @param {String} newPassword New password for user
+    * @return {Promise} Will fulfil with a result of success if the
+    * Old password is given correctly, the parameters are string type and 
+    * the state of client is BOUND else will fail with type error or LDAP ERROR.
+    * */
+  changePassword(userDN, oldPassword, newPassword) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
+      } else {
+        checkParameters.checkParametersIfString(
+          userDN, oldPassword, newPassword);
+
+        this._binding.changePassword(
+          userDN, oldPassword, newPassword, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+      }
+    });
+  }
   /**
    * ldap add operation
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,

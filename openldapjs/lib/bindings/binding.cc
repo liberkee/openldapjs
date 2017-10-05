@@ -12,6 +12,7 @@
 #include "ldap_modify_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
+#include "./ldap_changePassword_progress.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -30,6 +31,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "unbind", unbind);
     Nan::SetPrototypeMethod(tpl, "delete", del);
     Nan::SetPrototypeMethod(tpl, "add", add);
+    Nan::SetPrototypeMethod(tpl, "changePassword", changePassword);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -105,7 +107,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::True();   
+    stateClient[1] = Nan::True();
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;
@@ -215,6 +217,59 @@ class LDAPClient : public Nan::ObjectWrap {
     }
     Nan::AsyncQueueWorker(
         new LDAPCompareProgress(callback, progress, obj->ld_, message));
+  }
+
+  static NAN_METHOD(changePassword) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    /* Interpret the arguments from JS into string */
+    Nan::Utf8String userDN(info[0]);
+    Nan::Utf8String oldPassword(info[1]);
+    Nan::Utf8String newPassword(info[2]);
+
+    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+
+    /* Create the callback function to send the data back to JS */
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
+
+    static struct berval user = {0, NULL};
+    static struct berval newpw = {0, NULL};
+    static struct berval oldpw = {0, NULL};
+
+    /* The message ID that the ldap_passwd will have */
+    int msgID;
+
+    /* Set the pointer data into a berval structure */
+    user.bv_val = strdup(*userDN);
+    user.bv_len = strlen(user.bv_val);
+
+    newpw.bv_val = strdup(*newPassword);
+    newpw.bv_len = strlen(newpw.bv_val);
+
+    oldpw.bv_val = strdup(*oldPassword);
+    oldpw.bv_len = strlen(oldpw.bv_val);
+
+    /* Verify if the LDAP structure is still up */
+    if (obj->ld_ == nullptr) {
+      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+
+    /* Send the request for changing the password to server */
+    ldap_passwd(obj->ld_, &user, &oldpw, &newpw, nullptr, nullptr, &msgID);
+
+    /* Free the memory of unused data */
+    free(user.bv_val);
+    free(newpw.bv_val);
+    free(oldpw.bv_val);
+
+    /* Send the parameters to a thread to be processed */
+    Nan::AsyncQueueWorker(
+        new LDAPChangePasswordProgress(callback, progress, obj->ld_, msgID));
   }
 
   static NAN_METHOD(modify) {
