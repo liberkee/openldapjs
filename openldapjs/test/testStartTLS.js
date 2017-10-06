@@ -10,7 +10,8 @@ describe('Testing the async LDAP search ', () => {
   const host = config.ldapAuthentication.host;
   let adminLDAP = new LDAPWrap(host);
 
-  const pathToCert = '/etc/ldap/ca_certs.pem';
+  const pathFileToCert = '/etc/ldap/ca_certs.pem';
+  const pathToCert = '/etc/ldap';
   beforeEach(() => {
     adminLDAP = new LDAPWrap(host);
 
@@ -31,7 +32,7 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should reject if the credential is not correct', () => {
+  it('should reject if the path is wrong', () => {
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
       .catch((error) => {
@@ -39,7 +40,22 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should start a TLS communication', () => {
+  it('should reject if there are no certificate', () => {
+    const wrongCred = '/etc';
+    return adminLDAP.startTLS(wrongCred)
+      .catch((error) => {
+        should.deepEqual(error, errList.connectionError);
+      });
+  });
+
+  it('should start a TLS communication with full pathFile of cert', () => {
+    return adminLDAP.startTLS(pathFileToCert)
+      .then((res) => {
+        should.deepEqual(res, undefined);
+      });
+  });
+
+  it('should start a TLS communication with path of cert', () => {
     return adminLDAP.startTLS(pathToCert)
       .then((res) => {
         should.deepEqual(res, undefined);
