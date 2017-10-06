@@ -92,14 +92,16 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(startTls) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
+    /* Path to the file from JS*/
     Nan::Utf8String pathToCertificate(info[0]);
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
 
-    const auto pathFileCert = &pathToCertificate;
-    auto state = ldap_set_option(0, LDAP_OPT_X_TLS_CACERTFILE, pathFileCert);
+    /* Create the option for the client for using the TLS */
+    auto state =
+        ldap_set_option(0, LDAP_OPT_X_TLS_CACERTFILE, *pathToCertificate);
 
     if (state != LDAP_OPT_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);

@@ -82,6 +82,21 @@ describe('Testing the async LDAP add operation', () => {
 
   });
 
+  it('should reject if the entry attribute are not array', () => {
+
+    const invalidEntry = {
+      wrong: 'garbage',
+      sn: 'Entry',
+      description: 'Test',
+    };
+
+    return clientLDAP.add(dnUser, invalidEntry)
+      .catch((undefinedTypeErr) => {
+        should.deepEqual(undefinedTypeErr.message, errList.entryArrayError);
+      });
+
+  });
+
   it('should reject the add operation with a duplicated entry', () => {
     return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
       .catch((duplicatedEntryError) => {

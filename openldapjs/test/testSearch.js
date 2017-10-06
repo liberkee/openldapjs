@@ -91,6 +91,13 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
+  it('should reject if the scope doesn\'t exit', () => {
+    return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
+      .catch((err) => {
+        err.message.should.be.deepEqual(errList.scopeSearchError);
+      });
+  });
+
   it('should reject if the searchBase is not a string', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)

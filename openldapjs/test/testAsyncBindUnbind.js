@@ -37,4 +37,23 @@ describe('Testing the async LDAP authentication', () => {
         (result) => { should.deepEqual(result, undefined); });
   });
 
+  it('should reject if the client is not initialized', () => {
+    return clientLDAP.unbind()
+      .then(() => {
+        return clientLDAP.bind(
+          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+      })
+      .catch((error) => {
+        should.deepEqual(error.message, errList.bindErrorMessage);
+      });
+  });
+
+  it('should reject with server error', () => {
+    const newClient = new LDAPWrap(host);
+    return newClient.unbind()
+      .catch((error) => {
+        should.deepEqual(error, errList.serverDown);
+      });
+  });
+
 });

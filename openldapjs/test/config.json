@@ -4,7 +4,8 @@
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
-    "passwordUser": "secret"
+    "passwordUser": "secret",
+    "pathToCert": "/etc/ldap/ca_certs.pem"
   },
   "ldapModify": {
     "ldapModificationReplace": {
