@@ -29,3 +29,5 @@ class LdapOperationError extends LdapError {
 
 }
 
+
+module.exports = LdapError;

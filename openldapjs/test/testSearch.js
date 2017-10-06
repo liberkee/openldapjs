@@ -4,6 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errList = require('./errorlist.json');
+const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -81,7 +82,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
+      .catch((err) => { err.should.be.deepEqual(new ErrorHandler(32)); });
   });
 
   it('should reject if the scope is not a string', () => {
@@ -177,7 +178,7 @@ describe('Testing the async LDAP search ', () => {
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
-      .catch((err) => { const resShouldBe = err.should.not.be.empty; });
+      .catch((err) => { const resShouldBe = err.should.not.be.empty; }); // is it really worth it to write code like this just so we avoid lint error messages ?
   });
 
 
