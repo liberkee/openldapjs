@@ -8,6 +8,8 @@
  */
 
 
+// Optional, Don't bother reviewing :)
+
 const code2Description = new Map();
 const code2Error = new Map();
 
