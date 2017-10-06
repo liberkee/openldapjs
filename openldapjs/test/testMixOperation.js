@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
 
 describe.skip('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;

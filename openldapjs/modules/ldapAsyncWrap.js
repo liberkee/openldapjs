@@ -61,7 +61,7 @@ class LDAPAsyncWrap {
             this._stateClient = E_STATES.INITIALIZED;
             resolve();
           } else {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapInitError(err));
           }
         });
       } else {
@@ -86,7 +86,7 @@ class LDAPAsyncWrap {
         this._binding.bind(bindDn, passwordUser, (err, state) => {
           if (err) {
             this._stateClient = E_STATES.INITIALIZED;
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             this._stateClient = E_STATES.BOUND;
             resolve();
@@ -124,7 +124,7 @@ class LDAPAsyncWrap {
         this._binding.search(
           searchBase, scopeObject[scope], searchFilter, (err, result) => {
             if (err) {
-              reject(new ErrorHandler(err));
+              reject(new ErrorHandler.LdapOperationError(err));
             } else {
               resolve(result);
             }
@@ -157,7 +157,7 @@ class LDAPAsyncWrap {
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             resolve(result);
           }
@@ -189,7 +189,7 @@ class LDAPAsyncWrap {
 
         this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             resolve(result);
           }
@@ -221,7 +221,7 @@ class LDAPAsyncWrap {
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             resolve(result);
           }
@@ -250,7 +250,7 @@ class LDAPAsyncWrap {
 
         this._binding.delete(dn, ctrls, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             resolve(result);
           }
@@ -281,7 +281,7 @@ class LDAPAsyncWrap {
 
         this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            reject(new ErrorHandler.LdapOperationError(err));
           } else {
             resolve(result);
           }

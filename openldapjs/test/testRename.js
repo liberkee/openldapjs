@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
 const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
 
 describe('Testing the rename functionalities', () => {
@@ -85,7 +85,7 @@ describe('Testing the rename functionalities', () => {
     return ldapAsyncWrap
       .rename(badDn, config.ldapRename.newrdn, config.ldapRename.newparent)
       .catch(
-        (error) => { should.deepEqual(error, new ErrorHandler(errList.invalidDnSyntax)); });
+        (error) => { should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.invalidDnSyntax)); });
   });
 
   it('should reject if newparent  incorrectly defined', () => {
@@ -94,7 +94,7 @@ describe('Testing the rename functionalities', () => {
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn, badNewParent)
       .catch(
-        (error) => { should.deepEqual(error, new ErrorHandler(errList.invalidDnSyntax)); });
+        (error) => { should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.invalidDnSyntax)); });
   });
 
   it('should reject if dn  incorrectly defined', () => {
@@ -104,7 +104,7 @@ describe('Testing the rename functionalities', () => {
         incorrectDefinedDn, config.ldapRename.newrdn,
         config.ldapRename.newparent)
       .catch((error) => {
-        should.deepEqual(error, new ErrorHandler(errList.unwillingToPerform));
+        should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.unwillingToPerform));
       });
   });
 
@@ -115,7 +115,7 @@ describe('Testing the rename functionalities', () => {
         config.ldapRename.dnChange, config.ldapRename.newrdn,
         incorrectDefinedNewParent)
       .catch((error) => {
-        should.deepEqual(error, new ErrorHandler(errList.affectMultipleDsas));
+        should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.affectMultipleDsas));
       });
   });
 
@@ -138,7 +138,7 @@ describe('Testing the rename functionalities', () => {
         existDn, config.ldapRename.newrdn, config.ldapRename.newparent,
         controlOperation)
       .catch(
-        (error) => { should.deepEqual(error, new ErrorHandler(errList.ldapNoSuchObject)); });
+        (error) => { should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.ldapNoSuchObject)); });
   });
 
   it('should rename the dn',

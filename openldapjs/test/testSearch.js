@@ -3,7 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
 const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
 
 describe('Testing the async LDAP search ', () => {
@@ -82,7 +82,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .catch((err) => { err.should.be.deepEqual(new ErrorHandler(32)); });
+      .catch((err) => { err.should.be.deepEqual(new ErrorHandler.LdapOperationError(32)); });
   });
 
   it('should reject if the scope is not a string', () => {

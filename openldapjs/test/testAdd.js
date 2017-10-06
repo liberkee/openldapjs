@@ -4,7 +4,7 @@ const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
-const errList = require('./errorlist');
+const errList = require('./errorList');
 const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
 
 
@@ -64,7 +64,7 @@ describe('Testing the async LDAP add operation', () => {
 
     return clientLDAP.add('garbage', validEntry)
       .catch((invalidDnError) => {
-        should.deepEqual(invalidDnError, new ErrorHandler(errList.invalidDnSyntax));
+        should.deepEqual(invalidDnError, new ErrorHandler.LdapOperationError(errList.invalidDnSyntax));
       });
 
   });
@@ -87,7 +87,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should reject the add operation with a duplicated entry', () => {
     return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
       .catch((duplicatedEntryError) => {
-        should.deepEqual(duplicatedEntryError, new ErrorHandler(errList.alreadyExists));
+        should.deepEqual(duplicatedEntryError, new ErrorHandler.LdapOperationError(errList.alreadyExists));
       });
 
   });
@@ -121,7 +121,7 @@ describe('Testing the async LDAP add operation', () => {
           return clientLDAP.add(dnUser, validEntry);
         })
         .catch((err) => {
-          should.deepEqual(err, new ErrorHandler(errList.alreadyExists));
+          should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.alreadyExists));
           personNr += 1;
         });
     });
@@ -140,7 +140,7 @@ describe('Testing the async LDAP add operation', () => {
       return clientLDAP2
         .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
         .catch((accessError) => {
-          should.deepEqual(accessError, new ErrorHandler(errList.insufficientAccess));
+          should.deepEqual(accessError, new ErrorHandler.LdapOperationError(errList.insufficientAccess));
 
         });
     });
