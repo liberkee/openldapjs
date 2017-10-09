@@ -25,10 +25,10 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the state is not Initialized', () => {
     return adminLDAP.unbind()
       .then(() => {
-        return adminLDAP.startTLS(pathToCert)
-          .then((res) => {
-            should.deepEqual(res, errList.initializationErrorMessage);
-          });
+        return adminLDAP.startTLS(pathToCert);
+      })
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.initializationErrorMessage);
@@ -38,8 +38,8 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the path file doesn\'t exit', () => {
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
-      .then((res) => {
-        should.deepEqual(res, errList.connectionError);
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((error) => {
         should.deepEqual(error, errList.connectionError);
@@ -49,8 +49,8 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if there are no certificate in the specified directory', () => {
     const wrongCred = '/etc';
     return adminLDAP.startTLS(wrongCred)
-      .then((res) => {
-        should.deepEqual(res, errList.connectionError);
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((error) => {
         should.deepEqual(error, errList.connectionError);

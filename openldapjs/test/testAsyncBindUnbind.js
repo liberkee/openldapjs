@@ -28,8 +28,8 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .then((res) => {
-        should.deepEqual(res, errList.invalidCredentials);
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((err) => {
         should.deepEqual(err, errList.invalidCredentials);
@@ -46,10 +46,10 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP.unbind()
       .then(() => {
         return clientLDAP.bind(
-          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-          .then((res) => {
-            should.deepEqual(res, errList.bindErrorMessage);
-          });
+          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+      })
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
@@ -59,8 +59,8 @@ describe('Testing the async LDAP authentication', () => {
   it('should reject with server error', () => {
     const newClient = new LDAPWrap(host);
     return newClient.unbind()
-      .then((res) => {
-        should.deepEqual(res, errList.serverDown);
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((error) => {
         should.deepEqual(error, errList.serverDown);

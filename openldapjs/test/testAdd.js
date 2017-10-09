@@ -61,6 +61,9 @@ describe('Testing the async LDAP add operation', () => {
   it('should reject the add operation with a wrong dn', () => {
 
     return clientLDAP.add('garbage', validEntry)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((invalidDnError) => {
         should.deepEqual(invalidDnError, errList.invalidDnSyntax);
       });
@@ -76,6 +79,9 @@ describe('Testing the async LDAP add operation', () => {
     }];
 
     return clientLDAP.add(dnUser, invalidEntry)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((undefinedTypeErr) => {
         should.deepEqual(undefinedTypeErr.message, errList.entryObjectError);
       });
@@ -91,6 +97,9 @@ describe('Testing the async LDAP add operation', () => {
     };
 
     return clientLDAP.add(dnUser, invalidEntry)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((undefinedTypeErr) => {
         should.deepEqual(undefinedTypeErr.message, errList.entryArrayError);
       });
@@ -99,6 +108,9 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should reject the add operation with a duplicated entry', () => {
     return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((duplicatedEntryError) => {
         should.deepEqual(duplicatedEntryError, errList.alreadyExists);
       });
@@ -133,25 +145,33 @@ describe('Testing the async LDAP add operation', () => {
           res3.should.be.deepEqual(0);
           return clientLDAP.add(dnUser, validEntry);
         })
+        .then(() => {
+          should.fail('Didn\'t expect success');
+        })
         .catch((err) => {
           should.deepEqual(err, errList.alreadyExists);
           personNr += 1;
         });
     });
 
-  // is null the same with '' ? for '' the  resulting error code was 68
   it('should reject add request with empty(null) DN', () => {
     return clientLDAP.add(null, validEntry)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((err) => {
         should.deepEqual(err.message, errList.typeErrorMessage);
       });
   });
 
 
-  it('should reject the request if try to rebind',
-    () => { // what does this test ?
+  it('should reject if user don\'t have access ',
+    () => {
       return clientLDAP2
         .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
+        .then(() => {
+          should.fail('Didn\'t expect success');
+        })
         .catch((accessError) => {
           should.deepEqual(accessError, errList.insufficientAccess);
 
@@ -164,6 +184,9 @@ describe('Testing the async LDAP add operation', () => {
         return clientLDAP.add(
           `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
       })
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((stateError) => {
         should.deepEqual(stateError.message, errList.bindErrorMessage);
       });
@@ -172,7 +195,7 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should add entries in parallel', () => {
     const first = clientLDAP.add(dnUser, validEntry);
-    personNr += 1; // any use for this ?
+    personNr += 1;
     dnUser = `${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
     const second = clientLDAP.add(dnUser, validEntry);
     personNr += 1;
@@ -186,7 +209,7 @@ describe('Testing the async LDAP add operation', () => {
       });
   });
 
-  it('should add a new entry and return the control', () => { // what control ?
+  it('should add a new entry and return the attributes that was required in control', () => {
     return clientLDAP.add(dnUser, validEntry, controlOperation)
       .then((result) => {
         let resultOperation;
