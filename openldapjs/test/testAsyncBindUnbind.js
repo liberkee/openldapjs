@@ -46,7 +46,10 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP.unbind()
       .then(() => {
         return clientLDAP.bind(
-          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
+          .then((res) => {
+            should.deepEqual(res, errList.bindErrorMessage);
+          });
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
