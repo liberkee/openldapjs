@@ -5,9 +5,9 @@ const Errors = {
   1: {
     Name: 'LDAP_OPERATIONS_ERROR',
     Description: 'Indicates an internal error. The server is unable to respond with a more specific error and is also unable to properly respond to a request.' +
-                 'It does not indicate that the client has sent an erroneous message.' +
-                 'In NDS 8.3x through NDS 7.xx, this was the default error for NDS errors that did not map to an LDAP error code.' +
-                 'To conform to the new LDAP drafts, NDS 8.5 uses 80 (0x50) for such errors.',
+                 ' It does not indicate that the client has sent an erroneous message.' +
+                 ' In NDS 8.3x through NDS 7.xx, this was the default error for NDS errors that did not map to an LDAP error code.' +
+                 ' To conform to the new LDAP drafts, NDS 8.5 uses 80 (0x50) for such errors.',
   },
 
   2: {
@@ -17,39 +17,39 @@ const Errors = {
   3: {
     Name: 'LDAP_TIMELIMIT_EXCEEDED',
     Description: 'Indicates that the operation\'s time limit specified by either the client or the server' +
-                 'has been exceeded. On search operations, incomplete results are returned.',
+                 ' has been exceeded. On search operations, incomplete results are returned.',
   },
   4: {
     Name: 'LDAP_SIZELIMIT_EXCEEDED',
     Description: 'Indicates that in a search operation, the size limit specified by the client or the server' +
-                 'has been exceeded. Incomplete results are returned.',
+                 ' has been exceeded. Incomplete results are returned.',
   },
   5: {
     Name: 'LDAP_COMPARE_FALSE',
     Description: 'Does not indicate an error condition.' +
-                 'Indicates that the results of a compare operation are false.',
+                 ' Indicates that the results of a compare operation are false.',
   },
   6: {
     Name: 'LDAP_COMPARE_TRUE',
     Description: 'Does not indicate an error condition.' +
-                 'Indicates that the results of a compare operation are true.',
+                 ' Indicates that the results of a compare operation are true.',
   },
   7: {
     Name: 'LDAP_AUTH_METHOD_NOT_SUPPORTED',
-    Description: 'Indicates that during a bind operation the client requested' +
-                 'an authentication method not supported by the LDAP server.',
+    Description: 'Indicates that during a bind operation the client requested ' +
+                 ' an authentication method not supported by the LDAP server.',
   },
   8: {
     Name: 'LDAP_STRONG_AUTH_REQUIRED',
     Description: 'Indicates one of the following: In bind requests, the LDAP server accepts only strong authentication.' +
-                 'In a client request, the client requested an operation such as delete that requires strong authentication.' +
-                 'In an unsolicited notice of disconnection, the LDAP server discovers the security protecting the communication' +
-                 'between the client and server has unexpectedly failed or been compromised.',
+                 ' In a client request, the client requested an operation such as delete that requires strong authentication.' +
+                 ' In an unsolicited notice of disconnection, the LDAP server discovers the security protecting the communication' +
+                 ' between the client and server has unexpectedly failed or been compromised.',
   },
   10: {
     Name: 'LDAP_REFERRAL',
     Description: 'Does not indicate an error condition. In LDAPv3, indicates that the server' +
-                 'does not hold the target entry of the request, but that the servers in the referral field may.',
+                 ' does not hold the target entry of the request, but that the servers in the referral field may.',
   },
   11: {
     Name: 'LDAP_ADMINLIMIT_EXCEEDED',
@@ -58,7 +58,7 @@ const Errors = {
   12: {
     Name: 'LDAP_UNAVAILABLE_CRITICAL_EXTENSION',
     Description: 'Indicates that the LDAP server was unable to satisfy a request because one or more critical' +
-                 'extensions were not available. Either the server does not support the control or the control is not appropriate for the operation type.',
+                 ' extensions were not available. Either the server does not support the control or the control is not appropriate for the operation type.',
   },
   13: {
     Name: 'LDAP_CONFIDENTIALITY_REQUIRED',
@@ -67,7 +67,7 @@ const Errors = {
   14: {
     Name: 'LDAP_SASL_BIND_IN_PROGRESS',
     Description: 'Does not indicate an error condition, but indicates that the server is ready for the next step in the process.' +
-                 'The client must send the server the same SASL mechanism to continue the process.',
+                 ' The client must send the server the same SASL mechanism to continue the process.',
   },
   16: {
     Name: 'LDAP_NO_SUCH_ATTRIBUTE',
@@ -120,14 +120,14 @@ const Errors = {
   48: {
     Name: 'LDAP_INAPPROPRIATE_AUTH',
     Description: 'Indicates that during a bind operation, the client is attempting to use an authentication method that the client cannot use correctly.' +
-                 'For example, either of the following cause this error: The client returns simple credentials when strong credentials are required' +
+                 ' For example, either of the following cause this error: The client returns simple credentials when strong credentials are required' +
                  '...OR...The client returns a DN and a password for a simple bind when the entry does not have a password defined.',
   },
 
   49: {
     Name: 'LDAP_INVALID_CREDENTIALS',
     Description: 'Indicates that during a bind operation one of the following occurred: The client passed either an incorrect DN or password,' +
-                 'or the password is incorrect because it has expired, intruder detection has locked the account, or another similar reason. See the data code for more information.',
+                 ' or the password is incorrect because it has expired, intruder detection has locked the account, or another similar reason. See the data code for more information.',
   },
 
   50: {
@@ -155,21 +155,21 @@ const Errors = {
   64: {
     Name: 'LDAP_NAMING_VIOLATION',
     Description: 'Indicates that the add or modify DN operation violates the schema\'s structure rules.' +
-                 'For example,the request places the entry subordinate to an alias.' +
-                 'The request places the entry subordinate to a container that is forbidden by the containment rules. The RDN for the entry uses a forbidden attribute type.',
+                 ' For example,the request places the entry subordinate to an alias.' +
+                 ' The request places the entry subordinate to a container that is forbidden by the containment rules. The RDN for the entry uses a forbidden attribute type.',
   },
   65: {
     Name: 'LDAP_OBJECT_CLASS_VIOLATION',
     Description: 'Indicates that the add, modify, or modify DN operation violates the object class rules for the entry.' +
-                 'For example, the following types of request return this error: The add or modify operation tries to add an entry without a value for a required attribute.' +
-                 'The add or modify operation tries to add an entry with a value for an attribute which the class definition does not contain.' +
-                 'The modify operation tries to remove a required attribute without removing the auxiliary class that defines the attribute as required.',
+                 ' For example, the following types of request return this error: The add or modify operation tries to add an entry without a value for a required attribute.' +
+                 ' The add or modify operation tries to add an entry with a value for an attribute which the class definition does not contain.' +
+                 ' The modify operation tries to remove a required attribute without removing the auxiliary class that defines the attribute as required.',
   },
   66: {
     Name: 'LDAP_NOT_ALLOWED_ON_NONLEAF',
     Description: 'Indicates that the requested operation is permitted only on leaf entries.' +
-                 'For example, the following types of requests return this error:The client requests a delete operation on a parent entry.' +
-                 'The client request a modify DN operation on a parent entry.',
+                 ' For example, the following types of requests return this error:The client requests a delete operation on a parent entry.' +
+                 ' The client request a modify DN operation on a parent entry.',
   },
   67: {
     Name: 'LDAP_NOT_ALLOWED_ON_RDN',
