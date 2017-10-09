@@ -12,7 +12,7 @@
 #include "ldap_modify_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
-#include "./ldap_changePassword_progress.h"
+#include "ldap_changePassword_progress.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
