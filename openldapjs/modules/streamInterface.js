@@ -7,6 +7,7 @@ const Readable = require('stream').Readable;
  * class that extends the readable steram class
  */
 module.exports = class PagedSearchStream extends Readable {
+
   /**
    *
    * @param {String} base the base for the search.
@@ -30,21 +31,23 @@ module.exports = class PagedSearchStream extends Readable {
 
   _read() {
     this._binding.pagedSearch(
-        this._base, this._scope, this._filter, this._pageSize, this._searchID,
-        (err, page, morePages) => {
-          if (err) {
-            this.emit('err', err);
-            // console.log(err);
-            this.push(null);
-          } else {
-            if (!morePages) {
-              //   console.log('if:' + morePages);
-              this.push(null);
-            } else {
-              this.push(page);
-              // console.log('else:' + morePages);
-            }
-          }
-        });
+      this._base, this._scope, this._filter, this._pageSize, this._searchID,
+      (err, page, morePages) => {
+        if (err) {
+          this.emit('err', err);
+
+          this.push(null);
+        } else if (!morePages) {
+          this.push(page);
+          console.log(
+            'console log after the last page and before the push(null)');
+          this.push(null);
+
+        } else {
+          this.push(page);
+          // console.log('else:' + morePages);
+        }
+      });
   }
-}
+
+};

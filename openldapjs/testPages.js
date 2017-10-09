@@ -2,18 +2,21 @@
 
 
 const LDAPWrap = require('./modules/ldapAsyncWrap.js');
+
 const host = 'ldap://localhost:389';
 const dnAdmin = 'cn=admin,dc=demoApp,dc=com';
 const dnUser = 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com';
 const searchBase = 'dc=demoApp,dc=com';
 const password = 'secret';
-let clientLDAP = new LDAPWrap(host);
+const clientLDAP = new LDAPWrap(host);
 
 
-clientLDAP.initialize().then(() => {
-  clientLDAP.bind(dnAdmin, password).then(() => {
-    clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 1)
-        .pipe(process.stdout);
+clientLDAP.initialize()
+.then(() => {
+  clientLDAP.bind(dnAdmin, password)
+.then(() => {
+    clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 100)
+      .pipe(process.stdout);
   });
 
 });
