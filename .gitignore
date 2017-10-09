@@ -54,3 +54,6 @@ openldapjs/blabla.txt
 openldapjs/lib/bindings/build/Release/binding.node
 openldapjs/lib/build/config.gypi
 .vscode/settings.json
+openldapjs/lib/bindings/build/Release/binding.node
+openldapjs/lib/bindings/build/Release/binding.node
+openldapjs/lib/bindings/build/Release/obj.target/binding.node
