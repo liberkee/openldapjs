@@ -5,7 +5,7 @@ const should = require('should');
 const config = require('./config.json');
 const errList = require('./errorlist.json');
 
-describe.only('Testing the ChangePassword operation', () => {
+describe('Testing the ChangePassword operation', () => {
 
   /* Create the class for connecting to he LDAP server */
   const hostAddress = config.ldapAuthentication.host;
@@ -31,34 +31,57 @@ describe.only('Testing the ChangePassword operation', () => {
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
 
-  it('should reject the client is not bounded', () => {
+  it('should reject the client is not bound', () => {
     ldapAsyncWrap.unbind()
       .then(() => {
-        return ldapAsyncWrap.changePassword(userDN, oldPassword, newPassword);
+        return ldapAsyncWrap.changePassword(userDN, oldPassword, newPassword)
+          .then((res) => {
+            should.deepEqual(res, errList.bindErrorMessage);
+          });
       })
       .catch((err) => {
         should.deepEqual(err.message, errList.bindErrorMessage);
       });
   });
 
-  it('should reject if one of the parameters is not string type', () => {
+
+  it('should reject if userDN is not string type', () => {
     return ldapAsyncWrap.changePassword(1, oldPassword, newPassword)
-      .catch((err) => {
-        should.deepEqual(err.message, errList.typeErrorMessage);
-        return ldapAsyncWrap.changePassword(userDN, 1, newPassword);
-      })
-      .catch((err) => {
-        should.deepEqual(err.message, errList.typeErrorMessage);
-        return ldapAsyncWrap.changePassword(userDN, oldPassword, 1);
+      .then((res) => {
+        should.deepEqual(res, errList.typeErrorMessage);
       })
       .catch((err) => {
         should.deepEqual(err.message, errList.typeErrorMessage);
       });
   });
 
-  it('should reject if the userDN is not correct ', () => {
+  it('should reject if oldPassword is not string type', () => {
+    return ldapAsyncWrap.changePassword(userDN, 1, newPassword)
+      .then((res) => {
+        should.deepEqual(res, errList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.deepEqual(err.message, errList.typeErrorMessage);
+      });
+  });
+
+  it('should reject if newPassword is not string type', () => {
+    return ldapAsyncWrap.changePassword(userDN, oldPassword, 1)
+      .then((res) => {
+        should.deepEqual(res, errList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.deepEqual(err.message, errList.typeErrorMessage);
+      });
+  });
+
+
+  it('should reject if the userDN is not defined as an entry in LDAP database ', () => {
     const wrongUser = 'cn=WrongUser,dc=demoApp,dc=com';
     return ldapAsyncWrap.changePassword(wrongUser, oldPassword, newPassword)
+      .then((res) => {
+        should.deepEqual(res, errList.unwillingToPerform);
+      })
       .catch((err) => {
         should.deepEqual(err, errList.unwillingToPerform);
       });
@@ -67,6 +90,9 @@ describe.only('Testing the ChangePassword operation', () => {
   it('should reject if the oldPassword is not correct ', () => {
     const wrongPassword = 'wrongPassword';
     return ldapAsyncWrap.changePassword(userDN, wrongPassword, newPassword)
+      .then((res) => {
+        should.deepEqual(res, errList.unwillingToPerform);
+      })
       .catch((err) => {
         should.deepEqual(err, errList.unwillingToPerform);
       });
@@ -74,6 +100,9 @@ describe.only('Testing the ChangePassword operation', () => {
 
   it('should reject the password if newPassword is empty string', () => {
     return ldapAsyncWrap.changePassword(userDN, oldPassword, '')
+      .then((res) => {
+        should.deepEqual(res, errList.unwillingToPerform);
+      })
       .catch((err) => {
         should.deepEqual(err, errList.unwillingToPerform);
       });
