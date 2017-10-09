@@ -25,37 +25,46 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the state is not Initialized', () => {
     return adminLDAP.unbind()
       .then(() => {
-        return adminLDAP.startTLS(pathToCert);
+        return adminLDAP.startTLS(pathToCert)
+          .then((res) => {
+            should.deepEqual(res, errList.initializationErrorMessage);
+          });
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.initializationErrorMessage);
       });
   });
 
-  it('should reject if the path is wrong', () => {
+  it('should reject if the path file doesn\'t exit', () => {
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
+      .then((res) => {
+        should.deepEqual(res, errList.connectionError);
+      })
       .catch((error) => {
         should.deepEqual(error, errList.connectionError);
       });
   });
 
-  it('should reject if there are no certificate', () => {
+  it('should reject if there are no certificate in the specified directory', () => {
     const wrongCred = '/etc';
     return adminLDAP.startTLS(wrongCred)
+      .then((res) => {
+        should.deepEqual(res, errList.connectionError);
+      })
       .catch((error) => {
         should.deepEqual(error, errList.connectionError);
       });
   });
 
-  it('should start a TLS communication with full pathFile of cert', () => {
+  it('should start a TLS communication using the full path file to the certificate', () => {
     return adminLDAP.startTLS(pathFileToCert)
       .then((res) => {
         should.deepEqual(res, undefined);
       });
   });
 
-  it('should start a TLS communication with path of cert', () => {
+  it('should start a TLS communication using just the directory of the certificate', () => {
     return adminLDAP.startTLS(pathToCert)
       .then((res) => {
         should.deepEqual(res, undefined);

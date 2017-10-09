@@ -24,7 +24,10 @@ describe('Testing the async initialization', () => {
   it('should reject with multiple initialization on same object', () => {
     return ldapWrap.initialize()
       .then(() => {
-        return ldapWrap.initialize();
+        return ldapWrap.initialize()
+          .then((res) => {
+            should.deepEqual(res, errList.initializationErrorMessage);
+          });
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.initializationErrorMessage);

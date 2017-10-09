@@ -28,7 +28,12 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .catch((err) => { should.deepEqual(err, errList.invalidCredentials); });
+      .then((res) => {
+        should.deepEqual(res, errList.invalidCredentials);
+      })
+      .catch((err) => {
+        should.deepEqual(err, errList.invalidCredentials);
+      });
   });
 
   it('should unbind from the server', () => {
@@ -51,6 +56,9 @@ describe('Testing the async LDAP authentication', () => {
   it('should reject with server error', () => {
     const newClient = new LDAPWrap(host);
     return newClient.unbind()
+      .then((res) => {
+        should.deepEqual(res, errList.serverDown);
+      })
       .catch((error) => {
         should.deepEqual(error, errList.serverDown);
       });

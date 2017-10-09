@@ -50,7 +50,10 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         return adminLDAP.search(
           searchBase, searchScope.subtree,
-          config.ldapSearch.filterObjSpecific);
+          config.ldapSearch.filterObjSpecific)
+          .then((res) => {
+            should.deepEqual(res, errList.bindErrorMessage);
+          });
       })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
@@ -81,11 +84,13 @@ describe('Testing the async LDAP search ', () => {
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then((res) => { res.should.be.deepEqual(errList.ldapNoSuchObject); })
       .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
+      .then((res) => { res.should.be.deepEqual(errList.typeErrorMessage); })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -93,6 +98,7 @@ describe('Testing the async LDAP search ', () => {
 
   it('should reject if the scope doesn\'t exit', () => {
     return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
+      .then((res) => { res.should.be.deepEqual(errList.typeErrorMessage); })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.scopeSearchError);
       });
@@ -101,6 +107,7 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the searchBase is not a string', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then((res) => { res.should.be.deepEqual(errList.typeErrorMessage); })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });

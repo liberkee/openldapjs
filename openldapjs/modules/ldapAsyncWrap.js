@@ -74,7 +74,7 @@ class LDAPAsyncWrap {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
         checkParameters.checkParametersIfString(pathToCertFile);
-        this._binding.startTls(pathToCertFile, (err, res) => {
+        this._binding.startTls(pathToCertFile, (err) => {
           if (err) {
             reject(err);
           } else {
