@@ -1,0 +1,20 @@
+{
+  "bindErrorMessage": "The operation failed. It could be done if the state of the client is BOUND",
+  "invalidDnSyntax": 34,
+  "undefinedType": 17,
+  "alreadyExists": 68,
+  "insufficientAccess": 50,
+  "invalidCredentials": 49,
+  "resultSuccess": 0,
+  "typeErrorMessage": "Expected String parameter",
+  "comparisonResTrue": 6,
+  "comparisonResFalse": 5,
+  "ldapNoSuchObject": 32,
+  "unwillingToPerform": 53,
+  "notAllowedOnNonLeaf": 66,
+  "entryObjectError": "Invalid entryObject array",
+  "controlArrayError": "The control is not an array",
+  "controlPropError": "Invalid control array",
+  "affectMultipleDsas": 71,
+  "scopeSearchError": "Scope must be integer"
+}

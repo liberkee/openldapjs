@@ -1,27 +1,26 @@
-#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_SEARCH_PROGRESS_H_
-#define OPENLDAPJS_LIB_BINDINGS_LDAP_SEARCH_PROGRESS_H_
+#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_
+#define OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_
 
 #include <ldap.h>
 #include <nan.h>
-#include <string>
 
-class LDAPSearchProgress : public Nan::AsyncProgressWorker {
+class LDAPRenameProgress : public Nan::AsyncProgressWorker {
  private:
   LDAP *ld_{};
   Nan::Callback *progress_{};
-  std::string resultSearch_{};
+  int result_{};
+  LDAPMessage *resultMsg_{};
   int msgID_{};
-  int status_{};
 
  public:
   /**
-   **@brief Constructor
-   **@param callback, callback used to pass the final result to js
-   **@param progress, callback used to pass intermediate results to js
-   **@param ld, LDAP structure that holds ldap internal data.
-   **@param msgID, operation identifier.
-   **/
-  LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
+  **@brief Constructor
+  **@param callback, callback used to pass the final result to js
+  **@param progress, callback used to pass intermediate results to js
+  **@param ld, LDAP structure that holds ldap internal data.
+  **@param msgID, operation identifier.
+  **/
+  LDAPRenameProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                      const int msgID);
 
   /**
@@ -49,4 +48,4 @@ class LDAPSearchProgress : public Nan::AsyncProgressWorker {
   void HandleProgressCallback(const char *data, size_t size);
 };
 
-#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_SEARCH_PROGRESS_H_
+#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_RENAME_PROGRESS_H_

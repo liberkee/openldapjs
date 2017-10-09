@@ -1,8 +1,10 @@
-// Place your settings in this file to overwrite default and user settings.
 {
     "editor.tabSize": 2,
     "files.associations": {
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "array": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp"
     },
     "C_Cpp.intelliSenseEngine": "Default",
     "C_Cpp.clang_format_style": "Google",

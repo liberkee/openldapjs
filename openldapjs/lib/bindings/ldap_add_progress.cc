@@ -1,18 +1,17 @@
-#include "ldap_bind_progress.h"
+#include "ldap_add_progress.h"
+#include <string>
 #include "constants.h"
+#include "ldap_control.h"
 
-LDAPBindProgress::LDAPBindProgress(Nan::Callback *callback,
-                                   Nan::Callback *progress, LDAP *ld,
-                                   const int msgID)
+LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
+                                 Nan::Callback *progress, LDAP *ld,
+                                 const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
       msgID_(msgID) {}
 
-/**
-** Execute Method, runs outside the event loop.
-**/
-void LDAPBindProgress::Execute(
+void LDAPAddProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
   while (result_ == constants::LDAP_NOT_FINISHED) {
@@ -21,10 +20,8 @@ void LDAPBindProgress::Execute(
   }
 }
 
-/**
-** HandleOkCallback method, gets called when the execute method finishes.
-**/
-void LDAPBindProgress::HandleOKCallback() {
+void LDAPAddProgress::HandleOKCallback() {
+  std::string addResult;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
   if (result_ == constants::LDAP_ERROR) {
     stateClient[0] = Nan::New<v8::Number>(result_);
@@ -35,13 +32,21 @@ void LDAPBindProgress::HandleOKCallback() {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
-      stateClient[1] = Nan::New<v8::Number>(constants::BIND_STATE);
-      callback->Call(2, stateClient);
+      const auto &ldap_controls = new LdapControls();
+      addResult = ldap_controls->PrintModificationControls(ld_, resultMsg_);
+      if (!addResult.empty()) {
+        stateClient[1] = Nan::New(addResult).ToLocalChecked();
+        callback->Call(2, stateClient);
+
+      } else {
+        stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
+        callback->Call(2, stateClient);
+      }
+      delete ldap_controls;
     }
   }
-  ldap_msgfree(resultMsg_);
   callback->Reset();
   progress_->Reset();
 }
 
-void LDAPBindProgress::HandleProgressCallback(const char *data, size_t size) {}
+void LDAPAddProgress::HandleProgressCallback(const char *data, size_t size) {}

@@ -1,37 +1,40 @@
-#ifndef BINDINGS_LDAP_COMPARE_PROGRESS_H_
-#define BINDINGS_LDAP_COMPARE_PROGRESS_H_
+#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_COMPARE_PROGRESS_H_
+#define OPENLDAPJS_LIB_BINDINGS_LDAP_COMPARE_PROGRESS_H_
 
-#include <chrono>
-#include <iostream>
 #include <ldap.h>
-#include <map>
 #include <nan.h>
-#include <string>
-#include <thread>
 
-using namespace Nan;
-using namespace v8;
-using namespace std;
+class LDAPCompareProgress : public Nan::AsyncProgressWorker {
+ private:
+  LDAP *ld_{};
+  Nan::Callback *progress_{};
+  int result_{};
+  LDAPMessage *resultMsg_{};
+  int msgID_{};
 
-class LDAPCompareProgress : public AsyncProgressWorker {
-private:
-  LDAP *ld;
-  Callback *progress;
-  int result = 0;
-  LDAPMessage *resultMsg;
-  int msgID;
+ public:
+  /**
+   **@brief Constructor
+   **@param callback, callback used to pass the final result to js
+   **@param progress, callback used to pass intermediate results to js
+   **@param ld, LDAP structure that holds ldap internal data.
+   **@param msgID, operation identifier.
+   **/
+  LDAPCompareProgress(Nan::Callback *callback, Nan::Callback *progress,
+                      LDAP *ld, const int msgID);
 
-public:
-  LDAPCompareProgress(Callback *callback, Callback *progress, LDAP *ld,
-                      int msgID);
+  /**
+   ** Execute Method, runs outside the event loop.
+   **/
+  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress &progress);
 
-  // Executes in worker thread
-  void Execute(const AsyncProgressWorker::ExecutionProgress &progress);
-
-  // Executes in event loop
+  /**
+   ** HandleOkCallback method, gets called when the execute method finishes.
+   ** Executes in event loop.
+   **/
   void HandleOKCallback();
 
   void HandleProgressCallback(const char *data, size_t size);
-  // Required, this is not created automatically
 };
-#endif // BINDINGS_LDAP_COMPARE_PROGRESS_H_
+
+#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_COMPARE_PROGRESS_H_

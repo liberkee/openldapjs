@@ -2,56 +2,39 @@
 
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+const config = require('./config.json');
+const errList = require('./errorlist.json');
 
-describe('Testing the async LDAP authentification', () => {
-  const host = 'ldap://10.16.0.194:389';
-  const dn = 'cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com';
-  const password = 'secret';
-  const clientLDAP = new LDAPWrap();
+describe('Testing the async LDAP authentication', () => {
+  const host = config.ldapAuthentication.host;
+  const dn = config.ldapAuthentication.dnAdmin;
+  const password = config.ldapAuthentication.passwordAdmin;
+  let clientLDAP = new LDAPWrap(host);
 
-  const E_STATES = {
-    ERROR: 0,
-    INITIALIZED: 1,
-    BOUND: 2,
-    UNBOUND: 5,
-  };
-
-  beforeEach(
-      (next) => { clientLDAP.initialize(host).then(() => { next(); }); });
+  beforeEach(() => {
+    clientLDAP = new LDAPWrap(host);
+    return clientLDAP.initialize();
+  });
   afterEach(() => {});
 
-  it('should bind to server', (next) => {
-    const progress = 0;
-    clientLDAP.bind(dn, password).then((result) => {
-      should.deepEqual(result, E_STATES.BOUND);
-      next();
-    });
-  });
-
-  it('should not bind to server', (next) => {
-    const newDN = 'cn=rmim,ou=users,o=myhost,dc=demoApp,dc=com';
-    clientLDAP.bind(newDN, password).catch((err) => {
-      // Give the specific error not the state of the operation
-      should.deepEqual(err, 49);
-      next();
-    });
-  });
-
-  it('should unbind from server', (next) => {
-    clientLDAP.unbind().then((result) => {
-      should.deepEqual(result, E_STATES.UNBOUND);
-      next();
-    });
-  });
-
-  it('should return error for uninitialized', (next) => {
-    clientLDAP.unbind().then(() => {
-      // I will repet the operation for test porpes
-      clientLDAP.unbind().catch((err) => {
-        should.deepEqual(err, E_STATES.ERROR);
-        next();
+  it('should bind to the server with valid credentials', () => {
+    return clientLDAP.bind(dn, password)
+      .then((result) => {
+        should.deepEqual(result, undefined);
       });
-    });
+  });
+
+  it('should not bind to the server using invalid credentials', () => {
+    return clientLDAP
+      .bind(
+        config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
+      .catch((err) => { should.deepEqual(err, errList.invalidCredentials); });
+  });
+
+  it('should unbind from the server', () => {
+    return clientLDAP.unbind()
+      .then(
+        (result) => { should.deepEqual(result, undefined); });
   });
 
 });
