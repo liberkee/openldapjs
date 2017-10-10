@@ -7,6 +7,7 @@
   "invalidCredentials": 49,
   "resultSuccess": 0,
   "typeErrorMessage": "Expected String parameter",
+  "typeErrorIntMessage": "Expected Integer parameter",
   "comparisonResTrue": 6,
   "comparisonResFalse": 5,
   "ldapNoSuchObject": 32,
@@ -16,5 +17,8 @@
   "controlArrayError": "The control is not an array",
   "controlPropError": "Invalid control array",
   "affectMultipleDsas": 71,
-  "scopeSearchError": "Scope must be integer"
+  "scopeSearchError": "There is no such scope",
+  "initializationErrorMessage": "Initialize failed!",
+  "connectionError": -11,
+  "serverDown": -1
 }
