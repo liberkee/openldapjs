@@ -6,7 +6,7 @@ const Readable = require('stream').Readable;
  * @class PagedSearchStream
  * class that extends the readable steram class
  */
-module.exports = class PagedSearchStream extends Readable {
+class PagedSearchStream extends Readable {
 
   /**
    *
@@ -50,4 +50,5 @@ module.exports = class PagedSearchStream extends Readable {
       });
   }
 
-};
+}
+module.exports = PagedSearchStream;

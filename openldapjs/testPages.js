@@ -12,11 +12,10 @@ const clientLDAP = new LDAPWrap(host);
 
 
 clientLDAP.initialize()
-.then(() => {
-  clientLDAP.bind(dnAdmin, password)
-.then(() => {
-    clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 100)
-      .pipe(process.stdout);
+  .then(() => {
+    clientLDAP.bind(dnAdmin, password)
+      .then(() => {
+        clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 100)
+          .pipe(process.stdout);
+      });
   });
-
-});
