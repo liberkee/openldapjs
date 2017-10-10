@@ -1,3 +1,10 @@
+#include <lber.h>
+#include <ldap.h>
+#include <nan.h>
+#include <node.h>
+#include <string.h>
+#include <map>
+#include <memory>
 #include "constants.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
@@ -5,19 +12,12 @@
 #include "ldap_control.h"
 #include "ldap_delete_progress.h"
 #include "ldap_modify_progress.h"
+#include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
-#include "ldap_paged_search_progress.h"
-#include <lber.h>
-#include <ldap.h>
-#include <map>
-#include <memory>
-#include <nan.h>
-#include <node.h>
-#include <string.h>
 
 class LDAPClient : public Nan::ObjectWrap {
-public:
+ public:
   static NAN_MODULE_INIT(Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
     tpl->SetClassName(Nan::New("LDAPClient").ToLocalChecked());
@@ -40,8 +40,8 @@ public:
              Nan::GetFunction(tpl).ToLocalChecked());
   }
 
-protected:
-private:
+ protected:
+ private:
   LDAP *ld_{};
   std::shared_ptr<std::map<std::string, berval *>> cookies_{};
   explicit LDAPClient() {
@@ -154,9 +154,9 @@ private:
     int message{};
     int result{};
     struct timeval timeOut = {constants::TEN_SECONDS,
-                              constants::ZERO_USECONDS}; // if search exceeds
-                                                         // 10 seconds, throws
-                                                         // error
+                              constants::ZERO_USECONDS};  // if search exceeds
+                                                          // 10 seconds, throws
+                                                          // error
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
@@ -308,7 +308,7 @@ private:
           modHandle->Get(Nan::New("op").ToLocalChecked()));
 
       if (std::strcmp(*mod_op, "add") ==
-          constants::STRING_EQUAL) { // can't we just use !std::strcmp(..,..)?
+          constants::STRING_EQUAL) {  // can't we just use !std::strcmp(..,..)?
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
       } else if (std::strcmp(*mod_op, "delete") == constants::STRING_EQUAL) {
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;

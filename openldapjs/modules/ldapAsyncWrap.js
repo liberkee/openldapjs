@@ -133,7 +133,7 @@ class LDAPAsyncWrap {
 
 
   /**
-     * Search operation with reasults displayed page by page.
+     * Search operation with results displayed page by page.
      *
      * @method pagedSearch
      * @param {String} searchBase the base for the search.
@@ -145,7 +145,6 @@ class LDAPAsyncWrap {
      */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
     if (this._stateClient === E_STATES.BOUND) {
-
       checkParameters.checkParametersIfString(searchBase, searchFilter, scope);
 
       if (scopeObject[scope] === undefined) {
