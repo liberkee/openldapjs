@@ -27,29 +27,26 @@ class PagedSearchStream extends Readable {
     this._filter = filter;
     this._pageSize = pageSize;
     this._searchId = searchId;
+    this._lastResult = false;
   }
 
   _read() {
-    this._binding.pagedSearch(
-      this._base, this._scope, this._filter, this._pageSize, this._searchId,
-      (err, page, morePages) => {
-        if (err) {
-          this.emit('err', err);
-          this.push(null);
-        } if (morePages) {
-          console.log('it fails here');
-          this.push(page);
-          console.log('or does it?');
+    if (this._lastResult) {
+      this.push(null);
+    } else {
+      this._binding.pagedSearch(
+        this._base, this._scope, this._filter, this._pageSize, this._searchId,
+        (err, page, morePages) => {
+          if (err) {
+            this.emit('err', err);
+            this.push(null);
+          } else {
+            if (!morePages) this._lastResult = true;
+            this.push(page);
+          }
 
-        } else {
-          let flag = this.push(page);
-          console.log(`pushing last page:${flag}`);
-
-          flag = this.push(null);
-          console.log(`pushing null after the last page:${flag}`);
-        }
-
-      });
+        });
+    }
   }
 
 }
