@@ -39,9 +39,7 @@ void LDAPPagedSearchProgress::Execute(
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
-  /* through the loop                                               */
-  // do
-  {
+{
     status_ = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
                                        pagingCriticality, &pageControl);
     if (status_ != LDAP_SUCCESS) {
@@ -89,7 +87,7 @@ void LDAPPagedSearchProgress::Execute(
     if ((*cookies_)[cookieID_] != nullptr) {
       ber_bvfree((*cookies_)[cookieID_]);
       (*cookies_)[cookieID_] =
-          nullptr;  // once you free it way you put it again on null?
+          nullptr;
     }
     /* Parse the page control returned to get the cookie and          */
     /* determine whether there are more pages.                        */
@@ -101,8 +99,8 @@ void LDAPPagedSearchProgress::Execute(
     }
 
     /* Determine if the cookie is not empty, indicating there are more pages
-     */
-    /* for these search parameters. */
+     *
+     * for these search parameters. */
 
     if ((*cookies_)[cookieID_]->bv_len == 0) {
       morePages_ = false;

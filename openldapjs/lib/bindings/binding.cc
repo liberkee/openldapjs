@@ -44,7 +44,7 @@ class LDAPClient : public Nan::ObjectWrap {
  private:
   LDAP *ld_{};
   std::shared_ptr<std::map<std::string, berval *>> cookies_{};
-  explicit LDAPClient() {
+  explicit LDAPClient() {  //  getting cpp_lint error on this
     cookies_ = std::make_shared<std::map<std::string, berval *>>();
   }
 
@@ -511,7 +511,7 @@ class LDAPClient : public Nan::ObjectWrap {
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(nullptr);
       result = ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr,
-                            &msgID);
+                            &msgID);  // async op
     }
 
     if (result != LDAP_SUCCESS) {
@@ -523,7 +523,8 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    ldap_mods_free(newEntries, true);
+    ldap_mods_free(newEntries,
+                   true);  // free before it finishes ? isn't this dangerous ?
 
     Nan::AsyncQueueWorker(
         new LDAPAddProgress(callback, progress, obj->ld_, msgID));
