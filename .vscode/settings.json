@@ -9,5 +9,5 @@
     "C_Cpp.intelliSenseEngine": "Default",
     "C_Cpp.clang_format_style": "Google",
     "C_Cpp.clang_format_fallbackStyle": "Google",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
 }

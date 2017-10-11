@@ -15,7 +15,7 @@ clientLDAP.initialize()
   .then(() => {
     clientLDAP.bind(dnAdmin, password)
       .then(() => {
-        clientLDAP.pagedSearch(searchBase, 2, 'objectClass=person', 100)
+        clientLDAP.pagedSearch(searchBase, 'SUBTREE', 'objectClass=*', 500)
           .pipe(process.stdout);
       });
   });

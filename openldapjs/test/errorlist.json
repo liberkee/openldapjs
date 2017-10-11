@@ -20,5 +20,7 @@
   "scopeSearchError": "There is no such scope",
   "initializationErrorMessage": "Initialize failed!",
   "connectionError": -11,
-  "serverDown": -1
+  "serverDown": -1,
+  "filterError": -7,
+  "sizeLimitExceeded": 4
 }
