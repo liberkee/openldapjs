@@ -23,7 +23,6 @@ void LDAPPagedSearchProgress::Execute(
   int l_entries{};
   int l_entry_count = 0;
   int l_errcode = 0;
-  int page_nbr{};
   char pagingCriticality = 'T';
   char *l_dn{};
   int totalCount = 0;
@@ -35,10 +34,6 @@ void LDAPPagedSearchProgress::Execute(
   int msgId = 0;
   char *attribute{};
   char **values{};
-  /*                                                                */
-  /******************************************************************/
-
-  page_nbr = 1;
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
@@ -49,7 +44,6 @@ void LDAPPagedSearchProgress::Execute(
 
     l_rc = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
                                     pagingCriticality, &pageControl);
-
     /* Insert the control into a list to be passed to the search.     */
     M_controls[0] = pageControl;
 
@@ -57,7 +51,6 @@ void LDAPPagedSearchProgress::Execute(
 
     l_rc = ldap_search_ext(ld_, base_.c_str(), scope_, filter_.c_str(), nullptr,
                            0, M_controls, nullptr, nullptr, 0, &msgId);
-
     if ((l_rc != LDAP_SUCCESS)) {
       status_ = l_rc;
       return;
@@ -68,12 +61,17 @@ void LDAPPagedSearchProgress::Execute(
     while (pagedResult == 0) {
       pagedResult = ldap_result(ld_, msgId, 1, &timeOut, &l_result);
     }
-
     /**
     ** Check for errors and return
     **/
     if (pagedResult != LDAP_RES_SEARCH_RESULT) {
       status_ = pagedResult;
+      return;
+    }
+
+    /* Add the verification in case of error and return the result in status_  */
+    status_ = ldap_result2error(ld_, l_result, false);
+    if (status_ != LDAP_SUCCESS) {
       return;
     }
 
@@ -87,7 +85,6 @@ void LDAPPagedSearchProgress::Execute(
 
       (*cookies_)[cookieID_] = nullptr;
     }
-
     /* Parse the page control returned to get the cookie and          */
     /* determine whether there are more pages.                        */
 
@@ -120,7 +117,6 @@ void LDAPPagedSearchProgress::Execute(
     if (morePages_ == true) {
       l_entries = ldap_count_entries(ld_, l_result);
     }
-
     if (l_entries > 0) {
       l_entry_count = l_entry_count + l_entries;
     }
@@ -132,7 +128,6 @@ void LDAPPagedSearchProgress::Execute(
       pageResult_ += l_dn;
       pageResult_ += "\n";
       ldap_memfree(l_dn);
-
       for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
            attribute != nullptr;
            attribute = ldap_next_attribute(ld_, l_entry, ber)) {
@@ -153,9 +148,6 @@ void LDAPPagedSearchProgress::Execute(
 
     /* Free the search results.                                       */
     ldap_msgfree(l_result);
-
-    pageResult_ += "---------";
-    pageResult_ += "------\n";
   }
 }
 

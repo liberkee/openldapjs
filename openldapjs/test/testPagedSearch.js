@@ -12,6 +12,7 @@ describe.only('Testing the async LDAP search ', () => {
   const dnAdmin = config.ldapAuthentication.dnAdmin;
   const dnUser = config.ldapAuthentication.dnUser;
   const searchBase = config.ldapSearch.searchBase;
+  const searchBaseUser = config.ldapSearch.searchBaseUser;
 
 
   const password = config.ldapAuthentication.passwordAdmin;
@@ -44,9 +45,9 @@ describe.only('Testing the async LDAP search ', () => {
 
   afterEach(() => {
     const unbind1 = adminLDAP.unbind();
-    const unbind2 = userLDAP.unbind();
+    // const unbind2 = userLDAP.unbind();
 
-    return Promise.all([unbind1, unbind2]);
+    return Promise.all([unbind1]);
   });
 
   it('should reject if the state of client is not BOUND', (next) => {
@@ -107,12 +108,85 @@ describe.only('Testing the async LDAP search ', () => {
   it('should reject if scope parameter doesn\'t exist', (next) => {
     try {
       adminLDAP.pagedSearch(
-        searchBase, 'noScope', config.ldapSearch.filterObjSpecific,
-        pageSize);
+        searchBase, 'noScope', config.ldapSearch.filterObjSpecific, pageSize);
     } catch (err) {
       err.message.should.deepEqual(errList.scopeSearchError);
       next();
     }
+  });
+
+  it('should reject if filter is not defined correctly ', (next) => {
+    const resultPage = adminLDAP.pagedSearch(
+      searchBase, searchScope.subtree, 'aasd', pageSize);
+
+    resultPage.on('data', (data) => {
+      should.fail('Didn\'t expect success');
+    });
+
+    resultPage.on('err', (err) => {
+      err.should.deepEqual(errList.filterError);
+    });
+
+    resultPage.on('end', () => {
+      next();
+    });
+  });
+
+  it('should reject if user doesn\'t have the right to read on that entryDN', (next) => {
+    const resultPage = userLDAP.pagedSearch(
+      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific,
+      pageSize);
+
+
+    resultPage.on('data', (data) => {
+      should.fail('Didn\'t expect success');
+    });
+
+    resultPage.on('err', (err) => {
+      err.should.deepEqual(errList.ldapNoSuchObject);
+    });
+
+    resultPage.on('end', () => {
+      next();
+    });
+  });
+
+  it('should reject if the size of page is bigger then the size limit defined on server', (next) => {
+    /* On our server the page size is not set and is default on 500 entries */
+    const newPageSize = 1000;
+
+    const resultPage = userLDAP.pagedSearch(searchBaseUser, searchScope.subtree,
+      config.ldapSearch.filterObjAll, newPageSize);
+
+    resultPage.on('data', (data) => {
+      should.fail('Didn\'t expect success');
+    });
+
+    resultPage.on('err', (err) => {
+      err.should.deepEqual(errList.sizeLimitExceeded);
+    });
+
+    resultPage.on('end', () => {
+      next();
+    });
+  });
+
+  it('should return search results with pagesize 10', function pageSearchTime(next) {
+    this.timeout(0);
+    let i = 0;
+    /* Our LDAP database have ~50k entries */
+    const resultPage = adminLDAP.pagedSearch(searchBase, searchScope.subtree,
+      config.ldapSearch.filterObjAll, pageSize);
+
+    resultPage.on('data', (data) => {
+      i += 1;
+    });
+
+    resultPage.on('end', () => {
+      i.should.be.above(5000);
+      next();
+    });
+
   });
 
 
