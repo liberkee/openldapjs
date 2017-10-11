@@ -73,7 +73,7 @@ ${config.ldapAdd.secondAttr.attr}: ${config.ldapAdd.secondAttr.vals[0]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[0]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[1]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[2]}
-cn: ${attributeEntry}\n\n`;
+cn: ${attributeEntry}\n`;
 
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);

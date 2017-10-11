@@ -4,6 +4,7 @@
 #include <ldap.h>
 #include <nan.h>
 #include <string>
+#include "ldap_map_result.h"
 
 class LDAPSearchProgress : public Nan::AsyncProgressWorker {
  private:
@@ -12,6 +13,7 @@ class LDAPSearchProgress : public Nan::AsyncProgressWorker {
   std::string resultSearch_{};
   int msgID_{};
   int status_{};
+  LDAPMapResult *mapResult = new LDAPMapResult();
 
  public:
   /**

@@ -1,5 +1,6 @@
 #include "ldap_search_progress.h"
 #include "constants.h"
+#include "ldap_control.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -29,29 +30,22 @@ void LDAPSearchProgress::Execute(
   for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
        l_entry = ldap_next_entry(ld_, l_entry)) {
     l_dn = ldap_get_dn(ld_, l_entry);
-    resultSearch_ += constants::newLine;
-    resultSearch_ += constants::dn;
-    resultSearch_ += constants::separator;
-    resultSearch_ += l_dn;
-    resultSearch_ += constants::newLine;
+
+    mapResult->generateMapEntryDn(l_dn);
     ldap_memfree(l_dn);
 
     for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
          attribute != nullptr;
          attribute = ldap_next_attribute(ld_, l_entry, ber)) {
       if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
-        for (int i = 0; values[i] != nullptr; i++) {
-          resultSearch_ += attribute;
-          resultSearch_ += constants::separator;
-          resultSearch_ += values[i];
-          resultSearch_ += constants::newLine;
-        }
+        mapResult->generateMapAttribute(attribute, values);
         ldap_value_free(values);
       }
       ldap_memfree(attribute);
     }
+    mapResult->LDIFMap.push_back(mapResult->entry);
+    mapResult->entry.clear();
     ber_free(ber, false);
-    resultSearch_ += constants::newLine;
   }
 
   status_ = ldap_result2error(ld_, l_result, false);
@@ -68,10 +62,11 @@ void LDAPSearchProgress::HandleOKCallback() {
     stateClient[0] = Nan::New(status_);
     callback->Call(1, stateClient);
   } else {
-    stateClient[1] = Nan::New(resultSearch_).ToLocalChecked();
+    stateClient[1] = Nan::New(mapResult->resultLDIFString()).ToLocalChecked();
     callback->Call(2, stateClient);
   }
 
+  delete mapResult;
   callback->Reset();
   progress_->Reset();
 }

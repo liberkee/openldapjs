@@ -69,7 +69,7 @@ describe('Testing the async LDAP search ', () => {
    */
   it('should return the root node', () => {
     const ROOT_NODE =
-        '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n\n';
+        '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
     return adminLDAP
       .search('', searchScope.base, config.ldapSearch.filterObjAll)
       .then((result) => { should.deepEqual(result, ROOT_NODE); });
