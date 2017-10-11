@@ -132,6 +132,23 @@ describe.only('Testing the async LDAP search ', () => {
     });
   });
 
+  it('should reject if searchBase is not an entry in ldap', (next) => {
+    const resultPage = adminLDAP.pagedSearch(
+      'dc=notEntry,dc=com', searchScope.subtree, config.ldapSearch.filterObjSpecific, pageSize);
+
+    resultPage.on('data', (data) => {
+      should.fail('Didn\'t expect success');
+    });
+
+    resultPage.on('err', (err) => {
+      err.should.deepEqual(errList.ldapNoSuchObject);
+    });
+
+    resultPage.on('end', () => {
+      next();
+    });
+  });
+
   it('should reject if user doesn\'t have the right to read on that entryDN', (next) => {
     const resultPage = userLDAP.pagedSearch(
       searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific,

@@ -1,4 +1,5 @@
 #include "ldap_paged_search_progress.h"
+#include "constants.h"
 
 LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
@@ -19,47 +20,49 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
 void LDAPPagedSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   BerElement *ber{};
-  int l_rc{};
   int l_entries{};
-  int l_entry_count = 0;
-  int l_errcode = 0;
+  int l_entry_count{};
+  int l_errcode{};
+  int pagedResult{};
   char pagingCriticality = 'T';
   char *l_dn{};
-  int totalCount = 0;
+  int totalCount{};
   LDAPControl *pageControl = nullptr;
   LDAPControl *M_controls[2] = {nullptr, nullptr};
   LDAPControl **returnedControls = nullptr;
   LDAPMessage *l_result{};
   LDAPMessage *l_entry{};
-  int msgId = 0;
+  int msgId{};
   char *attribute{};
   char **values{};
+  struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
   /* through the loop                                               */
   // do
   {
-    pageResult_ += "\n";
-
-    l_rc = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
-                                    pagingCriticality, &pageControl);
+    status_ = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
+                                       pagingCriticality, &pageControl);
+    if (status_ != LDAP_SUCCESS) {
+      return;
+    }
     /* Insert the control into a list to be passed to the search.     */
     M_controls[0] = pageControl;
 
     /* Search for entries in the directory using the parmeters.       */
 
-    l_rc = ldap_search_ext(ld_, base_.c_str(), scope_, filter_.c_str(), nullptr,
-                           0, M_controls, nullptr, nullptr, 0, &msgId);
-    if ((l_rc != LDAP_SUCCESS)) {
-      status_ = l_rc;
+    status_ = ldap_search_ext(ld_, base_.c_str(), scope_, filter_.c_str(),
+                              nullptr, constants::ATTR_VALS_WANTED, M_controls,
+                              nullptr, nullptr, LDAP_NO_LIMIT, &msgId);
+
+    if ((status_ != LDAP_SUCCESS)) {
       return;
     }
 
-    int pagedResult = 0;
-    struct timeval timeOut = {1, 0};
-    while (pagedResult == 0) {
-      pagedResult = ldap_result(ld_, msgId, 1, &timeOut, &l_result);
+    while (pagedResult == constants::LDAP_NOT_FINISHED) {
+      pagedResult =
+          ldap_result(ld_, msgId, constants::ALL_RESULTS, &timeOut, &l_result);
     }
     /**
     ** Check for errors and return
@@ -69,7 +72,7 @@ void LDAPPagedSearchProgress::Execute(
       return;
     }
 
-    /* Add the verification in case of error and return the result in status_  */
+    /* Add the verification in case of error and return the result in status_ */
     status_ = ldap_result2error(ld_, l_result, false);
     if (status_ != LDAP_SUCCESS) {
       return;
@@ -77,19 +80,25 @@ void LDAPPagedSearchProgress::Execute(
 
     /* Parse the results to retrieve the controls being returned.      */
 
-    l_rc = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
-                             nullptr, &returnedControls, false);
+    status_ = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
+                                nullptr, &returnedControls, false);
+    if ((status_ != LDAP_SUCCESS)) {
+      return;
+    }
 
     if ((*cookies_)[cookieID_] != nullptr) {
       ber_bvfree((*cookies_)[cookieID_]);
-
-      (*cookies_)[cookieID_] = nullptr;
+      (*cookies_)[cookieID_] =
+          nullptr;  // once you free it way you put it again on null?
     }
     /* Parse the page control returned to get the cookie and          */
     /* determine whether there are more pages.                        */
 
-    l_rc = ldap_parse_page_control(ld_, returnedControls, &totalCount,
-                                   &(*cookies_)[cookieID_]);
+    status_ = ldap_parse_page_control(ld_, returnedControls, &totalCount,
+                                      &(*cookies_)[cookieID_]);
+    if ((status_ != LDAP_SUCCESS)) {
+      return;
+    }
 
     /* Determine if the cookie is not empty, indicating there are more pages
      */
@@ -124,9 +133,11 @@ void LDAPPagedSearchProgress::Execute(
     for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
          l_entry = ldap_next_entry(ld_, l_entry)) {
       l_dn = ldap_get_dn(ld_, l_entry);
-      pageResult_ += "dn: ";
+      pageResult_ += constants::newLine;
+      pageResult_ += constants::dn;
+      pageResult_ += constants::separator;
       pageResult_ += l_dn;
-      pageResult_ += "\n";
+      pageResult_ += constants::newLine;
       ldap_memfree(l_dn);
       for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
            attribute != nullptr;
@@ -134,16 +145,16 @@ void LDAPPagedSearchProgress::Execute(
         if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
           for (int i = 0; values[i] != nullptr; i++) {
             pageResult_ += attribute;
-            pageResult_ += ":";
+            pageResult_ += constants::separator;
             pageResult_ += values[i];
-            pageResult_ += "\n";
+            pageResult_ += constants::newLine;
           }
           ldap_value_free(values);
         }
         ldap_memfree(attribute);
       }
       ber_free(ber, 0);
-      pageResult_ += "\n";
+      pageResult_ += constants::newLine;
     }
 
     /* Free the search results.                                       */
