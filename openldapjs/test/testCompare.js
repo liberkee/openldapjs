@@ -4,7 +4,7 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
+const ErrorHandler = require('../modules/ldap_errors/error_dispenser');
 
 describe('Testing the Compare functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -56,7 +56,7 @@ describe('Testing the Compare functionalities', () => {
     const nonAttr = 'nonExistingAttr';
     return ldapAsyncWrap.compare(dn, nonAttr, val)
       .catch((err) => {
-        should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.undefinedType));
+        should.deepEqual(err, ErrorHandler(errList.undefinedType));
       });
   });
 
@@ -65,7 +65,7 @@ describe('Testing the Compare functionalities', () => {
     const nonObj = config.ldapCompare.invalidUser;
     return ldapAsyncWrap.compare(nonObj, attr, val)
       .catch((err) => {
-        should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.ldapNoSuchObject));
+        should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject));
       });
   });
 
@@ -77,7 +77,7 @@ describe('Testing the Compare functionalities', () => {
     return ldapAsyncWrap.initialize()
       .then(() => { return ldapAsyncWrap.bind(noAccessDn, password); })
       .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
-      .catch((err) => { should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.ldapNoSuchObject)); });
+      .catch((err) => { should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject)); });
   });
 
   it('should not compare if the binding failed', () => {
@@ -140,7 +140,7 @@ describe('Testing the Compare functionalities', () => {
           return ldapAsyncWrap.compare(dn, nonAttr, val);
         })
         .catch((err) => {
-          should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.undefinedType));
+          should.deepEqual(err, ErrorHandler(errList.undefinedType));
           return ldapAsyncWrap.compare(dn, attr, nonVal);
         })
         .then((result3) => {

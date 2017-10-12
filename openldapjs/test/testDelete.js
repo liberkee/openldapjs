@@ -5,7 +5,7 @@ const should = require('should');
 const Promise = require('bluebird');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
+const ErrorHandler = require('../modules/ldap_errors/error_dispenser');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -47,13 +47,13 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject the request with invalidDn error code', () => {
     return clientLDAP.delete('garbage')
       .catch(
-        (err) => { err.should.be.deepEqual(new ErrorHandler.LdapOperationError(errList.invalidDnSyntax)); });
+        (err) => { err.should.be.deepEqual(ErrorHandler(errList.invalidDnSyntax)); });
   });
 
   it('should reject the request for passing an empty DN', () => {
     return clientLDAP.delete('')
       .catch(
-        (err) => { err.should.be.deepEqual(new ErrorHandler.LdapOperationError(errList.unwillingToPerform)); });
+        (err) => { err.should.be.deepEqual(ErrorHandler(errList.unwillingToPerform)); });
   });
 
   it('should reject the request for passing a null DN', () => {
@@ -66,7 +66,7 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
     return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
-      .catch((err) => { err.should.be.deepEqual(new ErrorHandler.LdapOperationError(errList.ldapNoSuchObject)); });
+      .catch((err) => { err.should.be.deepEqual(ErrorHandler(errList.ldapNoSuchObject)); });
   });
 
   it('should delete the given leaf entry', () => {
@@ -82,7 +82,7 @@ describe('Testing the async LDAP delete operation', () => {
     const parentDn = config.ldapDelete.dn.slice(1, stringLength);
     return clientLDAP.delete(parentDn)
       .catch(
-        (err) => { err.should.be.deepEqual(new ErrorHandler.LdapOperationError(errList.notAllowedOnNonLeaf)); });
+        (err) => { err.should.be.deepEqual(ErrorHandler(errList.notAllowedOnNonLeaf)); });
   });
 
 
@@ -104,7 +104,7 @@ describe('Testing the async LDAP delete operation', () => {
         personNr += 1;
         dnUser =
               `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-        should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.ldapNoSuchObject));
+        should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject));
         return clientLDAP.delete(dnUser);
       })
       .then((res3) => {

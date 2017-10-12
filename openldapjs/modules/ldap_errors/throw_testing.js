@@ -3,10 +3,10 @@
 const errorHandler = require('./error_dispenser');
 
 
-const LdapError = errorHandler(3);
+const LdapError = errorHandler(18);
 
 const instance = new LdapError('Anything goes here?');
 
-console.log(instance.constructor.description);
-console.log(instance.constructor.code);
+console.log(LdapError.description);
+console.log(LdapError.code);
 throw instance;

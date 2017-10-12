@@ -5,7 +5,7 @@ const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
+const ErrorHandler = require('../modules/ldap_errors/error_dispenser');
 
 describe('Testing the modify functionalities', () => {
 
@@ -146,7 +146,7 @@ describe('Testing the modify functionalities', () => {
   it('should reject operation if the dn is empty', () => {
     return ldapAsyncWrap.modify('', changeAttributes)
       .catch((error) => {
-        should.deepEqual(error, new ErrorHandler.LdapOperationError(errList.unwillingToPerform));
+        should.deepEqual(error, ErrorHandler(errList.unwillingToPerform));
       });
   });
 

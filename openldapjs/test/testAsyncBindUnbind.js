@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/ldap_errors/ldap_errors.js');
+const ErrorHandler = require('../modules/ldap_errors/error_dispenser.js');
 
 describe('Testing the async LDAP authentication', () => {
   const host = config.ldapAuthentication.host;
@@ -29,7 +29,7 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .catch((err) => { should.deepEqual(err, new ErrorHandler.LdapOperationError(errList.invalidCredentials)); });
+      .catch((err) => { should.deepEqual(err, ErrorHandler(errList.invalidCredentials)); });
   });
 
   it('should unbind from the server', () => {
