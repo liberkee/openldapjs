@@ -5,7 +5,7 @@ const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
 const errList = require('./errorList');
-const ErrorHandler = require('../modules/ldap_errors/error_dispenser');
+const ErrorHandler = require('../modules/errors/error_dispenser');
 
 
 describe('Testing the async LDAP add operation', () => {

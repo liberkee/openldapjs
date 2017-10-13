@@ -3,7 +3,8 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
-const ErrorHandler = require('./ldap_errors/error_dispenser');
+const ErrorHandler = require('./errors/error_dispenser');
+const StateError = require('./errors/state_error');
 
 
 const E_STATES = {
@@ -65,7 +66,7 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(new Error(INITIALIZATION_ERROR_MESSAGE));
+        reject(new StateError(INITIALIZATION_ERROR_MESSAGE));
       }
     });
   }
@@ -93,7 +94,7 @@ class LDAPAsyncWrap {
           }
         });
       } else {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       }
     });
   }
@@ -112,13 +113,13 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         checkParameters.checkParametersIfString(
           searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error('There is no such scope');
+          throw new Error('There is no such scope'); // SyntaxError maybe ?
         }
 
         this._binding.search(
@@ -151,7 +152,7 @@ class LDAPAsyncWrap {
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         checkParameters.checkParametersIfString(dn, attr, value);
 
@@ -180,7 +181,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
@@ -213,7 +214,7 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn, newRdn, newParent);
@@ -242,7 +243,7 @@ class LDAPAsyncWrap {
   delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);

@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/ldap_errors/error_dispenser');
+const ErrorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the async LDAP search ', () => {
 
