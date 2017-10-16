@@ -15,7 +15,7 @@ class LDAPMapResult {
  private:
   std::vector<std::map<int, std::pair<std::string, std::string>>> LDIFList_;
   std::map<int, std::pair<std::string, std::string>> entry_;
-  unsigned int counterMap{};
+  unsigned int counterMap_{};
 
  public:
   LDAPMapResult();
@@ -50,11 +50,12 @@ class LDAPMapResult {
   void ClearEntry();
   /**
   **@brief GetEntry Method, Get the map for a single entry
+  **@return the map for an ldap entry
   **/
   std::map<int, std::pair<std::string, std::string>> GetEntry();
   /**
-  **@brief ResultLDIFString Method, Interrogate the map and return the result as
-  **string
+  **@brief ResultLDIFString Method, Interrogate the map vector
+  **@return a string from the map structure
   **/
   std::string ResultLDIFString();
 };

@@ -1,11 +1,9 @@
-#include "constants.h"
 #include "ldap_control.h"
 #include <map>
 #include <utility>
+#include "constants.h"
 
-LdapControls::LdapControls() {
-  mapResult_ = std::make_shared<LDAPMapResult>();
-}
+LdapControls::LdapControls() { mapResult_ = std::make_shared<LDAPMapResult>(); }
 
 std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     const v8::Local<v8::Array> &control_handle) {

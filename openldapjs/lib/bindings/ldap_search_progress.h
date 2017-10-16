@@ -3,8 +3,8 @@
 
 #include <ldap.h>
 #include <nan.h>
-#include <string>
 #include <memory>
+#include <string>
 #include "ldap_map_result.h"
 
 class LDAPSearchProgress : public Nan::AsyncProgressWorker {

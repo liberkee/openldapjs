@@ -8,20 +8,20 @@ void LDAPMapResult::GenerateMapEntryDn(const std::string dnEntry) {
     LDIFList_.push_back(entry_);
     entry_.clear();
   }
-  entry_[counterMap++] = {constants::dn, dnEntry};
+  entry_[counterMap_++] = {constants::dn, dnEntry};
 }
 
 void LDAPMapResult::GenerateMapAttribute(const std::string attribute,
                                          char **values) {
   for (int i = 0; values[i] != nullptr; i++) {
-    entry_[counterMap++] = {attribute, values[i]};
+    entry_[counterMap_++] = {attribute, values[i]};
   }
 }
 
 void LDAPMapResult::GenerateMapAttributeBer(const std::string attribute,
                                             BerVarray vals) {
   for (int i = 0; vals[i].bv_val != nullptr; i++) {
-    entry_[counterMap++] = {attribute, vals[i].bv_val};
+    entry_[counterMap_++] = {attribute, vals[i].bv_val};
   }
 }
 
