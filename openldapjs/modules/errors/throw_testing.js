@@ -2,11 +2,11 @@
 
 const errorHandler = require('./error_dispenser');
 
+const opError = require('./ldap_errors/operational_error');
 
-const LdapError = errorHandler(18);
+
+const LdapError = errorHandler(1);
 
 const instance = new LdapError('Anything goes here?');
 
-console.log(LdapError.description);
-console.log(LdapError.code);
 throw instance;

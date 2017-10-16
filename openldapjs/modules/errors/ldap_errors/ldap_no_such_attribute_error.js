@@ -1,8 +1,9 @@
 'use strict';
 
 const LdapError = require('./ldap_error');
+const OperationalError = require('./operational_error');
 
-class LdapNoSuchAttributeError extends LdapError {
+class LdapNoSuchAttributeError extends OperationalError {
 
   static get code() {
     return 16;

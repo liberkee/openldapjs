@@ -1,8 +1,9 @@
 'use strict';
 
 const LdapError = require('./ldap_error');
+const ServerError = require('./server_error');
 
-class LdapLoopError extends LdapError {
+class LdapLoopError extends ServerError {
 
   static get code() {
     return 54;

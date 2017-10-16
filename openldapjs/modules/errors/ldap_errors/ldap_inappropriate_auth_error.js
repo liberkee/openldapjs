@@ -1,8 +1,9 @@
 'use strict';
 
 const LdapError = require('./ldap_error');
+const LoginError = require('./login_error');
 
-class LdapInappropriateAuthError extends LdapError {
+class LdapInappropriateAuthError extends LoginError {
 
   static get code() {
     return 48;
