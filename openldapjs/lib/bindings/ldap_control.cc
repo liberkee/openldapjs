@@ -1,9 +1,11 @@
+#include "constants.h"
 #include "ldap_control.h"
 #include <map>
 #include <utility>
-#include "constants.h"
 
-LdapControls::LdapControls() {}
+LdapControls::LdapControls() {
+  mapResult_ = std::make_shared<LDAPMapResult>();
+}
 
 std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     const v8::Local<v8::Array> &control_handle) {
@@ -86,22 +88,22 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
     } else if (ber_scanf(berElement, "{m{" /*}}*/, &berValue) == LBER_ERROR) {
       return modifyResult;
     } else {
-      mapResult->generateMapEntryDn(berValue.bv_val);
+      mapResult_->GenerateMapEntryDn(berValue.bv_val);
 
       while (ber_scanf(berElement, "{m" /*}*/, &berValue) != LBER_ERROR) {
         if (ber_scanf(berElement, "[W]", &vals) == LBER_ERROR ||
             vals == nullptr) {
           return modifyResult;
         }
-        mapResult->generateMapAttributeBer(berValue.bv_val, vals);
+        mapResult_->GenerateMapAttributeBer(berValue.bv_val, vals);
       }
-      mapResult->LDIFMap.push_back(mapResult->entry);
-      mapResult->entry.clear();
+      mapResult_->FillLdifList(mapResult_->GetEntry());
+      mapResult_->ClearEntry();
     }
     i++;
   }
 
-  modifyResult = mapResult->resultLDIFString();
+  modifyResult = mapResult_->ResultLDIFString();
 
   ldap_controls_free(serverControls);
   return modifyResult;

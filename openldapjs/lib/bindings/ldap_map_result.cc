@@ -1,45 +1,51 @@
 #include "ldap_map_result.h"
-#include <iostream>
 #include "constants.h"
 
 LDAPMapResult::LDAPMapResult() {}
 
-void LDAPMapResult::generateMapEntryDn(char *dnEntry) {
-  if (!LDAPMapResult::entry.empty()) {
-    LDIFMap.push_back(LDAPMapResult::entry);
-    LDAPMapResult::entry.clear();
+void LDAPMapResult::GenerateMapEntryDn(const std::string dnEntry) {
+  if (!entry_.empty()) {
+    LDIFList_.push_back(entry_);
+    entry_.clear();
   }
-  ldapEntry.first = constants::dn;
-  ldapEntry.second = dnEntry;
-  entry[counterMap++] = ldapEntry;
+  entry_[counterMap++] = {constants::dn, dnEntry};
 }
 
-void LDAPMapResult::generateMapAttribute(char *attribute, char **values) {
+void LDAPMapResult::GenerateMapAttribute(const std::string attribute,
+                                         char **values) {
   for (int i = 0; values[i] != nullptr; i++) {
-    ldapEntry.first = attribute;
-    ldapEntry.second = values[i];
-    entry[counterMap++] = ldapEntry;
+    entry_[counterMap++] = {attribute, values[i]};
   }
 }
 
-void LDAPMapResult::generateMapAttributeBer(char *attribute, BerVarray vals) {
+void LDAPMapResult::GenerateMapAttributeBer(const std::string attribute,
+                                            BerVarray vals) {
   for (int i = 0; vals[i].bv_val != nullptr; i++) {
-    ldapEntry.first = attribute;
-    ldapEntry.second = vals[i].bv_val;
-    entry[counterMap++] = ldapEntry;
+    entry_[counterMap++] = {attribute, vals[i].bv_val};
   }
 }
 
-std::string LDAPMapResult::resultLDIFString() {
+std::string LDAPMapResult::ResultLDIFString() {
   std::string resultLDIF{};
-  for (auto &vector : LDAPMapResult::LDIFMap) {
-    for (auto &map : vector) {
+  for (auto &ldif : LDIFList_) {
+    for (auto &ldifEntry : ldif) {
       resultLDIF += constants::newLine;
-      resultLDIF += map.second.first;
+      resultLDIF += ldifEntry.second.first;
       resultLDIF += constants::separator;
-      resultLDIF += map.second.second;
+      resultLDIF += ldifEntry.second.second;
     }
     resultLDIF += constants::newLine;
   }
   return resultLDIF;
+}
+
+void LDAPMapResult::FillLdifList(
+    const std::map<int, std::pair<std::string, std::string>> &entry) {
+  LDIFList_.push_back(entry);
+}
+
+void LDAPMapResult::ClearEntry() { entry_.clear(); }
+
+std::map<int, std::pair<std::string, std::string>> LDAPMapResult::GetEntry() {
+  return entry_;
 }

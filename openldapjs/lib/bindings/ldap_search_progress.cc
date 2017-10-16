@@ -8,7 +8,9 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
-      msgID_(msgID) {}
+      msgID_(msgID) {
+        mapResult_ = std::make_shared<LDAPMapResult>();
+      }
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
@@ -31,20 +33,20 @@ void LDAPSearchProgress::Execute(
        l_entry = ldap_next_entry(ld_, l_entry)) {
     l_dn = ldap_get_dn(ld_, l_entry);
 
-    mapResult->generateMapEntryDn(l_dn);
+    mapResult_->GenerateMapEntryDn(l_dn);
     ldap_memfree(l_dn);
 
     for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
          attribute != nullptr;
          attribute = ldap_next_attribute(ld_, l_entry, ber)) {
       if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
-        mapResult->generateMapAttribute(attribute, values);
+        mapResult_->GenerateMapAttribute(attribute, values);
         ldap_value_free(values);
       }
       ldap_memfree(attribute);
     }
-    mapResult->LDIFMap.push_back(mapResult->entry);
-    mapResult->entry.clear();
+    mapResult_->FillLdifList(mapResult_->GetEntry());
+    mapResult_->ClearEntry();
     ber_free(ber, false);
   }
 
@@ -62,11 +64,10 @@ void LDAPSearchProgress::HandleOKCallback() {
     stateClient[0] = Nan::New(status_);
     callback->Call(1, stateClient);
   } else {
-    stateClient[1] = Nan::New(mapResult->resultLDIFString()).ToLocalChecked();
+    stateClient[1] = Nan::New(mapResult_->ResultLDIFString()).ToLocalChecked();
     callback->Call(2, stateClient);
   }
 
-  delete mapResult;
   callback->Reset();
   progress_->Reset();
 }
