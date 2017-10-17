@@ -141,7 +141,7 @@ class LDAPAsyncWrap {
      * SUBTREE
      * @param {String} searchFilter search filter.
      * @param {int} pageSize The number of entries per LDAP page
-     * @return {Readable stream} that pushes search results page by page
+     * @return {Promise} that resolves to a readable stream or rejects to a Error;
      */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
     return new Promise((resolve, reject) => {
