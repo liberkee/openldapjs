@@ -282,7 +282,8 @@ class LDAPAsyncWrap {
 
         this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
-            reject(new ErrorHandler(err));
+            const CustomError = ErrorHandler(err);
+            reject(new CustomError(2));
           } else {
             resolve(result);
           }

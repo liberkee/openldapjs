@@ -60,16 +60,20 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => { return clientLDAP2.unbind(); });
   });
 
-  xit('should reject the add operation with a wrong dn', () => { // this doesn't work as expected.
+  it.only('should reject the add operation with a wrong dn', () => { // this doesn't work as expected.
+
+    const CustomError = new ErrorHandler(errList.invalidDnSyntax);
 
     return clientLDAP.add('garbage', validEntry)
       .then(() => {
         should.fail('should not have succeeded');
       })
       .catch(ErrorHandler(errList.invalidDnSyntax), (err) => {
-        should.deepEqual(err, new ErrorHandler(errList.invalidDnSyntax));
+        console.log(err);
+        should.deepEqual(err, new CustomError(2));
       })
       .catch((err) => {
+        console.log(err);
         should.fail('did not expect generic error');
       });
 

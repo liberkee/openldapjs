@@ -13,6 +13,7 @@ class LdapConstraintError extends OperationalError {
     return 'Indicates that the attribute value specified in a modify, add, or modify DN operation violates constraints placed on the attribute. The constraint can be one of size or content (string only, no binary).';
   }
 
+
 }
 
 module.exports = LdapConstraintError;
