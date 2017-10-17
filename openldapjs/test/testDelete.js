@@ -7,7 +7,7 @@ const config = require('./config.json');
 const errList = require('./errorList.json');
 const ErrorHandler = require('../modules/errors/error_dispenser');
 
-describe('Testing the async LDAP delete operation', () => {
+describe.only('Testing the async LDAP delete operation', () => {
 
   const host = config.ldapAuthentication.host;
   const dnAdmin = config.ldapAuthentication.dnAdmin;
@@ -46,18 +46,35 @@ describe('Testing the async LDAP delete operation', () => {
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
   it('should reject the request with invalidDn error code', () => {
     return clientLDAP.delete('garbage')
-      .catch(
-        (err) => { err.should.be.deepEqual(ErrorHandler(errList.invalidDnSyntax)); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.invalidDnSyntax), (err) => {
+        const CustomError = ErrorHandler(errList.invalidDnSyntax);
+        should.be.deepEqual(err, new CustomError(errList.ldapDeleteErrorMessage));
+      })
+      .catch((err) => {
+        console.log(err);
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject the request for passing an empty DN', () => {
     return clientLDAP.delete('')
-      .catch(
-        (err) => { err.should.be.deepEqual(ErrorHandler(errList.unwillingToPerform)); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.unwillingToPerform), (err) => {
+        const CustomError = ErrorHandler(errList.unwillingToPerform);
+        should.be.deepEqual(err, new CustomError(errList.ldapDeleteErrorMessage));
+      });
   });
 
   it('should reject the request for passing a null DN', () => {
     return clientLDAP.delete(null)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -66,7 +83,13 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
     return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
-      .catch((err) => { err.should.be.deepEqual(ErrorHandler(errList.ldapNoSuchObject)); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.ldapNoSuchObject), (err) => {
+        const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      });
   });
 
   it('should delete the given leaf entry', () => {
@@ -81,8 +104,13 @@ describe('Testing the async LDAP delete operation', () => {
     const stringLength = config.ldapDelete.dn.length;
     const parentDn = config.ldapDelete.dn.slice(1, stringLength);
     return clientLDAP.delete(parentDn)
-      .catch(
-        (err) => { err.should.be.deepEqual(ErrorHandler(errList.notAllowedOnNonLeaf)); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.notAllowedOnNonLeaf), (err) => {
+        const CustomError = ErrorHandler(errList.notAllowedOnNonLeaf);
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      });
   });
 
 
@@ -100,11 +128,12 @@ describe('Testing the async LDAP delete operation', () => {
         should.deepEqual(res1, errList.resultSuccess);
         return clientLDAP.delete(dnUser);
       })
-      .catch((err) => {
+      .catch(ErrorHandler(errList.ldapNoSuchObject), (err) => {
+        const CustomError = ErrorHandler(errList.ldapNoSuchObject);
         personNr += 1;
         dnUser =
               `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-        should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject));
+        should.deepEqual(err, new CustomError(errList.ldapDeleteErrorMessage));
         return clientLDAP.delete(dnUser);
       })
       .then((res3) => {

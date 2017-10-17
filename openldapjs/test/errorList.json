@@ -17,5 +17,13 @@
   "controlPropError": "Invalid control array",
   "affectMultipleDsas": 71,
   "scopeSearchError": "Scope must be integer",
-  "ldapAddErrorMessage": "Ldap Add operation failed, check description for additional info"
+  "ldapSearchErrorMessage":"Ldap Search operation failed, check description for additional info",
+  "ldapBindErrorMessage": "Ldap Bind operation failed, check description for additional info",
+  "ldapModifyErrorMessage":"Ldap Modify operation failed, check description for additional info",
+  "ldapCompareErrorMessage":"Ldap Compare operation failed, check description for additional info",
+  "ldapRenameErrorMessage":"Ldap Rename operation failed, check description for additional info",
+  "ldapDeleteErrorMessage":"Ldap Delete operation failed, check description for additional info",
+  "ldapUnbindErrorMessage":"Ldap Unbind operation failed, check description for additional info",
+  "ldapAddErrorMessage": "Ldap Add operation failed, check description for additional info",
+  "ldapInitializeErrorMessage":"Ldap Initialize operation failed, check description for additional info"
 }

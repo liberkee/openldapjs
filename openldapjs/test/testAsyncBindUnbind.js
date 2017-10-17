@@ -29,7 +29,13 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .catch((err) => { should.deepEqual(err, ErrorHandler(errList.invalidCredentials)); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.invalidCredentials), (err) => {
+        const CustomError = ErrorHandler(errList.invalidCredentials);
+        should.deepEqual(err, new CustomError(errList.ldapBindErrorMessage));
+      });
   });
 
   it('should unbind from the server', () => {

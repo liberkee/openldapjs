@@ -29,6 +29,9 @@ describe('Testing the Compare functionalities', () => {
 
   it('should reject if dn is not a string', () => {
     return ldapAsyncWrap.compare(1, attr, val)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.typeErrorMessage);
       });
@@ -55,8 +58,15 @@ describe('Testing the Compare functionalities', () => {
   it('should compare non existing attribute', () => {
     const nonAttr = 'nonExistingAttr';
     return ldapAsyncWrap.compare(dn, nonAttr, val)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.undefinedType), (err) => {
+        const CustomError = ErrorHandler(errList.undefinedType);
+        should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
+      })
       .catch((err) => {
-        should.deepEqual(err, ErrorHandler(errList.undefinedType));
+        should.fail('did not expect generic error');
       });
   });
 
@@ -64,8 +74,15 @@ describe('Testing the Compare functionalities', () => {
   it('should compare non existing object', () => {
     const nonObj = config.ldapCompare.invalidUser;
     return ldapAsyncWrap.compare(nonObj, attr, val)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ErrorHandler(errList.ldapNoSuchObject), (err) => {
+        const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+        should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
+      })
       .catch((err) => {
-        should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject));
+        should.fail('did not expect generic error');
       });
   });
 
@@ -77,7 +94,13 @@ describe('Testing the Compare functionalities', () => {
     return ldapAsyncWrap.initialize()
       .then(() => { return ldapAsyncWrap.bind(noAccessDn, password); })
       .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
-      .catch((err) => { should.deepEqual(err, ErrorHandler(errList.ldapNoSuchObject)); });
+      .catch(ErrorHandler(errList.ldapNoSuchObject), (err) => {
+        const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+        should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should not compare if the binding failed', () => {
@@ -139,8 +162,9 @@ describe('Testing the Compare functionalities', () => {
           should.deepEqual(result1, errList.comparisonResTrue);
           return ldapAsyncWrap.compare(dn, nonAttr, val);
         })
-        .catch((err) => {
-          should.deepEqual(err, ErrorHandler(errList.undefinedType));
+        .catch(ErrorHandler(errList.undefinedType), (err) => {
+          const CustomError = ErrorHandler(errList.undefinedType);
+          should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
           return ldapAsyncWrap.compare(dn, attr, nonVal);
         })
         .then((result3) => {
