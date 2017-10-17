@@ -35,96 +35,94 @@ void LDAPPagedSearchProgress::Execute(
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
-  {
-    status_ = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
-                                       pagingCriticality, &pageControl);
-    if (status_ != LDAP_SUCCESS) {
-      return;
-    }
-    /* Insert the control into a list to be passed to the search.     */
-    M_controls[0] = pageControl;
-
-    /* Search for entries in the directory using the parmeters.       */
-
-    status_ = ldap_search_ext(ld_, base_.c_str(), scope_, filter_.c_str(),
-                              nullptr, constants::ATTR_VALS_WANTED, M_controls,
-                              nullptr, nullptr, LDAP_NO_LIMIT, &msgId);
-
-    if ((status_ != LDAP_SUCCESS)) {
-      return;
-    }
-
-    while (pagedResult == constants::LDAP_NOT_FINISHED) {
-      pagedResult =
-          ldap_result(ld_, msgId, constants::ALL_RESULTS, &timeOut, &l_result);
-    }
-    /**
-    ** Check for errors and return
-    **/
-    if (pagedResult != LDAP_RES_SEARCH_RESULT) {
-      status_ = pagedResult;
-      return;
-    }
-
-    /* Add the verification in case of error and return the result in status_ */
-    status_ = ldap_result2error(ld_, l_result, false);
-    if (status_ != LDAP_SUCCESS) {
-      return;
-    }
-
-    /* Parse the results to retrieve the controls being returned.      */
-
-    status_ = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
-                                nullptr, &returnedControls, false);
-    if ((status_ != LDAP_SUCCESS)) {
-      return;
-    }
-
-    if ((*cookies_)[cookieID_] != nullptr) {
-      ber_bvfree((*cookies_)[cookieID_]);
-      (*cookies_)[cookieID_] = nullptr;
-    }
-    /* Parse the page control returned to get the cookie and          */
-    /* determine whether there are more pages.                        */
-
-    status_ = ldap_parse_page_control(ld_, returnedControls, &totalCount,
-                                      &(*cookies_)[cookieID_]);
-    if ((status_ != LDAP_SUCCESS)) {
-      return;
-    }
-
-    /* Determine if the cookie is not empty, indicating there are more pages
-     *
-     * for these search parameters. */
-
-    if ((*cookies_)[cookieID_]->bv_len == 0) {
-      morePages_ = false;
-    } else {
-      morePages_ = true;
-    }
-
-    /* Cleanup the controls used. */
-    if (returnedControls != nullptr) {
-      ldap_controls_free(returnedControls);
-      returnedControls = nullptr;
-    }
-    M_controls[0] = nullptr;
-    ldap_control_free(pageControl);
-    pageControl = nullptr;
-
-    /******************************************************************/
-    /* Build the result string                                        */
-    /*                                                                */
-    /* Determine how many entries have been found.                    */
-    if (morePages_ == true) {
-      l_entries = ldap_count_entries(ld_, l_result);
-    }
-    if (l_entries > 0) {
-      l_entry_count = l_entry_count + l_entries;
-    }
-
-    pageResult_ = buildsSearchMessage(ld_, l_result);
+  status_ = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
+                                     pagingCriticality, &pageControl);
+  if (status_ != LDAP_SUCCESS) {
+    return;
   }
+  /* Insert the control into a list to be passed to the search.     */
+  M_controls[0] = pageControl;
+
+  /* Search for entries in the directory using the parmeters.       */
+
+  status_ = ldap_search_ext(ld_, base_.c_str(), scope_, filter_.c_str(),
+                            nullptr, constants::ATTR_VALS_WANTED, M_controls,
+                            nullptr, nullptr, LDAP_NO_LIMIT, &msgId);
+
+  if ((status_ != LDAP_SUCCESS)) {
+    return;
+  }
+
+  while (pagedResult == constants::LDAP_NOT_FINISHED) {
+    pagedResult =
+        ldap_result(ld_, msgId, constants::ALL_RESULTS, &timeOut, &l_result);
+  }
+  /**
+  ** Check for errors and return
+  **/
+  if (pagedResult != LDAP_RES_SEARCH_RESULT) {
+    status_ = pagedResult;
+    return;
+  }
+
+  /* Add the verification in case of error and return the result in status_ */
+  status_ = ldap_result2error(ld_, l_result, false);
+  if (status_ != LDAP_SUCCESS) {
+    return;
+  }
+
+  /* Parse the results to retrieve the controls being returned.      */
+
+  status_ = ldap_parse_result(ld_, l_result, &l_errcode, nullptr, nullptr,
+                              nullptr, &returnedControls, false);
+  if ((status_ != LDAP_SUCCESS)) {
+    return;
+  }
+
+  if ((*cookies_)[cookieID_] != nullptr) {
+    ber_bvfree((*cookies_)[cookieID_]);
+    (*cookies_)[cookieID_] = nullptr;
+  }
+  /* Parse the page control returned to get the cookie and          */
+  /* determine whether there are more pages.                        */
+
+  status_ = ldap_parse_page_control(ld_, returnedControls, &totalCount,
+                                    &(*cookies_)[cookieID_]);
+  if ((status_ != LDAP_SUCCESS)) {
+    return;
+  }
+
+  /* Determine if the cookie is not empty, indicating there are more pages
+   *
+   * for these search parameters. */
+
+  if ((*cookies_)[cookieID_]->bv_len == 0) {
+    morePages_ = false;
+  } else {
+    morePages_ = true;
+  }
+
+  /* Cleanup the controls used. */
+  if (returnedControls != nullptr) {
+    ldap_controls_free(returnedControls);
+    returnedControls = nullptr;
+  }
+  M_controls[0] = nullptr;
+  ldap_control_free(pageControl);
+  pageControl = nullptr;
+
+  /******************************************************************/
+  /* Build the result string                                        */
+  /*                                                                */
+  /* Determine how many entries have been found.                    */
+  if (morePages_ == true) {
+    l_entries = ldap_count_entries(ld_, l_result);
+  }
+  if (l_entries > 0) {
+    l_entry_count = l_entry_count + l_entries;
+  }
+
+  pageResult_ = buildsSearchMessage(ld_, l_result);
 }
 
 // Executes in event loop
