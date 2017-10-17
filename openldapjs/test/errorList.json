@@ -16,5 +16,6 @@
   "controlArrayError": "The control is not an array",
   "controlPropError": "Invalid control array",
   "affectMultipleDsas": 71,
-  "scopeSearchError": "Scope must be integer"
+  "scopeSearchError": "Scope must be integer",
+  "ldapAddErrorMessage": "Ldap Add operation failed, check description for additional info"
 }

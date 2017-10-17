@@ -69,11 +69,9 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not have succeeded');
       })
       .catch(ErrorHandler(errList.invalidDnSyntax), (err) => {
-        console.log(err);
-        should.deepEqual(err, new CustomError(2));
+        should.deepEqual(err, new CustomError(errList.ldapAddErrorMessage));
       })
       .catch((err) => {
-        console.log(err);
         should.fail('did not expect generic error');
       });
 

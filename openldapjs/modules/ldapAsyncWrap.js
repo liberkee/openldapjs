@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 const ErrorHandler = require('./errors/error_dispenser');
 const StateError = require('./errors/state_error');
+const errorList = require('../test/errorList.json');
 
 
 const E_STATES = {
@@ -119,7 +120,7 @@ class LDAPAsyncWrap {
           searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error('There is no such scope'); // SyntaxError maybe ?
+          throw new Error('There is no such scope');
         }
 
         this._binding.search(
@@ -283,7 +284,7 @@ class LDAPAsyncWrap {
         this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
             const CustomError = ErrorHandler(err);
-            reject(new CustomError(2));
+            reject(new CustomError(errorList.ldapAddErrorMessage));
           } else {
             resolve(result);
           }
