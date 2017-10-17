@@ -144,23 +144,24 @@ class LDAPAsyncWrap {
      * @return {Readable stream} that pushes search results page by page
      */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
-    if (this._stateClient === E_STATES.BOUND) {
-      checkParameters.checkParametersIfString(searchBase, searchFilter, scope);
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === E_STATES.BOUND) {
+        checkParameters.checkParametersIfString(searchBase, searchFilter, scope);
 
-      if (scopeObject[scope] === undefined) {
-        throw new Error('There is no such scope');
+        if (scopeObject[scope] === undefined) {
+          throw new Error('There is no such scope');
+        }
+
+        if (!Number.isInteger(pageSize)) {
+          throw new Error('Expected Integer parameter');
+        }
+        this._searchID += 1;
+        resolve(new SearchStream(
+          searchBase, scopeObject[scope], searchFilter, pageSize,
+          this._searchID, this._binding));
       }
-
-      if (!Number.isInteger(pageSize)) {
-        throw new Error('Expected Integer parameter');
-      }
-
-      this._searchID += 1;
-      return new SearchStream(
-        searchBase, scopeObject[scope], searchFilter, pageSize,
-        this._searchID, this._binding);
-    }
-    throw new Error(BIND_ERROR_MESSAGE);
+      reject(new Error(BIND_ERROR_MESSAGE));
+    });
   }
 
 
