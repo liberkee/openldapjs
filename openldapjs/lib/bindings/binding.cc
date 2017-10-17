@@ -44,7 +44,7 @@ class LDAPClient : public Nan::ObjectWrap {
  private:
   LDAP *ld_{};
   std::shared_ptr<std::map<std::string, berval *>> cookies_{};
-  explicit LDAPClient() {  //  getting cpp_lint error on this
+  LDAPClient() {  //  getting cpp_lint error on this
     cookies_ = std::make_shared<std::map<std::string, berval *>>();
   }
 
@@ -151,8 +151,6 @@ class LDAPClient : public Nan::ObjectWrap {
     char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
 
-    int message{};
-    int result{};
     struct timeval timeOut = {constants::TEN_SECONDS,
                               constants::ZERO_USECONDS};  // if search exceeds
                                                           // 10 seconds, throws
@@ -162,25 +160,11 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
-    // Verify if the argument is a Number for scope
-    if (!info[1]->IsNumber()) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-
     int scopeSearch = info[1]->NumberValue();
-    if (scopeSearch <= 0 && scopeSearch >= 3) {
-      stateClient[0] = Nan::New<v8::Number>(0);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
 
     if (obj->ld_ == nullptr) {
+      /* We verify the ld before an operation to see if we should continue or
+       * not */
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
@@ -188,12 +172,14 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    result =
-        ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch, nullptr, 0,
-                        nullptr, nullptr, &timeOut, LDAP_NO_LIMIT, &message);
+    int message{};
+    const auto result =
+        ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch, nullptr,
+                        constants::ATTR_WANTED, nullptr, nullptr, &timeOut,
+                        LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New(ldap_err2string(result)).ToLocalChecked();
+      stateClient[0] = Nan::New<v8::Number>(result);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
