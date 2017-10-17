@@ -120,15 +120,17 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should reject if filter is not defined correctly ', () => {
-    return adminLDAP.pagedSearch(
+  it('should reject if filter is not defined correctly ', (next) => {
+    adminLDAP.pagedSearch(
       searchBase, searchScope.subtree, 'aasd', pageSize)
       .then((res) => {
         res.on('data', (data) => {
           should.fail('Didn\'t expect success');
+          next();
         });
         res.on('err', (err) => {
           err.should.deepEqual(errList.filterError);
+          next();
         });
       });
   });
