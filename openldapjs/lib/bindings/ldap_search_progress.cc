@@ -1,4 +1,5 @@
 #include "ldap_search_progress.h"
+#include "ldap_helper_function.h"
 #include "constants.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
@@ -13,12 +14,7 @@ void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
-  BerElement *ber{};
   LDAPMessage *l_result{};
-  LDAPMessage *l_entry{};
-  char *attribute{};
-  char **values{};
-  char *l_dn{};
   int result{};
 
   while (result == constants::LDAP_NOT_FINISHED) {
@@ -26,38 +22,12 @@ void LDAPSearchProgress::Execute(
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
   }
 
-  for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
-       l_entry = ldap_next_entry(ld_, l_entry)) {
-    l_dn = ldap_get_dn(ld_, l_entry);
-    resultSearch_ += constants::newLine;
-    resultSearch_ += constants::dn;
-    resultSearch_ += constants::separator;
-    resultSearch_ += l_dn;
-    resultSearch_ += constants::newLine;
-    ldap_memfree(l_dn);
-
-    for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
-         attribute != nullptr;
-         attribute = ldap_next_attribute(ld_, l_entry, ber)) {
-      if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
-        for (int i = 0; values[i] != nullptr; i++) {
-          resultSearch_ += attribute;
-          resultSearch_ += constants::separator;
-          resultSearch_ += values[i];
-          resultSearch_ += constants::newLine;
-        }
-        ldap_value_free(values);
-      }
-      ldap_memfree(attribute);
-    }
-    ber_free(ber, false);
-    resultSearch_ += constants::newLine;
+  status_ = ldap_result2error(ld_, l_result, false);
+  if (status_ != LDAP_SUCCESS) {
+    return;
   }
 
-  status_ = ldap_result2error(ld_, l_result, false);
-
-  /* Free the search results.                                       */
-  ldap_msgfree(l_result);
+  resultSearch_ = buildsSearchMessage(ld_, l_result);
 }
 
 // Executes in event loop

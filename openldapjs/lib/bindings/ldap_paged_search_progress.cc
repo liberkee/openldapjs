@@ -1,5 +1,6 @@
 #include "ldap_paged_search_progress.h"
 #include "constants.h"
+#include "ldap_helper_function.h"
 
 LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
@@ -19,27 +20,22 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
 // Executes in worker thread
 void LDAPPagedSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  BerElement *ber{};
   int l_entries{};
   int l_entry_count{};
   int l_errcode{};
   int pagedResult{};
   char pagingCriticality = 'T';
-  char *l_dn{};
   int totalCount{};
   LDAPControl *pageControl = nullptr;
   LDAPControl *M_controls[2] = {nullptr, nullptr};
   LDAPControl **returnedControls = nullptr;
   LDAPMessage *l_result{};
-  LDAPMessage *l_entry{};
   int msgId{};
-  char *attribute{};
-  char **values{};
   struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
-{
+  {
     status_ = ldap_create_page_control(ld_, pageSize_, (*cookies_)[cookieID_],
                                        pagingCriticality, &pageControl);
     if (status_ != LDAP_SUCCESS) {
@@ -86,8 +82,7 @@ void LDAPPagedSearchProgress::Execute(
 
     if ((*cookies_)[cookieID_] != nullptr) {
       ber_bvfree((*cookies_)[cookieID_]);
-      (*cookies_)[cookieID_] =
-          nullptr;
+      (*cookies_)[cookieID_] = nullptr;
     }
     /* Parse the page control returned to get the cookie and          */
     /* determine whether there are more pages.                        */
@@ -128,35 +123,7 @@ void LDAPPagedSearchProgress::Execute(
       l_entry_count = l_entry_count + l_entries;
     }
 
-    for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
-         l_entry = ldap_next_entry(ld_, l_entry)) {
-      l_dn = ldap_get_dn(ld_, l_entry);
-      pageResult_ += constants::newLine;
-      pageResult_ += constants::dn;
-      pageResult_ += constants::separator;
-      pageResult_ += l_dn;
-      pageResult_ += constants::newLine;
-      ldap_memfree(l_dn);
-      for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
-           attribute != nullptr;
-           attribute = ldap_next_attribute(ld_, l_entry, ber)) {
-        if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
-          for (int i = 0; values[i] != nullptr; i++) {
-            pageResult_ += attribute;
-            pageResult_ += constants::separator;
-            pageResult_ += values[i];
-            pageResult_ += constants::newLine;
-          }
-          ldap_value_free(values);
-        }
-        ldap_memfree(attribute);
-      }
-      ber_free(ber, 0);
-      pageResult_ += constants::newLine;
-    }
-
-    /* Free the search results.                                       */
-    ldap_msgfree(l_result);
+    pageResult_ = buildsSearchMessage(ld_, l_result);
   }
 }
 

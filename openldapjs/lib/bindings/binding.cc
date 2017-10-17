@@ -206,7 +206,7 @@ class LDAPClient : public Nan::ObjectWrap {
       obj->cookies_->insert(it, {cookie_id, nullptr});
     }
 
-    v8::Local<v8::Value> stateClient[4] = {Nan::Null(), Nan::Null(),
+    v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null(),
                                            Nan::Null()};
 
     Nan::Callback *callback = new Nan::Callback(info[5].As<v8::Function>());
