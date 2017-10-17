@@ -168,7 +168,7 @@ cn: ${attributeEntry}\n\n`;
 
   it('should make multiple operations in parallel', () => {
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
-    let searchEntry = config.ldapAuthentication.dnUser.split(',');
+    let searchEntry = config.ldapAuthentication.dnUserNoRight.split(',');
     searchEntry = searchEntry[0];
 
     const addOP =
@@ -213,9 +213,9 @@ cn: ${attributeEntry}\n\n`;
             resultOperation = resultOperation[1].split(':');
             resultOperation = resultOperation[1];
 
-            if (resultOperation === config.ldapAuthentication.dnUser) {
+            if (resultOperation === config.ldapAuthentication.dnUserNoRight) {
               should.deepEqual(
-                resultOperation, `${config.ldapAuthentication.dnUser}`);
+                resultOperation, `${config.ldapAuthentication.dnUserNoRight}`);
             } else if (
               resultOperation ===
                   ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
