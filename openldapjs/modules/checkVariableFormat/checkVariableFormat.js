@@ -36,7 +36,7 @@ class CheckParam {
     *
     * @method checkModifyChangeArray
     * @param {Array} changes The Array of json Objects that is sent for
-   * verification
+    * verification
     * @return Throws error in case the json can't be validated
     */
   static checkModifyChangeArray(changes) {
@@ -81,7 +81,7 @@ class CheckParam {
     * Verify the entry parameter.
     *
     * @method checkControlArray
-    * @param {Object} entry The object that is send for verification
+    * @param {Object} entry The object that is sent for verification
     * @return Throws error in case the entry can't be validated.
     */
   static checkEntryObject(entry) {
