@@ -3,7 +3,7 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
-const ErrorHandler = require('./errors/error_dispenser');
+const errorHandler = require('./errors/error_dispenser');
 const StateError = require('./errors/state_error');
 const errorList = require('../test/errorList.json');
 
@@ -63,7 +63,7 @@ class LDAPAsyncWrap {
             this._stateClient = E_STATES.INITIALIZED;
             resolve();
           } else {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapInitializeErrorMessage));
           }
         });
@@ -88,7 +88,7 @@ class LDAPAsyncWrap {
       if (this._stateClient === E_STATES.INITIALIZED) {
         this._binding.bind(bindDn, passwordUser, (err, state) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
             reject(new CustomError(errorList.ldapBindErrorMessage));
           } else {
@@ -128,7 +128,7 @@ class LDAPAsyncWrap {
         this._binding.search(
           searchBase, scopeObject[scope], searchFilter, (err, result) => {
             if (err) {
-              const CustomError = ErrorHandler(err);
+              const CustomError = errorHandler(err);
               reject(new CustomError(errorList.ldapSearchErrorMessage));
             } else {
               resolve(result);
@@ -162,7 +162,7 @@ class LDAPAsyncWrap {
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapCompareErrorMessage));
           } else {
             resolve(result);
@@ -195,7 +195,7 @@ class LDAPAsyncWrap {
 
         this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapModifyErrorMessage));
           } else {
             resolve(result);
@@ -228,7 +228,7 @@ class LDAPAsyncWrap {
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapRenameErrorMessage));
           } else {
             resolve(result);
@@ -258,7 +258,7 @@ class LDAPAsyncWrap {
 
         this._binding.delete(dn, ctrls, (err, result) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapDeleteErrorMessage));
           } else {
             resolve(result);
@@ -290,7 +290,7 @@ class LDAPAsyncWrap {
 
         this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapAddErrorMessage));
           } else {
             resolve(result);
@@ -312,7 +312,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
           if (err) {
-            const CustomError = ErrorHandler(err);
+            const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapUnbindErrorMessage));
           } else {
             this._stateClient = E_STATES.UNBOUND;

@@ -4,7 +4,7 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/errors/error_dispenser');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the rename functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
@@ -102,8 +102,8 @@ describe('Testing the rename functionalities', () => {
       .then(() => {
         should.fail('should not have passed');
       })
-      .catch(ErrorHandler(errList.invalidDnSyntax), (error) => {
-        const CustomError = ErrorHandler(errList.invalidDnSyntax);
+      .catch(errorHandler(errList.invalidDnSyntax), (error) => {
+        const CustomError = errorHandler(errList.invalidDnSyntax);
         should.deepEqual(error, new CustomError(errList.ldapRenameErrorMessage));
       })
       .catch((err) => {
@@ -113,7 +113,7 @@ describe('Testing the rename functionalities', () => {
 
   it('should reject if newparent  incorrectly defined', () => {
     const badNewParent = 'bad dn';
-    const CustomError = ErrorHandler(errList.invalidDnSyntax);
+    const CustomError = errorHandler(errList.invalidDnSyntax);
     return ldapAsyncWrap
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn, badNewParent)
@@ -130,7 +130,7 @@ describe('Testing the rename functionalities', () => {
 
   it('should reject if dn  incorrectly defined', () => {
     const incorrectDefinedDn = 'cn=admin';
-    const CustomError = ErrorHandler(errList.unwillingToPerform);
+    const CustomError = errorHandler(errList.unwillingToPerform);
     return ldapAsyncWrap
       .rename(
         incorrectDefinedDn, config.ldapRename.newrdn,
@@ -148,7 +148,7 @@ describe('Testing the rename functionalities', () => {
 
   it('should reject if newparent  incorrectly defined', () => {
     const incorrectDefinedNewParent = 'ou=users';
-    const CustomError = ErrorHandler(errList.affectMultipleDsas);
+    const CustomError = errorHandler(errList.affectMultipleDsas);
     return ldapAsyncWrap
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn,
@@ -181,7 +181,7 @@ describe('Testing the rename functionalities', () => {
 
   it('should reject if dn doesn\'t exist ', () => {
     const existDn = 'cn=1,ou=users,o=myhost,dc=demoApp,dc=com';
-    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return ldapAsyncWrap
       .rename(
         existDn, config.ldapRename.newrdn, config.ldapRename.newparent,

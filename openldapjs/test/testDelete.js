@@ -5,7 +5,7 @@ const should = require('should');
 const Promise = require('bluebird');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/errors/error_dispenser');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -46,7 +46,7 @@ describe('Testing the async LDAP delete operation', () => {
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
   it('should reject the request with invalidDn error code', () => {
 
-    const CustomError = ErrorHandler(errList.invalidDnSyntax);
+    const CustomError = errorHandler(errList.invalidDnSyntax);
 
     return clientLDAP.delete('garbage')
       .then(() => {
@@ -62,7 +62,7 @@ describe('Testing the async LDAP delete operation', () => {
 
   it('should reject the request for passing an empty DN', () => {
 
-    const CustomError = ErrorHandler(errList.unwillingToPerform);
+    const CustomError = errorHandler(errList.unwillingToPerform);
 
     return clientLDAP.delete('')
       .then(() => {
@@ -88,7 +88,7 @@ describe('Testing the async LDAP delete operation', () => {
 
   it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
-    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
       .then(() => {
         should.fail('should not have succeeded');
@@ -113,7 +113,7 @@ describe('Testing the async LDAP delete operation', () => {
   it('should reject the request to delete non-leaf node', () => {
     const stringLength = config.ldapDelete.dn.length;
     const parentDn = config.ldapDelete.dn.slice(1, stringLength);
-    const CustomError = ErrorHandler(errList.notAllowedOnNonLeaf);
+    const CustomError = errorHandler(errList.notAllowedOnNonLeaf);
     return clientLDAP.delete(parentDn)
       .then(() => {
         should.fail('should not have succeeded');
@@ -136,7 +136,7 @@ describe('Testing the async LDAP delete operation', () => {
   });
 
   it('should delete sequential requests with one error', () => {
-    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return clientLDAP.delete(dnUser)
       .then((res1) => {
         should.deepEqual(res1, errList.resultSuccess);

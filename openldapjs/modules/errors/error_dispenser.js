@@ -85,7 +85,11 @@ const errors = {
 
 
 };
-
+/**
+ * Function that returns the error class corresponding to the LDAP error code.
+ * @param {int} code Ldap error code ranging from 1 to 80. (not sure if int is the right mdn keyword for integers)
+ * @return {Error} DesiredErrorClass Custom error class corresponding to the ldap error code.
+ */
 function errorSelection(code) {
 
   const FoundErrorClassKey = Object.keys(errors)

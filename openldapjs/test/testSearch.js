@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/errors/error_dispenser');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -83,7 +83,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
-    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => {

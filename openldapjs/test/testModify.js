@@ -5,7 +5,7 @@ const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/errors/error_dispenser');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the modify functionalities', () => {
 
@@ -156,7 +156,7 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject operation if the dn is empty', () => {
-    const CustomError = ErrorHandler(errList.unwillingToPerform);
+    const CustomError = errorHandler(errList.unwillingToPerform);
     return ldapAsyncWrap.modify('', changeAttributes)
       .then(() => {
         should.fail('should not have passed');

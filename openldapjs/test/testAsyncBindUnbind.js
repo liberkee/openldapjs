@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errList = require('./errorList.json');
-const ErrorHandler = require('../modules/errors/error_dispenser');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the async LDAP authentication', () => {
   const host = config.ldapAuthentication.host;
@@ -27,7 +27,7 @@ describe('Testing the async LDAP authentication', () => {
 
   it('should not bind to the server using invalid credentials', () => {
 
-    const CustomError = ErrorHandler(errList.invalidCredentials);
+    const CustomError = errorHandler(errList.invalidCredentials);
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
