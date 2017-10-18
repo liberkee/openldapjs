@@ -39,6 +39,9 @@ describe('Testing the rename functionalities', () => {
   it('should reject if dn is not a string', () => {
     return ldapAsyncWrap
       .rename(1, config.ldapRename.newrdn, config.ldapRename.newparent)
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.typeErrorMessage);
       });
@@ -47,6 +50,9 @@ describe('Testing the rename functionalities', () => {
   it('should reject if newRdn is not a string', () => {
     return ldapAsyncWrap
       .rename(config.ldapRename.dnChange, 1, config.ldapRename.newparent)
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.typeErrorMessage);
       });

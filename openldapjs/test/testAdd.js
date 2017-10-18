@@ -68,7 +68,7 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch(ErrorHandler(errList.invalidDnSyntax), (err) => {
+      .catch(CustomError, (err) => {
         should.deepEqual(err, new CustomError(errList.ldapAddErrorMessage));
       })
       .catch((err) => {
@@ -90,19 +90,23 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch((undefinedTypeErr) => {
+        // It not better if we create a dedicate error for this case too?
         should.deepEqual(undefinedTypeErr.message, errList.entryObjectError);
       });
 
   });
 
   it('should reject the add operation with a duplicated entry', () => {
+    const CustomError = ErrorHandler(errList.alreadyExists);
     return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch(ErrorHandler(errList.alreadyExists), (duplicatedEntryError) => {
-        const CustomError = ErrorHandler(errList.alreadyExists);
+      .catch(CustomError, (duplicatedEntryError) => {
         should.deepEqual(duplicatedEntryError, new CustomError(errList.ldapAddErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
 
   });
@@ -118,6 +122,7 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should add multiple entries sequentially and reject to add a duplicate',
     () => {
+      const CustomError = ErrorHandler(errList.alreadyExists);
       return clientLDAP.add(dnUser, validEntry)
         .then((res1) => {
           personNr += 1;
@@ -135,8 +140,10 @@ describe('Testing the async LDAP add operation', () => {
           res3.should.be.deepEqual(0);
           return clientLDAP.add(dnUser, validEntry);
         })
-        .catch(ErrorHandler(errList.alreadyExists), (err) => {
-          const CustomError = ErrorHandler(errList.alreadyExists);
+        .then(() => {
+          should.fail('should not succeed');
+        })
+        .catch(CustomError, (err) => {
           should.deepEqual(err, new CustomError(errList.ldapAddErrorMessage));
           personNr += 1;
         })
@@ -145,13 +152,14 @@ describe('Testing the async LDAP add operation', () => {
         });
     });
 
-  // is null the same with '' ? for '' the  resulting error code was 68
+  // is null the same with '' ? for '' the  resulting error code was 68 
+  // <-> null wold give a type error and '' will give 68 or 32
   it('should reject add request with empty(null) DN', () => {
     return clientLDAP.add(null, validEntry)
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch((err) => {
+      .catch((err) => { // dedicate error?
         should.deepEqual(err.message, errList.typeErrorMessage);
       });
   });
@@ -159,15 +167,18 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should reject the request if try to rebind',
     () => { // what does this test ?
+      const CustomError = ErrorHandler(errList.insufficientAccess);
       return clientLDAP2
         .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
         .then(() => {
           should.fail(' should not succeed');
         })
-        .catch(ErrorHandler(errList.insufficientAccess), (accessError) => {
-          const CustomError = ErrorHandler(errList.insufficientAccess);
+        .catch(CustomError, (accessError) => {
           should.deepEqual(accessError, new CustomError(errList.ldapAddErrorMessage));
 
+        })
+        .catch((err) => {
+          should.fail('did not expect generic error');
         });
     });
 
@@ -180,7 +191,7 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch((stateError) => {
+      .catch((stateError) => { // dedicate error?
         should.deepEqual(stateError.message, errList.bindErrorMessage);
       });
   });

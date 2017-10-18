@@ -91,6 +91,9 @@ describe('Testing the modify functionalities', () => {
           config.ldapModify.ldapModificationReplace.change_dn,
           changeAttributes);
       })
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
       });
@@ -115,6 +118,9 @@ describe('Testing the modify functionalities', () => {
       return ldapAsyncWrap
         .modify(
           config.ldapModify.ldapModificationReplace.change_dn, attribute)
+        .then(() => {
+          should.fail('should not have succeeded');
+        })
         .catch((error) => { should.deepEqual(error.message, errorMSG); });
     });
 
@@ -128,6 +134,9 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
@@ -140,16 +149,19 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the dn is empty', () => {
+    const CustomError = ErrorHandler(errList.unwillingToPerform);
     return ldapAsyncWrap.modify('', changeAttributes)
       .then(() => {
         should.fail('should not have passed');
       })
-      .catch(ErrorHandler(errList.unwillingToPerform), (error) => {
-        const CustomError = ErrorHandler(errList.unwillingToPerform);
+      .catch(CustomError, (error) => {
         should.deepEqual(error, new CustomError(errList.ldapModifyErrorMessage));
       })
       .catch((err) => {

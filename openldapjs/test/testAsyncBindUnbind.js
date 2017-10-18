@@ -35,6 +35,9 @@ describe('Testing the async LDAP authentication', () => {
       .catch(ErrorHandler(errList.invalidCredentials), (err) => {
         const CustomError = ErrorHandler(errList.invalidCredentials);
         should.deepEqual(err, new CustomError(errList.ldapBindErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 

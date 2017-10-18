@@ -196,6 +196,9 @@ describe('Testing the async LDAP search ', () => {
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((err) => { err.should.not.be.empty; });
   });
 
