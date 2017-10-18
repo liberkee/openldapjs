@@ -92,6 +92,7 @@ describe('Testing the Compare functionalities', () => {
   it('should not compare with denied access', () => {
     const noAccessDn = config.ldapAuthentication.dnUser;
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
+    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
 
     return ldapAsyncWrap.initialize()
       .then(() => { return ldapAsyncWrap.bind(noAccessDn, password); })
@@ -99,8 +100,7 @@ describe('Testing the Compare functionalities', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch(ErrorHandler(errList.ldapNoSuchObject), (err) => {
-        const CustomError = ErrorHandler(errList.ldapNoSuchObject);
+      .catch(CustomError, (err) => {
         should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
       })
       .catch((err) => {

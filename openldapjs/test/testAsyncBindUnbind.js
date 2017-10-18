@@ -26,14 +26,15 @@ describe('Testing the async LDAP authentication', () => {
   });
 
   it('should not bind to the server using invalid credentials', () => {
+
+    const CustomError = ErrorHandler(errList.invalidCredentials);
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch(ErrorHandler(errList.invalidCredentials), (err) => {
-        const CustomError = ErrorHandler(errList.invalidCredentials);
+      .catch(CustomError, (err) => {
         should.deepEqual(err, new CustomError(errList.ldapBindErrorMessage));
       })
       .catch((err) => {
