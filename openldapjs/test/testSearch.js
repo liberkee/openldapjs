@@ -53,6 +53,9 @@ describe('Testing the async LDAP search ', () => {
           searchBase, searchScope.subtree,
           config.ldapSearch.filterObjSpecific);
       })
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
       });
@@ -63,7 +66,7 @@ describe('Testing the async LDAP search ', () => {
       .search(
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific)
-      .then((result) => { const resShouldBe = result.should.be.empty; });
+      .then((result) => { result.should.be.empty; });
   });
   /**
    * case for search with non existing search base
@@ -80,13 +83,25 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
+    const CustomError = ErrorHandler(errList.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .catch((err) => { err.should.be.deepEqual(ErrorHandler(32)); });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapSearchErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -95,6 +110,9 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the searchBase is not a string', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -178,7 +196,7 @@ describe('Testing the async LDAP search ', () => {
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
-      .catch((err) => { const resShouldBe = err.should.not.be.empty; }); // is it really worth it to write code like this just so we avoid lint error messages ?
+      .catch((err) => { err.should.not.be.empty; });
   });
 
 

@@ -60,7 +60,7 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => { return clientLDAP2.unbind(); });
   });
 
-  it('should reject the add operation with a wrong dn', () => { // this doesn't work as expected.
+  it('should reject the add operation with a wrong dn', () => {
 
     const CustomError = ErrorHandler(errList.invalidDnSyntax);
 

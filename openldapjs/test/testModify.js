@@ -145,8 +145,15 @@ describe('Testing the modify functionalities', () => {
 
   it('should reject operation if the dn is empty', () => {
     return ldapAsyncWrap.modify('', changeAttributes)
-      .catch((error) => {
-        should.deepEqual(error, ErrorHandler(errList.unwillingToPerform));
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(ErrorHandler(errList.unwillingToPerform), (error) => {
+        const CustomError = ErrorHandler(errList.unwillingToPerform);
+        should.deepEqual(error, new CustomError(errList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
