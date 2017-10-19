@@ -22,6 +22,7 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
    **/
   LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                   const int msgID);
+  ~LDAPAddProgress();
 
   /**
    **@brief Execute Method, runs outside the event loop.

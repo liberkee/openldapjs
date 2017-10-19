@@ -22,6 +22,7 @@ class LDAPRenameProgress : public Nan::AsyncProgressWorker {
   **/
   LDAPRenameProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                      const int msgID);
+  ~LDAPRenameProgress();
 
   /**
    **@brief Execute Method, runs outside the event loop.

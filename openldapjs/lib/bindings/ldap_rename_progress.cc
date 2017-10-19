@@ -11,6 +11,8 @@ LDAPRenameProgress::LDAPRenameProgress(Nan::Callback *callback,
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPRenameProgress::~LDAPRenameProgress() { ldap_destroy(ld_); }
+
 void LDAPRenameProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};

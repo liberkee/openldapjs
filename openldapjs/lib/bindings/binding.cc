@@ -105,7 +105,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    stateClient[1] = Nan::True();   
+    stateClient[1] = Nan::True();
     callback->Call(2, stateClient);
     delete callback;
     callback = nullptr;
@@ -176,9 +176,9 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
-
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPSearchProgress(callback, progress, obj->ld_, message));
+        new LDAPSearchProgress(callback, progress, newLD, message));
   }
 
   static NAN_METHOD(compare) {
@@ -213,8 +213,10 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
+
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPCompareProgress(callback, progress, obj->ld_, message));
+        new LDAPCompareProgress(callback, progress, newLD, message));
   }
 
   static NAN_METHOD(modify) {
@@ -306,8 +308,10 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     ldap_mods_free(ldapmods, true);
+
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPModifyProgress(callback, progress, obj->ld_, msgID));
+        new LDAPModifyProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(ldaprename) {
@@ -345,8 +349,9 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPRenameProgress(callback, progress, obj->ld_, msgID));
+        new LDAPRenameProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(del) {
@@ -391,8 +396,9 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPDeleteProgress(callback, progress, obj->ld_, msgID));
+        new LDAPDeleteProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(add) {
@@ -467,8 +473,9 @@ class LDAPClient : public Nan::ObjectWrap {
 
     ldap_mods_free(newEntries, true);
 
+    auto *newLD = ldap_dup(obj->ld_);
     Nan::AsyncQueueWorker(
-        new LDAPAddProgress(callback, progress, obj->ld_, msgID));
+        new LDAPAddProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(unbind) {

@@ -22,6 +22,8 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
    **/
   LDAPModifyProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                      const int msgID);
+  ~LDAPModifyProgress();
+
   /**
    **@brief Execute Method, runs outside the event loop.
    **@param progress, used to send data back to js during execution, currently

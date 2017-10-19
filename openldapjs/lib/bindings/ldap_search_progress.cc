@@ -9,6 +9,8 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPSearchProgress::~LDAPSearchProgress() { ldap_destroy(ld_); }
+
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};

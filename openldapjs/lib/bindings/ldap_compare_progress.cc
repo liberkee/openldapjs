@@ -9,6 +9,8 @@ LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPCompareProgress::~LDAPCompareProgress() { ldap_destroy(ld_); }
+
 // Executes in worker thread
 void LDAPCompareProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {

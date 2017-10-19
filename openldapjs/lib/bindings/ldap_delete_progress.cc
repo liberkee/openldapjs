@@ -11,6 +11,8 @@ LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback,
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPDeleteProgress::~LDAPDeleteProgress() { ldap_destroy(ld_); }
+
 // Executes in worker thread
 void LDAPDeleteProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {

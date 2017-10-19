@@ -22,6 +22,7 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
    **/
   LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
                      const int msgID);
+  ~LDAPDeleteProgress();
 
   /**
    **@brief Execute Method, runs outside the event loop.

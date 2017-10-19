@@ -11,6 +11,8 @@ LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPAddProgress::~LDAPAddProgress() { ldap_destroy(ld_); }
+
 void LDAPAddProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
