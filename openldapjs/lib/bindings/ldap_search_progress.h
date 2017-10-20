@@ -22,7 +22,7 @@ class LDAPSearchProgress : public Nan::AsyncProgressWorker {
    **@param msgID, operation identifier.
    **/
   LDAPSearchProgress(Nan::Callback *callback, Nan::Callback *progress,
-                     std::shared_ptr<LDAP> ld, const int msgID);
+                     const std::shared_ptr<LDAP> &ld, const int msgID);
   ~LDAPSearchProgress();
 
   /**

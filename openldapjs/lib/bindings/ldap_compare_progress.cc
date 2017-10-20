@@ -3,7 +3,7 @@
 
 LDAPCompareProgress::LDAPCompareProgress(
     Nan::Callback *callback, Nan::Callback *progress,
-    std::shared_ptr<LDAP> ld, const int msgID)
+    const std::shared_ptr<LDAP> &ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),

@@ -3,7 +3,7 @@
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress,
-                                       std::shared_ptr<LDAP> ld,
+                                       const std::shared_ptr<LDAP> &ld,
                                        const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
@@ -42,7 +42,8 @@ void LDAPSearchProgress::Execute(
     for (attribute = ldap_first_attribute(ld_.get(), l_entry, &ber);
          attribute != nullptr;
          attribute = ldap_next_attribute(ld_.get(), l_entry, ber)) {
-      if ((values = ldap_get_values(ld_.get(), l_entry, attribute)) != nullptr) {
+      if ((values = ldap_get_values(ld_.get(), l_entry, attribute)) !=
+          nullptr) {
         for (int i = 0; values[i] != nullptr; i++) {
           resultSearch_ += attribute;
           resultSearch_ += constants::separator;
