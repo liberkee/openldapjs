@@ -6,7 +6,7 @@
 
 class LDAPCompareProgress : public Nan::AsyncProgressWorker {
  private:
-  std::shared_ptr<LDAP> ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};

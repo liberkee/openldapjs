@@ -7,7 +7,7 @@
 
 class LDAPSearchProgress : public Nan::AsyncProgressWorker {
  private:
-  std::shared_ptr<LDAP> ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   std::string resultSearch_{};
   int msgID_{};
