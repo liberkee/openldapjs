@@ -6,7 +6,7 @@
 
 class LDAPRenameProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
+  std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};
@@ -20,8 +20,8 @@ class LDAPRenameProgress : public Nan::AsyncProgressWorker {
   **@param ld, LDAP structure that holds ldap internal data.
   **@param msgID, operation identifier.
   **/
-  LDAPRenameProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     const int msgID);
+  LDAPRenameProgress(Nan::Callback *callback, Nan::Callback *progress,
+                     std::shared_ptr<LDAP> ld, const int msgID);
   ~LDAPRenameProgress();
 
   /**

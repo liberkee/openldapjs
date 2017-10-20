@@ -2,14 +2,15 @@
 #include "constants.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
-                                       Nan::Callback *progress, LDAP *ld,
+                                       Nan::Callback *progress,
+                                       std::shared_ptr<LDAP> ld,
                                        const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
       msgID_(msgID) {}
 
-LDAPSearchProgress::~LDAPSearchProgress() { ldap_destroy(ld_); }
+LDAPSearchProgress::~LDAPSearchProgress() {}
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
@@ -24,13 +25,13 @@ void LDAPSearchProgress::Execute(
   int result{};
 
   while (result == constants::LDAP_NOT_FINISHED) {
-    result =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
+    result = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                         &l_result);
   }
 
-  for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
-       l_entry = ldap_next_entry(ld_, l_entry)) {
-    l_dn = ldap_get_dn(ld_, l_entry);
+  for (l_entry = ldap_first_entry(ld_.get(), l_result); l_entry != nullptr;
+       l_entry = ldap_next_entry(ld_.get(), l_entry)) {
+    l_dn = ldap_get_dn(ld_.get(), l_entry);
     resultSearch_ += constants::newLine;
     resultSearch_ += constants::dn;
     resultSearch_ += constants::separator;
@@ -38,10 +39,10 @@ void LDAPSearchProgress::Execute(
     resultSearch_ += constants::newLine;
     ldap_memfree(l_dn);
 
-    for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
+    for (attribute = ldap_first_attribute(ld_.get(), l_entry, &ber);
          attribute != nullptr;
-         attribute = ldap_next_attribute(ld_, l_entry, ber)) {
-      if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
+         attribute = ldap_next_attribute(ld_.get(), l_entry, ber)) {
+      if ((values = ldap_get_values(ld_.get(), l_entry, attribute)) != nullptr) {
         for (int i = 0; values[i] != nullptr; i++) {
           resultSearch_ += attribute;
           resultSearch_ += constants::separator;
@@ -56,7 +57,7 @@ void LDAPSearchProgress::Execute(
     resultSearch_ += constants::newLine;
   }
 
-  status_ = ldap_result2error(ld_, l_result, false);
+  status_ = ldap_result2error(ld_.get(), l_result, false);
 
   /* Free the search results.                                       */
   ldap_msgfree(l_result);

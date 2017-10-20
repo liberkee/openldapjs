@@ -4,21 +4,21 @@
 #include "ldap_control.h"
 
 LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
-                                 Nan::Callback *progress, LDAP *ld,
-                                 const int msgID)
+                                 Nan::Callback *progress,
+                                 std::shared_ptr<LDAP> ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
       msgID_(msgID) {}
 
-LDAPAddProgress::~LDAPAddProgress() { ldap_destroy(ld_); }
+LDAPAddProgress::~LDAPAddProgress() {}
 
 void LDAPAddProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
   while (result_ == constants::LDAP_NOT_FINISHED) {
-    result_ =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
+    result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                          &resultMsg_);
   }
 }
 
@@ -29,13 +29,14 @@ void LDAPAddProgress::HandleOKCallback() {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    const auto status = ldap_result2error(ld_, resultMsg_, false);
+    const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
       const auto &ldap_controls = new LdapControls();
-      addResult = ldap_controls->PrintModificationControls(ld_, resultMsg_);
+      addResult =
+          ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
       if (!addResult.empty()) {
         stateClient[1] = Nan::New(addResult).ToLocalChecked();
         callback->Call(2, stateClient);
