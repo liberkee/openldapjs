@@ -19,12 +19,11 @@ class CheckParam {
     *
     * @method checkModifyChangeArray
     * @param {Array} elements The array of parameters
-    * @return Throws an error in case the provided arguments aren't strings
+    * @return Throws an error in case the provided parameters aren't strings
     */
 
-  static checkParametersIfString() {
-    const args = Array.from(arguments);
-    args.forEach((element) => {
+  static checkParametersIfString(...parameters) {
+    parameters.forEach((element) => {
       if (!_.isString(element)) {
         throw new TypeError('Expected String parameter');
       }
