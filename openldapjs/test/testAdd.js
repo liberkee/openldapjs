@@ -6,6 +6,8 @@ const config = require('./config');
 const Promise = require('bluebird');
 const errList = require('./errorList');
 const ErrorHandler = require('../modules/errors/error_dispenser');
+const StateError = require('../modules/errors/state_error');
+const ValidationError = require('../modules/errors/validation_error');
 
 
 describe('Testing the async LDAP add operation', () => {
@@ -89,9 +91,11 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch((undefinedTypeErr) => {
-        // It not better if we create a dedicate error for this case too?
+      .catch(ValidationError, (undefinedTypeErr) => {
         should.deepEqual(undefinedTypeErr.message, errList.entryObjectError);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
 
   });
@@ -152,15 +156,16 @@ describe('Testing the async LDAP add operation', () => {
         });
     });
 
-  // is null the same with '' ? for '' the  resulting error code was 68 
-  // <-> null wold give a type error and '' will give 68 or 32
   it('should reject add request with empty(null) DN', () => {
     return clientLDAP.add(null, validEntry)
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch((err) => { // dedicate error?
+      .catch(TypeError, (err) => { // dedicate error?
         should.deepEqual(err.message, errList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
@@ -191,8 +196,11 @@ describe('Testing the async LDAP add operation', () => {
       .then(() => {
         should.fail('should not succeed');
       })
-      .catch((stateError) => { // dedicate error?
+      .catch(StateError, (stateError) => {
         should.deepEqual(stateError.message, errList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 

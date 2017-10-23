@@ -281,7 +281,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.checkParametersIfString(dn);
