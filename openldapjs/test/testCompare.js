@@ -4,6 +4,7 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
 const errList = require('./errorList.json');
+const StateError = require('../modules/errors/state_error');
 const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the Compare functionalities', () => {
@@ -32,8 +33,11 @@ describe('Testing the Compare functionalities', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch((error) => { // dedicate error
+      .catch(TypeError, (error) => { // dedicate error
         should.deepEqual(error.message, errList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -52,7 +56,7 @@ describe('Testing the Compare functionalities', () => {
       .then((result) => {
         // there is define a dedicate error for this resolve we 
         // can use that error or delete it because is not actually an error
-        should.deepEqual(result, errList.comparisonResFalse);
+        should.deepEqual(result, errList.comparisonResFalse); // something like this ?
       });
   });
 
@@ -123,8 +127,11 @@ describe('Testing the Compare functionalities', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch((err) => { // dedicate error?
+      .catch(StateError, (err) => {
         should.deepEqual(err.message, errList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -137,8 +144,11 @@ describe('Testing the Compare functionalities', () => {
         .then(() => {
           should.fail('should not have succeeded');
         })
-        .catch((err) => { // dedicate error?
+        .catch(StateError, (err) => {
           should.deepEqual(err.message, errList.bindErrorMessage);
+        })
+        .catch((err) => {
+          should.fail('did not expect generic error');
         });
     });
 
@@ -149,8 +159,11 @@ describe('Testing the Compare functionalities', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch((err) => { // dedicate error?
+      .catch(StateError, (err) => {
         should.deepEqual(err.message, errList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 

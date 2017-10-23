@@ -22,8 +22,9 @@ class CheckParam {
     * @return Throws an error in case the provided parameters aren't strings
     */
 
-  static checkParametersIfString(...parameters) {
-    parameters.forEach((element) => {
+  static checkParametersIfString() {
+    const args = _.toArray(arguments);
+    args.forEach((element) => {
       if (!_.isString(element)) {
         throw new TypeError('Expected String parameter');
       }

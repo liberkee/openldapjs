@@ -87,7 +87,7 @@ const errors = {
 };
 /**
  * Function that returns the error class corresponding to the LDAP error code.
- * @param {Number} code Ldap error code ranging from 1 to 80. (not sure if Number is the right keyword here)
+ * @param {Number} code Ldap error code ranging from 1 to 80.
  * @return {Error} DesiredErrorClass Custom error class corresponding to the ldap error code.
  */
 function errorSelection(code) {
