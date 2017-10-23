@@ -15,10 +15,9 @@ const ValidationError = require('../errors/validation_error');
 class CheckParam {
 
   /**
-    * Verify the rename parameters.
+    * Checks if the arguments provided are Strings.
     *
-    * @method checkModifyChangeArray
-    * @param {Array} elements The array of parameters
+    * @method checkParametersIfString
     * @return Throws an error in case the provided parameters aren't strings
     */
 
