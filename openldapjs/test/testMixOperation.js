@@ -5,7 +5,7 @@ const should = require('should');
 const config = require('./config.json');
 const errList = require('./errorlist.json');
 
-describe.skip('Testing multiple operations functionalities', () => {
+describe('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
   const dn = config.ldapAuthentication.dnAdmin;
   const password = config.ldapAuthentication.passwordAdmin;
