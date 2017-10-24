@@ -7,6 +7,7 @@
   "invalidCredentials": 49,
   "resultSuccess": 0,
   "typeErrorMessage": "Expected String parameter",
+  "typeErrorIntMessage": "Expected Integer parameter",
   "comparisonResTrue": 6,
   "comparisonResFalse": 5,
   "ldapNoSuchObject": 32,
@@ -20,5 +21,7 @@
   "scopeSearchError": "There is no such scope",
   "initializationErrorMessage": "Initialize failed!",
   "connectionError": -11,
-  "serverDown": -1
+  "serverDown": -1,
+  "filterError": -7,
+  "sizeLimitExceeded": 4
 }
