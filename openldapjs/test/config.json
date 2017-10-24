@@ -8,7 +8,7 @@
     "passwordUser": "secret"
   },
   "ldapChangePassword": {
-    "user": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "oldPasswd": "secret",
     "newPasswd": "secret"
   },
