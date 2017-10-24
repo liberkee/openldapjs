@@ -28,12 +28,12 @@ void LDAPSearchProgress::Execute(
                          &l_result);
   }
 
-  status_ = ldap_result2error(ld_, l_result, false);
+  status_ = ldap_result2error(ld_.get(), l_result, false);
   if (status_ != LDAP_SUCCESS) {
     return;
   }
 
-  resultSearch_ = buildsSearchMessage(ld_, l_result);
+  resultSearch_ = buildsSearchMessage(ld_.get(), l_result);
 }
 
 // Executes in event loop
