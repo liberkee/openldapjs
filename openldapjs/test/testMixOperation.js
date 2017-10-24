@@ -5,7 +5,7 @@ const should = require('should');
 const config = require('./config.json');
 const errList = require('./errorlist.json');
 
-describe('Testing multiple operations functionalities', () => {
+describe.skip('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
   const dn = config.ldapAuthentication.dnAdmin;
   const password = config.ldapAuthentication.passwordAdmin;
@@ -73,7 +73,7 @@ ${config.ldapAdd.secondAttr.attr}: ${config.ldapAdd.secondAttr.vals[0]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[0]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[1]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[2]}
-cn: ${attributeEntry}\n\n`;
+cn: ${attributeEntry}\n`;
 
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);

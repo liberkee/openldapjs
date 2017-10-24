@@ -32,7 +32,6 @@ std::string buildsSearchMessage(LDAP *ld, LDAPMessage *result) {
       ldap_memfree(attribute);
     }
     ber_free(ber, 0);
-    pageResult += constants::newLine;
   }
   ldap_msgfree(result);
 

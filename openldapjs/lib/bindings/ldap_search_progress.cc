@@ -1,6 +1,7 @@
 #include "ldap_search_progress.h"
-#include "ldap_helper_function.h"
 #include "constants.h"
+#include "ldap_control.h"
+#include "ldap_helper_function.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -8,7 +9,9 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
-      msgID_(msgID) {}
+      msgID_(msgID) {
+  mapResult_ = std::make_shared<LDAPMapResult>();
+}
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
