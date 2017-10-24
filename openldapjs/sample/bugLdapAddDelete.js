@@ -51,6 +51,7 @@ Promise.all([int1, int2])
       add1, add2, add3, add4, add5, add6, delete1, delete2, delete3, delete4,
       delete5, delete6,
     ]);
+
   })
   .then((res) => { console.log(`Operation Promise Resorses -> ${res}`); })
   .catch((err) => { console.log(`ERROR VALUE: -----------> ${err}`); })

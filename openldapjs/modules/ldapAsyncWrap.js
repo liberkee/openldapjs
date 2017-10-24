@@ -3,6 +3,7 @@
 const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
+const SearchStream = require('./streamInterface.js');
 
 
 const E_STATES = {
@@ -20,7 +21,7 @@ const scopeObject = {
 
 const INITIALIZATION_ERROR_MESSAGE = 'Initialize failed!';
 const BIND_ERROR_MESSAGE =
-  'The operation failed. It could be done if the state of the client is BOUND';
+    'The operation failed. It could be done if the state of the client is BOUND';
 
 
 /**
@@ -127,6 +128,39 @@ class LDAPAsyncWrap {
             }
           });
       }
+    });
+  }
+
+
+  /**
+     * Search operation with results displayed page by page.
+     *
+     * @method pagedSearch
+     * @param {String} searchBase the base for the search.
+     * @param {String} scope  scope for the search, can be BASE, ONE or
+     * SUBTREE
+     * @param {String} searchFilter search filter.
+     * @param {int} pageSize The number of entries per LDAP page
+     * @return {Promise} that resolves to a readable stream or rejects to a Error;
+     */
+  pagedSearch(searchBase, scope, searchFilter, pageSize) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === E_STATES.BOUND) {
+        checkParameters.checkParametersIfString(searchBase, searchFilter, scope);
+
+        if (scopeObject[scope] === undefined) {
+          throw new Error('There is no such scope');
+        }
+
+        if (!Number.isInteger(pageSize)) {
+          throw new Error('Expected Integer parameter');
+        }
+        this._searchID += 1;
+        resolve(new SearchStream(
+          searchBase, scopeObject[scope], searchFilter, pageSize,
+          this._searchID, this._binding));
+      }
+      reject(new Error(BIND_ERROR_MESSAGE));
     });
   }
 
@@ -252,6 +286,37 @@ class LDAPAsyncWrap {
             resolve(result);
           }
         });
+      }
+    });
+  }
+
+  /**
+    * Perform an LDAP password change operation
+    *
+    * @method changePassword
+    * @param {String} userDN The user dn which the password will be changed
+    * @param {String} oldPassword Old password of user 
+    * @param {String} newPassword New password for user
+    * @return {Promise} Will fulfil with a result of success if the
+    * Old password is given correctly, the parameters are string type and 
+    * the state of client is BOUND else will fail with type error or LDAP ERROR.
+    * */
+  changePassword(userDN, oldPassword, newPassword) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new Error(BIND_ERROR_MESSAGE));
+      } else {
+        checkParameters.checkParametersIfString(
+          userDN, oldPassword, newPassword);
+
+        this._binding.changePassword(
+          userDN, oldPassword, newPassword, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
       }
     });
   }

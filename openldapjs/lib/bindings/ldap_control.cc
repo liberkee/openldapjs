@@ -1,7 +1,9 @@
 #include "ldap_control.h"
+#include <map>
+#include <utility>
 #include "constants.h"
 
-LdapControls::LdapControls() {}
+LdapControls::LdapControls() { mapResult_ = std::make_shared<LDAPMapResult>(); }
 
 std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     const v8::Local<v8::Array> &control_handle) {
@@ -46,11 +48,10 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
 
     if (std::strcmp(*controlOperation, constants::postread) ==
         constants::STR_COMPARE_TRUE) {
-      ctrl->ldctl_oid = reinterpret_cast<const char *>(
-          LDAP_CONTROL_POST_READ);  //  compiler warning though...
+      ctrl->ldctl_oid = LDAP_CONTROL_POST_READ;
     } else if (std::strcmp(*controlOperation, constants::preread) ==
                constants::STR_COMPARE_TRUE) {
-      ctrl->ldctl_oid = reinterpret_cast<const char *>(LDAP_CONTROL_PRE_READ);
+      ctrl->ldctl_oid = LDAP_CONTROL_PRE_READ;
     } else {
       return std::vector<LDAPControl *>();
     }
@@ -75,7 +76,6 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
   ldap_parse_result(ld, resultMsg, nullptr, nullptr, nullptr, nullptr,
                     &serverControls, constants::FREE_MSG_FALSE);
   auto i = 0;
-
   if (serverControls == nullptr) {
     return modifyResult;
   }
@@ -86,29 +86,23 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
     } else if (ber_scanf(berElement, "{m{" /*}}*/, &berValue) == LBER_ERROR) {
       return modifyResult;
     } else {
-      modifyResult += constants::newLine;
-      modifyResult += constants::dn;
-      modifyResult += constants::separator;
-      modifyResult += berValue.bv_val;
+      mapResult_->GenerateMapEntryDn(berValue.bv_val);
+
       while (ber_scanf(berElement, "{m" /*}*/, &berValue) != LBER_ERROR) {
         if (ber_scanf(berElement, "[W]", &vals) == LBER_ERROR ||
             vals == nullptr) {
-          modifyResult.clear();
           return modifyResult;
         }
-        auto j = 0;
-        while (vals[j].bv_val != NULL) {
-          modifyResult += constants::newLine;
-          modifyResult += berValue.bv_val;
-          modifyResult += constants::separator;
-          modifyResult += vals[j].bv_val;
-          j++;
-        }
+        mapResult_->GenerateMapAttributeBer(berValue.bv_val, vals);
       }
-      modifyResult += constants::newLine;
+      mapResult_->FillLdifList(mapResult_->GetEntry());
+      mapResult_->ClearEntry();
     }
     i++;
   }
+
+  modifyResult = mapResult_->ResultLDIFString();
+
   ldap_controls_free(serverControls);
   return modifyResult;
 }

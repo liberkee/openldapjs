@@ -2,9 +2,15 @@
   "ldapAuthentication": {
     "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
-    "dnUser": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret"
+  },
+  "ldapChangePassword": {
+    "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
+    "oldPasswd": "secret",
+    "newPasswd": "secret"
   },
   "ldapModify": {
     "ldapModificationReplace": {
@@ -85,6 +91,7 @@
   },
   "ldapSearch": {
     "searchBase": "dc=demoApp,dc=com",
+    "searchBaseUser": "ou=users,o=myhost,dc=demoApp,dc=com",
     "rdnUser": "cn=cghitea",
     "filterObjAll": "objectclass=*",
     "filterObjSpecific": "objectclass=aliens",
