@@ -1,4 +1,5 @@
 #include "ldap_search_progress.h"
+#include "ldap_helper_function.h"
 #include "constants.h"
 #include "ldap_control.h"
 
@@ -16,44 +17,20 @@ void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
-  BerElement *ber{};
   LDAPMessage *l_result{};
-  LDAPMessage *l_entry{};
-  char *attribute{};
-  char **values{};
-  char *l_dn{};
   int result{};
 
   while (result == constants::LDAP_NOT_FINISHED) {
     result =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
   }
-
-  for (l_entry = ldap_first_entry(ld_, l_result); l_entry != nullptr;
-       l_entry = ldap_next_entry(ld_, l_entry)) {
-    l_dn = ldap_get_dn(ld_, l_entry);
-
-    mapResult_->GenerateMapEntryDn(l_dn);
-    ldap_memfree(l_dn);
-
-    for (attribute = ldap_first_attribute(ld_, l_entry, &ber);
-         attribute != nullptr;
-         attribute = ldap_next_attribute(ld_, l_entry, ber)) {
-      if ((values = ldap_get_values(ld_, l_entry, attribute)) != nullptr) {
-        mapResult_->GenerateMapAttribute(attribute, values);
-        ldap_value_free(values);
-      }
-      ldap_memfree(attribute);
-    }
-    mapResult_->FillLdifList(mapResult_->GetEntry());
-    mapResult_->ClearEntry();
-    ber_free(ber, false);
+  
+  status_ = ldap_result2error(ld_, l_result, false);
+  if (status_ != LDAP_SUCCESS) {
+    return;
   }
 
-  status_ = ldap_result2error(ld_, l_result, false);
-
-  /* Free the search results.                                       */
-  ldap_msgfree(l_result);
+  resultSearch_ = buildsSearchMessage(ld_, l_result);
 }
 
 // Executes in event loop
