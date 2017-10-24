@@ -6,6 +6,7 @@ const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 const errorHandler = require('./errors/error_dispenser');
 const StateError = require('./errors/state_error');
 const errorList = require('../test/errorList.json');
+const _ = require('underscore');
 
 
 const E_STATES = {
@@ -107,16 +108,17 @@ class LDAPAsyncWrap {
      * @param {String} searchBase the base for the search.
      * @param {String} scope  scope for the search, can be BASE, ONE or
      * SUBTREE
-     * @param {String} searchFilter  search filter.
+     * @param {String} searchFilter  search filter.If not provided,
+     * the default filter, (objectClass=*), is used.
      * @return {Promise} That resolves and returns a string with the search
      * results. Rejects in case of error.
      * */
-  search(searchBase, scope, searchFilter) {
+  search(searchBase, scope, searchFilter = 'objectClass=*') {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
-        checkParameters.checkParametersIfString(
+        checkParameters.validateStrings(
           searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
@@ -156,7 +158,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
-        checkParameters.checkParametersIfString(dn, attr, value);
+        checkParameters.validateStrings(dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
@@ -187,7 +189,7 @@ class LDAPAsyncWrap {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkModifyChangeArray(jsonChange);
         checkParameters.checkControlArray(controls);
 
@@ -221,7 +223,7 @@ class LDAPAsyncWrap {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn, newRdn, newParent);
+        checkParameters.validateStrings(dn, newRdn, newParent);
         checkParameters.checkControlArray(controls);
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
@@ -251,7 +253,7 @@ class LDAPAsyncWrap {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkControlArray(controls);
 
         this._binding.delete(dn, ctrls, (err, result) => {
@@ -282,7 +284,7 @@ class LDAPAsyncWrap {
         reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkEntryObject(entry);
         checkParameters.checkControlArray(controls);
 

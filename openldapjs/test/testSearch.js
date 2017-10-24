@@ -247,4 +247,12 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
+  it('should use default filter  if filter is not explicitly provided', () => {
+    return adminLDAP
+      .search(searchBase, searchScope.base)
+      .then((result) => {
+        result.should.not.be.empty;
+      });
+  });
+
 });
