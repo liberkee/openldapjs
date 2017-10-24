@@ -1,7 +1,7 @@
 #include "ldap_search_progress.h"
-#include "ldap_helper_function.h"
 #include "constants.h"
 #include "ldap_control.h"
+#include "ldap_helper_function.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress, LDAP *ld,
@@ -24,7 +24,7 @@ void LDAPSearchProgress::Execute(
     result =
         ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
   }
-  
+
   status_ = ldap_result2error(ld_, l_result, false);
   if (status_ != LDAP_SUCCESS) {
     return;
@@ -41,7 +41,7 @@ void LDAPSearchProgress::HandleOKCallback() {
     stateClient[0] = Nan::New(status_);
     callback->Call(1, stateClient);
   } else {
-    stateClient[1] = Nan::New(mapResult_->ResultLDIFString()).ToLocalChecked();
+    stateClient[1] = Nan::New(resultSearch_).ToLocalChecked();
     callback->Call(2, stateClient);
   }
 
