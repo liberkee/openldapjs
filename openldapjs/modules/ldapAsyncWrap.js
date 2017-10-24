@@ -42,10 +42,8 @@ class LDAPAsyncWrap {
     * Initialize to an LDAP server.
     *
     * @method initialize
-    * @return {Promise} That resolves with the initialize state code(1) if the
-    * LDAP
-    ** initialize succeeds
-    ** Rejects if the address is incorrect or the client was not created.
+    * @return {Promise} That resolves if ldap_initialize succeeds
+    ** Rejects if client was not created or ldap_initialize fails.
     * */
   initialize() {
     return new Promise((resolve, reject) => {
