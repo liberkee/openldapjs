@@ -3,6 +3,8 @@
 #include <nan.h>
 #include <node.h>
 #include <string.h>
+#include <map>
+#include <memory>
 #include "constants.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
@@ -10,6 +12,7 @@
 #include "ldap_control.h"
 #include "ldap_delete_progress.h"
 #include "ldap_modify_progress.h"
+#include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
 #include "ldap_changePassword_progress.h"
@@ -32,6 +35,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "delete", del);
     Nan::SetPrototypeMethod(tpl, "add", add);
     Nan::SetPrototypeMethod(tpl, "changePassword", changePassword);
+    Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -41,7 +45,10 @@ class LDAPClient : public Nan::ObjectWrap {
  protected:
  private:
   LDAP *ld_{};
-  LDAPClient() {}
+  std::shared_ptr<std::map<std::string, berval *>> cookies_{};
+  LDAPClient() {  //  getting cpp_lint error on this
+    cookies_ = std::make_shared<std::map<std::string, berval *>>();
+  }
 
   ~LDAPClient() {}
 
@@ -59,10 +66,10 @@ class LDAPClient : public Nan::ObjectWrap {
 
   static NAN_METHOD(initialize) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
     Nan::Utf8String hostArg(info[0]);
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+
     char *hostAddress = *hostArg;
     int protocol_version = LDAP_VERSION3;
 
@@ -146,8 +153,6 @@ class LDAPClient : public Nan::ObjectWrap {
     char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
 
-    int message{};
-    int result{};
     struct timeval timeOut = {constants::TEN_SECONDS,
                               constants::ZERO_USECONDS};  // if search exceeds
                                                           // 10 seconds, throws
@@ -160,6 +165,8 @@ class LDAPClient : public Nan::ObjectWrap {
     int scopeSearch = info[1]->NumberValue();
 
     if (obj->ld_ == nullptr) {
+      /* We verify the ld before an operation to see if we should continue or
+       * not */
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
@@ -167,9 +174,11 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    result = ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch,
-                             nullptr, constants::ATTR_WANTED, nullptr, nullptr,
-                             &timeOut, LDAP_NO_LIMIT, &message);
+    int message{};
+    const auto result =
+        ldap_search_ext(obj->ld_, dnBase, scopeSearch, filterSearch, nullptr,
+                        constants::ATTR_WANTED, nullptr, nullptr, &timeOut,
+                        LDAP_NO_LIMIT, &message);
 
     if (result != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(result);
@@ -181,6 +190,41 @@ class LDAPClient : public Nan::ObjectWrap {
 
     Nan::AsyncQueueWorker(
         new LDAPSearchProgress(callback, progress, obj->ld_, message));
+  }
+
+  static NAN_METHOD(pagedSearch) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Nan::Utf8String baseArg(info[0]);
+    int scopeSearch = info[1]->NumberValue();
+    Nan::Utf8String filterArg(info[2]);
+    int pageSize = info[3]->NumberValue();
+    Nan::Utf8String cookieID(info[4]);
+    std::string dnBase = *baseArg;
+    std::string filterSearch = *filterArg;
+    std::string cookie_id = *cookieID;
+    const auto &it = obj->cookies_->find(cookie_id);
+    if (it == obj->cookies_->end()) {
+      obj->cookies_->insert(it, {cookie_id, nullptr});
+    }
+
+    v8::Local<v8::Value> stateClient[3] = {Nan::Null(), Nan::Null(),
+                                           Nan::Null()};
+
+    Nan::Callback *callback = new Nan::Callback(info[5].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[6].As<v8::Function>());
+
+    if (obj->ld_ == nullptr) {
+      stateClient[0] = Nan::New<v8::Number>(0);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+
+    Nan::AsyncQueueWorker(new LDAPPagedSearchProgress(
+        callback, progress, obj->ld_, dnBase, scopeSearch, filterSearch,
+        cookie_id, pageSize, obj->cookies_));
   }
 
   static NAN_METHOD(compare) {
@@ -508,7 +552,7 @@ class LDAPClient : public Nan::ObjectWrap {
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(nullptr);
       result = ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr,
-                            &msgID);
+                            &msgID);  // async op
     }
 
     if (result != LDAP_SUCCESS) {
@@ -520,7 +564,8 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    ldap_mods_free(newEntries, true);
+    ldap_mods_free(newEntries,
+                   true);  // free before it finishes ? isn't this dangerous ?
 
     Nan::AsyncQueueWorker(
         new LDAPAddProgress(callback, progress, obj->ld_, msgID));
@@ -536,6 +581,7 @@ class LDAPClient : public Nan::ObjectWrap {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
+      delete callback;
       return;
     }
 
@@ -550,6 +596,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     stateClient[1] = Nan::True();
     callback->Call(2, stateClient);
+    callback->Reset();
 
     delete callback;
     callback = nullptr;
