@@ -111,7 +111,7 @@ class LDAPAsyncWrap {
      * SUBTREE
      * @param {String} searchFilter  search filter.
      * @return {Promise} That resolves and returns a string with the search
-     *results. Rejects in case of error.
+     * results. Rejects in case of error.
      * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
@@ -179,9 +179,9 @@ class LDAPAsyncWrap {
     * @param {String} dn The dn of the entry to modify
     * @param {Array} jsonChange The attribute and value to be changed
     * @return {Promise} That resolves if LDAP modified successfully the
-   * entry.
+    * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
-   * BOUND
+    * BOUND
     */
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
