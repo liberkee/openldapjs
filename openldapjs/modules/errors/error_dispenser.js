@@ -7,8 +7,6 @@ const LdapTimeLimitError = require('./ldap_errors/ldap_time_limit_error');
 const LdapProtocolError = require('./ldap_errors/ldap_protocol_error');
 const LdapInvalidSyntaxError = require('./ldap_errors/ldap_invalid_syntax_error');
 const LdapOperationError = require('./ldap_errors/ldap_operation_error');
-const LdapCompareFalse = require('./ldap_errors/ldap_compare_false');
-const LdapCompareTrue = require('./ldap_errors/ldap_compare_true');
 const LdapAuthUnsupportedError = require('./ldap_errors/ldap_auth_method_unsupported');
 const LdapStrongAuthError = require('./ldap_errors/ldap_strong_auth_error');
 const LdapReferralError = require('./ldap_errors/ldap_referral_error');
@@ -49,8 +47,6 @@ const errors = {
   LdapProtocolError: LdapProtocolError,
   LdapInvalidSyntaxError: LdapInvalidSyntaxError,
   LdapOperationError: LdapOperationError,
-  LdapCompareFalse: LdapCompareFalse,
-  LdapCompareTrue: LdapCompareTrue,
   LdapAuthUnsupportedError: LdapAuthUnsupportedError,
   LdapStrongAuthError: LdapStrongAuthError,
   LdapReferralError: LdapReferralError,
