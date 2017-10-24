@@ -21,8 +21,9 @@ describe('Testing the Compare functionalities', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(
-        () => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
@@ -33,7 +34,7 @@ describe('Testing the Compare functionalities', () => {
       .then(() => {
         should.fail('should not have succeeded');
       })
-      .catch(TypeError, (error) => { // dedicate error
+      .catch(TypeError, (error) => {
         should.deepEqual(error.message, errList.typeErrorMessage);
       })
       .catch((err) => {
@@ -41,13 +42,12 @@ describe('Testing the Compare functionalities', () => {
       });
   });
 
-  it('should compare existing attribute',
-    () => { // rename it into should compare two attributes maybe ?
-      return ldapAsyncWrap.compare(dn, attr, val)
-        .then((result) => {
-          should.deepEqual(result, errList.comparisonResTrue);
-        });
-    });
+  it('should compare existing attribute', () => {
+    return ldapAsyncWrap.compare(dn, attr, val)
+      .then((result) => {
+        should.deepEqual(result, errList.comparisonResTrue);
+      });
+  });
 
 
   it('should compare non existing value for attribute', () => {
