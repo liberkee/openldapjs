@@ -6,7 +6,7 @@
 
 class LDAPModifyProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};
@@ -20,8 +20,10 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
    **/
-  LDAPModifyProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     const int msgID);
+  LDAPModifyProgress(Nan::Callback *callback, Nan::Callback *progress,
+                     const std::shared_ptr<LDAP> &ld, const int msgID);
+  ~LDAPModifyProgress();
+
   /**
    **@brief Execute Method, runs outside the event loop.
    **@param progress, used to send data back to js during execution, currently

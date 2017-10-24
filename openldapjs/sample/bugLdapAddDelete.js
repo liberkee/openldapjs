@@ -8,11 +8,11 @@ const host = config.ldapAuthentication.host;
 const newClient = new LDAPCLIENT(host);
 const newClient2 = new LDAPCLIENT(host);
 
-const validEntry = {
-  objectClass: config.ldapAdd.objectClass,
-  sn: config.ldapAdd.sn,
-  description: config.ldapAdd.description,
-};
+const validEntry = [
+  config.ldapAdd.firstAttr,
+  config.ldapAdd.secondAttr,
+  config.ldapAdd.lastAttr,
+];
 
 const newEntry = 'cn=newPointChild111';
 const dnUser = `${newEntry}${config.ldapAdd.dnNewEntry}`;
@@ -40,8 +40,8 @@ Promise.all([int1, int2])
     const add5 = newClient.add(dnUser, validEntry);
     const add6 = newClient.add(dnUser, validEntry);
 
-    const delete1 = newClient2.delete(config.ldapDelete.dn);
-    const delete2 = newClient2.delete(config.ldapDelete.dn);
+    const delete1 = newClient2.delete(dnUser);
+    const delete2 = newClient2.delete(dnUser);
     const delete3 = newClient2.delete(config.ldapDelete.dn);
     const delete4 = newClient2.delete(config.ldapDelete.dn);
     const delete5 = newClient2.delete(config.ldapDelete.dn);
@@ -50,7 +50,8 @@ Promise.all([int1, int2])
     return Promise.all([
       add1, add2, add3, add4, add5, add6, delete1, delete2, delete3, delete4,
       delete5, delete6,
-    ].map((p) => { return p.catch((e) => { return e; }); }));
+    ]);
+
   })
   .then((res) => { console.log(`Operation Promise Resorses -> ${res}`); })
   .catch((err) => { console.log(`ERROR VALUE: -----------> ${err}`); })

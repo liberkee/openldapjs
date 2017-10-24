@@ -1,13 +1,15 @@
 #include "ldap_compare_progress.h"
 #include "constants.h"
 
-LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
-                                         Nan::Callback *progress, LDAP *ld,
-                                         const int msgID)
+LDAPCompareProgress::LDAPCompareProgress(
+    Nan::Callback *callback, Nan::Callback *progress,
+    const std::shared_ptr<LDAP> &ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
       msgID_(msgID) {}
+
+LDAPCompareProgress::~LDAPCompareProgress() {}
 
 // Executes in worker thread
 void LDAPCompareProgress::Execute(
@@ -16,7 +18,7 @@ void LDAPCompareProgress::Execute(
 
   while (result_ == constants::LDAP_NOT_FINISHED) {
     result_ =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
+        ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
   }
 }
 // Executes in event loop
@@ -26,7 +28,7 @@ void LDAPCompareProgress::HandleOKCallback() {
     stateClient[0] = Nan::New(result_);
     callback->Call(1, stateClient);
   } else {
-    const auto status = ldap_result2error(ld_, resultMsg_, false);
+    const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
     if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE) {
       stateClient[1] = Nan::New(status);
       callback->Call(2, stateClient);

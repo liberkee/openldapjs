@@ -7,9 +7,18 @@
   "ldapAdd": {
     "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnNewEntryAdmin": ",dc=demoApp,dc=com",
-    "objectClass": "person",
-    "sn": "Entry",
-    "description": "Tesst"
+    "firstAttr": {
+      "attr": "objectClass",
+      "vals": ["person"]
+    },
+    "secondAttr": {
+      "attr": "sn",
+      "vals": ["Entry"]
+    },
+    "lastAttr": {
+      "attr": "description",
+      "vals": ["Tesst1", "Tesst2", "weCanAddMultipleVals"]
+    }
   },
   "ldapDelete": {
     "dn": "cn=testUsers1,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"

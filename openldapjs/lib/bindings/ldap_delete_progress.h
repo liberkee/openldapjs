@@ -6,7 +6,7 @@
 
 class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};
@@ -20,8 +20,9 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
    **/
-  LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                     const int msgID);
+  LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress,
+                     const std::shared_ptr<LDAP> &ld, const int msgID);
+  ~LDAPDeleteProgress();
 
   /**
    **@brief Execute Method, runs outside the event loop.

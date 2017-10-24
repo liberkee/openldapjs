@@ -4,20 +4,23 @@
 #include "ldap_control.h"
 
 LDAPDeleteProgress::LDAPDeleteProgress(Nan::Callback *callback,
-                                       Nan::Callback *progress, LDAP *ld,
+                                       Nan::Callback *progress,
+                                       const std::shared_ptr<LDAP> &ld,
                                        const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
       msgID_(msgID) {}
 
+LDAPDeleteProgress::~LDAPDeleteProgress() {}
+
 // Executes in worker thread
 void LDAPDeleteProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
   while (result_ == constants::LDAP_NOT_FINISHED) {
-    result_ =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
+    result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                          &resultMsg_);
   }
 }
 
@@ -28,13 +31,14 @@ void LDAPDeleteProgress::HandleOKCallback() {
     stateClient[0] = Nan::New<v8::Number>(result_);
     callback->Call(1, stateClient);
   } else {
-    int status = ldap_result2error(ld_, resultMsg_, false);
+    int status = ldap_result2error(ld_.get(), resultMsg_, false);
     if (status != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(status);
       callback->Call(1, stateClient);
     } else {
       const auto &ldap_controls = new LdapControls();
-      deleteResult = ldap_controls->PrintModificationControls(ld_, resultMsg_);
+      deleteResult =
+          ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
       if (!deleteResult.empty()) {
         stateClient[1] = Nan::New(deleteResult).ToLocalChecked();
         callback->Call(2, stateClient);

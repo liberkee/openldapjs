@@ -4,7 +4,8 @@
 #include "ldap_helper_function.h"
 
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
-                                       Nan::Callback *progress, LDAP *ld,
+                                       Nan::Callback *progress,
+                                       const std::shared_ptr<LDAP> &ld,
                                        const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
@@ -12,6 +13,8 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
       msgID_(msgID) {
   mapResult_ = std::make_shared<LDAPMapResult>();
 }
+
+LDAPSearchProgress::~LDAPSearchProgress() {}
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
@@ -21,16 +24,16 @@ void LDAPSearchProgress::Execute(
   int result{};
 
   while (result == constants::LDAP_NOT_FINISHED) {
-    result =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &l_result);
+    result = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                         &l_result);
   }
 
-  status_ = ldap_result2error(ld_, l_result, false);
+  status_ = ldap_result2error(ld_.get(), l_result, false);
   if (status_ != LDAP_SUCCESS) {
     return;
   }
 
-  resultSearch_ = buildsSearchMessage(ld_, l_result);
+  resultSearch_ = buildsSearchMessage(ld_.get(), l_result);
 }
 
 // Executes in event loop

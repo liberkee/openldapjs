@@ -6,7 +6,7 @@
 
 class LDAPAddProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};
@@ -20,8 +20,9 @@ class LDAPAddProgress : public Nan::AsyncProgressWorker {
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
    **/
-  LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                  const int msgID);
+  LDAPAddProgress(Nan::Callback *callback, Nan::Callback *progress,
+                  const std::shared_ptr<LDAP> &ld, const int msgID);
+  ~LDAPAddProgress();
 
   /**
    **@brief Execute Method, runs outside the event loop.

@@ -60,7 +60,8 @@ class LDAPClient : public Nan::ObjectWrap {
       const int argc = 1;
       v8::Local<v8::Value> argv[argc] = {info[0]};
       v8::Local<v8::Function> cons = Nan::New(constructor());
-      info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+      info.GetReturnValue().Set(
+          Nan::NewInstance(cons, argc, argv).ToLocalChecked());
     }
   }
 
@@ -187,9 +188,10 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
-
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPSearchProgress(callback, progress, obj->ld_, message));
+        new LDAPSearchProgress(callback, progress, newLD, message));
   }
 
   static NAN_METHOD(pagedSearch) {
@@ -259,8 +261,11 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
+
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPCompareProgress(callback, progress, obj->ld_, message));
+        new LDAPCompareProgress(callback, progress, newLD, message));
   }
 
   static NAN_METHOD(changePassword) {
@@ -405,8 +410,11 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     ldap_mods_free(ldapmods, true);
+
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPModifyProgress(callback, progress, obj->ld_, msgID));
+        new LDAPModifyProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(ldaprename) {
@@ -444,8 +452,10 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPRenameProgress(callback, progress, obj->ld_, msgID));
+        new LDAPRenameProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(del) {
@@ -490,8 +500,10 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPDeleteProgress(callback, progress, obj->ld_, msgID));
+        new LDAPDeleteProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(add) {
@@ -567,8 +579,10 @@ class LDAPClient : public Nan::ObjectWrap {
     ldap_mods_free(newEntries,
                    true);  // free before it finishes ? isn't this dangerous ?
 
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPAddProgress(callback, progress, obj->ld_, msgID));
+        new LDAPAddProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(unbind) {
