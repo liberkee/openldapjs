@@ -102,11 +102,35 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(startTls) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
+    /* Path to the file from JS*/
+    Nan::Utf8String pathToCertificate(info[0]);
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[0].As<v8::Function>());
-    stateClient[0] = Nan::New<v8::Number>(0);
 
-    int state = ldap_start_tls_s(obj->ld_, nullptr, nullptr);
+    Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+    /* Create the option for the client for using the TLS */
+    auto state =
+        ldap_set_option(nullptr, LDAP_OPT_X_TLS_CACERTDIR, *pathToCertificate);
+
+    if (state != LDAP_OPT_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(state);
+      callback->Call(1, stateClient);
+      delete callback;
+      callback = nullptr;
+      return;
+    }
+
+    state =
+        ldap_set_option(nullptr, LDAP_OPT_X_TLS_CACERTFILE, *pathToCertificate);
+
+    if (state != LDAP_OPT_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(state);
+      callback->Call(1, stateClient);
+      delete callback;
+      callback = nullptr;
+      return;
+    }
+
+    state = ldap_start_tls_s(obj->ld_, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
       callback->Call(1, stateClient);
@@ -353,12 +377,11 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::String::Utf8Value mod_op(
           modHandle->Get(Nan::New("op").ToLocalChecked()));
 
-      if (std::strcmp(*mod_op, "add") ==
-          constants::STRING_EQUAL) {  // can't we just use !std::strcmp(..,..)?
+      if (!std::strcmp(*mod_op, "add")) {
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
-      } else if (std::strcmp(*mod_op, "delete") == constants::STRING_EQUAL) {
+      } else if (!std::strcmp(*mod_op, "delete")) {
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;
-      } else if (std::strcmp(*mod_op, "replace") == constants::STRING_EQUAL) {
+      } else if (!std::strcmp(*mod_op, "replace")) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
       } else {
         stateClient[0] = Nan::New<v8::Number>(LDAP_INVALID_SYNTAX);
@@ -564,7 +587,7 @@ class LDAPClient : public Nan::ObjectWrap {
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(nullptr);
       result = ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr,
-                            &msgID);  // async op
+                            &msgID);
     }
 
     if (result != LDAP_SUCCESS) {
@@ -576,8 +599,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    ldap_mods_free(newEntries,
-                   true);  // free before it finishes ? isn't this dangerous ?
+    ldap_mods_free(newEntries, true);
 
     std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
                                 [](LDAP *ld) { ldap_destroy(ld); });
@@ -594,7 +616,6 @@ class LDAPClient : public Nan::ObjectWrap {
     if (obj->ld_ == nullptr) {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
-      delete callback;
       delete callback;
       return;
     }

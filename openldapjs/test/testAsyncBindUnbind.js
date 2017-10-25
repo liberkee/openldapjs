@@ -28,13 +28,43 @@ describe('Testing the async LDAP authentication', () => {
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
-      .catch((err) => { should.deepEqual(err, errList.invalidCredentials); });
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
+      .catch((err) => {
+        should.deepEqual(err, errList.invalidCredentials);
+      });
   });
 
   it('should unbind from the server', () => {
     return clientLDAP.unbind()
       .then(
         (result) => { should.deepEqual(result, undefined); });
+  });
+
+  it('should reject if the client is not initialized', () => {
+    return clientLDAP.unbind()
+      .then(() => {
+        return clientLDAP.bind(
+          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+      })
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
+      .catch((error) => {
+        should.deepEqual(error.message, errList.bindErrorMessage);
+      });
+  });
+
+  it('should reject with server error', () => {
+    const newClient = new LDAPWrap(host);
+    return newClient.unbind()
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
+      .catch((error) => {
+        should.deepEqual(error, errList.serverDown);
+      });
   });
 
 });

@@ -52,6 +52,9 @@ describe('Testing the async LDAP search ', () => {
           searchBase, searchScope.subtree,
           config.ldapSearch.filterObjSpecific);
       })
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
       });
@@ -81,19 +84,38 @@ describe('Testing the async LDAP search ', () => {
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
+      });
+  });
+
+  it('should reject if the scope doesn\'t exit', () => {
+    return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
+      .catch((err) => {
+        err.message.should.be.deepEqual(errList.scopeSearchError);
       });
   });
 
   it('should reject if the searchBase is not a string', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -176,6 +198,9 @@ describe('Testing the async LDAP search ', () => {
         should.notDeepEqual(result2, result3);
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
+      })
+      .then(() => {
+        should.fail('Didn\'t expect success');
       })
       .catch((err) => { const resShouldBe = err.should.not.be.empty; });
   });

@@ -30,7 +30,7 @@ const BIND_ERROR_MESSAGE =
  */
 class LDAPAsyncWrap {
 
-  constructor(host, password) {
+  constructor(host) {
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
     this._stateClient = E_STATES.CREATED;
@@ -49,17 +49,37 @@ class LDAPAsyncWrap {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAddress, (err, result) => {
-          if (result) {
-            this._binding.startTls((errTls, stateTls) => {
-              if (errTls) {
-                reject(new Error(errTls));
-              } else {
-                this._stateClient = E_STATES.INITIALIZED;
-                resolve();
-              }
-            });
-          } else {
+          if (err) {
             reject(err);
+          } else {
+            this._stateClient = E_STATES.INITIALIZED;
+            resolve();
+          }
+        });
+      } else {
+        reject(new Error(INITIALIZATION_ERROR_MESSAGE));
+      }
+    });
+  }
+
+  /**
+    * Initiate a TLS processing on an LDAP session.
+    *
+    * @method initialize
+    * @param {String} pathToCertFile The path to the certificate
+    * @return {Promise} Will reject if state is not Initialized or if the
+    * certificate is not good else will resolve
+    * */
+
+  startTLS(pathToCertFile) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === E_STATES.INITIALIZED) {
+        checkParameters.checkParametersIfString(pathToCertFile);
+        this._binding.startTls(pathToCertFile, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
           }
         });
       } else {
