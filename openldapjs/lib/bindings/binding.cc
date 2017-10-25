@@ -550,7 +550,6 @@ class LDAPClient : public Nan::ObjectWrap {
       stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
-      delete callback;
       return;
     }
 
