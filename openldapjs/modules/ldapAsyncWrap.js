@@ -25,6 +25,7 @@ const scopeObject = {
 const INITIALIZATION_ERROR_MESSAGE = 'Initialize failed!';
 const BIND_ERROR_MESSAGE =
   'The operation failed. It could be done if the state of the client is BOUND';
+const LDAP_COMPARE_TRUE = 6;
 
 
 /**
@@ -165,7 +166,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapCompareErrorMessage));
           } else {
-            resolve(result);
+            const res = result === LDAP_COMPARE_TRUE;
+            resolve(res);
           }
         });
       }

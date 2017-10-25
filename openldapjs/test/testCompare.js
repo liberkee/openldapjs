@@ -7,7 +7,7 @@ const errList = require('./errorList.json');
 const StateError = require('../modules/errors/state_error');
 const errorHandler = require('../modules/errors/error_dispenser');
 
-describe('Testing the Compare functionalities', () => {
+describe('Testing the Compare function', () => {
   const hostAddress = config.ldapAuthentication.host;
   const dn = config.ldapAuthentication.dnAdmin;
   const password = config.ldapAuthentication.passwordAdmin;
@@ -45,7 +45,7 @@ describe('Testing the Compare functionalities', () => {
   it('should compare existing attribute', () => {
     return ldapAsyncWrap.compare(dn, attr, val)
       .then((result) => {
-        should.deepEqual(result, errList.comparisonResTrue);
+        should.deepEqual(result, true);
       });
   });
 
@@ -54,9 +54,7 @@ describe('Testing the Compare functionalities', () => {
     const nonVal = 'nonExistingValue';
     return ldapAsyncWrap.compare(dn, attr, nonVal)
       .then((result) => {
-        // there is define a dedicate error for this resolve we 
-        // can use that error or delete it because is not actually an error
-        should.deepEqual(result, errList.comparisonResFalse); // something like this ?
+        should.deepEqual(result, false);
       });
   });
 
@@ -170,43 +168,43 @@ describe('Testing the Compare functionalities', () => {
   it('should compare several identical sequential compares', () => {
     return ldapAsyncWrap.compare(dn, attr, val)
       .then((result1) => {
-        should.deepEqual(result1, errList.comparisonResTrue);
+        should.deepEqual(result1, true);
         return ldapAsyncWrap.compare(dn, attr, val);
       })
       .then((result2) => {
-        should.deepEqual(result2, errList.comparisonResTrue);
+        should.deepEqual(result2, true);
         return ldapAsyncWrap.compare(dn, attr, val);
       })
       .then((result3) => {
-        should.deepEqual(result3, errList.comparisonResTrue);
+        should.deepEqual(result3, true);
       });
   });
 
 
-  it('should compare several different sequential compares with error cases',
-    () => {
-      const nonVal = 'nonExistingValue';
-      const nonAttr = 'nonExistingAttr';
-      const CustomError = errorHandler(errList.undefinedType);
-      return ldapAsyncWrap.compare(dn, attr, val)
-        .then((result1) => {
-          should.deepEqual(result1, errList.comparisonResTrue);
-          return ldapAsyncWrap.compare(dn, nonAttr, val);
-        })
-        .then(() => {
-          should.fail('should not have succeeded');
-        })
-        .catch(CustomError, (err) => {
-          should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
-          return ldapAsyncWrap.compare(dn, attr, nonVal);
-        })
-        .catch(() => {
-          should.fail('did not expect generic error');
-        })
-        .then((result3) => {
-          should.deepEqual(result3, errList.comparisonResFalse);
-        });
-    });
+  it('should compare several different sequential compares with  error cases', () => {
+    const nonVal = 'nonExistingValue';
+    const nonAttr = 'nonExistingAttr';
+    const CustomError = errorHandler(errList.undefinedType);
+
+    return ldapAsyncWrap.compare(dn, attr, val)
+      .then((result1) => {
+        should.deepEqual(result1, true);
+        return ldapAsyncWrap.compare(dn, nonAttr, val);
+      })
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err, new CustomError(errList.ldapCompareErrorMessage));
+        return ldapAsyncWrap.compare(dn, attr, nonVal);
+      })
+      .catch(() => {
+        should.fail('did not expect generic error');
+      })
+      .then((result3) => {
+        should.deepEqual(result3, false);
+      });
+  });
 
   it('should compare several parallel compares', () => {
     const firstCompare = ldapAsyncWrap.compare(dn, attr, val);
@@ -215,9 +213,9 @@ describe('Testing the Compare functionalities', () => {
 
     return Promise.all([firstCompare, secondCompare, thirdCompare])
       .then((values) => {
-        should.deepEqual(values[0], errList.comparisonResTrue);
-        should.deepEqual(values[1], errList.comparisonResTrue);
-        should.deepEqual(values[2], errList.comparisonResTrue);
+        should.deepEqual(values[0], true);
+        should.deepEqual(values[1], true);
+        should.deepEqual(values[2], true);
       });
   });
 });

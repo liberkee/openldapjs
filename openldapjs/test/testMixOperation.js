@@ -124,7 +124,7 @@ cn: ${attributeEntry}\n\n`;
         })
 
         .then((result5) => {
-          should.deepEqual(result5, errList.comparisonResTrue);
+          should.deepEqual(result5, true);
           return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
         })
         .then((result6) => {
@@ -162,7 +162,7 @@ cn: ${attributeEntry}\n\n`;
         })
 
         .then((result10) => {
-          should.deepEqual(result10, errList.comparisonResTrue);
+          should.deepEqual(result10, true);
         });
     });
 
@@ -205,8 +205,8 @@ cn: ${attributeEntry}\n\n`;
             should.deepEqual(element, errList.alreadyExists);
           } else if (element === errList.alreadyExists) {
             should.deepEqual(element, errList.alreadyExists);
-          } else if (element === errList.comparisonResTrue) {
-            should.deepEqual(errList.comparisonResTrue, element);
+          } else if (element === true) {
+            should.deepEqual(true, element);
           } else {
             let resultOperation;
             resultOperation = element.split('\n');
