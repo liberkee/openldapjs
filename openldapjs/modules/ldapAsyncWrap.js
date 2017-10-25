@@ -113,7 +113,7 @@ class LDAPAsyncWrap {
      * @return {Promise} That resolves and returns a string with the search
      * results. Rejects in case of error.
      * */
-  search(searchBase, scope, searchFilter = 'objectClass=*') {
+  search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(BIND_ERROR_MESSAGE));
