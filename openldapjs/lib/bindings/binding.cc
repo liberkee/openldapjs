@@ -317,12 +317,11 @@ class LDAPClient : public Nan::ObjectWrap {
       v8::String::Utf8Value mod_op(
           modHandle->Get(Nan::New("op").ToLocalChecked()));
 
-      if (std::strcmp(*mod_op, "add") ==
-          constants::STRING_EQUAL) {  // can't we just use !std::strcmp(..,..)?
+      if (!std::strcmp(*mod_op, "add")) {
         ldapmods[i]->mod_op = LDAP_MOD_ADD;
-      } else if (std::strcmp(*mod_op, "delete") == constants::STRING_EQUAL) {
+      } else if (!std::strcmp(*mod_op, "delete")) {
         ldapmods[i]->mod_op = LDAP_MOD_DELETE;
-      } else if (std::strcmp(*mod_op, "replace") == constants::STRING_EQUAL) {
+      } else if (!std::strcmp(*mod_op, "replace")) {
         ldapmods[i]->mod_op = LDAP_MOD_REPLACE;
       } else {
         stateClient[0] = Nan::New<v8::Number>(LDAP_INVALID_SYNTAX);
@@ -521,7 +520,7 @@ class LDAPClient : public Nan::ObjectWrap {
       auto ctrls = ldap_controls->CreateModificationControls(controlHandle);
       ctrls.push_back(nullptr);
       result = ldap_add_ext(obj->ld_, dns, newEntries, ctrls.data(), nullptr,
-                            &msgID);  // async op
+                            &msgID);
     }
 
     if (result != LDAP_SUCCESS) {
@@ -533,8 +532,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    ldap_mods_free(newEntries,
-                   true);  // free before it finishes ? isn't this dangerous ?
+    ldap_mods_free(newEntries, true);
 
     Nan::AsyncQueueWorker(
         new LDAPAddProgress(callback, progress, obj->ld_, msgID));

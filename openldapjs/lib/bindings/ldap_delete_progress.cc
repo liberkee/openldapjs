@@ -51,5 +51,4 @@ void LDAPDeleteProgress::HandleOKCallback() {
 }
 
 void LDAPDeleteProgress::HandleProgressCallback(const char *data, size_t size) {
-  // progress.send what ?
 }
