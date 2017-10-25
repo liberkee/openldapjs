@@ -23,8 +23,8 @@ class CheckParam {
     */
 
   static validateStrings() {
-    const args = _.toArray(arguments);
-    args.forEach((element) => {
+
+    _.each(arguments, (element) => {
       if (!_.isString(element)) {
         throw new TypeError(errorList.typeErrorMessage);
       }
