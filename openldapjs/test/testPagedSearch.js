@@ -4,7 +4,8 @@ const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config');
 const Promise = require('bluebird');
-const errList = require('./errorlist.json');
+const errorList = require('./errorList.json');
+const StateError = require('../modules/errors/state_error');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -59,8 +60,11 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
+      .catch(StateError, (err) => {
+        err.message.should.deepEqual(errorList.bindErrorMessage);
+      })
       .catch((err) => {
-        err.message.should.deepEqual(errList.bindErrorMessage);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -70,8 +74,11 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
+      .catch(TypeError, (err) => {
+        err.message.should.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => {
-        err.message.should.deepEqual(errList.typeErrorMessage);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -81,8 +88,11 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
+      .catch(TypeError, (err) => {
+        err.message.should.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => {
-        err.message.should.deepEqual(errList.typeErrorMessage);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -92,9 +102,13 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
+      .catch(TypeError, (err) => {
+        err.message.should.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => {
-        err.message.should.deepEqual(errList.typeErrorMessage);
+        should.fail('did not expect generic error');
       });
+
   });
 
   it('should reject if pageSize is not integer type', () => {
@@ -104,8 +118,11 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
+      .catch(TypeError, (err) => {
+        err.message.should.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => {
-        err.message.should.deepEqual(errList.typeErrorIntMessage);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -116,7 +133,7 @@ describe('Testing the async LDAP search ', () => {
         should.fail('Didn\'t expect success');
       })
       .catch((err) => {
-        err.message.should.deepEqual(errList.scopeSearchError);
+        err.message.should.deepEqual(errorList.scopeSearchErrorMessage);
       });
   });
 
@@ -129,7 +146,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errList.filterError);
+          err.should.deepEqual(errorList.filterError);
           next();
         });
       });
@@ -145,7 +162,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errList.ldapNoSuchObject);
+          err.should.deepEqual(errorList.ldapNoSuchObject);
           next();
         });
       });
@@ -160,7 +177,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errList.ldapNoSuchObject);
+          err.should.deepEqual(errorList.ldapNoSuchObject);
           next();
         });
       });
@@ -178,7 +195,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errList.sizeLimitExceeded);
+          err.should.deepEqual(errorList.sizeLimitExceeded);
           next();
         });
       });

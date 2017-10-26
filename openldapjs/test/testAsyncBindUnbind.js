@@ -3,7 +3,10 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
+const StateError = require('../modules/errors/state_error');
+const LdapOtherError = require('../modules/errors/ldap_errors/ldap_other_error');
 
 describe('Testing the async LDAP authentication', () => {
   const host = config.ldapAuthentication.host;
@@ -25,14 +28,19 @@ describe('Testing the async LDAP authentication', () => {
   });
 
   it('should not bind to the server using invalid credentials', () => {
+
+    const CustomError = errorHandler(errList.invalidCredentials);
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err, new CustomError(errList.ldapBindErrorMessage));
       })
       .catch((err) => {
-        should.deepEqual(err, errList.invalidCredentials);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -51,8 +59,11 @@ describe('Testing the async LDAP authentication', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error.message, errList.bindErrorMessage);
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errList.uninitializedErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -62,8 +73,8 @@ describe('Testing the async LDAP authentication', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error, errList.serverDown);
+      .catch(LdapOtherError, (error) => {
+        should.deepEqual(error.message, errList.ldapUnbindErrorMessage);
       });
   });
 

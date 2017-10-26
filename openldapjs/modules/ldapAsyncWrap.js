@@ -4,6 +4,10 @@ const binding = require('../lib/bindings/build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 const SearchStream = require('./streamInterface.js');
+const errorHandler = require('./errors/error_dispenser');
+const StateError = require('./errors/state_error');
+const errorList = require('../test/errorList.json');
+const _ = require('underscore');
 
 
 const E_STATES = {
@@ -19,9 +23,10 @@ const scopeObject = {
   SUBTREE: 2,
 };
 
-const INITIALIZATION_ERROR_MESSAGE = 'Initialize failed!';
+
 const BIND_ERROR_MESSAGE =
     'The operation failed. It could be done if the state of the client is BOUND';
+const LDAP_COMPARE_TRUE = 6;
 
 
 /**
@@ -40,24 +45,24 @@ class LDAPAsyncWrap {
     * Initialize to an LDAP server.
     *
     * @method initialize
-    * @return {Promise} That resolves with the initialize state code(1) if the
-    * LDAP
-    ** initialize succeeds
-    ** Rejects if the address is incorrect or the client was not created.
+    * @return {Promise} That resolves if ldap_initialize succeeds
+    ** Rejects if client was not created or ldap_initialize fails.
     * */
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAddress, (err, result) => {
           if (err) {
-            reject(err);
+
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapInitializeErrorMessage));
           } else {
             this._stateClient = E_STATES.INITIALIZED;
             resolve();
           }
         });
       } else {
-        reject(new Error(INITIALIZATION_ERROR_MESSAGE));
+        reject(new StateError(errorList.initErrorMessage));
       }
     });
   }
@@ -74,16 +79,17 @@ class LDAPAsyncWrap {
   startTLS(pathToCertFile) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        checkParameters.checkParametersIfString(pathToCertFile);
+        checkParameters.validateStrings(pathToCertFile);
         this._binding.startTls(pathToCertFile, (err) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapStartTlsErrorMessage));
           } else {
             resolve();
           }
         });
       } else {
-        reject(new Error(INITIALIZATION_ERROR_MESSAGE));
+        reject(new StateError(errorList.initErrorMessage));
       }
     });
   }
@@ -103,15 +109,16 @@ class LDAPAsyncWrap {
       if (this._stateClient === E_STATES.INITIALIZED) {
         this._binding.bind(bindDn, passwordUser, (err, state) => {
           if (err) {
+            const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
-            reject(err);
+            reject(new CustomError(errorList.ldapBindErrorMessage));
           } else {
             this._stateClient = E_STATES.BOUND;
             resolve();
           }
         });
       } else {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.uninitializedErrorMessage));
       }
     });
   }
@@ -123,26 +130,27 @@ class LDAPAsyncWrap {
      * @param {String} searchBase the base for the search.
      * @param {String} scope  scope for the search, can be BASE, ONE or
      * SUBTREE
-     * @param {String} searchFilter  search filter.
+     * @param {String} searchFilter  search filter.If not provided,
+     * the default filter, (objectClass=*), is used.
      * @return {Promise} That resolves and returns a string with the search
-     *results. Rejects in case of error.
+     * results. Rejects in case of error.
      * */
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
-        checkParameters.checkParametersIfString(
-          searchBase, searchFilter, scope);
+        checkParameters.validateStrings(searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error('There is no such scope');
+          throw new Error(errorList.scopeSearchErrorMessage);
         }
 
         this._binding.search(
           searchBase, scopeObject[scope], searchFilter, (err, result) => {
             if (err) {
-              reject(err);
+              const CustomError = errorHandler(err);
+              reject(new CustomError(errorList.ldapSearchErrorMessage));
             } else {
               resolve(result);
             }
@@ -161,26 +169,29 @@ class LDAPAsyncWrap {
      * SUBTREE
      * @param {String} searchFilter search filter.
      * @param {int} pageSize The number of entries per LDAP page
-     * @return {Promise} that resolves to a readable stream or rejects to a Error;
+     * @return {Promise} that resolves to a readable stream or rejects to a
+   * Error;
      */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {
-        checkParameters.checkParametersIfString(searchBase, searchFilter, scope);
+        checkParameters.validateStrings(
+          searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error('There is no such scope');
+          throw new Error(errorList.scopeSearchErrorMessage);
         }
 
-        if (!Number.isInteger(pageSize)) {
-          throw new Error('Expected Integer parameter');
+        if (!_.isNumber(pageSize)) {
+          throw new TypeError(errorList.typeErrorMessage);
         }
         this._searchID += 1;
-        resolve(new SearchStream(
-          searchBase, scopeObject[scope], searchFilter, pageSize,
-          this._searchID, this._binding));
+        resolve(
+          new SearchStream(
+            searchBase, scopeObject[scope], searchFilter, pageSize,
+            this._searchID, this._binding));
       }
-      reject(new Error(BIND_ERROR_MESSAGE));
+      reject(new StateError(BIND_ERROR_MESSAGE));
     });
   }
 
@@ -202,15 +213,17 @@ class LDAPAsyncWrap {
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
-        checkParameters.checkParametersIfString(dn, attr, value);
+        checkParameters.validateStrings(dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err, result) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapCompareErrorMessage));
           } else {
-            resolve(result);
+            const res = result === LDAP_COMPARE_TRUE;
+            resolve(res);
           }
         });
       }
@@ -224,23 +237,24 @@ class LDAPAsyncWrap {
     * @param {String} dn The dn of the entry to modify
     * @param {Array} jsonChange The attribute and value to be changed
     * @return {Promise} That resolves if LDAP modified successfully the
-   * entry.
+    * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
-   * BOUND
+    * BOUND
     */
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkModifyChangeArray(jsonChange);
         checkParameters.checkControlArray(controls);
 
         this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapModifyErrorMessage));
           } else {
             resolve(result);
           }
@@ -264,15 +278,16 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn, newRdn, newParent);
+        checkParameters.validateStrings(dn, newRdn, newParent);
         checkParameters.checkControlArray(controls);
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapRenameErrorMessage));
           } else {
             resolve(result);
           }
@@ -293,15 +308,16 @@ class LDAPAsyncWrap {
   delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkControlArray(controls);
 
         this._binding.delete(dn, ctrls, (err, result) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapDeleteErrorMessage));
           } else {
             resolve(result);
           }
@@ -315,24 +331,25 @@ class LDAPAsyncWrap {
     *
     * @method changePassword
     * @param {String} userDN The user dn which the password will be changed
-    * @param {String} oldPassword Old password of user 
+    * @param {String} oldPassword Old password of user
     * @param {String} newPassword New password for user
     * @return {Promise} Will fulfil with a result of success if the
-    * Old password is given correctly, the parameters are string type and 
+    * Old password is given correctly, the parameters are string type and
     * the state of client is BOUND else will fail with type error or LDAP ERROR.
     * */
   changePassword(userDN, oldPassword, newPassword) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
-        checkParameters.checkParametersIfString(
+        checkParameters.validateStrings(
           userDN, oldPassword, newPassword);
 
         this._binding.changePassword(
           userDN, oldPassword, newPassword, (err, result) => {
             if (err) {
-              reject(err);
+              const CustomError = errorHandler(err);
+              reject(new CustomError(errorList.ldapChangePasswordErrorMessage));
             } else {
               resolve();
             }
@@ -354,16 +371,17 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new Error(BIND_ERROR_MESSAGE));
+        reject(new StateError(BIND_ERROR_MESSAGE));
       } else {
         const ctrls = controls !== undefined ? controls : null;
-        checkParameters.checkParametersIfString(dn);
+        checkParameters.validateStrings(dn);
         checkParameters.checkEntryObject(entry);
         checkParameters.checkControlArray(controls);
 
         this._binding.add(dn, entry, ctrls, (err, result) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapAddErrorMessage));
           } else {
             resolve(result);
           }
@@ -384,7 +402,8 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.UNBOUND) {
         this._binding.unbind((err, state) => {
           if (err) {
-            reject(err);
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapUnbindErrorMessage));
           } else {
             this._stateClient = E_STATES.UNBOUND;
             resolve();

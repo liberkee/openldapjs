@@ -4,7 +4,8 @@ const LDAP = require('../modules/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the async LDAP delete operation', () => {
 
@@ -44,19 +45,42 @@ describe('Testing the async LDAP delete operation', () => {
 
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
   it('should reject the request with invalidDn error code', () => {
+
+    const CustomError = errorHandler(errList.invalidDnSyntax);
+
     return clientLDAP.delete('garbage')
-      .catch(
-        (err) => { err.should.be.deepEqual(errList.invalidDnSyntax); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject the request for passing an empty DN', () => {
+
+    const CustomError = errorHandler(errList.unwillingToPerform);
+
     return clientLDAP.delete('')
-      .catch(
-        (err) => { err.should.be.deepEqual(errList.unwillingToPerform); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject the request for passing a null DN', () => {
     return clientLDAP.delete(null)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errList.typeErrorMessage);
       });
@@ -64,8 +88,17 @@ describe('Testing the async LDAP delete operation', () => {
 
   it('should reject the request with no such object error code', () => {
     const rdnUser = 'cn=a1User32,cn=no12DD';
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return clientLDAP.delete(`${rdnUser}${config.ldapDelete.dn}`)
-      .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      })
+      .catch(() => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should delete the given leaf entry', () => {
@@ -74,37 +107,53 @@ describe('Testing the async LDAP delete operation', () => {
         should.deepEqual(result, errList.resultSuccess);
         personNr += 1; // ?what for ?
       });
+
   });
 
   it('should reject the request to delete non-leaf node', () => {
     const stringLength = config.ldapDelete.dn.length;
     const parentDn = config.ldapDelete.dn.slice(1, stringLength);
+    const CustomError = errorHandler(errList.notAllowedOnNonLeaf);
     return clientLDAP.delete(parentDn)
-      .catch(
-        (err) => { err.should.be.deepEqual(errList.notAllowedOnNonLeaf); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapDeleteErrorMessage));
+      })
+      .catch(() => {
+        should.fail('did not expect generic error');
+      });
   });
 
 
   it('should reject because BOUND state is required', () => {
     return clientLDAP.unbind()
       .then(() => { return clientLDAP.delete(dnUser); })
-      .catch((err) => {
+      .catch((err) => { // dedicate error?
         should.deepEqual(err.message, errList.bindErrorMessage);
       });
   });
 
   it('should delete sequential requests with one error', () => {
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return clientLDAP.delete(dnUser)
       .then((res1) => {
         should.deepEqual(res1, errList.resultSuccess);
         return clientLDAP.delete(dnUser);
       })
-      .catch((err) => {
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
         personNr += 1;
         dnUser =
               `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
-        should.deepEqual(err, errList.ldapNoSuchObject);
+        should.deepEqual(err, new CustomError(errList.ldapDeleteErrorMessage));
         return clientLDAP.delete(dnUser);
+      })
+      .catch(() => {
+        should.fail('did not expect generic error');
       })
       .then((res3) => {
         personNr += 1;
@@ -113,7 +162,7 @@ describe('Testing the async LDAP delete operation', () => {
   });
 
 
-  it('should delete in parallel requests with one error', () => {
+  it('should delete 4 entries in parallel ', () => {
     const first = clientLDAP.delete(dnUser);
     personNr += 1;
     dnUser = `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
@@ -135,7 +184,7 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-  it('should delete an exist entry and return the control',
+  it('should delete an existing entry and return the control',
     () => { // what control ?
       return clientLDAP.delete(dnUser, controlOperation)
         .then((result) => {

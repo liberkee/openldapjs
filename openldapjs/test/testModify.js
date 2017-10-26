@@ -4,7 +4,8 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
 
 describe('Testing the modify functionalities', () => {
 
@@ -90,6 +91,9 @@ describe('Testing the modify functionalities', () => {
           config.ldapModify.ldapModificationReplace.change_dn,
           changeAttributes);
       })
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
       });
@@ -114,6 +118,9 @@ describe('Testing the modify functionalities', () => {
       return ldapAsyncWrap
         .modify(
           config.ldapModify.ldapModificationReplace.change_dn, attribute)
+        .then(() => {
+          should.fail('should not have succeeded');
+        })
         .catch((error) => { should.deepEqual(error.message, errorMSG); });
     });
 
@@ -127,6 +134,9 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
@@ -139,13 +149,23 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
       .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
 
   it('should reject operation if the dn is empty', () => {
+    const CustomError = errorHandler(errList.unwillingToPerform);
     return ldapAsyncWrap.modify('', changeAttributes)
-      .catch((error) => {
-        should.deepEqual(error, errList.unwillingToPerform);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 

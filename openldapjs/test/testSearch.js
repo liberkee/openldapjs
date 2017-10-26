@@ -3,7 +3,9 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
+const StateError = require('../modules/errors/state_error');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -53,10 +55,13 @@ describe('Testing the async LDAP search ', () => {
           config.ldapSearch.filterObjSpecific);
       })
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have passed');
       })
-      .catch((error) => {
+      .catch(StateError, (error) => {
         should.deepEqual(error.message, errList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -65,7 +70,7 @@ describe('Testing the async LDAP search ', () => {
       .search(
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific)
-      .then((result) => { const resShouldBe = result.should.be.empty; });
+      .then((result) => { result.should.be.empty; });
   });
   /**
    * case for search with non existing search base
@@ -82,31 +87,40 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
+    const CustomError = errorHandler(errList.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have passed');
       })
-      .catch((err) => { err.should.be.deepEqual(errList.ldapNoSuchObject); });
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(new CustomError(errList.ldapSearchErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (err) => {
+        err.message.should.be.deepEqual(errList.typeErrorMessage);
       })
       .catch((err) => {
-        err.message.should.be.deepEqual(errList.typeErrorMessage);
+        should.fail('did not expect generic error');
       });
   });
 
-  it('should reject if the scope doesn\'t exit', () => {
+  it('should reject if the scope doesn\'t exist', () => {
     return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
       .then(() => {
         should.fail('Didn\'t expect success');
       })
       .catch((err) => {
-        err.message.should.be.deepEqual(errList.scopeSearchError);
+        err.message.should.be.deepEqual(errList.scopeSearchErrorMessage);
       });
   });
 
@@ -114,10 +128,13 @@ describe('Testing the async LDAP search ', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (err) => {
+        err.message.should.be.deepEqual(errList.typeErrorMessage);
       })
       .catch((err) => {
-        err.message.should.be.deepEqual(errList.typeErrorMessage);
+        should.fail('did not expect generic error');
       });
   });
 
@@ -200,9 +217,9 @@ describe('Testing the async LDAP search ', () => {
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
       .then(() => {
-        should.fail('Didn\'t expect success');
+        should.fail('should not have passed');
       })
-      .catch((err) => { const resShouldBe = err.should.not.be.empty; });
+      .catch((err) => { err.should.not.be.empty; });
   });
 
 
@@ -249,5 +266,4 @@ describe('Testing the async LDAP search ', () => {
         count.should.be.above(10000);
       });
   });
-
 });

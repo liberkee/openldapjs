@@ -3,7 +3,8 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errList = require('./errorList.json');
+const StateError = require('../modules/errors/state_error');
 
 describe('Testing the async initialization', () => {
 
@@ -29,8 +30,8 @@ describe('Testing the async initialization', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error.message, errList.initializationErrorMessage);
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errList.initErrorMessage);
       });
   });
 
