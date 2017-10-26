@@ -19,6 +19,7 @@
   "entryObjectError": "Invalid entryObject array",
   "controlArrayError": "The control is not an array",
   "controlPropError": "Invalid control array",
+  "invalidJSONMessage":"'Invalid JSON'",
   "affectMultipleDsas": 71,
   "scopeSearchErrorMessage": "Invalid scope",
   "ldapStartTlsErrorMessage":"Ldap Start TLS operation failed, check description for additional info",

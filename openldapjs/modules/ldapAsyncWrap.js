@@ -23,9 +23,6 @@ const scopeObject = {
   SUBTREE: 2,
 };
 
-
-const BIND_ERROR_MESSAGE =
-    'The operation failed. It could be done if the state of the client is BOUND';
 const LDAP_COMPARE_TRUE = 6;
 
 
@@ -138,7 +135,7 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(searchBase, searchFilter, scope);
 
@@ -191,7 +188,7 @@ class LDAPAsyncWrap {
             searchBase, scopeObject[scope], searchFilter, pageSize,
             this._searchID, this._binding));
       }
-      reject(new StateError(BIND_ERROR_MESSAGE));
+      reject(new StateError(errorList.bindErrorMessage));
     });
   }
 
@@ -213,7 +210,7 @@ class LDAPAsyncWrap {
   compare(dn, attr, value) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, attr, value);
 
@@ -244,7 +241,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);
@@ -278,7 +275,7 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn, newRdn, newParent);
@@ -308,7 +305,7 @@ class LDAPAsyncWrap {
   delete(dn, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);
@@ -340,7 +337,7 @@ class LDAPAsyncWrap {
   changePassword(userDN, oldPassword, newPassword) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(
           userDN, oldPassword, newPassword);
@@ -371,7 +368,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(BIND_ERROR_MESSAGE));
+        reject(new StateError(errorList.bindErrorMessage));
       } else {
         const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);

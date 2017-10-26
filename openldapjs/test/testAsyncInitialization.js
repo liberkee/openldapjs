@@ -3,7 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorList.json');
+const errorList = require('./errorList.json');
 const StateError = require('../modules/errors/state_error');
 
 describe('Testing the async initialization', () => {
@@ -22,7 +22,7 @@ describe('Testing the async initialization', () => {
       });
   });
 
-  it('should reject with multiple initialization on same object', () => {
+  it('should reject when trying multiple initializes on the same object', () => {
     return ldapWrap.initialize()
       .then(() => {
         return ldapWrap.initialize();
@@ -31,7 +31,7 @@ describe('Testing the async initialization', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errList.initErrorMessage);
+        should.deepEqual(error.message, errorList.initErrorMessage);
       });
   });
 

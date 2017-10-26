@@ -47,7 +47,7 @@ class CheckParam {
         const result = validator.validateMultiple(element, changeSchema);
         if (!result.valid) {
           throw new ValidationError(
-            'Invalid JSON', result.error, result.errors);
+            errorList.invalidJSONMessage, result.error, result.errors);
         }
       });
     }
