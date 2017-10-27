@@ -37,4 +37,4 @@ modify.ldif
 **/Release/*
 ./.vscode/
 /openldapjs/build/**
-
+.vscode/settings.json
