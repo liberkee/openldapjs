@@ -79,7 +79,7 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
   if (serverControls == nullptr) {
     return modifyResult;
   }
-  while (serverControls[i] != constants::CONTROL_NO_VAL) {
+  while (serverControls[i] != nullptr) {
     berElement = ber_init(&serverControls[i]->ldctl_value);
     if (berElement == nullptr) {
       return modifyResult;

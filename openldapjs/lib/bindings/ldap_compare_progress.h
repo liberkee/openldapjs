@@ -32,6 +32,7 @@ class LDAPCompareProgress : public Nan::AsyncProgressWorker {
   /**
    ** HandleOkCallback method, gets called when the execute method finishes.
    ** Executes in event loop.
+   ** Sends result back to javascript: LDAP_RES_TRUE, LDAP_RES_FALSE or error in case of failure.
    **/
   void HandleOKCallback();
 
