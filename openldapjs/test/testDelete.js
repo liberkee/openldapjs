@@ -1,12 +1,12 @@
 'use strict';
 
-const LDAP = require('../modules/ldapAsyncWrap.js');
+const LDAP = require('../libs/ldapAsyncWrap.js');
 const should = require('should');
 const Promise = require('bluebird');
 const config = require('./config.json');
 const errorList = require('./errorList.json');
-const errorHandler = require('../modules/errors/error_dispenser');
-const StateError = require('../modules/errors/state_error');
+const errorHandler = require('../libs/errors/error_dispenser');
+const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async LDAP delete operation', () => {
 

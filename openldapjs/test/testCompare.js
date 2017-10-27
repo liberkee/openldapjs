@@ -1,11 +1,11 @@
 'use strict';
 
-const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
+const LdapAsyncWrap = require('../libs/ldapAsyncWrap.js');
 const should = require('should');
 const config = require('./config.json');
 const errorList = require('./errorList.json');
-const StateError = require('../modules/errors/state_error');
-const errorHandler = require('../modules/errors/error_dispenser');
+const StateError = require('../libs/errors/state_error');
+const errorHandler = require('../libs/errors/error_dispenser');
 
 describe('Testing the Compare function', () => {
   const hostAddress = config.ldapAuthentication.host;

@@ -7,10 +7,10 @@
          "<!(node -e \"require('nan')\")",
         '/usr/local/include'
       ],
-      'sources': [ 'binding.cc', 'ldap_control.cc','ldap_bind_progress.cc', 'ldap_paged_search_progress.cc',
-            'ldap_search_progress.cc','ldap_add_progress.cc','ldap_delete_progress.cc',
-            'ldap_modify_progress.cc','ldap_rename_progress.cc','ldap_compare_progress.cc',
-            'ldap_changePassword_progress.cc', 'ldap_map_result.cc', 'ldap_helper_function.cc'],
+      'sources': [ './src/binding.cc', './src/ldap_control.cc','./src/ldap_bind_progress.cc', './src/ldap_paged_search_progress.cc',
+            './src/ldap_search_progress.cc','./src/ldap_add_progress.cc','./src/ldap_delete_progress.cc',
+            './src/ldap_modify_progress.cc','./src/ldap_rename_progress.cc','./src/ldap_compare_progress.cc',
+            './src/ldap_changePassword_progress.cc', './src/ldap_map_result.cc', './src/ldap_helper_function.cc'],
       'ldflags': [
             '-Wl,-z,defs'
       ],

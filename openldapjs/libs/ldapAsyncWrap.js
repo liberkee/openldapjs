@@ -1,6 +1,6 @@
 'use strict';
 
-const binding = require('../lib/bindings/build/Release/binding.node');
+const binding = require('../build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./checkVariableFormat/checkVariableFormat');
 const SearchStream = require('./streamInterface.js');

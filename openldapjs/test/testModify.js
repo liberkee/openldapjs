@@ -1,13 +1,13 @@
 'use strict';
 
-const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
+const LdapAsyncWrap = require('../libs/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
 const errorList = require('./errorList.json');
-const errorHandler = require('../modules/errors/error_dispenser');
-const StateError = require('../modules/errors/state_error');
-const ValidationError = require('../modules/errors/validation_error');
+const errorHandler = require('../libs/errors/error_dispenser');
+const StateError = require('../libs/errors/state_error');
+const ValidationError = require('../libs/errors/validation_error');
 
 describe('Testing the modify functionalities', () => {
 

@@ -1,10 +1,10 @@
 'use strict';
 
 const should = require('should');
-const LDAPWrap = require('../modules/ldapAsyncWrap.js');
+const LDAPWrap = require('../libs/ldapAsyncWrap.js');
 const config = require('./config.json');
 const errorList = require('./errorList.json');
-const StateError = require('../modules/errors/state_error');
+const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async initialization', () => {
 

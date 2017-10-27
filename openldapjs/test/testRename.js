@@ -1,12 +1,12 @@
 'use strict';
 
-const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
+const LdapAsyncWrap = require('../libs/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const errorList = require('./errorList.json');
-const errorHandler = require('../modules/errors/error_dispenser');
-const ValidationError = require('../modules/errors/validation_error');
-const StateError = require('../modules/errors/state_error');
+const errorHandler = require('../libs/errors/error_dispenser');
+const ValidationError = require('../libs/errors/validation_error');
+const StateError = require('../libs/errors/state_error');
 
 describe('Testing the rename functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
