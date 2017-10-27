@@ -8,14 +8,16 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     std::string filter, const std::string &cookieID, int pgSize,
     const std::shared_ptr<std::map<std::string, berval *>> &cookies)
     : Nan::AsyncProgressWorker(callback),
-      progress_(progress),
+      cookies_(cookies),
       ld_(ld),
+      progress_(progress),
       base_(base),
-      scope_(scope),
       filter_(filter),
-      cookieID_(cookieID),
+      scope_(scope),
       pageSize_(pgSize),
-      cookies_(cookies) {}
+      cookieID_(cookieID) {}
+
+
 
 // Executes in worker thread
 void LDAPPagedSearchProgress::Execute(

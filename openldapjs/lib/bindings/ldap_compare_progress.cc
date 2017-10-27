@@ -1,12 +1,13 @@
 #include "ldap_compare_progress.h"
 #include "constants.h"
 
-LDAPCompareProgress::LDAPCompareProgress(
-    Nan::Callback *callback, Nan::Callback *progress,
-    const std::shared_ptr<LDAP> &ld, const int msgID)
+LDAPCompareProgress::LDAPCompareProgress(Nan::Callback *callback,
+                                         Nan::Callback *progress,
+                                         const std::shared_ptr<LDAP> &ld,
+                                         const int msgID)
     : Nan::AsyncProgressWorker(callback),
-      progress_(progress),
       ld_(ld),
+      progress_(progress),
       msgID_(msgID) {}
 
 LDAPCompareProgress::~LDAPCompareProgress() {}
@@ -17,8 +18,8 @@ void LDAPCompareProgress::Execute(
   struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
   while (result_ == constants::LDAP_NOT_FINISHED) {
-    result_ =
-        ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
+    result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                          &resultMsg_);
   }
 }
 // Executes in event loop

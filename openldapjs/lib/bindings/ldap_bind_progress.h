@@ -6,11 +6,11 @@
 
 class LDAPBindProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
   Nan::Callback *progress_{};
+  LDAP *ld_{};
+  int msgID_{};
   int result_{};
   LDAPMessage *resultMsg_{};
-  int msgID_{};
 
  public:
   /**

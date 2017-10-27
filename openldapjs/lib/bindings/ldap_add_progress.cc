@@ -8,8 +8,8 @@ LDAPAddProgress::LDAPAddProgress(Nan::Callback *callback,
                                  const std::shared_ptr<LDAP> &ld,
                                  const int msgID)
     : Nan::AsyncProgressWorker(callback),
-      progress_(progress),
       ld_(ld),
+      progress_(progress),
       msgID_(msgID) {}
 
 LDAPAddProgress::~LDAPAddProgress() {}

@@ -6,8 +6,8 @@ LDAPChangePasswordProgress::LDAPChangePasswordProgress(
     Nan::Callback *callback, Nan::Callback *progress,
     const std::shared_ptr<LDAP> &ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
-      progress_(progress),
       ld_(ld),
+      progress_(progress),
       msgID_(msgID) {}
 
 void LDAPChangePasswordProgress::Execute(
