@@ -4,14 +4,14 @@ const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
-const errList = require('./errorlist.json');
+const errorList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
+const StateError = require('../modules/errors/state_error');
+const ValidationError = require('../modules/errors/validation_error');
 
 describe('Testing the modify functionalities', () => {
 
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
-
-  const resStateRequired =
-      'The operation failed. It could be done if the state of the client is BOUND';
 
   const changeAttributesAdd = [
     {
@@ -90,8 +90,14 @@ describe('Testing the modify functionalities', () => {
           config.ldapModify.ldapModificationReplace.change_dn,
           changeAttributes);
       })
-      .catch((error) => {
-        should.deepEqual(error.message, errList.bindErrorMessage);
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errorList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
@@ -101,24 +107,30 @@ describe('Testing the modify functionalities', () => {
       .modify(config.ldapModify.ldapModificationReplace.change_dn)
       .catch((error) => { should.deepEqual(error.message, errorMSG); });
   });
-  // aren't these two tests basically the same ?
-  it('should reject operation if the attribute parameter is not correctly defined',
-    () => {
-      const errorMSG = 'Invalid JSON';
-      const attribute = [
-        {
-          add: 'add',
-        },
-      ];
 
-      return ldapAsyncWrap
-        .modify(
-          config.ldapModify.ldapModificationReplace.change_dn, attribute)
-        .catch((error) => { should.deepEqual(error.message, errorMSG); });
-    });
+  it('should reject operation if the attribute parameter is not correctly defined', () => {
+
+    const attribute = [
+      {
+        add: 'add',
+      },
+    ];
+
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn, attribute)
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ValidationError, (error) => {
+        should.deepEqual(error.message, errorList.invalidJSONMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
+      });
+  });
 
   it('should reject if control parameter is not an array', () => {
-    const errorMSG = 'The control is not an array';
     const control = {
       op: 'postread',
     };
@@ -127,11 +139,18 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
-      .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(TypeError, (error) => {
+        should.deepEqual(error.message, errorList.controlArrayError);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
+      });
   });
 
   it('should reject if the control parameter is not correctly defined', () => {
-    const errorMSG = 'Invalid control array';
     const control = [{
       op: 'postread',
     }];
@@ -139,13 +158,28 @@ describe('Testing the modify functionalities', () => {
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
-      .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(ValidationError, (error) => {
+        should.deepEqual(error.message, errorList.controlPropError);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
+      });
   });
 
   it('should reject operation if the dn is empty', () => {
+    const CustomError = errorHandler(errorList.unwillingToPerform);
     return ldapAsyncWrap.modify('', changeAttributes)
-      .catch((error) => {
-        should.deepEqual(error, errList.unwillingToPerform);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 

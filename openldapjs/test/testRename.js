@@ -3,7 +3,10 @@
 const LdapAsyncWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
 const should = require('should');
-const errList = require('./errorlist.json');
+const errorList = require('./errorList.json');
+const errorHandler = require('../modules/errors/error_dispenser');
+const ValidationError = require('../modules/errors/validation_error');
+const StateError = require('../modules/errors/state_error');
 
 describe('Testing the rename functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
@@ -38,24 +41,42 @@ describe('Testing the rename functionalities', () => {
   it('should reject if dn is not a string', () => {
     return ldapAsyncWrap
       .rename(1, config.ldapRename.newrdn, config.ldapRename.newparent)
-      .catch((error) => {
-        should.deepEqual(error.message, errList.typeErrorMessage);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (error) => {
+        should.deepEqual(error.message, errorList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
   it('should reject if newRdn is not a string', () => {
     return ldapAsyncWrap
       .rename(config.ldapRename.dnChange, 1, config.ldapRename.newparent)
-      .catch((error) => {
-        should.deepEqual(error.message, errList.typeErrorMessage);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (error) => {
+        should.deepEqual(error.message, errorList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
   it('should reject if newParent is not a string', () => {
     return ldapAsyncWrap
       .rename(config.ldapRename.dnChange, config.ldapRename.newrdn, 1)
-      .catch((error) => {
-        should.deepEqual(error.message, errList.typeErrorMessage);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (error) => {
+        should.deepEqual(error.message, errorList.typeErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
@@ -64,8 +85,14 @@ describe('Testing the rename functionalities', () => {
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn,
         config.ldapRename.newparent, {test: 'test'})
-      .catch((error) => {
-        should.deepEqual(error.message, errList.controlArrayError);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(TypeError, (error) => {
+        should.deepEqual(error.message, errorList.controlArrayError);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
@@ -74,8 +101,14 @@ describe('Testing the rename functionalities', () => {
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn,
         config.ldapRename.newparent, [{test: 'test'}])
-      .catch((error) => {
-        should.deepEqual(error.message, errList.controlPropError);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(ValidationError, (error) => {
+        should.deepEqual(error.message, errorList.controlPropError);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -83,38 +116,68 @@ describe('Testing the rename functionalities', () => {
     const badDn = 'bad dn';
     return ldapAsyncWrap
       .rename(badDn, config.ldapRename.newrdn, config.ldapRename.newparent)
-      .catch(
-        (error) => { should.deepEqual(error, errList.invalidDnSyntax); });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(errorHandler(errorList.invalidDnSyntax), (error) => {
+        const CustomError = errorHandler(errorList.invalidDnSyntax);
+        should.deepEqual(error, new CustomError(errorList.ldapRenameErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if newparent  incorrectly defined', () => {
     const badNewParent = 'bad dn';
+    const CustomError = errorHandler(errorList.invalidDnSyntax);
     return ldapAsyncWrap
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn, badNewParent)
-      .catch(
-        (error) => { should.deepEqual(error, errList.invalidDnSyntax); });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapRenameErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if dn  incorrectly defined', () => {
     const incorrectDefinedDn = 'cn=admin';
+    const CustomError = errorHandler(errorList.unwillingToPerform);
     return ldapAsyncWrap
       .rename(
         incorrectDefinedDn, config.ldapRename.newrdn,
         config.ldapRename.newparent)
-      .catch((error) => {
-        should.deepEqual(error, errList.unwillingToPerform);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapRenameErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
   it('should reject if newparent  incorrectly defined', () => {
     const incorrectDefinedNewParent = 'ou=users';
+    const CustomError = errorHandler(errorList.affectMultipleDsas);
     return ldapAsyncWrap
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn,
         incorrectDefinedNewParent)
-      .catch((error) => {
-        should.deepEqual(error, errList.affectMultipleDsas);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapRenameErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
       });
   });
 
@@ -125,19 +188,33 @@ describe('Testing the rename functionalities', () => {
           config.ldapRename.dnChange, config.ldapRename.newrdn,
           config.ldapRename.newparent);
       })
-      .catch((error) => {
-        should.deepEqual(error.message, errList.bindErrorMessage);
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errorList.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
   it('should reject if dn doesn\'t exist ', () => {
     const existDn = 'cn=1,ou=users,o=myhost,dc=demoApp,dc=com';
+    const CustomError = errorHandler(errorList.ldapNoSuchObject);
     return ldapAsyncWrap
       .rename(
         existDn, config.ldapRename.newrdn, config.ldapRename.newparent,
         controlOperation)
-      .catch(
-        (error) => { should.deepEqual(error, errList.ldapNoSuchObject); });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapRenameErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should rename the dn',
@@ -158,7 +235,7 @@ describe('Testing the rename functionalities', () => {
             config.ldapRename.dnChange, config.ldapRename.newrdn,
             config.ldapRename.newparent, controlOperation);
         })
-        .catch(() => {
+        .catch(() => { // shouldn't we place catch at the end ?
           return ldapAsyncWrap.rename(
             config.ldapRename.dnChange, config.ldapRename.newrdn,
             config.ldapRename.newparent, controlOperation);

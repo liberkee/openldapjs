@@ -6,7 +6,8 @@ const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
-const ValidationError = require('./custom_errors.js');
+const ValidationError = require('../errors/validation_error');
+const errorList = require('../../test/errorList.json');
 
 /**
  * @module checkVariableFormat
@@ -15,18 +16,17 @@ const ValidationError = require('./custom_errors.js');
 class CheckParam {
 
   /**
-    * Verify the rename parameters.
+    * Checks if the arguments provided are Strings.
     *
-    * @method checkModifyChangeArray
-    * @param {Array} elements The array of parameters
-    * @return Throws an error in case the provided arguments aren't strings
+    * @method validateStrings
+    * @return Throws an error in case the provided parameters aren't  valid strings
     */
 
-  static checkParametersIfString() {
-    const args = Array.from(arguments);
-    args.forEach((element) => {
+  static validateStrings() {
+
+    _.each(arguments, (element) => {
       if (!_.isString(element)) {
-        throw new TypeError('Expected String parameter');
+        throw new TypeError(errorList.typeErrorMessage);
       }
     });
   }
@@ -36,7 +36,7 @@ class CheckParam {
     *
     * @method checkModifyChangeArray
     * @param {Array} changes The Array of json Objects that is sent for
-   * verification
+    * verification
     * @return Throws error in case the json can't be validated
     */
   static checkModifyChangeArray(changes) {
@@ -47,7 +47,7 @@ class CheckParam {
         const result = validator.validateMultiple(element, changeSchema);
         if (!result.valid) {
           throw new ValidationError(
-            'Invalid JSON', result.error, result.errors);
+            errorList.invalidJSONMessage, result.error, result.errors);
         }
       });
     }
@@ -63,13 +63,13 @@ class CheckParam {
   static checkControlArray(controls) {
     if (controls !== undefined) {
       if (!_.isArray(controls)) {
-        throw new TypeError('The control is not an array');
+        throw new TypeError(errorList.controlArrayError);
       } else {
         controls.forEach((element) => {
           const result = validator.validateMultiple(element, controlSchema);
           if (!result.valid) {
             throw new ValidationError(
-              'Invalid control array', result.error, result.errors);
+              errorList.controlPropError, result.error, result.errors);
           }
         });
       }
@@ -81,7 +81,7 @@ class CheckParam {
     * Verify the entry parameter.
     *
     * @method checkControlArray
-    * @param {Object} entry The object that is send for verification
+    * @param {Object} entry The object that is sent for verification
     * @return Throws error in case the entry can't be validated.
     */
   static checkEntryObject(entry) {
@@ -92,7 +92,7 @@ class CheckParam {
         const result = validator.validateMultiple(element, addEntrySchema);
         if (!result.valid) {
           throw new ValidationError(
-            'Invalid entryObject array', result.error, result.errors);
+            errorList.entryObjectError, result.error, result.errors);
         }
       });
     }

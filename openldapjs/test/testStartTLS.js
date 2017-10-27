@@ -3,9 +3,11 @@
 const should = require('should');
 const LDAPWrap = require('../modules/ldapAsyncWrap.js');
 const config = require('./config.json');
-const errList = require('./errorlist.json');
+const errorList = require('./errorList.json');
+const StateError = require('../modules/errors/state_error');
+const errorHandler = require('../modules/errors/error_dispenser');
 
-describe('Testing the async LDAP search ', () => {
+describe('Testing the LDAP start TLS routine', () => {
 
   const host = config.ldapAuthentication.host;
   let adminLDAP = new LDAPWrap(host);
@@ -30,30 +32,41 @@ describe('Testing the async LDAP search ', () => {
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error.message, errList.initializationErrorMessage);
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errorList.initErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
-  it('should reject if the path file doesn\'t exit', () => {
+  it('should reject if the path file doesn\'t exist', () => {
+    const CustomError = errorHandler(errorList.connectionError);
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error, errList.connectionError);
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapStartTlsErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
   it('should reject if there are no certificate in the specified directory', () => {
     const wrongCred = '/etc';
+    const CustomError = errorHandler(errorList.connectionError);
     return adminLDAP.startTLS(wrongCred)
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch((error) => {
-        should.deepEqual(error, errList.connectionError);
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapStartTlsErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic Error');
       });
   });
 
