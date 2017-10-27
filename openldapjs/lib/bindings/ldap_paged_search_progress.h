@@ -10,7 +10,7 @@
 class LDAPPagedSearchProgress : public Nan::AsyncProgressWorker {
  private:
   std::shared_ptr<std::map<std::string, berval *>> cookies_{};
-  LDAP *ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   std::string base_{};
   std::string filter_{};
@@ -36,9 +36,9 @@ class LDAPPagedSearchProgress : public Nan::AsyncProgressWorker {
   **@param cookies, the berval cookie structure for a page
   **/
   LDAPPagedSearchProgress(
-      Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-      std::string base, int scope, std::string filter,
-      const std::string &cookieID, int pgSize,
+      Nan::Callback *callback, Nan::Callback *progress,
+      const std::shared_ptr<LDAP> &ld, std::string base, int scope,
+      std::string filter, const std::string &cookieID, int pgSize,
       const std::shared_ptr<std::map<std::string, berval *>> &cookies);
 
   /**

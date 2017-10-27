@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
+#include "ldap_changePassword_progress.h"
 #include "ldap_compare_progress.h"
 #include "ldap_control.h"
 #include "ldap_delete_progress.h"
@@ -15,7 +16,6 @@
 #include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
-#include "ldap_changePassword_progress.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -220,7 +220,6 @@ class LDAPClient : public Nan::ObjectWrap {
 
   static NAN_METHOD(pagedSearch) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
     Nan::Utf8String baseArg(info[0]);
     int scopeSearch = info[1]->NumberValue();
     Nan::Utf8String filterArg(info[2]);
@@ -241,16 +240,19 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Callback *progress = new Nan::Callback(info[6].As<v8::Function>());
 
     if (obj->ld_ == nullptr) {
-      stateClient[0] = Nan::New<v8::Number>(0);
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
       return;
     }
 
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
+
     Nan::AsyncQueueWorker(new LDAPPagedSearchProgress(
-        callback, progress, obj->ld_, dnBase, scopeSearch, filterSearch,
-        cookie_id, pageSize, obj->cookies_));
+        callback, progress, newLD, dnBase, scopeSearch, filterSearch, cookie_id,
+        pageSize, obj->cookies_));
   }
 
   static NAN_METHOD(compare) {
@@ -341,8 +343,10 @@ class LDAPClient : public Nan::ObjectWrap {
     free(oldpw.bv_val);
 
     /* Send the parameters to a thread to be processed */
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPChangePasswordProgress(callback, progress, obj->ld_, msgID));
+        new LDAPChangePasswordProgress(callback, progress, newLD, msgID));
   }
 
   static NAN_METHOD(modify) {
@@ -621,6 +625,7 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     int unbindResult = ldap_unbind(obj->ld_);
+    obj->ld_ = nullptr;
 
     if (unbindResult != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(unbindResult);

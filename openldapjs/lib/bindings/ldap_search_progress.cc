@@ -10,9 +10,7 @@ LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
-      msgID_(msgID) {
-  mapResult_ = std::make_shared<LDAPMapResult>();
-}
+      msgID_(msgID) {}
 
 LDAPSearchProgress::~LDAPSearchProgress() {}
 
