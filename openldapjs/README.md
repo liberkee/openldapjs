@@ -1,28 +1,86 @@
-# openldapjs
+# Project Title
 
-## Purpose
+One Paragraph of project description goes here
 
-TODO 
+## Getting Started
 
-## Building and Setup
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Requirements
-TODO
+### Prerequisites
 
-### Build Steps
-TODO
+What things you need to install the software and how to install them
 
-### Deploy Steps
-TODO
+```
+Give examples
+```
 
-## Testing
+### Installing
 
-TODO 
+A step by step series of examples that tell you have to get a development env running
 
-## Samples
+Say what the step will be
 
-TODO
+```
+Give the example
+```
 
-## Licences 
+And repeat
+
+```
+until finished
+```
+
+End with an example of getting some data out of the system or using it for a little demo
+
+## Running the tests
+
+Explain how to run the automated tests for this system
+
+### Break down into end to end tests
+
+Explain what these tests test and why
+
+```
+Give an example
+```
+
+### And coding style tests
+
+Explain what these tests test and why
+
+```
+Give an example
+```
+
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+## Built With
+
+
+
+## Contributing
+
+
+
+## Versioning
+
+
+
+## Authors
+
+
+See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/contributors) who participated in this project.
+
+## License
 
 - openldap:   OpenLDAP Public License Version 2.8
+
+## Acknowledgments
+
+* Hat tip to anyone who's code was used
+* Inspiration
+* etc
+
+
