@@ -3,7 +3,7 @@
 const should = require('should');
 const ldif = require('ldif');
 const config = require('./config.json');
-const LDAPWrap = require('../libs/ldapAsyncWrap.js');
+const LDAPWrap = require('../libs/ldap_async_wrap.js');
 
 const scopeSearch = {
   base: 'BASE',

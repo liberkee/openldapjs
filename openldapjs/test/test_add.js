@@ -1,10 +1,10 @@
 'use strict';
 
-const LDAP = require('../libs/ldapAsyncWrap.js');
+const LDAP = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./errorList');
+const errorList = require('./error_list');
 const errorHandler = require('../libs/errors/error_dispenser');
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');

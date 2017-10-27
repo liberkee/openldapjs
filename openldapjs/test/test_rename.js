@@ -1,9 +1,9 @@
 'use strict';
 
-const LdapAsyncWrap = require('../libs/ldapAsyncWrap.js');
+const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const should = require('should');
-const errorList = require('./errorList.json');
+const errorList = require('./error_list.json');
 const errorHandler = require('../libs/errors/error_dispenser');
 const ValidationError = require('../libs/errors/validation_error');
 const StateError = require('../libs/errors/state_error');

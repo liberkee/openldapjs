@@ -2,11 +2,11 @@
 
 const binding = require('../build/Release/binding.node');
 const Promise = require('bluebird');
-const checkParameters = require('./checkVariableFormat/checkVariableFormat');
-const SearchStream = require('./streamInterface.js');
+const checkParameters = require('./check_variable_format/check_variable_format');
+const SearchStream = require('./stream_interface.js');
 const errorHandler = require('./errors/error_dispenser');
 const StateError = require('./errors/state_error');
-const errorList = require('../test/errorList.json');
+const errorList = require('../test/error_list.json');
 const _ = require('underscore');
 
 

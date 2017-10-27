@@ -7,7 +7,7 @@ const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
 const ValidationError = require('../errors/validation_error');
-const errorList = require('../../test/errorList.json');
+const errorList = require('../../test/error_list.json');
 
 /**
  * @module checkVariableFormat
