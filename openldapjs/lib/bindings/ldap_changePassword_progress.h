@@ -3,10 +3,11 @@
 
 #include <ldap.h>
 #include <nan.h>
+#include <memory>
 
 class LDAPChangePasswordProgress : public Nan::AsyncProgressWorker {
  private:
-  LDAP *ld_{};
+  const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
   LDAPMessage *resultMsg_{};
@@ -21,7 +22,7 @@ class LDAPChangePasswordProgress : public Nan::AsyncProgressWorker {
   **@param msgID, operation identifier.
   **/
   LDAPChangePasswordProgress(Nan::Callback *callback, Nan::Callback *progress,
-                             LDAP *ld, const int msgID);
+                             const std::shared_ptr<LDAP> &ld, const int msgID);
 
   /**
   **@brief Execute Method, runs outside the event loop.

@@ -1,12 +1,10 @@
 #include "ldap_changePassword_progress.h"
-#include <iostream>
 #include <string>
 #include "constants.h"
 
-LDAPChangePasswordProgress::LDAPChangePasswordProgress(Nan::Callback *callback,
-                                                       Nan::Callback *progress,
-                                                       LDAP *ld,
-                                                       const int msgID)
+LDAPChangePasswordProgress::LDAPChangePasswordProgress(
+    Nan::Callback *callback, Nan::Callback *progress,
+    const std::shared_ptr<LDAP> &ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
       progress_(progress),
       ld_(ld),
@@ -19,8 +17,8 @@ void LDAPChangePasswordProgress::Execute(
 
   /* Wait until the result is not LDAP_RES_UNSOLICITED*/
   while (result_ == LDAP_RES_UNSOLICITED) {
-    result_ =
-        ldap_result(ld_, msgID_, constants::ALL_RESULTS, &timeOut, &resultMsg_);
+    result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+                          &resultMsg_);
   }
 }
 
@@ -38,7 +36,7 @@ void LDAPChangePasswordProgress::HandleOKCallback() {
     /* If result is LDAP_RES_EXTENDED then we process the operation
      * response */
     case LDAP_RES_EXTENDED: {
-      const auto status = ldap_result2error(ld_, resultMsg_, false);
+      const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       /* We verify if the operation failed or the operation has made
        * succesfully */
       switch (status) {
