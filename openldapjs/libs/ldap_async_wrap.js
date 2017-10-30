@@ -2,7 +2,8 @@
 
 const binding = require('../build/Release/binding.node');
 const Promise = require('bluebird');
-const checkParameters = require('./check_variable_format/check_variable_format');
+const checkParameters =
+    require('./check_variable_format/check_variable_format');
 const SearchStream = require('./stream_interface.js');
 const errorHandler = require('./errors/error_dispenser');
 const StateError = require('./errors/state_error');
@@ -50,7 +51,6 @@ class LDAPAsyncWrap {
       if (this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAddress, (err, result) => {
           if (err) {
-
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapInitializeErrorMessage));
           } else {
@@ -172,8 +172,7 @@ class LDAPAsyncWrap {
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {
-        checkParameters.validateStrings(
-          searchBase, searchFilter, scope);
+        checkParameters.validateStrings(searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error(errorList.scopeSearchErrorMessage);
@@ -232,7 +231,9 @@ class LDAPAsyncWrap {
     *
     * @method modify
     * @param {String} dn The dn of the entry to modify
-    * @param {Array} jsonChange The attribute and value to be changed
+    * @param {Object || Array} jsonChange The attribute and value to be changed
+    * @param {Object || Array} [controls] Request to execute a specific control or
+    * multiple controls. This parameter is optional.
     * @return {Promise} That resolves if LDAP modified successfully the
     * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
@@ -243,12 +244,11 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);
-        checkParameters.checkModifyChangeArray(jsonChange);
-        checkParameters.checkControlArray(controls);
+        const changes = checkParameters.checkModifyChange(jsonChange);
+        const ctrls = checkParameters.checkControl(controls);
 
-        this._binding.modify(dn, jsonChange, ctrls, (err, result) => {
+        this._binding.modify(dn, changes, ctrls, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapModifyErrorMessage));
@@ -267,8 +267,8 @@ class LDAPAsyncWrap {
    * @param {String} dn The dn of the entry to rename
    * @param {String} newRdn The new rdn for the dn
    * @param {String} newParent New parent for the rdn
-   * @param {Array} controls Control that is sent as a request to the
-   * server
+   * @param {Object || Array} [controls] Request to execute a specific control or
+   * multiple controls. This parameter is optional.
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
@@ -277,9 +277,8 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn, newRdn, newParent);
-        checkParameters.checkControlArray(controls);
+        const ctrls = checkParameters.checkControl(controls);
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
           if (err) {
@@ -296,8 +295,8 @@ class LDAPAsyncWrap {
   /**
    * ldap delete operation
    * @param {String} dn the dn entry to be deleted.
-   * @param {Array} controls Optional control array parameter, can be
-   * NULL.
+   * @param {Object || Array} [controls] Request to execute a specific control or
+   * multiple controls. This parameter is optional.
    * @return {Promise} promise that resolves if the element provided was
    * deleted
    * or rejects if not.
@@ -307,9 +306,8 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);
-        checkParameters.checkControlArray(controls);
+        const ctrls = checkParameters.checkControl(controls);
 
         this._binding.delete(dn, ctrls, (err, result) => {
           if (err) {
@@ -339,14 +337,14 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        checkParameters.validateStrings(
-          userDN, oldPassword, newPassword);
+        checkParameters.validateStrings(userDN, oldPassword, newPassword);
 
         this._binding.changePassword(
           userDN, oldPassword, newPassword, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
-              reject(new CustomError(errorList.ldapChangePasswordErrorMessage));
+              reject(
+                new CustomError(errorList.ldapChangePasswordErrorMessage));
             } else {
               resolve();
             }
@@ -359,9 +357,10 @@ class LDAPAsyncWrap {
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
    * exist'
-   * @param {Object} entry ldif format to be added, needs to have a
+   * @param {Object || Array} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param {Array} controls client & sever controls, OPTIONAL parameter
+   * @param {Object || Array} [controls] Request to execute a specific control or
+   * multiple controls. This parameter is optional.
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
@@ -370,12 +369,11 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        const ctrls = controls !== undefined ? controls : null;
         checkParameters.validateStrings(dn);
-        checkParameters.checkEntryObject(entry);
-        checkParameters.checkControlArray(controls);
+        const entryAttr = checkParameters.checkEntryObject(entry);
+        const ctrls = checkParameters.checkControl(controls);
 
-        this._binding.add(dn, entry, ctrls, (err, result) => {
+        this._binding.add(dn, entryAttr, ctrls, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapAddErrorMessage));

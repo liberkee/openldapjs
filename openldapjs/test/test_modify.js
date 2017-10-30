@@ -102,10 +102,9 @@ describe('Testing the modify functionalities', () => {
   });
 
   it('should reject if attribute parameter is not defined', () => {
-    const errorMSG = 'The json is not an array';
     return ldapAsyncWrap
       .modify(config.ldapModify.ldapModificationReplace.change_dn)
-      .catch((error) => { should.deepEqual(error.message, errorMSG); });
+      .catch((error) => { should.deepEqual(error.message, errorList.invalidJSONMessage); });
   });
 
   it('should reject operation if the attribute parameter is not correctly defined', () => {
@@ -130,23 +129,26 @@ describe('Testing the modify functionalities', () => {
       });
   });
 
-  it('should reject if control parameter is not an array', () => {
+  it('should modify if control parameter is just a single object', () => {
     const control = {
-      op: 'postread',
+      oid: config.ldapControls.ldapModificationControlPostRead.oid,
+      value: config.ldapControls.ldapModificationControlPostRead.value,
+      isCritical:
+          config.ldapControls.ldapModificationControlPostRead.isCritical,
     };
-    // does it need to be an array ?
+    // does it need to be an array ? not anymore
     return ldapAsyncWrap
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
-      .then(() => {
-        should.fail('should not have succeeded');
-      })
-      .catch(TypeError, (error) => {
-        should.deepEqual(error.message, errorList.controlArrayError);
-      })
-      .catch((err) => {
-        should.fail('did not expect generic Error');
+      .then((result) => {
+        let resultOperation;
+        resultOperation = result.split('\n');
+        resultOperation = resultOperation[1].split(':');
+        resultOperation = resultOperation[1];
+        should.deepEqual(
+          resultOperation,
+          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
       });
   });
 

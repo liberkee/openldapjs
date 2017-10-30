@@ -80,7 +80,7 @@ describe('Testing the rename functionalities', () => {
       });
   });
 
-  it('should reject if control is not an array or undefined', () => {
+  it('should reject if control is not a valid control object', () => {
     return ldapAsyncWrap
       .rename(
         config.ldapRename.dnChange, config.ldapRename.newrdn,
@@ -88,8 +88,8 @@ describe('Testing the rename functionalities', () => {
       .then(() => {
         should.fail('should not have passed');
       })
-      .catch(TypeError, (error) => {
-        should.deepEqual(error.message, errorList.controlArrayError);
+      .catch(ValidationError, (error) => {
+        should.deepEqual(error.message, errorList.controlPropError);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');

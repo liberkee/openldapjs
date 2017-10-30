@@ -19,11 +19,11 @@ class CheckParam {
     * Checks if the arguments provided are Strings.
     *
     * @method validateStrings
-    * @return Throws an error in case the provided parameters aren't  valid strings
+    * @return Throws an error in case the provided parameters aren't  valid
+   * strings
     */
 
   static validateStrings() {
-
     _.each(arguments, (element) => {
       if (!_.isString(element)) {
         throw new TypeError(errorList.typeErrorMessage);
@@ -34,68 +34,65 @@ class CheckParam {
   /**
     * Verify the modify change parameter.
     *
-    * @method checkModifyChangeArray
-    * @param {Array} changes The Array of json Objects that is sent for
-    * verification
-    * @return Throws error in case the json can't be validated
+    * @method checkModifyChange
+    * @param {Object || Array} changes parameter set for verification
+    * @return Throws error in case the changes is not valid. Return the changes as
+    * an array in case entry is valid
     */
-  static checkModifyChangeArray(changes) {
-    if (!_.isArray(changes)) {
-      throw new TypeError('The json is not an array');
-    } else {
-      changes.forEach((element) => {
-        const result = validator.validateMultiple(element, changeSchema);
-        if (!result.valid) {
-          throw new ValidationError(
-            errorList.invalidJSONMessage, result.error, result.errors);
-        }
-      });
-    }
+  static checkModifyChange(changes) {
+    const changesAttr = !_.isArray(changes) ? [changes] : changes;
+    changesAttr.forEach((element) => {
+      const result = validator.validateMultiple(element, changeSchema);
+      if (!result.valid) {
+        throw new ValidationError(
+          errorList.invalidJSONMessage, result.error, result.errors);
+      }
+    });
+    return changesAttr;
   }
 
   /**
     * Verify the control parameter.
     *
-    * @method checkControlArray
-    * @param {Array} controls The jsonControl that is send for verification
-    * @return Throws error in case the controls can't be validated.
+    * @method checkControl
+    * @param {Object || Array} controls parameter set for verification
+    * @return Throws error in case the controls is not valid with the schema
+    * members. Return the array of control or null if the control is undefined.
     */
-  static checkControlArray(controls) {
+  static checkControl(controls) {
     if (controls !== undefined) {
-      if (!_.isArray(controls)) {
-        throw new TypeError(errorList.controlArrayError);
-      } else {
-        controls.forEach((element) => {
-          const result = validator.validateMultiple(element, controlSchema);
-          if (!result.valid) {
-            throw new ValidationError(
-              errorList.controlPropError, result.error, result.errors);
-          }
-        });
-      }
+      const ctrls = !_.isArray(controls) ? [controls] : controls;
+      ctrls.forEach((element) => {
+        const result = validator.validateMultiple(element, controlSchema);
+        if (!result.valid) {
+          throw new ValidationError(
+            errorList.controlPropError, result.error, result.errors);
+        }
+      });
+      return ctrls;
     }
-    // does nothing in case controls isn't defined.
+    return null;
   }
 
   /**
     * Verify the entry parameter.
     *
     * @method checkControlArray
-    * @param {Object} entry The object that is sent for verification
-    * @return Throws error in case the entry can't be validated.
+    * @param {Object || Array} entry parameter set for verification
+    * @return Throws error in case the entry is not valid. Return the entry as
+    * an array in case entry is valid
     */
   static checkEntryObject(entry) {
-    if (!_.isArray(entry)) {
-      throw new TypeError('The entryObject is not an array');
-    } else {
-      entry.forEach((element) => {
-        const result = validator.validateMultiple(element, addEntrySchema);
-        if (!result.valid) {
-          throw new ValidationError(
-            errorList.entryObjectError, result.error, result.errors);
-        }
-      });
-    }
+    const entryAttr = !_.isArray(entry) ? [entry] : entry;
+
+    entryAttr.forEach((element) => {
+      const result = validator.validateMultiple(element, addEntrySchema);
+      if (!result.valid) {
+        throw new ValidationError(
+          errorList.entryObjectError, result.error, result.errors);
+      }
+    });
+    return entryAttr;
   }
 
 }
