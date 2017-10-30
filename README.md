@@ -24,21 +24,37 @@ Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+* Get all required packages with npm :
+  ``` npm install ```
 
-Say what the step will be
+* Build the C++ libraries:
+    * ```node-gyp configure```
+    * ``` node-gyp build```
 
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
+```javascript
+const LdapClient = require('./libs/ldap_async_wrap.js');
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+A normal workflow would be :
+```javascript
+const ldapClientInstance = new LdapClient('ldap://your_ldap_server:PORT');
+
+ldapClientInstance.initialize()
+    .then(() => {
+      return ldapClientInstance.bind(userDn,userPassword)
+    })
+    .then( () => {
+      ldapClientInstance.search(...);
+      ldapClientInstance.add(...);
+      ldapClientInstance.delete(...);
+      ldapClientInstance.modify(...);
+    });
+```
+
+
+
+
 
 ## Running the tests
 
