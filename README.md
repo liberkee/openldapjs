@@ -1,18 +1,26 @@
-# Project Title
+#OpenLDAP.JS
 
-One Paragraph of project description goes here
+Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+* Clone or download repository.
+* Install dependencies.
+* [V8 Embedder's guide](https://github.com/v8/v8/wiki/Embedder's-Guide) Useful documentation + examples if you want a deeper look at how    embedding is done.
+* [Nan](https://github.com/nodejs/nan) Nan examples, documentation and source.
+* [LDAP](https://www.ldap.com) & [OpenLDAP](http://www.openldap.org/) documentation and resources.
+
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+* Install all dependencies :
+  * Node.js(>version 4.8.5)
+  * NPM
+  * OpenLDAP libraries : apt-get install libldap-2.4.2
+  * SLAPD
+  * [Nan](https://github.com/nodejs/nan)
+  * [V8](https://github.com/v8/v8) 
 
-```
-Give examples
-```
 
 ### Installing
 
