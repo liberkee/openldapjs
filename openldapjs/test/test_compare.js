@@ -49,6 +49,20 @@ describe('Testing the Compare function', () => {
       });
   });
 
+  it('should fail if attribute doesn\'t exist', () => {
+    const noSuchAttribute = 'title';
+    const CustomError = errorHandler(errorList.noSuchAttirbute);
+    return ldapAsyncWrap.compare(dn, noSuchAttribute, val)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err.constructor.description, CustomError.description);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
 
   it('should compare non existing value for attribute', () => {
     const nonVal = 'nonExistingValue';
@@ -68,6 +82,7 @@ describe('Testing the Compare function', () => {
       })
       .catch(CustomError, (err) => {
         should.deepEqual(err, new CustomError(errorList.ldapCompareErrorMessage));
+        should.deepEqual(err.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -84,6 +99,7 @@ describe('Testing the Compare function', () => {
       })
       .catch(CustomError, (err) => {
         should.deepEqual(err, new CustomError(errorList.ldapCompareErrorMessage));
+        should.deepEqual(err.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');

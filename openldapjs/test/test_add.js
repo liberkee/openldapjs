@@ -200,7 +200,7 @@ describe('Testing the async LDAP add operation', () => {
       })
       .catch(CustomError, (accessError) => {
         should.deepEqual(accessError, new CustomError(errorList.ldapAddErrorMessage));
-
+        should.deepEqual(accessError.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');

@@ -69,12 +69,14 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   it('should reject with server error', () => {
     const newClient = new LDAPWrap(host);
+    const CustomError = errorHandler(errorList.ldapOther);
     return newClient.unbind()
       .then(() => {
         should.fail('Didn\'t expect success');
       })
-      .catch(LdapOtherError, (error) => {
-        should.deepEqual(error.message, errorList.ldapUnbindErrorMessage);
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapUnbindErrorMessage));
+        should.deepEqual(error.constructor.description, CustomError.description);
       });
   });
 

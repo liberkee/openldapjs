@@ -124,6 +124,7 @@ describe('Testing the async LDAP delete operation', () => {
       })
       .catch(CustomError, (err) => {
         err.should.be.deepEqual(new CustomError(errorList.ldapDeleteErrorMessage));
+        err.constructor.description.should.be.deepEqual(CustomError.description);
       })
       .catch(() => {
         should.fail('did not expect generic error');

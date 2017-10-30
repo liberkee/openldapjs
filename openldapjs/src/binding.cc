@@ -164,7 +164,16 @@ class LDAPClient : public Nan::ObjectWrap {
       delete progress;
       return;
     }
+
     int msgID = ldap_simple_bind(obj->ld_, username, password);
+
+    if (msgID == constants::LDAP_ERROR) {
+      stateClient[0] = Nan::New<v8::Number>(constants::LDAP_ERROR);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
 
     AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld_, msgID));
   }

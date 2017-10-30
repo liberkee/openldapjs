@@ -179,6 +179,7 @@ describe('Testing the modify functionalities', () => {
       })
       .catch(CustomError, (error) => {
         should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+        should.deepEqual(error.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -199,6 +200,50 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributesAdd)
       .then((result) => { should.deepEqual(result, 0); });
+  });
+
+  it('should reject the change not respect the class rules', () => {
+    const CustomError = errorHandler(errorList.objectClassViolation);
+    const change = [
+      {
+        op: config.ldapModify.ldapModificationAdd.operation,
+        attr: 'title',
+        vals: ['Un titlu'],
+      },
+    ];
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        change)
+      .then((result) => { should.fail('should not have passed'); })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err.constructor.description, CustomError.description);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject the change not respect the schema structure rules', () => {
+    const CustomError = errorHandler(errorList.namingViolation);
+    const change = [
+      {
+        op: config.ldapModify.ldapModificationReplace.operation,
+        attr: 'cn',
+        vals: ['sss'],
+      },
+    ];
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        change)
+      .then((result) => { should.fail('should not have passed'); })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err.constructor.description, CustomError.description);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should delete an  attribute from an existing entry', () => {

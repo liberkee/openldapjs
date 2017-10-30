@@ -5,6 +5,7 @@ const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config');
 const Promise = require('bluebird');
 const errorList = require('./error_list.json');
+const errorHandler = require('../libs/errors/error_dispenser');
 const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async LDAP search ', () => {
@@ -186,6 +187,7 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the size of page is bigger then the size limit defined on server', (next) => {
     /* On our server the page size is not set and is default on 500 entries */
     const newPageSize = 1000;
+    const CustomError = errorHandler(errorList.sizeLimitExceeded);
 
     userLDAP.pagedSearch(searchBaseUser, searchScope.subtree,
       config.ldapSearch.filterObjAll, newPageSize)
@@ -195,7 +197,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errorList.sizeLimitExceeded);
+          should.deepEqual(errorHandler(err).description, CustomError.description);
           next();
         });
       });
