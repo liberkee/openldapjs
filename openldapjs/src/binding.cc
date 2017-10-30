@@ -344,8 +344,16 @@ class LDAPClient : public Nan::ObjectWrap {
     }
 
     /* Send the request for changing the password to server */
-    ldap_passwd(obj->ld_, &user, &oldpw, &newpw, nullptr, nullptr, &msgID);
+    int result =
+        ldap_passwd(obj->ld_, &user, &oldpw, &newpw, nullptr, nullptr, &msgID);
 
+    if (result != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(LDAP_INSUFFICIENT_ACCESS);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
     /* Free the memory of unused data */
     free(user.bv_val);
     free(newpw.bv_val);

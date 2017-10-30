@@ -17,19 +17,15 @@ Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
   * Node.js(>version 4.8.5)
   * NPM
   * OpenLDAP libraries : apt-get install libldap-2.4.2
-  * SLAPD
+  * SLAPD (optional)
   * [Nan](https://github.com/nodejs/nan)
   * [V8](https://github.com/v8/v8) 
 
 
 ### Installing
 
-* Get all required packages with npm :
+* Get all required packages with npm and build the addon files :
   ``` npm install ```
-
-* Build the C++ libraries:
-    * ```node-gyp configure```
-    * ``` node-gyp build```
 
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
 ```javascript
