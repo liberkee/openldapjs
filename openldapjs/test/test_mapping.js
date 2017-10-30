@@ -10,6 +10,7 @@ const scopeSearch = {
   one: 'ONE',
   subtree: 'SUBTREE',
 };
+const pathToCert = config.ldapAuthentication.pathFileToCert;
 
 describe('Test mapping string to JSON', () => {
   const host = config.ldapAuthentication.host;
@@ -23,11 +24,16 @@ describe('Test mapping string to JSON', () => {
   beforeEach(() => {
     adminLDAP = new LDAPWrap(host);
 
-    const init = adminLDAP.initialize();
-    const bind = adminLDAP.bind(
-      config.ldapAuthentication.dnAdmin,
-      config.ldapAuthentication.passwordAdmin);
-    return Promise.all([init, bind]);
+    const init1 = adminLDAP.initialize();
+    const startTLS1 = adminLDAP.startTLS(pathToCert);
+
+    return Promise.all([init1, startTLS1])
+      .then(() => {
+        return adminLDAP.bind(
+          config.ldapAuthentication.dnAdmin,
+          config.ldapAuthentication.passwordAdmin);
+
+      });
   });
 
   afterEach(() => { return adminLDAP.unbind(); });

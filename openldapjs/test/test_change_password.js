@@ -21,14 +21,15 @@ describe('Testing the ChangePassword operation', () => {
   const oldPassword = config.ldapChangePassword.oldPasswd;
   const newPassword = config.ldapChangePassword.newPasswd;
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   beforeEach(() => {
     /* Create an LDAP connection with a defined user */
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(() => {
-        return ldapAsyncWrap.bind(dn, password);
-      });
+      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
+      .then(() => { return ldapAsyncWrap.bind(dn, password); });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });

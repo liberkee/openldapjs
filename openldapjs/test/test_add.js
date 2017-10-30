@@ -38,21 +38,30 @@ describe('Testing the async LDAP add operation', () => {
   let clientLDAP = new LDAP(config.ldapAuthentication.host);
   let clientLDAP2 = new LDAP(config.ldapAuthentication.host);
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   beforeEach(() => {
     clientLDAP = new LDAP(config.ldapAuthentication.host);
     clientLDAP2 = new LDAP(config.ldapAuthentication.host);
 
     const init1 = clientLDAP.initialize();
     const init2 = clientLDAP2.initialize();
-    const bind1 = clientLDAP.bind(
-      config.ldapAuthentication.dnAdmin,
-      config.ldapAuthentication.passwordAdmin);
-    const bind2 = clientLDAP2.bind(
-      config.ldapAuthentication.dnUser,
-      config.ldapAuthentication.passwordUser);
 
-    return Promise.all([init1, init2, bind1, bind2])
-      .then((result) => {
+    const startTLS1 = clientLDAP.startTLS(pathToCert);
+    const startTLS2 = clientLDAP2.startTLS(pathToCert);
+
+    return Promise.all([init1, init2, startTLS1, startTLS2])
+      .then(() => {
+        const bind1 = clientLDAP.bind(
+          config.ldapAuthentication.dnAdmin,
+          config.ldapAuthentication.passwordAdmin);
+        const bind2 = clientLDAP2.bind(
+          config.ldapAuthentication.dnUser,
+          config.ldapAuthentication.passwordUser);
+
+        return Promise.all([bind1, bind2]);
+      })
+      .then(() => {
         dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
       });
   });
@@ -200,7 +209,6 @@ describe('Testing the async LDAP add operation', () => {
       })
       .catch(CustomError, (accessError) => {
         should.deepEqual(accessError, new CustomError(errorList.ldapAddErrorMessage));
-        should.deepEqual(accessError.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');

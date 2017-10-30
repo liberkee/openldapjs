@@ -13,19 +13,16 @@ describe('Testing the async LDAP bind/unbind', () => {
   const dn = config.ldapAuthentication.dnAdmin;
   const password = config.ldapAuthentication.passwordAdmin;
   let clientLDAP = new LDAPWrap(host);
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
 
   beforeEach(() => {
     clientLDAP = new LDAPWrap(host);
-    return clientLDAP.initialize();
-  });
-  afterEach(() => {});
-
-  it('should bind to the server with valid credentials', () => {
-    return clientLDAP.bind(dn, password)
-      .then((result) => {
-        should.deepEqual(result, undefined);
+    return clientLDAP.initialize()
+      .then(() => {
+        return clientLDAP.startTLS(pathToCert);
       });
   });
+  afterEach(() => {});
 
   it('should not bind to the server using invalid credentials', () => {
 
@@ -46,8 +43,27 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   it('should unbind from the server', () => {
     return clientLDAP.unbind()
-      .then(
-        (result) => { should.deepEqual(result, undefined); });
+      .catch(() => {
+        should.fail('did not expect an error');
+      });
+  });
+
+  it('should unbind from the server', () => {
+    const newClient = new LDAPWrap(host);
+    const CustomError = errorHandler(errorList.confidentialityRequired);
+    return newClient.initialize()
+      .then((result) => {
+        return newClient.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+      })
+      .then(() => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err.constructor.description, CustomError.description);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if the client is not initialized', () => {
@@ -76,7 +92,6 @@ describe('Testing the async LDAP bind/unbind', () => {
       })
       .catch(CustomError, (error) => {
         should.deepEqual(error, new CustomError(errorList.ldapUnbindErrorMessage));
-        should.deepEqual(error.constructor.description, CustomError.description);
       });
   });
 

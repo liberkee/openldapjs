@@ -69,10 +69,15 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize()
+      .then(() => {
+        return ldapAsyncWrap.startTLS(pathToCert);
+      })
       .then(() => {
         return ldapAsyncWrap.bind(
           config.ldapAuthentication.dnAdmin,
@@ -179,7 +184,6 @@ describe('Testing the modify functionalities', () => {
       })
       .catch(CustomError, (error) => {
         should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
-        should.deepEqual(error.constructor.description, CustomError.description);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -200,6 +204,21 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributesAdd)
       .then((result) => { should.deepEqual(result, 0); });
+  });
+
+  it('should add  new attributes to an existing entry', () => {
+    const CustomError = errorHandler(errorList.typeOrValueExists);
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesAdd)
+      .then((result) => { should.fail('should not have passed'); })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err.constructor.description, CustomError.description);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject the change not respect the class rules', () => {
@@ -245,6 +264,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('did not expect generic error');
       });
   });
+
 
   it('should delete an  attribute from an existing entry', () => {
     return ldapAsyncWrap

@@ -30,12 +30,15 @@ describe('Testing the async LDAP delete operation', () => {
     },
   ];
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   let clientLDAP = new LDAP(host);
 
   beforeEach(() => {
     clientLDAP = new LDAP(host);
 
     return clientLDAP.initialize()
+      .then(() => { return clientLDAP.startTLS(pathToCert); })
       .then(() => { return clientLDAP.bind(dnAdmin, password); })
       .then(() => {
         dnUser =
@@ -124,7 +127,6 @@ describe('Testing the async LDAP delete operation', () => {
       })
       .catch(CustomError, (err) => {
         err.should.be.deepEqual(new CustomError(errorList.ldapDeleteErrorMessage));
-        err.constructor.description.should.be.deepEqual(CustomError.description);
       })
       .catch(() => {
         should.fail('did not expect generic error');

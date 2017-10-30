@@ -75,12 +75,14 @@ ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[1]}
 ${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[2]}
 cn: ${attributeEntry}\n`;
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(
-        () => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
+      .then(() => { return ldapAsyncWrap.bind(dn, password); });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
@@ -161,9 +163,7 @@ cn: ${attributeEntry}\n`;
           return ldapAsyncWrap.compare(dn, attr, val);
         })
 
-        .then((result10) => {
-          should.deepEqual(result10, true);
-        });
+        .then((result10) => { should.deepEqual(result10, true); });
     });
 
   it('should make multiple operations in parallel', () => {
@@ -215,7 +215,8 @@ cn: ${attributeEntry}\n`;
 
             if (resultOperation === config.ldapAuthentication.dnUserNoRight) {
               should.deepEqual(
-                resultOperation, `${config.ldapAuthentication.dnUserNoRight}`);
+                resultOperation,
+                `${config.ldapAuthentication.dnUserNoRight}`);
             } else if (
               resultOperation ===
                   ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {

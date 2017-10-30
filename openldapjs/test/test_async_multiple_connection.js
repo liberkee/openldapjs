@@ -24,12 +24,19 @@ describe('Testing the async LDAP connection', () => {
   afterEach(() => {});
 
   it('should bind multiple clients at the same time', () => {
+    const pathToCert = config.ldapAuthentication.pathFileToCert;
     const init1 = clientLDAP.initialize();
     const init2 = clientLDAP2.initialize();
-    const bind1 = clientLDAP.bind(dn, password);
-    const bind2 = clientLDAP2.bind(dn2, password2);
+    const startTLS1 = clientLDAP.startTLS(pathToCert);
+    const startTLS2 = clientLDAP2.startTLS(pathToCert);
 
-    return Promise.all([init1, init2, bind1, bind2])
+    return Promise.all([init1, init2, startTLS1, startTLS2])
+      .then(() => {
+        const bind1 = clientLDAP.bind(dn, password);
+        const bind2 = clientLDAP2.bind(dn2, password2);
+
+        return Promise.all([bind1, bind2]);
+      })
       .catch(() => {
         should.fail('did not expect an error');
       });

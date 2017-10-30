@@ -17,6 +17,7 @@ describe('Testing the async LDAP search ', () => {
   const password = config.ldapAuthentication.passwordAdmin;
   let adminLDAP = new LDAPWrap(host);
   let userLDAP = new LDAPWrap(host);
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
 
   const searchScope = {
     base: 'BASE',
@@ -31,14 +32,16 @@ describe('Testing the async LDAP search ', () => {
 
     const init1 = adminLDAP.initialize();
     const init2 = userLDAP.initialize();
-    const bind1 = adminLDAP.bind(
-      config.ldapAuthentication.dnAdmin,
-      config.ldapAuthentication.passwordAdmin);
-    const bind2 = userLDAP.bind(
-      config.ldapAuthentication.dnUser,
-      config.ldapAuthentication.passwordUser);
+    const startTLS1 = adminLDAP.startTLS(pathToCert);
+    const startTLS2 = userLDAP.startTLS(pathToCert);
 
-    return Promise.all([init1, init2, bind1, bind2]);
+    return Promise.all([init1, init2, startTLS1, startTLS2])
+      .then(() => {
+        const bind1 = adminLDAP.bind(dnAdmin, password);
+        const bind2 = userLDAP.bind(dnUser, password);
+
+        return Promise.all([bind1, bind2]);
+      });
 
   });
 
@@ -54,15 +57,13 @@ describe('Testing the async LDAP search ', () => {
           searchBase, searchScope.subtree,
           config.ldapSearch.filterObjSpecific);
       })
-      .then(() => {
-        should.fail('should not have passed');
-      })
-      .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorList.bindErrorMessage);
-      })
-      .catch((err) => {
-        should.fail('did not expect generic error');
-      });
+      .then(() => { should.fail('should not have passed'); })
+      .catch(
+        StateError,
+        (error) => {
+          should.deepEqual(error.message, errorList.bindErrorMessage);
+        })
+      .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should return an empty search', () => {
@@ -90,35 +91,31 @@ describe('Testing the async LDAP search ', () => {
     const CustomError = errorHandler(errorList.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .then(() => {
-        should.fail('should not have passed');
-      })
-      .catch(CustomError, (err) => {
-        err.should.be.deepEqual(new CustomError(errorList.ldapSearchErrorMessage));
-      })
-      .catch((err) => {
-        should.fail('did not expect generic error');
-      });
+      .then(() => { should.fail('should not have passed'); })
+      .catch(
+        CustomError,
+        (err) => {
+          err.should.be.deepEqual(
+            new CustomError(errorList.ldapSearchErrorMessage));
+        })
+      .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
-      .then(() => {
-        should.fail('should not have passed');
-      })
-      .catch(TypeError, (err) => {
-        err.message.should.be.deepEqual(errorList.typeErrorMessage);
-      })
-      .catch((err) => {
-        should.fail('did not expect generic error');
-      });
+      .then(() => { should.fail('should not have passed'); })
+      .catch(
+        TypeError,
+        (err) => {
+          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+        })
+      .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if the scope doesn\'t exist', () => {
-    return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
-      .then(() => {
-        should.fail('Didn\'t expect success');
-      })
+    return userLDAP
+      .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
+      .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
         err.message.should.be.deepEqual(errorList.scopeSearchErrorMessage);
       });
@@ -127,15 +124,13 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the searchBase is not a string', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .then(() => {
-        should.fail('should not have passed');
-      })
-      .catch(TypeError, (err) => {
-        err.message.should.be.deepEqual(errorList.typeErrorMessage);
-      })
-      .catch((err) => {
-        should.fail('did not expect generic error');
-      });
+      .then(() => { should.fail('should not have passed'); })
+      .catch(
+        TypeError,
+        (err) => {
+          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+        })
+      .catch((err) => { should.fail('did not expect generic error'); });
   });
 
 
@@ -216,9 +211,7 @@ describe('Testing the async LDAP search ', () => {
         return adminLDAP.search(
           'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
-      .then(() => {
-        should.fail('should not have passed');
-      })
+      .then(() => { should.fail('should not have passed'); })
       .catch((err) => { err.should.not.be.empty; });
   });
 

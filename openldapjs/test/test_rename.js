@@ -25,10 +25,15 @@ describe('Testing the rename functionalities', () => {
     },
   ];
 
+  const pathToCert = config.ldapAuthentication.pathFileToCert;
+
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize()
+      .then(() => {
+        return ldapAsyncWrap.startTLS(pathToCert);
+      })
       .then(() => {
         return ldapAsyncWrap.bind(
           config.ldapAuthentication.dnAdmin,

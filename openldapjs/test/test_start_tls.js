@@ -12,8 +12,8 @@ describe('Testing the LDAP start TLS routine', () => {
   const host = config.ldapAuthentication.host;
   let adminLDAP = new LDAPWrap(host);
 
-  const pathFileToCert = '/etc/ldap/ca_certs.pem';
-  const pathToCert = '/etc/ldap';
+  const pathFileToCert = config.ldapAuthentication.pathFileToCert;
+  const pathToCert = config.ldapAuthentication.pathToCert;
   beforeEach(() => {
     adminLDAP = new LDAPWrap(host);
 
@@ -24,6 +24,7 @@ describe('Testing the LDAP start TLS routine', () => {
     return adminLDAP.unbind();
   });
 
+  /* The TLS test should run separated */
   it('should reject if the state is not Initialized', () => {
     return adminLDAP.unbind()
       .then(() => {
