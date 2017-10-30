@@ -52,43 +52,38 @@ ldapClientInstance.initialize()
     });
 ```
 
+For more in depth examples please consult [Tests](https://github.com/hufsm/openldapjs/tree/development/openldapjs/test) and [Samples](https://github.com/hufsm/openldapjs/tree/development/openldapjs/sample).
+
+
+
 
 
 
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a ldapadd :
+* ```ldapadd -H "ldap://your_ldap_URL:port" -D "admin dn" -w "admin password" -f test/dump.ldif ```
 
-### Break down into end to end tests
+This will only work if your ldap schema is empty and it will populate it with test data. For a less straight forward approach, configure the config.json file with your local data. 
 
-Explain what these tests test and why
+After the sample data is ready, run npm test and the tests should run.
 
-```
-Give an example
-```
+``` npm test ```
 
-### And coding style tests
+### Test breakdown
 
-Explain what these tests test and why
-
-```
-Give an example
-```
+The tests are mainly designed for testing all ldap routines (add,delete,search,modify, initialize,bind, unbind, start tls, etc.).
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+TODO
 
 ## Built With
 
-
+* [Node-Gyp](https://github.com/nodejs/node-gyp)
 
 ## Contributing
-
-
-
-## Versioning
 
 
 
