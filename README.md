@@ -1,4 +1,4 @@
-#OpenLDAP.JS
+# OpenLDAP.JS
 
 Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
 
