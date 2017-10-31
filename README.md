@@ -24,7 +24,8 @@ Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
 
 ### Installing
 
-* Get all required packages with npm and build the addon files :
+Clone or download the repository.
+Get all required packages with npm and build the addon files :
   ``` npm install ```
 
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
@@ -73,18 +74,31 @@ The tests are mainly designed for testing all ldap routines (add,delete,search,m
 
 ## Deployment
 
-TODO
+This is where i'd put instructions on how to require my package....if i had one.
 
 ## Built With
 
 * [Node-Gyp](https://github.com/nodejs/node-gyp)
 
 ## Contributing
+ This project follows  the airbnb lint rules for javascript and [Clang google style](https://clang.llvm.org/docs/ClangFormatStyleOptions.html) for the C/C++ addon files. For easier collaboration, please ensure that your code is properly linted/formated before submitting a pull request.
 
+ Any pull requests or issue reports are appreciated.
 
 
 ## Authors
 
+ ### Reviewers:
+  - [Michael de Paly](https://github.com/mdepaly)
+  - [Philipp Tusch](https://github.com/ptusch)
+  - [Yogesh Patel](https://github.com/pately)
+  
+
+ ### Developers:
+  - [Cosmin Ghitea](https://github.com/cosminghitea)
+  - [Maxim Rotaru](https://github.com/MaximRotaru)
+  - [Radu Aribasoiu](https://github.com/Radu94)
+ 
 
 See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/contributors) who participated in this project.
 
@@ -96,6 +110,6 @@ See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/c
 
 * Hat tip to anyone who's code was used
 * Inspiration
-* etc
+* [Nan](https://github.com/nodejs/nan) and [v8](https://github.com/v8/v8) 
 
 
