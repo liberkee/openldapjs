@@ -17,7 +17,7 @@ newClient.initialize()
   })
   .then(() => {
 
-    return newClient.pagedSearch(dn, 'SUBTREE', 'cn=*', 10);
+    return newClient.pagedSearch(dn, 'ONE', 'cn=*', 2);
   })
   .then((result) => {
     let pageNumber = 0;
@@ -26,8 +26,13 @@ newClient.initialize()
       console.log(`The page number is ${pageNumber += 1}`);
       console.log('-----------------------------------');
       const resultJson = ldif.parse(data.toString());
+      const outputOptions = {};
+
+      const JSONstructure = resultJson.toObject(outputOptions);
       console.log(`LDIF structure: ${data.toString()}`);
-      console.log(`JSON structure: ${JSON.stringify(resultJson)}\n`);
+      JSONstructure.entries.forEach((element) => {
+        console.log(element);
+      });
     });
 
     result.on('err', (err) => {
