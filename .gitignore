@@ -38,3 +38,4 @@ modify.ldif
 ./.vscode/
 ./build/**
 .vscode/settings.json
+build/*
