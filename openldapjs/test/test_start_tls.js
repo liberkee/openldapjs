@@ -73,15 +73,15 @@ describe('Testing the LDAP start TLS routine', () => {
 
   it('should start a TLS communication using the full path file to the certificate', () => {
     return adminLDAP.startTLS(pathFileToCert)
-      .then((res) => {
-        should.deepEqual(res, undefined);
+      .catch(() => {
+        should.fail('did not expect an error');
       });
   });
 
   it('should start a TLS communication using just the directory of the certificate', () => {
     return adminLDAP.startTLS(pathToCert)
-      .then((res) => {
-        should.deepEqual(res, undefined);
+      .catch(() => {
+        should.fail('did not expect an error');
       });
   });
 

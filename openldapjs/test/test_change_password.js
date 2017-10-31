@@ -137,8 +137,8 @@ describe('Testing the ChangePassword operation', () => {
 
   it('should change the password', () => {
     return ldapAsyncWrap.changePassword(userDN, oldPassword, newPassword)
-      .then((res) => {
-        should.deepEqual(res, undefined);
+      .catch(() => {
+        should.fail('did not expect an error');
       });
   });
 
