@@ -38,6 +38,7 @@ const LdapRdnError = require('./ldap_errors/ldap_rdn_error');
 const LdapAlreadyExists = require('./ldap_errors/ldap_already_exists_error');
 const LdapClassModsError = require('./ldap_errors/ldap_object_class_mods_error');
 const LdapDsasError = require('./ldap_errors/ldap_dsas_error');
+const LdapFilterError = require('./ldap_errors/ldap_filter_error');
 const LdapOtherError = require('./ldap_errors/ldap_other_error');
 
 
@@ -79,6 +80,7 @@ const errors = {
   LdapAlreadyExists: LdapAlreadyExists,
   LdapClassModsError: LdapClassModsError,
   LdapDsasError: LdapDsasError,
+  LdapFilterError: LdapFilterError,
   LdapOtherError: LdapOtherError,
 
 

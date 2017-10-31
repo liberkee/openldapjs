@@ -8,7 +8,7 @@ const errorList = require('./error_list.json');
 const errorHandler = require('../libs/errors/error_dispenser');
 const StateError = require('../libs/errors/state_error');
 
-describe('Testing the async LDAP search ', () => {
+describe('Testing the async LDAP paged search ', () => {
 
   const host = config.ldapAuthentication.host;
   const dnAdmin = config.ldapAuthentication.dnAdmin;
@@ -137,6 +137,7 @@ describe('Testing the async LDAP search ', () => {
   });
 
   it('should reject if filter is not defined correctly ', (next) => {
+    const CustomError = errorHandler(errorList.filterError);    
     adminLDAP.pagedSearch(searchBase, searchScope.subtree, 'aasd', pageSize)
       .then((res) => {
         res.on('data', (data) => {
@@ -144,14 +145,15 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errorList.filterError);
+          should.deepEqual(err.constructor.description, CustomError.description);
           next();
         });
       });
   });
 
   it('should reject if searchBase is not an entry in ldap', (next) => {
-
+    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    
     adminLDAP
       .pagedSearch(
         'dc=notEntry,dc=com', searchScope.subtree,
@@ -162,7 +164,7 @@ describe('Testing the async LDAP search ', () => {
           next();
         });
         res.on('err', (err) => {
-          err.should.deepEqual(errorList.ldapNoSuchObject);
+          should.deepEqual(err.constructor.description, CustomError.description);
           next();
         });
       });
@@ -170,6 +172,8 @@ describe('Testing the async LDAP search ', () => {
 
   it('should reject if user doesn\'t have the right to read from specified base',
     (next) => {
+      const CustomError = errorHandler(errorList.ldapNoSuchObject);
+      
       userLDAP
         .pagedSearch(
           searchBase, searchScope.subtree,
@@ -180,7 +184,7 @@ describe('Testing the async LDAP search ', () => {
             next();
           });
           res.on('err', (err) => {
-            err.should.deepEqual(errorList.ldapNoSuchObject);
+            should.deepEqual(err.constructor.description, CustomError.description);
             next();
           });
         });
@@ -203,9 +207,8 @@ describe('Testing the async LDAP search ', () => {
             next();
           });
           res.on('err', (err) => {
-            should.deepEqual(
-              errorHandler(err).description, CustomError.description);
-            next();
+              should.deepEqual(err.constructor.description, CustomError.description);
+              next();
           });
         });
     });

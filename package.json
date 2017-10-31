@@ -24,7 +24,7 @@
     "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./modules/checkVariableFormat/*.js",
-    "install": "node-gyp configure && node-gyp build"
+    "install": "node-gyp rebuild"
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",
