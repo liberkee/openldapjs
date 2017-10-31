@@ -71,6 +71,7 @@ After the sample data is ready, run npm test and the tests should run.
 ### Test breakdown
 
 The tests are mainly designed for testing all ldap routines (add,delete,search,modify, initialize,bind, unbind, start tls, etc.).
+Test suite is composed of integration + unit tests.
 
 ## Deployment
 
