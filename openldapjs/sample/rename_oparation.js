@@ -6,27 +6,20 @@ const ldif = require('ldif');
 const newClient = new LdapClientLib('ldap://localhost:389');
 
 const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const newParent = 'ou=template,o=myhost,dc=demoApp,dc=com';
 
-const entry = [
+const prePostReadControls = [
   {
-    attr: 'objectClass',
-    vals: ['top', 'person'],
+    oid: 'postread',
+    value: ['entryCSN', 'description'],
+    isCritical: true,
   },
   {
-    attr: 'sn',
-    vals: ['New User', 'New Name'],
-  },
-  {
-    attr: 'description',
-    vals: ['First description', 'Second description', 'Last description'],
+    oid: 'preread',
+    value: ['entryCSN', 'description'],
+    isCritical: true,
   },
 ];
-
-const postReadControl = {
-  oid: 'postread',
-  value: ['entryCSN', 'description'],
-  isCritical: true,
-};
 
 newClient.initialize()
   .then(() => {
@@ -37,11 +30,11 @@ newClient.initialize()
   })
   .then(() => {
 
-    return newClient.add(`cn=newUser01,${dn}`, entry);
+    return newClient.rename(`cn=newUser03,${dn}`, 'cn=newUser03Change', newParent);
   })
   .then(() => {
-    console.log('The user was add with success');
-    return newClient.add(`cn=newUser02,${dn}`, entry, postReadControl);
+    console.log('The user was renamed with success');
+    return newClient.rename(`cn=newUser04,${dn}`, 'cn=newUser04Change', newParent, prePostReadControls);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);
