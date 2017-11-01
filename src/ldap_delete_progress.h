@@ -1,5 +1,5 @@
-#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_DELETE_PROGRESS_H_
-#define OPENLDAPJS_LIB_BINDINGS_LDAP_DELETE_PROGRESS_H_
+#ifndef OPENLDAPJS_SRC_LDAP_DELETE_PROGRESS_H_
+#define OPENLDAPJS_SRC_LDAP_DELETE_PROGRESS_H_
 
 #include <ldap.h>
 #include <nan.h>
@@ -49,4 +49,4 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
   void HandleProgressCallback(const char *data, size_t size);
 };
 
-#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_DELETE_PROGRESS_H_
+#endif  // OPENLDAPJS_SRC_LDAP_DELETE_PROGRESS_H_
