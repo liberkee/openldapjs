@@ -1,5 +1,5 @@
-#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
-#define OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
+#ifndef OPENLDAPJS_SRC_LDAP_CONTROL_H_
+#define OPENLDAPJS_SRC_LDAP_CONTROL_H_
 
 #include <lber.h>
 #include <ldap.h>
@@ -50,4 +50,4 @@ class LdapControls {
   std::string PrintModificationControls(LDAP* ld, LDAPMessage* resultMsg);
 };
 
-#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_CONTROL_H_
+#endif  // OPENLDAPJS_SRC_LDAP_CONTROL_H_

@@ -1,5 +1,5 @@
-#ifndef OPENLDAPJS_LIB_BINDINGS_LDAP_MAP_RESULT_H_
-#define OPENLDAPJS_LIB_BINDINGS_LDAP_MAP_RESULT_H_
+#ifndef OPENLDAPJS_SRC_LDAP_MAP_RESULT_H_
+#define OPENLDAPJS_SRC_LDAP_MAP_RESULT_H_
 
 #include <lber.h>
 #include <map>
@@ -60,4 +60,4 @@ class LDAPMapResult {
   std::string ResultLDIFString();
 };
 
-#endif  // OPENLDAPJS_LIB_BINDINGS_LDAP_MAP_RESULT_H_
+#endif  // OPENLDAPJS_SRC_LDAP_MAP_RESULT_H_

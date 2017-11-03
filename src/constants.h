@@ -1,5 +1,5 @@
-#ifndef OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
-#define OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
+#ifndef OPENLDAPJS_SRC_CONSTANTS_H_
+#define OPENLDAPJS_SRC_CONSTANTS_H_
 namespace constants {
 const char postread[] = "postread";
 const char preread[] = "preread";
@@ -32,4 +32,4 @@ const int ATTR_VALS_WANTED = 0;
 const int LDAP_NOT_FINISHED = 0;  // ldap_ext op not finished yet.
 }  // namespace constants
 
-#endif  // OPENLDAPJS_LIB_BINDINGS_CONSTANTS_H_
+#endif  // OPENLDAPJS_SRC_CONSTANTS_H_
