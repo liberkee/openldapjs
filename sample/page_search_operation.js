@@ -4,20 +4,21 @@ const LdapClientLib = require('../libs/ldap_async_wrap.js');
 
 const ldif = require('ldif');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
+const config = require('./config.json');
 
-const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.pagedSearch(dn, 'ONE', 'cn=*', 2);
+    return newClient.pagedSearch(config.ldapSearch.searchBase, config.ldapSearch.scope.one,
+      config.ldapSearch.filter, config.ldapSearch.pageSize);
   })
   .then((result) => {
     let pageNumber = 0;

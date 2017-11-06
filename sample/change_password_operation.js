@@ -1,20 +1,20 @@
 'use strict';
 
 const LdapClientLib = require('../libs/ldap_async_wrap.js');
+const config = require('./config.json');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
-
-const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-    return newClient.changePassword(`cn=cbuta,${dn}`, 'secret', 'newPassword');
+    return newClient.changePassword(config.ldapAuthentication.dnUser,
+      config.ldapChangePassword.oldPasswd, config.ldapChangePassword.newPasswd);
   })
   .then(() => {
     console.log('The user password was changed with success');
