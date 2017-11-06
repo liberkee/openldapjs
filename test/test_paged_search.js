@@ -5,7 +5,7 @@ const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config');
 const Promise = require('bluebird');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser');
+const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async LDAP paged search ', () => {
@@ -137,7 +137,7 @@ describe('Testing the async LDAP paged search ', () => {
   });
 
   it('should reject if filter is not defined correctly ', (next) => {
-    const CustomError = errorHandler(errorList.filterError);    
+    const CustomError = errorHandler(errorList.filterError);
     adminLDAP.pagedSearch(searchBase, searchScope.subtree, 'aasd', pageSize)
       .then((res) => {
         res.on('data', (data) => {
@@ -153,7 +153,7 @@ describe('Testing the async LDAP paged search ', () => {
 
   it('should reject if searchBase is not an entry in ldap', (next) => {
     const CustomError = errorHandler(errorList.ldapNoSuchObject);
-    
+
     adminLDAP
       .pagedSearch(
         'dc=notEntry,dc=com', searchScope.subtree,
@@ -173,7 +173,7 @@ describe('Testing the async LDAP paged search ', () => {
   it('should reject if user doesn\'t have the right to read from specified base',
     (next) => {
       const CustomError = errorHandler(errorList.ldapNoSuchObject);
-      
+
       userLDAP
         .pagedSearch(
           searchBase, searchScope.subtree,
@@ -207,8 +207,8 @@ describe('Testing the async LDAP paged search ', () => {
             next();
           });
           res.on('err', (err) => {
-              should.deepEqual(err.constructor.description, CustomError.description);
-              next();
+            should.deepEqual(err.constructor.description, CustomError.description);
+            next();
           });
         });
     });

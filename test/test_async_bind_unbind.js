@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser');
+const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const LdapOtherError = require('../libs/errors/ldap_errors/ldap_other_error');
 

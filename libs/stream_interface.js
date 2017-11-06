@@ -1,7 +1,7 @@
 'use strict';
 
 const Readable = require('stream').Readable;
-const errorHandler = require('./errors/error_dispenser');
+const errorHandler = require('./errors/error_dispenser').errorFunction;
 const errorList = require('../test/error_list.json');
 
 /**

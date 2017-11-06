@@ -5,7 +5,7 @@ const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser');
+const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 

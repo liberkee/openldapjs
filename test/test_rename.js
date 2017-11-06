@@ -4,7 +4,7 @@ const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const should = require('should');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser');
+const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const ValidationError = require('../libs/errors/validation_error');
 const StateError = require('../libs/errors/state_error');
 

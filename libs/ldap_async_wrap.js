@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 const checkParameters =
     require('./check_variable_format/check_variable_format');
 const SearchStream = require('./stream_interface.js');
-const errorHandler = require('./errors/error_dispenser');
+const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
 const errorList = require('../test/error_list.json');
 const _ = require('underscore');
