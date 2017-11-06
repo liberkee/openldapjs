@@ -167,7 +167,7 @@ class LDAPAsyncWrap {
      * @param {String} searchFilter search filter.
      * @param {int} pageSize The number of entries per LDAP page
      * @return {Promise} that resolves to a readable stream or rejects to a
-   * Error;
+     * Error;
      */
   pagedSearch(searchBase, scope, searchFilter, pageSize) {
     return new Promise((resolve, reject) => {
@@ -293,12 +293,8 @@ class LDAPAsyncWrap {
   }
 
   /**
-<<<<<<< HEAD
-   * ldap delete operation
-=======
    * Perform an LDAP delete operation
    *
->>>>>>> bfe680bfb3d146f0386a7ccd38f10afabc9064ac
    * @method delete
    * @param {String} dn the dn entry to be deleted.
    * @param {Object || Array} [controls] Request to execute a specific control or
@@ -359,12 +355,8 @@ class LDAPAsyncWrap {
     });
   }
   /**
-<<<<<<< HEAD
-   * ldap add operation
-=======
    * Perform an LDAP add operation
    *
->>>>>>> bfe680bfb3d146f0386a7ccd38f10afabc9064ac
    * @method add
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
