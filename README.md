@@ -16,13 +16,47 @@ Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
 * Install all dependencies :
   * Node.js(>version 4.8.5)
   * NPM
-  * OpenLDAP libraries : apt-get install libldap-2.4.2
+  * OpenLDAP libraries
   * SLAPD (optional)
   * [Nan](https://github.com/nodejs/nan)
   * [V8](https://github.com/v8/v8) 
 
 
 ### Installing
+
+OpenLDAP.js requires OpenLDAP development libraries.
+
+### Debian/Ubuntu
+
+* OpenLDAP development libraries : sudo apt-get install libldap2-dev
+
+
+### MacOs
+* N/a yet.
+
+### Windows
+* N/a yet.
+
+
+
+
+## Running the tests
+
+In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a ldapadd :
+* ```ldapadd -H "ldap://your_ldap_URL:port" -D "admin dn" -w "admin password" -f test/dump.ldif ```
+
+This will only work if your ldap schema is empty and it will populate it with test data. For a less straight forward approach, configure the config.json file with your local data. 
+
+After the sample data is ready, run npm test and the tests should run.
+
+``` npm test ```
+
+### Test breakdown
+
+The tests are mainly designed for testing all ldap routines (add,delete,search,modify, initialize,bind, unbind, start tls, etc.).
+Test suite is composed of integration + unit tests.
+
+## Deployment
 
 Clone or download the repository.
 Get all required packages with npm and build the addon files :
@@ -50,32 +84,6 @@ ldapClientInstance.initialize()
 ```
 
 For more in depth examples please consult [Tests](https://github.com/hufsm/openldapjs/tree/development/openldapjs/test) and [Samples](https://github.com/hufsm/openldapjs/tree/development/openldapjs/sample).
-
-
-
-
-
-
-
-## Running the tests
-
-In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a ldapadd :
-* ```ldapadd -H "ldap://your_ldap_URL:port" -D "admin dn" -w "admin password" -f test/dump.ldif ```
-
-This will only work if your ldap schema is empty and it will populate it with test data. For a less straight forward approach, configure the config.json file with your local data. 
-
-After the sample data is ready, run npm test and the tests should run.
-
-``` npm test ```
-
-### Test breakdown
-
-The tests are mainly designed for testing all ldap routines (add,delete,search,modify, initialize,bind, unbind, start tls, etc.).
-Test suite is composed of integration + unit tests.
-
-## Deployment
-
-This is where i'd put instructions on how to require my package....if i had one.
 
 ## Built With
 
