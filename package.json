@@ -2,7 +2,7 @@
   "name": "ldapclientwrapper",
   "version": "0.0.1",
   "description": "A ldap client nodejs",
-  "main": "ldapwrapper.js",
+  "main": "index.js",
   "dependencies": {
     "addict-ioc": "1.0.6",
     "ajv": "^5.3.0",
@@ -23,7 +23,7 @@
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "\"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "start": "nodemon ldapwrapper.js",
-    "lint": "eslint ./modules/checkVariableFormat/*.js",
+    "lint": "eslint ./libs/ldap_async_wrap.js",
     "install": "node-gyp rebuild"
   },
   "author": {
