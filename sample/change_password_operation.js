@@ -13,8 +13,8 @@ newClient.initialize()
     return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-    return newClient.changePassword(config.ldapAuthentication.dnUser, config.ldapChangePassword.oldPasswd,
-      config.ldapChangePassword.newPasswd);
+    return newClient.changePassword(config.ldapAuthentication.dnUser,
+      config.ldapChangePassword.oldPasswd, config.ldapChangePassword.newPasswd);
   })
   .then(() => {
     console.log('The user password was changed with success');
