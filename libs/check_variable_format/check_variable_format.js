@@ -1,13 +1,15 @@
 'use strict';
 
 const Promise = require('bluebird');
-const validator = require('tv4');
+const Ajv = require('ajv');
 const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
 const ValidationError = require('../errors/validation_error');
 const errorList = require('../../test/error_list.json');
+
+const ajv = new Ajv();
 
 /**
  * @module checkVariableFormat
@@ -42,10 +44,10 @@ class CheckParam {
   static checkModifyChange(changes) {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
     changesAttr.forEach((element) => {
-      const result = validator.validateMultiple(element, changeSchema);
-      if (!result.valid) {
+      const valid = ajv.validate(changeSchema, element);
+      if (!valid) {
         throw new ValidationError(
-          errorList.invalidJSONMessage, result.error, result.errors);
+          errorList.invalidJSONMessage, ajv.errors);
       }
     });
     return changesAttr;
@@ -63,10 +65,10 @@ class CheckParam {
     if (controls !== undefined) {
       const ctrls = !_.isArray(controls) ? [controls] : controls;
       ctrls.forEach((element) => {
-        const result = validator.validateMultiple(element, controlSchema);
-        if (!result.valid) {
+        const valid = ajv.validate(controlSchema, element);
+        if (!valid) {
           throw new ValidationError(
-            errorList.controlPropError, result.error, result.errors);
+            errorList.controlPropError, ajv.errors);
         }
       });
       return ctrls;
@@ -86,10 +88,10 @@ class CheckParam {
     const entryAttr = !_.isArray(entry) ? [entry] : entry;
 
     entryAttr.forEach((element) => {
-      const result = validator.validateMultiple(element, addEntrySchema);
-      if (!result.valid) {
+      const valid = ajv.validate(addEntrySchema, element);
+      if (!valid) {
         throw new ValidationError(
-          errorList.entryObjectError, result.error, result.errors);
+          errorList.entryObjectError, ajv.errors);
       }
     });
     return entryAttr;

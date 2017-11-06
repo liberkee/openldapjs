@@ -43,14 +43,14 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   it('should unbind from the server', () => {
     return clientLDAP.unbind()
-      .catch(() => {
+      .catch((err) => {
         should.fail('did not expect an error');
       });
   });
 
-  it('should unbind from the server', () => {
+  it('should reject if the credential are not correct', () => {
     const newClient = new LDAPWrap(host);
-    const CustomError = errorHandler(errorList.confidentialityRequired);
+    const CustomError = errorHandler(errorList.invalidCredentials);
     return newClient.initialize()
       .then((result) => {
         return newClient.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
@@ -62,6 +62,7 @@ describe('Testing the async LDAP bind/unbind', () => {
         should.deepEqual(err.constructor.description, CustomError.description);
       })
       .catch((err) => {
+        console.log(err);
         should.fail('did not expect generic error');
       });
   });

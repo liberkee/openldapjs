@@ -109,27 +109,6 @@ describe('Testing the async LDAP add operation', () => {
 
   });
 
-  it('should reject the add operation with an invalid entry Object', () => {
-
-    const invalidEntry = [{
-      wrong: 'garbage',
-      sn: 'Entry',
-      description: 'Test',
-    }];
-
-    return clientLDAP.add(dnUser, invalidEntry)
-      .then(() => {
-        should.fail('should not succeed');
-      })
-      .catch(ValidationError, (undefinedTypeErr) => {
-        should.deepEqual(undefinedTypeErr.message, errorList.entryObjectError);
-      })
-      .catch((err) => {
-        should.fail('did not expect generic Error');
-      });
-
-  });
-
 
   it('should reject the add operation with a duplicated entry', () => {
     const CustomError = errorHandler(errorList.alreadyExists);
