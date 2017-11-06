@@ -20,7 +20,8 @@
     "underscore": "1.8.3"
   },
   "scripts": {
-    "test": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
+    "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
+    "test": "\"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./modules/checkVariableFormat/*.js",
     "install": "node-gyp rebuild"

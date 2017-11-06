@@ -30,12 +30,9 @@
           '-std=c++11',
           '-Werror',
           '-Wfatal-errors'
-          
       ],
       'cflags!': ['-fno-exceptions'],
       'cflags_cc!': ['-fno-exceptions']
     }
   ]
 }
-
-

@@ -293,7 +293,9 @@ class LDAPAsyncWrap {
   }
 
   /**
-   * ldap delete operation
+   * Perform an LDAP delete operation
+   *
+   * @method delete
    * @param {String} dn the dn entry to be deleted.
    * @param {Object || Array} [controls] Request to execute a specific control or
    * multiple controls. This parameter is optional.
@@ -353,7 +355,9 @@ class LDAPAsyncWrap {
     });
   }
   /**
-   * ldap add operation
+   * Perform an LDAP add operation
+   *
+   * @method add
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
    * exist'
