@@ -2,56 +2,39 @@
 
 const LdapClientLib = require('../libs/ldap_async_wrap.js');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
 const ldif = require('ldif');
 
 const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
 
+const config = require('./config.json');
+
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
+
 const changes = [
-  {
-    op: 'add',
-    attr: 'telephoneNumber',
-    vals: ['0744429'],
-  },
-  {
-    op: 'delete',
-    attr: 'description',
-    vals: ['First description', 'Second description'],
-  },
-  {
-    op: 'replace',
-    attr: 'sn',
-    vals: ['User New Name'],
-  },
+  config.ldapModify.ldapModificationAdd,
+  config.ldapModify.ldapModificationDelete,
+  config.ldapModify.ldapModificationReplace,
 ];
 
 const prePostReadControls = [
-  {
-    oid: 'postread',
-    value: ['entryCSN', 'description'],
-    isCritical: true,
-  },
-  {
-    oid: 'preread',
-    value: ['entryCSN', 'description'],
-    isCritical: true,
-  },
+  config.ldapControls.ldapModificationControlPostRead,
+  config.ldapControls.ldapModificationControlPreRead,
 ];
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.modify(`cn=newUser01,${dn}`, changes);
+    return newClient.modify(config.ldapModify.firstDNEntry, changes);
   })
   .then(() => {
     console.log('The user was modify with success');
-    return newClient.modify(`cn=newUser02,${dn}`, changes, prePostReadControls);
+    return newClient.modify(config.ldapModify.secondDNEntry, changes, prePostReadControls);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);

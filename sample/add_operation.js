@@ -2,46 +2,31 @@
 
 const LdapClientLib = require('../libs/ldap_async_wrap.js');
 const ldif = require('ldif');
+const config = require('./config.json');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
-
-const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 const entry = [
-  {
-    attr: 'objectClass',
-    vals: ['top', 'person'],
-  },
-  {
-    attr: 'sn',
-    vals: ['New User', 'New Name'],
-  },
-  {
-    attr: 'description',
-    vals: ['First description', 'Second description', 'Last description'],
-  },
+  config.ldapAdd.firstAttr,
+  config.ldapAdd.secondAttr,
+  config.ldapAdd.thirdAttr,
 ];
-
-const postReadControl = {
-  oid: 'postread',
-  value: ['entryCSN', 'description'],
-  isCritical: true,
-};
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.add(`cn=newUser01,${dn}`, entry);
+    return newClient.add(config.ldapAdd.dnNewEntry, entry);
   })
   .then(() => {
     console.log('The user was add with success');
-    return newClient.add(`cn=newUser02,${dn}`, entry, postReadControl);
+    return newClient.add(config.ldapAdd.secondDnNewEntry, entry,
+      config.ldapControls.ldapModificationControlPostRead);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);

@@ -4,26 +4,31 @@ const LdapClientLib = require('../libs/ldap_async_wrap.js');
 
 const ldif = require('ldif');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
+const config = require('./config.json');
 
-const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.search(dn, 'SUBTREE', 'cn=newUser01');
+    return newClient.search(config.ldapSearch.searchBase, config.ldapSearch.scope.one,
+      config.ldapSearch.filter, config.ldapSearch.pageSize);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);
+    const outputOptions = {};
+    const JSONstructure = resultJson.toObject(outputOptions);
     console.log(`LDIF structure: ${result}`);
     console.log('\n\n');
-    console.log(`JSON structure: \n ${JSON.stringify(resultJson)}`);
+    JSONstructure.entries.forEach((element) => {
+      console.log(element);
+    });
   })
   .catch((err) => {
     console.log(`${err.name} ${err.constructor.description}`);

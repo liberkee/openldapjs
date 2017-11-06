@@ -3,38 +3,31 @@
 const LdapClientLib = require('../libs/ldap_async_wrap.js');
 const ldif = require('ldif');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
+const config = require('./config.json');
 
-const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
-const newParent = 'ou=template,o=myhost,dc=demoApp,dc=com';
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 const prePostReadControls = [
-  {
-    oid: 'postread',
-    value: ['entryCSN', 'description'],
-    isCritical: true,
-  },
-  {
-    oid: 'preread',
-    value: ['entryCSN', 'description'],
-    isCritical: true,
-  },
+  config.ldapControls.ldapModificationControlPostRead,
+  config.ldapControls.ldapModificationControlPreRead,
 ];
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.rename(`cn=newUser03,${dn}`, 'cn=newUser03Change', newParent);
+    return newClient.rename(config.ldapRename.firstDNChange, config.ldapRename.firstRDN,
+      config.ldapRename.newParent);
   })
   .then(() => {
     console.log('The user was renamed with success');
-    return newClient.rename(`cn=newUser04,${dn}`, 'cn=newUser04Change', newParent, prePostReadControls);
+    return newClient.rename(config.ldapRename.secondDNChange, config.ldapRename.secondRDN,
+      config.ldapRename.newParent, prePostReadControls);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);

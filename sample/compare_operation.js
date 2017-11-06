@@ -2,24 +2,26 @@
 
 const LdapClientLib = require('../libs/ldap_async_wrap.js');
 
-const newClient = new LdapClientLib('ldap://localhost:389');
+const config = require('./config.json');
+
+const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
 
 newClient.initialize()
   .then(() => {
-    return newClient.startTLS('/etc/ldap/ca_certs.pem');
+    return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(`cn=cbuta,${dn}`, 'secret');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
 
-    return newClient.compare(`cn=newUser01,${dn}`, 'cn', 'newUser01');
+    return newClient.compare(config.ldapAuthentication.dnUser, config.ldapCompare.attribute, config.ldapCompare.value);
   })
   .then((result) => {
     console.log(`Compare result: ${result}`);
-    return newClient.compare(`cn=newUser01,${dn}`, 'cn', 'wrongCompare');
+    return newClient.compare(config.ldapAuthentication.dnUser, config.ldapCompare.attribute, config.ldapCompare.wrongValue);
   })
   .then((result) => {
     console.log(`Compare result: ${result}`);
