@@ -75,7 +75,7 @@ std::string LdapControls::PrintModificationControls(LDAP *ld,
 
   ldap_parse_result(ld, resultMsg, nullptr, nullptr, nullptr, nullptr,
                     &serverControls, constants::FREE_MSG_FALSE);
-  auto i = 0;
+  int i = 0;
   if (serverControls == nullptr) {
     return modifyResult;
   }
