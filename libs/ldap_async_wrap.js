@@ -67,7 +67,7 @@ class LDAPAsyncWrap {
   /**
     * Initiate a TLS processing on an LDAP session.
     *
-    * @method initialize
+    * @method startTLS
     * @param {String} pathToCertFile The path to the certificate
     * @return {Promise} Will reject if state is not Initialized or if the
     * certificate is not good else will resolve
@@ -294,6 +294,7 @@ class LDAPAsyncWrap {
 
   /**
    * ldap delete operation
+   * @method delete
    * @param {String} dn the dn entry to be deleted.
    * @param {Object || Array} [controls] Request to execute a specific control or
    * multiple controls. This parameter is optional.
@@ -354,6 +355,7 @@ class LDAPAsyncWrap {
   }
   /**
    * ldap add operation
+   * @method add
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
    * exist'

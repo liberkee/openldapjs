@@ -105,4 +105,7 @@ function errorSelection(code) {
   return DesiredErrorClass;
 }
 
-module.exports = errorSelection;
+module.exports = {
+  errorFunction: errorSelection,
+  errorList: errors,
+};
