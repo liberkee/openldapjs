@@ -1,7 +1,6 @@
 'use strict';
 
 const LdapError = require('./ldap_errors/ldap_error');
-const LdapConnectionError = require('./ldap_errors/ldap_connection_error');
 const LdapInvalidDnError = require('./ldap_errors/ldap_invalid_dn_error');
 const LdapSizeLimitError = require('./ldap_errors/ldap_size_limit_error');
 const LdapTimeLimitError = require('./ldap_errors/ldap_time_limit_error');
@@ -38,13 +37,11 @@ const LdapRdnError = require('./ldap_errors/ldap_rdn_error');
 const LdapAlreadyExists = require('./ldap_errors/ldap_already_exists_error');
 const LdapClassModsError = require('./ldap_errors/ldap_object_class_mods_error');
 const LdapDsasError = require('./ldap_errors/ldap_dsas_error');
-const LdapFilterError = require('./ldap_errors/ldap_filter_error');
 const LdapOtherError = require('./ldap_errors/ldap_other_error');
 
 
 const errors = {
   LdapInvalidDnError: LdapInvalidDnError,
-  LdapConnectionError: LdapConnectionError,
   LdapSizeLimitError: LdapSizeLimitError,
   LdapTimeLimitError: LdapTimeLimitError,
   LdapProtocolError: LdapProtocolError,
@@ -80,7 +77,6 @@ const errors = {
   LdapAlreadyExists: LdapAlreadyExists,
   LdapClassModsError: LdapClassModsError,
   LdapDsasError: LdapDsasError,
-  LdapFilterError: LdapFilterError,
   LdapOtherError: LdapOtherError,
 
 
