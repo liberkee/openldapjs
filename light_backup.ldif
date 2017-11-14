@@ -1,0 +1,212 @@
+dn: dc=demoApp,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: myhost
+dc: demoApp
+structuralObjectClass: organization
+entryUUID: a118fe34-35fc-1036-8eed-e58afd4a1347
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161103103256Z
+entryCSN: 20161103103256.817579Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161103103256Z
+
+dn: cn=admin,dc=demoApp,dc=com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+structuralObjectClass: organizationalRole
+entryUUID: a1265a2a-35fc-1036-8eee-e58afd4a1347
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161103103256Z
+userPassword:: e1NTSEF9OFJTSzF3L1lFWWRPZUpweEhiRElSNHlZOWN3ck11dW0=
+entryCSN: 20171004160315.556000Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20171004160315Z
+
+dn: o=myhost,dc=demoApp,dc=com
+objectClass: organization
+o: myhost
+structuralObjectClass: organization
+entryUUID: e6740a14-362e-1036-8b7c-a93160af6404
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161103163248Z
+entryCSN: 20161103163248.013529Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161103163248Z
+
+dn: ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalUnit
+ou: template
+structuralObjectClass: organizationalUnit
+entryUUID: e67b77a4-362e-1036-8b7e-a93160af6404
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161103163248Z
+description: Hello
+entryCSN: 20161104085647.615818Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161104085647Z
+
+dn: ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalUnit
+ou: users
+structuralObjectClass: organizationalUnit
+entryUUID: 29018966-3917-1036-80c6-0ff2da876ca9
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161107092025Z
+entryCSN: 20161107092025.237293Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161107092025Z
+
+dn: cn=T1,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalRole
+cn: T1
+structuralObjectClass: organizationalRole
+entryUUID: 65e21532-3b77-1036-9278-494810d661b2
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161110095421Z
+description: /path/to/T1
+entryCSN: 20161115130944.519467Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161115130944Z
+
+dn: cn=T2,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalRole
+cn: T2
+description: /path/T2
+structuralObjectClass: organizationalRole
+entryUUID: 6b57b8be-3b77-1036-9279-494810d661b2
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161110095430Z
+entryCSN: 20161110095430.543340Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161110095430Z
+
+dn: cn=T3,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalRole
+cn: T3
+description: /path/T3
+structuralObjectClass: organizationalRole
+entryUUID: 6feb93a0-3b77-1036-927a-494810d661b2
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161110095438Z
+entryCSN: 20161110095438.223205Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161110095438Z
+
+dn: cn=manager,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: groupOfNames
+cn: manager
+member: cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com
+member: cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com
+seeAlso: cn=Temp
+structuralObjectClass: groupOfNames
+entryUUID: a2ccd28c-3b7e-1036-891c-17cde550521d
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161110104610Z
+entryCSN: 20161110104610.062564Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161110104610Z
+
+dn: cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: Ghitea Cosmin
+sn: Andrei Ioan
+seeAlso: cn=T1
+seeAlso: cn=T3
+seeAlso: cn=HTML
+structuralObjectClass: person
+entryUUID: 9e1af424-3ea5-1036-857d-09e31c149a75
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161114110246Z
+cn: cghitea
+cn: asd
+userPassword:: e1NTSEF9V2tscG9STlFrdkJndTJ4dVJPc3hydjV6UysxMHU0UDQ=
+description: 1Modification
+description: 2Modification
+description: 3Modification
+entryCSN: 20171114160242.901844Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20171114160242Z
+
+dn: cn=HTML,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalRole
+cn: HTML
+description: GeneralInfo.html
+structuralObjectClass: organizationalRole
+entryUUID: 4c4ac1b6-3f80-1036-9f45-2f23ad9f24fe
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20161115130808Z
+entryCSN: 20161115130808.570677Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20161115130808Z
+
+dn: cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: FU
+description: newdescription0
+structuralObjectClass: person
+cn: newPoint
+entryUUID: 03d0f32c-cb69-1036-9a5a-9528eb6fc946
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20170512141411Z
+entryCSN: 20170512141411.340533Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20170512141411Z
+
+dn: cn=newPointChild100,cn=newPoint,ou=template,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: FU
+description: newdescription100
+cn: newPointChild100
+structuralObjectClass: person
+entryUUID: 6490ee54-2bf1-1037-91a4-ab906eeaa64b
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20170912103216Z
+entryCSN: 20170912103216.841850Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20170912103216Z
+
+dn: cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: Entry
+description: Tesst
+structuralObjectClass: person
+cn: newPoint
+entryUUID: bd9c9f72-32f2-1037-85bb-bb98ab159e60
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20170921082933Z
+entryCSN: 20170921082933.871870Z#000000#000#000000
+modifiersName: cn=admin,dc=demoApp,dc=com
+modifyTimestamp: 20170921082933Z
+
+dn: cn=bcostel,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: Costel Buta
+description: cbuta@yahoo.com
+structuralObjectClass: person
+entryUUID: 9845ae0a-4d03-1037-9a73-c5a763905c55
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20171024123542Z
+userPassword:: e1NTSEF9UUpZdjNVOUw3YWEvWnRxUkFlOVc1RmlmSWdRWUt4YmE=
+cn: bcostel
+entryCSN: 20171101115329.686942Z#000000#000#000000
+modifiersName: cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com
+modifyTimestamp: 20171101115329Z
+
+dn: cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: Costel Buta
+description: cbuta@yahoo.com
+structuralObjectClass: person
+entryUUID: 782ba846-5347-1037-8973-d7c641a20255
+creatorsName: cn=admin,dc=demoApp,dc=com
+createTimestamp: 20171101115641Z
+cn: cbuta
+userPassword:: e1NTSEF9VU5lem9JdmI0K2k5SGh2S0lMUXFYK0pqa2FLMkJpeE4=
+entryCSN: 20171114160241.419341Z#000000#000#000000
+modifiersName: cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com
+modifyTimestamp: 20171114160241Z
+
