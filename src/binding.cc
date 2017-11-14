@@ -641,7 +641,11 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    int unbindResult = ldap_unbind(obj->ld_);
+    /**
+     * ldap_destroy paired with ldap_dup ensure thread_safety
+     *  when multiple ops are executed using the same handle
+     * */
+    int unbindResult = ldap_destroy(obj->ld_);
     obj->ld_ = nullptr;
 
     if (unbindResult != LDAP_SUCCESS) {
