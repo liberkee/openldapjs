@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "A ldap client nodejs",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hufsm/openldapjs.git"
+  },
   "dependencies": {
     "addict-ioc": "1.0.6",
     "ajv": "5.3.0",
@@ -17,9 +21,16 @@
     "should": "11.2.0",
     "underscore": "1.8.3"
   },
+  "config": {
+    "domain": "ldap://localhost:389",
+    "userDn": "cn=admin,dc=demoApp,dc=com",
+    "userPassword": "secret"
+  },
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
+    "pretest": "service slapd stop && slapadd -l ./heavy_backup.ldif && service slapd start",
+    "posttest": "ldapdelete -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config__userPassword -f ./deleteEntries.ldif -ZZ -c",
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./libs/ldap_async_wrap.js"
   },
@@ -39,6 +50,7 @@
   },
   "devDependencies": {
     "istanbul": "0.4.5",
-    "mocha": "4.0.1"
+    "mocha": "4.0.1",
+    "node-gyp": "3.6.2"
   }
 }
