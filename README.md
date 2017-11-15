@@ -45,8 +45,8 @@ OpenLDAP.js requires OpenLDAP development libraries.
 
 ## Running the tests
 
-In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a ldapadd :
-* ```ldapadd -H "ldap://your_ldap_URL:port" -D "admin dn" -w "admin password" -f test/dump.ldif ```
+In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a slapadd :
+*  `sudo slapadd -l light_backup.ldif`
 
 This will only work if your ldap schema is empty and it will populate it with test data. For a less straight forward approach, configure the config.json file with your local data. 
 
