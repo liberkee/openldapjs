@@ -78,6 +78,13 @@ describe('Testing the LDAP start TLS routine', () => {
       });
   });
 
+  it('should start a TLS communication using the server certificate', () => {
+    return adminLDAP.startTLS()
+      .catch(() => {
+        should.fail('did not expect an error');
+      });
+  });
+
   it('should start a TLS communication using just the directory of the certificate', () => {
     return adminLDAP.startTLS(pathToCert)
       .catch(() => {
