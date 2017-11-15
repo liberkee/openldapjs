@@ -217,7 +217,7 @@ describe('Testing the async LDAP paged search ', () => {
     function pageSearchTime(next) {
       this.timeout(0);
       let numberPage = 0;
-      /* Our LDAP database have ~50k entries */
+      /* Our LDAP database has ~50k entries */
       adminLDAP
         .pagedSearch(
           searchBase, searchScope.subtree, config.ldapSearch.filterObjAll,
@@ -225,7 +225,7 @@ describe('Testing the async LDAP paged search ', () => {
         .then((res) => {
           res.on('data', (data) => { numberPage += 1; });
           res.on('end', () => {
-            numberPage.should.be.above(5000);
+            numberPage.should.be.above(900);
             next();
           });
         });
