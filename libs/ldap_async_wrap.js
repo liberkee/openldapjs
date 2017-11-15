@@ -2,8 +2,7 @@
 
 const binding = require('../build/Release/binding.node');
 const Promise = require('bluebird');
-const checkParameters =
-    require('./utils/check_variable_format');
+const checkParameters = require('./utils/check_variable_format');
 const SearchStream = require('./stream_interface.js');
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
@@ -68,16 +67,17 @@ class LDAPAsyncWrap {
     * Initiate a TLS processing on an LDAP session.
     *
     * @method startTLS
-    * @param {String} pathToCertFile The path to the certificate
+    * @param {String} pathToCertFile The path to the certificate can be optional
     * @return {Promise} Will reject if state is not Initialized or if the
-    * certificate is not good else will resolve
+    * certificate is not good else will resolve If the certificate is not
+    * specified then the client will use the server certificate
     * */
 
   startTLS(pathToCertFile) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        checkParameters.validateStrings(pathToCertFile);
-        this._binding.startTls(pathToCertFile, (err) => {
+        const path = pathToCertFile === undefined ? null : pathToCertFile;
+        this._binding.startTls(path, (err, res) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapStartTlsErrorMessage));
@@ -232,7 +232,8 @@ class LDAPAsyncWrap {
     * @method modify
     * @param {String} dn The dn of the entry to modify
     * @param {Object || Array} jsonChange The attribute and value to be changed
-    * @param {Object || Array} [controls] Request to execute a specific control or
+    * @param {Object || Array} [controls] Request to execute a specific control
+   * or
     * multiple controls. This parameter is optional.
     * @return {Promise} That resolves if LDAP modified successfully the
     * entry.
@@ -267,7 +268,8 @@ class LDAPAsyncWrap {
    * @param {String} dn The dn of the entry to rename
    * @param {String} newRdn The new rdn for the dn
    * @param {String} newParent New parent for the rdn
-   * @param {Object || Array} [controls] Request to execute a specific control or
+   * @param {Object || Array} [controls] Request to execute a specific control
+   * or
    * multiple controls. This parameter is optional.
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
@@ -297,7 +299,8 @@ class LDAPAsyncWrap {
    *
    * @method delete
    * @param {String} dn the dn entry to be deleted.
-   * @param {Object || Array} [controls] Request to execute a specific control or
+   * @param {Object || Array} [controls] Request to execute a specific control
+   * or
    * multiple controls. This parameter is optional.
    * @return {Promise} promise that resolves if the element provided was
    * deleted
@@ -363,7 +366,8 @@ class LDAPAsyncWrap {
    * exist'
    * @param {Object || Array} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param {Object || Array} [controls] Request to execute a specific control or
+   * @param {Object || Array} [controls] Request to execute a specific control
+   * or
    * multiple controls. This parameter is optional.
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
