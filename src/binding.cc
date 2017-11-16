@@ -108,7 +108,6 @@ class LDAPClient : public Nan::ObjectWrap {
     /* Create the option for the client for using the TLS */
 
     char *pathToCert = *pathToCertificate;
-    char *path;
     int state{};
 
     if (pathToCertificate.length()) {
@@ -123,7 +122,6 @@ class LDAPClient : public Nan::ObjectWrap {
       }
     }
 
-    ldap_get_option(obj->ld_, LDAP_OPT_X_TLS_CACERTFILE, &path);
     state = ldap_start_tls_s(obj->ld_, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
