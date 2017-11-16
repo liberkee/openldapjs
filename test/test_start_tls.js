@@ -13,7 +13,6 @@ describe('Testing the LDAP start TLS routine', () => {
   let adminLDAP = new LDAPWrap(host);
 
   const pathFileToCert = config.ldapAuthentication.pathFileToCert;
-  const pathToCert = config.ldapAuthentication.pathToCert;
   beforeEach(() => {
     adminLDAP = new LDAPWrap(host);
 
@@ -28,7 +27,7 @@ describe('Testing the LDAP start TLS routine', () => {
   it('should reject if the state is not Initialized', () => {
     return adminLDAP.unbind()
       .then(() => {
-        return adminLDAP.startTLS(pathToCert);
+        return adminLDAP.startTLS(pathFileToCert);
       })
       .then(() => {
         should.fail('Didn\'t expect success');
@@ -41,38 +40,10 @@ describe('Testing the LDAP start TLS routine', () => {
       });
   });
 
-  it('should reject if the path file doesn\'t exist', () => {
+  it('should start a TLS communication using the default certificate if the path is wrong', () => {
     const CustomError = errorHandler(errorList.connectionError);
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
-      .then(() => {
-        should.fail('Didn\'t expect success');
-      })
-      .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorList.ldapStartTlsErrorMessage));
-      })
-      .catch((err) => {
-        should.fail('did not expect generic Error');
-      });
-  });
-
-  it('should reject if there are no certificate in the specified directory', () => {
-    const wrongCred = '/etc';
-    const CustomError = errorHandler(errorList.connectionError);
-    return adminLDAP.startTLS(wrongCred)
-      .then(() => {
-        should.fail('Didn\'t expect success');
-      })
-      .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorList.ldapStartTlsErrorMessage));
-      })
-      .catch((err) => {
-        should.fail('did not expect generic Error');
-      });
-  });
-
-  it('should start a TLS communication using the full path file to the certificate', () => {
-    return adminLDAP.startTLS(pathFileToCert)
       .catch(() => {
         should.fail('did not expect an error');
       });
@@ -80,13 +51,13 @@ describe('Testing the LDAP start TLS routine', () => {
 
   it('should start a TLS communication using the server certificate', () => {
     return adminLDAP.startTLS()
-      .catch(() => {
+      .catch((err) => {
         should.fail('did not expect an error');
       });
   });
 
-  it('should start a TLS communication using just the directory of the certificate', () => {
-    return adminLDAP.startTLS(pathToCert)
+  it('should start a TLS communication using the full path file to the certificate', () => {
+    return adminLDAP.startTLS(pathFileToCert)
       .catch(() => {
         should.fail('did not expect an error');
       });

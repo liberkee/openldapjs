@@ -76,7 +76,7 @@ class LDAPAsyncWrap {
   startTLS(pathToCertFile) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        const path = pathToCertFile === undefined ? null : pathToCertFile;
+        const path = pathToCertFile === undefined ? '' : pathToCertFile;
         this._binding.startTls(path, (err, res) => {
           if (err) {
             const CustomError = errorHandler(err);

@@ -6,8 +6,7 @@
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
-    "pathToCert": "/etc/ldap/",
-    "pathFileToCert": "/etc/ldap/ca_certs.pem"
+    "pathFileToCert": "/home/hufserverldap/Desktop/Share/cghitea/ADDRepository/openldapjs/ca_certs.pem"
   },
   "ldapChangePassword": {
     "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
