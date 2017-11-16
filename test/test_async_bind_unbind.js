@@ -62,7 +62,6 @@ describe('Testing the async LDAP bind/unbind', () => {
         should.deepEqual(err.constructor.description, CustomError.description);
       })
       .catch((err) => {
-        console.log(err);
         should.fail('did not expect generic error');
       });
   });

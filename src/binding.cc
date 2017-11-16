@@ -42,11 +42,10 @@ class LDAPClient : public Nan::ObjectWrap {
              Nan::GetFunction(tpl).ToLocalChecked());
   }
 
- protected:
  private:
   LDAP *ld_{};
   std::shared_ptr<std::map<std::string, berval *>> cookies_{};
-  LDAPClient() {  //  getting cpp_lint error on this
+  LDAPClient() {
     cookies_ = std::make_shared<std::map<std::string, berval *>>();
   }
 

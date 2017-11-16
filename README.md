@@ -121,7 +121,7 @@ See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/c
 ## Acknowledgments
 
 * Hat tip to anyone who's code was used
-* Inspiration
+* TODO
 * [Nan](https://github.com/nodejs/nan) and [v8](https://github.com/v8/v8) 
 
 
