@@ -53,6 +53,9 @@ describe('Testing the async LDAP bind/unbind', () => {
     const CustomError = errorHandler(errorList.invalidCredentials);
     return newClient.initialize()
       .then((result) => {
+        return newClient.startTLS();
+      })
+      .then((result) => {
         return newClient.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
       })
       .then(() => {
@@ -61,7 +64,7 @@ describe('Testing the async LDAP bind/unbind', () => {
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
       })
-      .catch((err) => {
+      .catch(() => {
         should.fail('did not expect generic error');
       });
   });
