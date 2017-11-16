@@ -98,7 +98,6 @@ class LDAPClient : public Nan::ObjectWrap {
     callback = nullptr;
     return;
   }
-
   static NAN_METHOD(startTls) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
@@ -108,28 +107,24 @@ class LDAPClient : public Nan::ObjectWrap {
 
     Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
     /* Create the option for the client for using the TLS */
-    auto state =
-        ldap_set_option(nullptr, LDAP_OPT_X_TLS_CACERTDIR, *pathToCertificate);
 
-    if (state != LDAP_OPT_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(state);
-      callback->Call(1, stateClient);
-      delete callback;
-      callback = nullptr;
-      return;
+    char *pathToCert = *pathToCertificate;
+    char *path;
+    int state{};
+
+    if (pathToCertificate.length()) {
+      state = ldap_set_option(obj->ld_, LDAP_OPT_X_TLS_CACERTFILE, pathToCert);
+
+      if (state != LDAP_OPT_SUCCESS) {
+        stateClient[0] = Nan::New<v8::Number>(state);
+        callback->Call(1, stateClient);
+        delete callback;
+        callback = nullptr;
+        return;
+      }
     }
 
-    state =
-        ldap_set_option(nullptr, LDAP_OPT_X_TLS_CACERTFILE, *pathToCertificate);
-
-    if (state != LDAP_OPT_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(state);
-      callback->Call(1, stateClient);
-      delete callback;
-      callback = nullptr;
-      return;
-    }
-
+    ldap_get_option(obj->ld_, LDAP_OPT_X_TLS_CACERTFILE, &path);
     state = ldap_start_tls_s(obj->ld_, nullptr, nullptr);
     if (state != LDAP_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
