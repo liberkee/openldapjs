@@ -33,6 +33,7 @@
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
     "addData": "node populate.js",
+    "deleteTestData": "ldapdelete -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword  $npm_package_config_entryDn -c",
     "workingAddData": "node ldifBuilder.js && ldapadd -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword -f ./bigDb.ldif -c && rm ./bigDb.ldif"
     
   },

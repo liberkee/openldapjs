@@ -45,10 +45,21 @@ OpenLDAP.js requires OpenLDAP development libraries.
 
 ## Running the tests
 
-In order for the tests to pass, you'll have to either change the test/config.json file with entries that exists in your local LDAP server schema, or do a slapadd :
-*  `sudo slapadd -l light_backup.ldif`
+For the tests to run, you'll need some sample test data. In order to do this use `npm config set` ,or manually edit your package.json file, and configure your local ldap data :
+ domain: address of your ldap server, E.g: ldap://localhost:389
 
-This will only work if your ldap schema is empty and it will populate it with test data. For a less straight forward approach, configure the config.json file with your local data. 
+ userDn: E.g: cn=admin,dc=demoApp,dc=com
+
+ userPassword: Password for your userDn
+ 
+ entryDn: Entrypoint for your test data, E.g: cn=newPoint,o=myhost,dc=demoApp,dc=com
+
+ After you're done configuring, run  `npm run workingAddData`, this should add 10k test entries to your ldap Server.
+
+ Note: if you want to remove the testData, run `npm run deleteTestData`.
+
+
+
 
 After the sample data is ready, run npm test and the tests should run.
 
