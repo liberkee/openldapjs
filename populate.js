@@ -44,22 +44,13 @@ ldapClient.initialize()
   .then(() => {
     ldapClient.add(dn, validEntryObject)
       .then(() => {
-        const workers = [];
-        for (let j = 0; j < 900; j++) {
-          const series = [];
-          for (let i = 0; i < 10; i++) {
-            series.push(ldapClient.add(`${`${rdn + i}${j}`},${dn}`, validEntryObject));
-
-          }
-          const finalTaskPromise = series.reduce((prev, task) => {
-            return prev.then(task);
-          }, Promise.resolve([]));
-
-          workers.push(finalTaskPromise);
-
+        const args = [];
+        for (let i = 0; i < 10000; i++) {
+          args.push(`${`${rdn + i}`},${dn}`);
         }
-        Promise.all(workers);
 
+        Promise.map(args, (arg) => {
+          return ldapClient.add(arg, validEntryObject);
+        }, {concurrency: 10});
       });
   });
-
