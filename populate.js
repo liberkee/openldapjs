@@ -4,6 +4,8 @@
 const fs = require('fs');
 const configFile = require('./test/config.json');
 const Client = require('./index.js').Client;
+const Promise = require('bluebird');
+const _ = require('underscore');
 
 
 const rdn = 'cn=testUser';
@@ -31,6 +33,7 @@ const validEntryObject = [
 
 
 const ldapClient = new Client(process.env.npm_package_config_domain);
+const promiseArray = [];
 
 ldapClient.initialize()
   .then(() => {
@@ -41,10 +44,22 @@ ldapClient.initialize()
   .then(() => {
     ldapClient.add(dn, validEntryObject)
       .then(() => {
-        for (let i = 0; i < 1000; i++) {
-          ldapClient.add(`${rdn + i},${dn}`, validEntryObject);
+        const workers = [];
+        for (let j = 0; j < 900; j++) {
+          const series = [];
+          for (let i = 0; i < 10; i++) {
+            series.push(ldapClient.add(`${`${rdn + i}${j}`},${dn}`, validEntryObject));
+
+          }
+          const finalTaskPromise = series.reduce((prev, task) => {
+            return prev.then(task);
+          }, Promise.resolve([]));
+
+          workers.push(finalTaskPromise);
 
         }
+        Promise.all(workers);
+
       });
   });
 

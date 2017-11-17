@@ -24,14 +24,16 @@
   "config": {
     "domain": "ldap://localhost:389",
     "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret"
+    "userPassword": "secret",
+    "entryDn": "cn=newPoint,o=myhost,dc=demoApp,dc=com"
   },
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
-    "addData": "node populate.js"
+    "addData": "node populate.js",
+    "workingAddData": "node ldifBuilder.js && ldapadd -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword -f ./bigDb.ldif -c && rm ./bigDb.ldif"
     
   },
   "author": {
