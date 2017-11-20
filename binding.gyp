@@ -3,7 +3,7 @@
     {
       'target_name': 'binding',
       'conditions': [
-        [ 'OS=="win"',
+        ['OS=="win"',
           {
             'include_dirs' : [
               "<!(node -e \"require('nan')\")",
@@ -19,8 +19,10 @@
                 'C:/openldap/lib'
               ],
             },
-          }, 
-          { #not windows
+          }
+        ], 
+        ['OS=="linux"',
+          {
             'include_dirs' : [
               "<!(node -e \"require('nan')\")",
               '/usr/local/include'
