@@ -1,0 +1,47 @@
+dn: dc=demoApp,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: demoApp.com
+dc: demoApp
+
+dn: cn=admin,dc=demoApp,dc=com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword:: e1NTSEF9aFZ6ZVZSbTJybWNiNnJUc0E2YWtiWHA1L1JBSVpuWTM=
+
+dn: o=myhost,dc=demoApp,dc=com
+objectClass: organization
+o: myhost
+
+dn: ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalUnit
+ou: user
+ou: users
+
+dn: cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: cbuta
+sn: cbuta
+description: a
+userPassword:: e1NTSEF9dWVLbjY4Vi9YS09MMDFhMWQ2UEdZMnUrOFVvQjJpUk4=
+
+dn: cn=rmaxim,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: Entry
+description: Tesst1
+description: Tesst2
+description: weCanAddMultipleVals
+cn: rmaxim
+
+dn: cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: cghitea
+sn: Cosmin Ghitea
+userPassword:: c2VjcmV0
+description: 1Modification
+description: 2Modification
+description: 3Modification
+
