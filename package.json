@@ -8,14 +8,8 @@
     "url": "https://github.com/hufsm/openldapjs.git"
   },
   "dependencies": {
-    "addict-ioc": "1.0.6",
     "ajv": "5.3.0",
     "bluebird": "3.4.3",
-    "eslint": "4.7.1",
-    "eslint-config-airbnb": "15.1.0",
-    "eslint-plugin-import": "2.7.0",
-    "eslint-plugin-jsx-a11y": "5.1.1",
-    "eslint-plugin-react": "7.3.0",
     "ldif": "0.5.1",
     "nan": "2.6.0",
     "should": "11.2.0",
@@ -25,7 +19,7 @@
     "domain": "ldap://localhost:389",
     "userDn": "cn=admin,dc=demoApp,dc=com",
     "userPassword": "secret",
-    "entryDn": "cn=newPoint,o=myhost,dc=demoApp,dc=com"
+    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
@@ -33,9 +27,8 @@
     "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
     "addData": "node populate.js",
-    "deleteTestData": "ldapdelete -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword  $npm_package_config_entryDn -r -c",
+    "deleteTestData": "ldapdelete -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword  $npm_package_config_entryDn -r -c -Z",
     "workingAddData": "node ldifBuilder.js && ldapadd -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword -f ./bigDb.ldif -c && rm ./bigDb.ldif"
-    
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",
@@ -54,6 +47,11 @@
   "devDependencies": {
     "istanbul": "0.4.5",
     "mocha": "4.0.1",
+    "eslint": "4.7.1",
+    "eslint-config-airbnb": "15.1.0",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-jsx-a11y": "5.1.1",
+    "eslint-plugin-react": "7.3.0",
     "node-gyp": "3.6.2"
   }
 }
