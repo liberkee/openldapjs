@@ -13,10 +13,11 @@
               'libraries': [
                 'LIBLDAP_R.lib',
                 'LDAP_SSL.lib',
-                'LIBLBER.lib'
+                'LIBLBER.lib',
               ],
               'library_dirs': [
-                'C:/openldap/lib'
+                './bin/dll',
+                './bin/lib'
               ],
             },
           }
