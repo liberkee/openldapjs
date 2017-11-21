@@ -1,14 +1,8 @@
-
 'use strict';
 
-process.env.UV_THREADPOOL_SIZE = 32;
-
-const fs = require('fs');
 const configFile = require('./test/config.json');
 const Client = require('./index.js').Client;
 const Promise = require('bluebird');
-const _ = require('underscore');
-
 
 const rdn = 'cn=testUser';
 const dn = process.env.npm_package_config_entryDn;
@@ -53,6 +47,6 @@ ldapClient.initialize()
 
         Promise.map(args, (arg) => {
           return ldapClient.add(arg, validEntryObject);
-        }, {concurrency: 1000});
+        }, {concurrency: 1});
       });
   });
