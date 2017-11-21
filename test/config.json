@@ -1,12 +1,12 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://localhost:389",
+    "host": "ldap://10.16.0.194:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
-    "pathFileToCert": "/home/hufserverldap/Desktop/Share/cghitea/ADDRepository/openldapjs/ca_certs.pem"
+    "pathFileToCert": "D:/HSM/ca_certs.pem"
   },
   "ldapChangePassword": {
     "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",

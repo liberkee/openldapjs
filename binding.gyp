@@ -7,7 +7,7 @@
           {
             'include_dirs' : [
               "<!(node -e \"require('nan')\")",
-              'C:/openldap/inc'
+              './bin/inc'
             ],
             'link_settings': {
               'libraries': [
