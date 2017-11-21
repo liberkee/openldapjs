@@ -7,7 +7,7 @@
           {
             'include_dirs' : [
               "<!(node -e \"require('nan')\")",
-              './bin/inc'
+              './bin/include'
             ],
             'link_settings': {
               'libraries': [
