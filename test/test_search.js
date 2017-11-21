@@ -240,7 +240,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(
         searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjSpecific3)
+        config.ldapSearch.filterObjAll)
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.above(1);
