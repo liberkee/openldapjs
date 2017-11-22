@@ -3,7 +3,7 @@
 
 #include <ldap.h>
 #include <nan.h>
-
+#include <memory>
 class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
  private:
   const std::shared_ptr<LDAP> ld_{};

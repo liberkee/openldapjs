@@ -3,6 +3,7 @@
 
 #include <ldap.h>
 #include <nan.h>
+#include <memory>
 
 class LDAPCompareProgress : public Nan::AsyncProgressWorker {
  private:

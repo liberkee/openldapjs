@@ -3,6 +3,7 @@
 
 #include <ldap.h>
 #include <nan.h>
+#include <memory>
 
 class LDAPAddProgress : public Nan::AsyncProgressWorker {
  private:

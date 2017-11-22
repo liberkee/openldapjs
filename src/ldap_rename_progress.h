@@ -3,6 +3,7 @@
 
 #include <ldap.h>
 #include <nan.h>
+#include <memory>
 
 class LDAPRenameProgress : public Nan::AsyncProgressWorker {
  private:
