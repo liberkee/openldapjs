@@ -25,12 +25,6 @@
     "eslint-plugin-react": "7.3.0"
     
   },
-  "config": {
-    "domain": "ldap://localhost:389",
-    "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret",
-    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
-  },
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
