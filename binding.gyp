@@ -20,6 +20,12 @@
                 './bin/lib'
               ],
             },
+            'copies':[
+              {
+                'destination':'<(module_root_dir)/build/Release/',
+                'files':['<(module_root_dir)/bin/dll/libeay32.dll','<(module_root_dir)/bin/dll/liblber.dll','<(module_root_dir)/bin/dll/libldap_r.dll','<(module_root_dir)/bin/dll/nldapextd.dll','<(module_root_dir)/bin/dll/ssleay32.dll']
+              }
+            ]
           }
         ], 
         ['OS=="linux"',
