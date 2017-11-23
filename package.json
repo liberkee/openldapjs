@@ -12,8 +12,18 @@
     "bluebird": "3.4.3",
     "ldif": "0.5.1",
     "nan": "2.6.0",
-    "should": "11.2.0",
     "underscore": "1.8.3"
+  },
+  "devDependencies": {
+    "istanbul": "0.4.5",
+    "mocha": "4.0.1",
+    "eslint": "4.7.1",
+    "eslint-config-airbnb": "15.1.0",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-jsx-a11y": "5.1.1",
+    "should": "11.2.0",
+    "eslint-plugin-react": "7.3.0"
+    
   },
   "config": {
     "domain": "ldap://localhost:389",
@@ -24,10 +34,8 @@
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
-    "start": "nodemon ldapwrapper.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
-    "addData": "node populate.js",
-    "deleteTestData": "ldapdelete -H $npm_package_config_domain -D $npm_package_config_userDn -w $npm_package_config_userPassword  $npm_package_config_entryDn -r -c -Z"
+    "addData": "node populate.js"
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",
@@ -42,15 +50,5 @@
   "gypfile": true,
   "directories": {
     "test": "test"
-  },
-  "devDependencies": {
-    "istanbul": "0.4.5",
-    "mocha": "4.0.1",
-    "eslint": "4.7.1",
-    "eslint-config-airbnb": "15.1.0",
-    "eslint-plugin-import": "2.7.0",
-    "eslint-plugin-jsx-a11y": "5.1.1",
-    "eslint-plugin-react": "7.3.0",
-    "node-gyp": "3.6.2"
   }
 }

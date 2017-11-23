@@ -5,7 +5,7 @@ const Client = require('./index.js').Client;
 const Promise = require('bluebird');
 
 const rdn = 'cn=testUser';
-const dn = process.env.npm_package_config_entryDn;
+const dn = configFile.ldapTestEntries.entryDn;
 const validEntryObject = [
   {
     attr: 'objectClass',
@@ -28,14 +28,13 @@ const validEntryObject = [
 ];
 
 
-const ldapClient = new Client(process.env.npm_package_config_domain);
-const promiseArray = [];
+const ldapClient = new Client(configFile.ldapTestEntries.host);
 
 ldapClient.initialize()
   .then(() => {
     return ldapClient.bind(
-      process.env.npm_package_config_userDn,
-      process.env.npm_package_config_userPassword);
+      configFile.ldapTestEntries.userDn,
+      configFile.ldapTestEntries.userPassword);
   })
   .then(() => {
     ldapClient.add(dn, validEntryObject)

@@ -102,5 +102,11 @@
   "ldapDelete": {
     "rdnUser": "cn=testUsers",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
+  },
+  "ldapTestEntries": {
+    "host": "ldap://10.16.0.194:389",
+    "entryDn":"cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "userDn": "cn=admin,dc=demoApp,dc=com",
+    "userPassword": "secret"
   }
 }
