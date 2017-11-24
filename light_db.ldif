@@ -1,17 +1,3 @@
-dn: dc=demoApp,dc=com
-objectClass: top
-objectClass: dcObject
-objectClass: organization
-o: demoApp.com
-dc: demoApp
-
-dn: cn=admin,dc=demoApp,dc=com
-objectClass: simpleSecurityObject
-objectClass: organizationalRole
-cn: admin
-description: LDAP administrator
-userPassword:: e1NTSEF9aFZ6ZVZSbTJybWNiNnJUc0E2YWtiWHA1L1JBSVpuWTM=
-
 dn: o=myhost,dc=demoApp,dc=com
 objectClass: organization
 o: myhost
