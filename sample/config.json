@@ -1,0 +1,108 @@
+{
+  "ldapAuthentication": {
+    "host": "ldap://localhost:389",
+    "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
+    "passwordUser": "secret",
+    "pathFileToCert": "/etc/ldap/ca_certs.pem"
+  },
+  "ldapChangePassword": {
+    "oldPasswd": "secret",
+    "newPasswd": "secret"
+  },
+  "ldapModify": {
+    "firstDNEntry": "cn=newUser01,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "secondDNEntry": "cn=newUser02,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "ldapModificationAdd": {
+      "op": "add",
+      "attr": "telephoneNumber",
+      "vals": [
+        "0744429"
+      ]
+    },
+    "ldapModificationDelete": {
+      "op": "delete",
+      "attr": "description",
+      "vals": [
+        "Tesst1",
+        "Tesst2"
+      ]
+    },
+    "ldapModificationReplace": {
+      "op": "replace",
+      "attr": "sn",
+      "vals": [
+        "User New Name"
+      ]
+    }
+  },
+  "ldapControls": {
+    "ldapModificationControlPostRead": {
+      "oid": "postread",
+      "value": [
+        "entryCSN",
+        "entryUUID",
+        "description"
+      ],
+      "isCritical": false
+    },
+    "ldapModificationControlPreRead": {
+      "oid": "preread",
+      "value": [
+        "cn",
+        "sn"
+      ],
+      "isCritical": false
+    }
+  },
+  "ldapAdd": {
+    "dnNewEntry": "cn=newUser01,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "secondDnNewEntry": "cn=newUser02,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "firstAttr": {
+      "attr": "objectClass",
+      "vals": [
+        "person"
+      ]
+    },
+    "secondAttr": {
+      "attr": "sn",
+      "vals": [
+        "Entry"
+      ]
+    },
+    "thirdAttr": {
+      "attr": "description",
+      "vals": [
+        "Tesst1",
+        "Tesst2",
+        "weCanAddMultipleVals"
+      ]
+    }
+  },
+  "ldapRename": {
+    "firstDNChange": "cn=newUser01,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "secondDNChange": "cn=newUser02,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "firstRDN": "cn=newUser03Change",
+    "secondRDN": "cn=newUser04Change",
+    "newParent": "ou=users,o=myhost,dc=demoApp,dc=com"
+  },
+  "ldapCompare": {
+    "attribute": "cn",
+    "value": "cbuta",
+    "wrongValue": "example"
+  },
+  "ldapSearch": {
+    "searchBase": "ou=users,o=myhost,dc=demoApp,dc=com",
+    "rdnUser": "cn=cghitea",
+    "filter": "objectclass=*",
+    "pageSize": 10,
+    "scope": {
+      "base": "BASE",
+      "one": "ONE",
+      "subtree": "SUBTREE"
+    }
+  },
+  "ldapDelete": {
+    "dnNewEntry": "cn=newUser01,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "secondDnNewEntry": "cn=newUser02,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
+  }
+}
