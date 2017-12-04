@@ -23,7 +23,6 @@ static_server_npm_helper.pid
 */out
 **/.jscsrc
 **/.jshintrc
-**/docs/*
 !**/docs/.gitkeep
 **/coverage/*
 !**/coverage/.gitkeep
