@@ -36,5 +36,5 @@ Multiple adds can be executed in parallel (only limit to how many adds can be ch
 
 * [LDAP Add](https://linux.die.net/man/3/ldap_add_ext)
 * [Nan Add Wrapper](../../src/binding.cc) & [AsyncProgress Worker](../../src/ldap_add_progress.cc)
-* [Javascript Source Code](../..libs/ldap_async_wrap.js)
+* [Javascript Source Code](../../libs/ldap_async_wrap.js)
 
