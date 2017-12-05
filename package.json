@@ -25,7 +25,7 @@
     "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
     "remote_path": "./{module_name}/v{version}/{configuration}/",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://node-pre-gyp-tests.s3-us-west-1.amazonaws.com"
+    "host": "https://github.com/hufsm/openldapjs/tree/XPLHUFRO-53_node-pre-gyp/releases/download/"
   },
   "devDependencies": {
     "aws-sdk": "^2.163.0",
