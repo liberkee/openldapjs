@@ -6,6 +6,7 @@ const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
+const updateAttrSchema = require('../schemas/update_attr_schema');
 const ValidationError = require('../errors/validation_error');
 const errorList = require('../../test/error_list.json');
 
@@ -43,14 +44,45 @@ class CheckParam {
     */
   static checkModifyChange(changes) {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
+    const changeBuildArr = [];
     changesAttr.forEach((element) => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
         throw new ValidationError(
           errorList.invalidJSONMessage, ajv.errors);
       }
+      if (element.op === 'update') {
+        const deleteVals = [];
+        const addVals = [];
+
+        element.vals.forEach((val) => {
+          const validVal = ajv.validate(updateAttrSchema, val);
+          if (!validVal) {
+            throw new ValidationError(
+              errorList.invalidJSONMessage, ajv.errors);
+          } else {
+            deleteVals.push(val.oldVal);
+            addVals.push(val.newVal);
+          }
+        });
+
+        const ldapDeleteObject = {
+          op: 'delete',
+          attr: element.attr,
+          vals: deleteVals,
+        };
+        changeBuildArr.push(ldapDeleteObject);
+        const ldapAddObject = {
+          op: 'add',
+          attr: element.attr,
+          vals: addVals,
+        };
+        changeBuildArr.push(ldapAddObject);
+      } else {
+        changeBuildArr.push(element);
+      }
     });
-    return changesAttr;
+    return changeBuildArr;
   }
 
   /**

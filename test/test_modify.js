@@ -29,6 +29,14 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
+  const changeAttributesUpdate = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: config.ldapModify.ldapModificationUpdate.vals,
+    },
+  ];
+
   const changeAttributesDelete = [
     {
       op: config.ldapModify.ldapModificationDelete.operation,
@@ -188,6 +196,14 @@ describe('Testing the modify functionalities', () => {
       .catch((err) => {
         should.fail('did not expect generic error');
       });
+  });
+
+  it('should update the old existing attributes with new ones from an entry', () => {
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesUpdate)
+      .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should replace the old attributes with new one from an entry', () => {

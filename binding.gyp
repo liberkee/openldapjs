@@ -12,11 +12,9 @@
             'link_settings': {
               'libraries': [
                 'LIBLDAP_R.lib',
-                'LDAP_SSL.lib',
                 'LIBLBER.lib',
               ],
               'library_dirs': [
-                './bin/dll',
                 './bin/lib'
               ],
             },
