@@ -330,22 +330,20 @@ class LDAPAsyncWrap {
     * Perform an LDAP password change operation
     *
     * @method changePassword
-    * @param {String} userDN The user dn which the password will be changed
-    * @param {String} oldPassword Old password of user
-    * @param {String} newPassword New password for user
-    * @return {Promise} Will fulfil with a result of success if the
-    * Old password is given correctly, the parameters are string type and
-    * the state of client is BOUND else will fail with type error or LDAP ERROR.
+    * @param {String} userDn The user dn whose password will be changed
+    * @param {String} oldPassword Old password of userDn
+    * @param {String} newPassword New password for userDn
+    * @return {Promise} Will fulfil if the password was changed, fails otherwise. 
     * */
-  changePassword(userDN, oldPassword, newPassword) {
+  changePassword(userDn, oldPassword, newPassword) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        checkParameters.validateStrings(userDN, oldPassword, newPassword);
+        checkParameters.validateStrings(userDn, oldPassword, newPassword);
 
         this._binding.changePassword(
-          userDN, oldPassword, newPassword, (err, result) => {
+          userDn, oldPassword, newPassword, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(
