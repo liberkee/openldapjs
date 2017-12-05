@@ -3,7 +3,7 @@
 ```javascript
      ldap.initialize('hostaddress');
 ```
-* hostaddress : ldap server address. Example of a local ldap server: 
+* `hostaddress`, ldap server address. Example of a local ldap server: 
                 ldap://localhost:389
 
 
@@ -40,6 +40,6 @@ ldap.initialize('host')
 
 * [LDAP Initialize](https://linux.die.net/man/3/ldap_initialize)
 * [Nan Initialize wrapper ](../src/binding.cc)
-* [Javascript source code](../libs/ldap_async_wrap.js)
+* [Javascript source code](../../libs/ldap_async_wrap.js)
 
 

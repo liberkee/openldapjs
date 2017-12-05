@@ -14,11 +14,11 @@ After installing it in your project, and assuming that you have access to a func
 
 ```javascript
 
-/* creates a new ldap client instance with the host address              your_ldap_host_address */
+/* creates a new ldap client instance with the host address your_ldap_host_address */
 const ldapClient = new LDAP('your_ldap_host_address');
 
-/* in order for the client to be usable, it has to be initialized and bound with a user DN and a password */
 
+/* in order for the client to be usable, it has to be initialized and bound with a user DN and a password */
 ldapClient.initialize()
     .then( () => {
        return ldapClient.bind('validDn','password')
@@ -29,10 +29,6 @@ ldapClient.initialize()
     .catch( (customError) => {
         //custom errors have a description and a code field that you can inspect
     })
-
-
-
-
 
 ```
 
@@ -45,7 +41,7 @@ Most functions that interact with the LDAP server are mapped using [Nan](https:/
 * [LDAP Bind](./ldap_functions/bind.MD)
 * [LDAP StartTls](./ldap_functions/startTls.MD)
 * [LDAP Regular search](./ldap_functions/search.MD)
-* [LDAP Paged Search](./ldap_functions/pagedSearch.md)
+* [LDAP Paged Search](./ldap_functions/pagedSearch.MD)
 * [LDAP Add](./ldap_functions/add.MD)
 * [LDAP Delete](./ldap_functions/delete.MD)
 * [LDAP Modify](./ldap_functions/modify.MD)
@@ -66,4 +62,11 @@ State Machine illustrating library usage:
 ## FAQ
 
 List of commonly asked questions
+
+
+## References 
+
+* [LDAP](https://www.ldap.com/getting-started-with-ldap)
+* [BlueBird](https://github.com/petkaantonov/bluebird)
+* [LDAP Error Codes](http://wiki.servicenow.com/index.php?title=LDAP_Error_Codes#gsc.tab=0)
 
