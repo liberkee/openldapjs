@@ -51,7 +51,7 @@ Most functions that interact with the LDAP server are mapped using [Nan](https:/
 
 State Machine illustrating library usage:
 
->>>>>>>>>>>pic goes here
+![State Machine](./stateMachine.JPG)
 
 ## Error Handling
 
