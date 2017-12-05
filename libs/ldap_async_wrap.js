@@ -233,8 +233,7 @@ class LDAPAsyncWrap {
     * @param {String} dn The dn of the entry to modify
     * @param {Object || Array} jsonChange The attribute and value to be changed
     * @param {Object || Array} [controls] Request to execute a specific control
-   * or
-    * multiple controls. This parameter is optional.
+    * or multiple controls. This parameter is optional.
     * @return {Promise} That resolves if LDAP modified successfully the
     * entry.
     * Reject if  LDAP rejects the operation or the client's state is not

@@ -87,6 +87,14 @@ describe('Testing the modify functionalities', () => {
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
 
+  it('should replace the old attributes with new one from an entry', () => {
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesReplace)
+      .then((result) => { should.deepEqual(result, 0); });
+  });
+
 
   it('should reject if the state is not BOUND', () => {
     return ldapAsyncWrap.unbind()
@@ -141,7 +149,6 @@ describe('Testing the modify functionalities', () => {
       isCritical:
           config.ldapControls.ldapModificationControlPostRead.isCritical,
     };
-    // does it need to be an array ? not anymore
     return ldapAsyncWrap
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
@@ -190,13 +197,6 @@ describe('Testing the modify functionalities', () => {
       });
   });
 
-  it('should replace the old attributes with new one from an entry', () => {
-    return ldapAsyncWrap
-      .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesReplace)
-      .then((result) => { should.deepEqual(result, 0); });
-  });
 
   it('should add  new attributes to an existing entry', () => {
     return ldapAsyncWrap
