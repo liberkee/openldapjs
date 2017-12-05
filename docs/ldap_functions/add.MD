@@ -4,8 +4,8 @@
     ldap.add(distinguishedName,entryObject,optionalControls);
 ```
 
-* `distinguishedName`, Dn where the entryObject is to be added.
-* `entryObject`, LDAP entry object to be added to the provided DN
+* `distinguishedName` Dn where the entryObject is to be added.
+* `entryObject` LDAP entry object to be added to the provided DN
 
 Example usecase:
 

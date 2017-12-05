@@ -4,9 +4,9 @@
 
     ldap.modify(dnToBeChanged, changes, optionalControls);
 ```
-* `dnToBeChanged`, entry that will be modified.
-* `changes`, Object that contains changes to be made.
-* `optionalControls`, optional control parameter.
+* `dnToBeChanged` entry that will be modified.
+* `changes` Object that contains changes to be made.
+* `optionalControls` optional control parameter.
 
 Modify example:
 

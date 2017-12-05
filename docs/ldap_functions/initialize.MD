@@ -3,7 +3,7 @@
 ```javascript
      ldap.initialize('hostaddress');
 ```
-* `hostaddress`, ldap server address. Example of a local ldap server: 
+* `hostaddress` ldap server address. Example of a local ldap server: 
                 ldap://localhost:389
 
 

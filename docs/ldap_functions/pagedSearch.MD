@@ -1,14 +1,14 @@
 # LDAP Paged Search Operation.
 
 ```javascript
-    pagedSearch(searchBase, scope, searchFilter, pageSize)
+    ldap.pagedSearch(searchBase, scope, searchFilter, pageSize)
 
 ```
 
-* `searchBase`, base from where to start searching.
-* `scope`, search scope. Either BASE, ONE or SUBTREE.
-* `searchFilter`, what to search for.
-* `pageSize`, how many results should be displayed on each page.
+* `searchBase` base from where to start searching.
+* `scope` search scope. Either BASE, ONE or SUBTREE.
+* `searchFilter` what to search for.
+* `pageSize` how many results should be displayed on each page.
 
 A Promise returning function that resolves to a readable stream, chunking the results page by page. This should be used instead of the regular search if a large number of results is expected.
 
