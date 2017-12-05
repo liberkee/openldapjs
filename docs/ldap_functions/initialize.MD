@@ -36,7 +36,7 @@ ldap.initialize('host')
 ```
 
 
-##  Refferences:
+##  References:
 
 * [LDAP Initialize](https://linux.die.net/man/3/ldap_initialize)
 * [Nan Initialize wrapper ](../src/binding.cc)
