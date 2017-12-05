@@ -20,7 +20,7 @@
             },
             'copies':[
               {
-                'destination':'<(module_root_dir)/build/Release/',
+                'destination':'<(module_root_dir)/lib/binding/Release/node-v57-win32-x64',
                 'files':['<(module_root_dir)/bin/dll/libeay32.dll','<(module_root_dir)/bin/dll/liblber.dll','<(module_root_dir)/bin/dll/libldap_r.dll','<(module_root_dir)/bin/dll/nldapextd.dll','<(module_root_dir)/bin/dll/ssleay32.dll']
               }
             ]
@@ -44,7 +44,8 @@
             ],
           }
         ]
-      ],      
+      ],
+      'product_dir': '<(module_path)',        
       'defines': [ 'V8_DEPRECATION_WARNINGS=1', 
         'LDAP_DEPRECATED' 
       ],
