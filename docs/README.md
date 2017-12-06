@@ -37,6 +37,9 @@ ldapClient.initialize()
 
 Most functions that interact with the LDAP server are mapped using [Nan](https://github.com/nodejs/nan) from corresponding [Openldap](https://github.com/openldap/openldap) Asynchronous C functions. The javascript bindings to those functions return [Bluebird Promises](https://github.com/petkaantonov/bluebird).
 
+The Async C functions are processed using [AsyncProgressWorkers](https://github.com/nodejs/nan/blob/master/doc/asyncworker.md). This prevents the event loop from blocking, delegating the heavy-lifting to the worker thread(Execute method) . Upon finishing, the result gets passed to node in the HandleOkCallback method.
+
+
 * [LDAP Initialize ](./ldap_functions/initialize.MD)
 * [LDAP Bind](./ldap_functions/bind.MD)
 * [LDAP StartTls](./ldap_functions/startTls.MD)
@@ -69,4 +72,5 @@ List of commonly asked questions
 * [LDAP](https://www.ldap.com/getting-started-with-ldap)
 * [BlueBird](https://github.com/petkaantonov/bluebird)
 * [LDAP Error Codes](http://wiki.servicenow.com/index.php?title=LDAP_Error_Codes#gsc.tab=0)
+* [Nan](https://github.com/nodejs/nan)
 
