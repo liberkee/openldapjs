@@ -45,8 +45,8 @@ OpenLDAP.js requires OpenLDAP development libraries.
 
 ## Running the tests
 
-For the tests to run, you'll need some sample test data. In order to do this use `npm config set` ,or manually edit your package.json file, and configure your local ldap data :
- domain: address of your ldap server, E.g: ldap://localhost:389
+For the tests to run, you'll need some sample test data. In order to do this manually edit the ldapTestEntries section of the [config](./test/config.json) file and configure your local ldap data :
+ host: address of your ldap server, E.g: ldap://localhost:389
 
  userDn: E.g: cn=admin,dc=demoApp,dc=com
 
@@ -54,12 +54,7 @@ For the tests to run, you'll need some sample test data. In order to do this use
  
  entryDn: Entrypoint for your test data, E.g: cn=newPoint,o=myhost,dc=demoApp,dc=com
 
- After you're done configuring, run  `npm run workingAddData`, this should add 10k test entries to your ldap Server.
-
- Note: if you want to remove the testData, run `npm run deleteTestData`.
-
-
-
+ After you're done configuring, run  `npm run addData`, this should add 10k test entries to your ldap Server.
 
 After the sample data is ready, run npm test and the tests should run.
 
@@ -74,7 +69,7 @@ Test suite is composed of integration + unit tests.
 
 Clone or download the repository.
 Get all required packages with npm and build the addon files :
-  ``` npm install ```
+  `npm install `
 
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
 ```javascript
@@ -133,6 +128,8 @@ See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/c
 
 * Hat tip to anyone who's code was used
 * TODO
+* [node-ldapjs](https://github.com/mcavage/node-ldapjs)
 * [Nan](https://github.com/nodejs/nan) and [v8](https://github.com/v8/v8) 
+* [OpenLDAP](https://github.com/openldap/openldap)
 
 

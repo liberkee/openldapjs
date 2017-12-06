@@ -23,7 +23,7 @@ ldap.initialize(...)
 
 ## References:
 
-* [LDAP Delete](https://linux.die.net/man/3/ldap_delete_ext)
-* [Nan Delete Wrapper](../../src/binding.cc) & [AsyncProgress Worker](../../src/ldap_delete_progress.cc)
-* [Javascript Source Code](../../libs/ldap_async_wrap.js)
+* [LDAP Delete man page](https://linux.die.net/man/3/ldap_delete_ext)
+* [LDAP Delete specs](https://www.ldap.com/the-ldap-delete-operation)
+
 

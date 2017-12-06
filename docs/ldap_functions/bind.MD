@@ -39,6 +39,5 @@ ldap.initialize('host')
 
 ## References
 
-* [LDAP Bind](https://linux.die.net/man/3/ldap_simple_bind_s)
-* [Nan bind wrapper](../../src/binding.cc) & [Nan Progress Workers for bind](../../src/ldap_bind_progress.cc)
-* [Javascript source code](../../libs/ldap_async_wrap.js)
+* [LDAP Bind manpage](https://linux.die.net/man/3/ldap_simple_bind_s)
+* [LDAP Bind specs](https://www.ldap.com/the-ldap-bind-operation)

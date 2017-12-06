@@ -33,6 +33,5 @@ A promise returning function that wraps the `ldap_modify_ext` asynchronous C fun
 
 ## References 
 
-* [LDAP Modify](https://linux.die.net/man/3/ldap_modify_ext)
-* [Nan Modify Wrapper](../../src/binding.cc) & [AsyncProgress Worker](../../src/ldap_modify_progress.cc)
-* [Javascript Source Code](../../libs/ldap_async_wrap.js)
+* [LDAP Modify man page](https://linux.die.net/man/3/ldap_modify_ext)
+* [LDAP Modify specs](https://www.ldap.com/the-ldap-modify-operation)
