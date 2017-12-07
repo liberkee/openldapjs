@@ -1,6 +1,7 @@
 # OpenLDAP.JS
 
-Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap) C library.
+Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap).
+This library allows you to interact through Node.js with a LDAP backend.
 
 ## Getting Started
 
@@ -43,7 +44,7 @@ OpenLDAP.js requires OpenLDAP development libraries.
 
 
 
-## Running the tests
+## Testing
 
 For the tests to run, you'll need some sample test data. In order to do this manually edit the ldapTestEntries section of the [config](./test/config.json) file and configure your local ldap data :
  host: address of your ldap server, E.g: ldap://localhost:389
@@ -67,9 +68,13 @@ Test suite is composed of integration + unit tests.
 
 ## Deployment
 
+
 Clone or download the repository.
 Get all required packages with npm and build the addon files :
   `npm install `
+
+
+**_This section should be updated as soon as we properly package it_**.
 
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
 ```javascript
@@ -92,7 +97,7 @@ ldapClientInstance.initialize()
     });
 ```
 
-For more in depth examples please consult [Tests](https://github.com/hufsm/openldapjs/tree/development/openldapjs/test) and [Samples](https://github.com/hufsm/openldapjs/tree/development/openldapjs/sample).
+For more in depth examples please consult [Tests](./test) and [Samples](./sample).
 
 ## Built With
 
