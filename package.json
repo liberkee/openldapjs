@@ -8,6 +8,9 @@
     "url": "https://github.com/hufsm/openldapjs.git"
   },
   "dependencies": {
+    "@types/bluebird": "^3.5.18",
+    "@types/lodash": "^4.14.88",
+    "@types/underscore": "^1.8.5",
     "ajv": "5.3.0",
     "bluebird": "3.4.3",
     "ldif": "0.5.1",
@@ -28,7 +31,8 @@
     "host": "https://github.com/hufsm/openldapjs/releases/download/"
   },
   "devDependencies": {
-    "aws-sdk": "^2.163.0",
+    "@types/node": "^8.0.56",
+    "aws-sdk": "^2.165.0",
     "eslint": "4.7.1",
     "eslint-config-airbnb": "15.1.0",
     "eslint-plugin-import": "2.7.0",
@@ -44,8 +48,7 @@
     "lint": "eslint ./libs/ldap_async_wrap.js",
     "addData": "node populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
-    "package": "node-pre-gyp package",
-    "prepublish": "npm ls"
+    "package": "node-pre-gyp package"
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",
