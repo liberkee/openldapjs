@@ -1,4 +1,4 @@
-#LDAP Errors 
+# LDAP Errors 
 
 The LDAP server's response to requests is usually a number representing either success(0) or an error(1-80).
 
@@ -19,6 +19,8 @@ ldapClient.add(dn,entry)
         //catching specific errors
     })
 ```
+
+More examples of error handling can be found in [Tests](../test).
 
 ## References:
 
