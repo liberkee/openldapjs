@@ -18,7 +18,6 @@ This library allows you to interact through Node.js with a LDAP backend.
   * Node.js(>version 4.8.5)
   * NPM
   * OpenLDAP libraries
-  * SLAPD (optional)
   * [Nan](https://github.com/nodejs/nan)
   * [V8](https://github.com/v8/v8) 
 
