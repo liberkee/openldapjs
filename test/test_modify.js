@@ -21,6 +21,19 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
+  const changeAttributesError = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: [
+        {
+          oldVal: 'nonExistingValue',
+          newVal: 'repeat',
+        },
+      ],
+    },
+  ];
+
   const changeAttributesReplace = [
     {
       op: config.ldapModify.ldapModificationReplace.operation,
@@ -194,6 +207,43 @@ describe('Testing the modify functionalities', () => {
         should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
       })
       .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject the update if the oldVal don\'t exit', () => {
+    const CustomError = errorHandler(errorList.noSuchAttirbute);
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject the update if the newVal already exit', () => {
+    const CustomError = errorHandler(errorList.typeOrValueExists);
+    changeAttributesError[0].vals[0].oldVal = '2Modification';
+    changeAttributesError[0].vals[0].newVal = '1Modification';
+    return ldapAsyncWrap
+      .modify(
+        config.ldapModify.ldapModificationReplace.change_dn,
+        changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        console.log(err.constructor.code);
         should.fail('did not expect generic error');
       });
   });
