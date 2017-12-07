@@ -23,9 +23,9 @@
   "binary": {
     "module_name": "binding",
     "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
-    "remote_path": "./{module_name}/v{version}/{configuration}/",
+    "remote_path": "{version}",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/hufsm/openldapjs/tree/XPLHUFRO-53_node-pre-gyp/releases/download/"
+    "host": "https://github.com/hufsm/openldapjs/releases/download/"
   },
   "devDependencies": {
     "aws-sdk": "^2.163.0",
@@ -44,6 +44,7 @@
     "lint": "eslint ./libs/ldap_async_wrap.js",
     "addData": "node populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
+    "package": "node-pre-gyp package",
     "prepublish": "npm ls"
   },
   "author": {
