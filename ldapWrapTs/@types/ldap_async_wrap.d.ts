@@ -1,6 +1,4 @@
-import path = require('path');
 import Promise = require('bluebird');
-import _ = require('underscore');
 import { method } from 'bluebird';
 
 interface ObjectE_STATE {
