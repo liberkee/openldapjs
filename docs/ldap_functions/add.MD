@@ -6,6 +6,7 @@
 
 * `distinguishedName` Dn where the entryObject is to be added.
 * `entryObject` LDAP entry object to be added to the provided DN
+* `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
 
 Example usecase:
 

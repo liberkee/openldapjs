@@ -6,7 +6,7 @@
 ```
 * `dnToBeChanged` entry that will be modified.
 * `changes` Object that contains changes to be made.
-* `optionalControls` optional control parameter.
+* `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
 
 Modify example:
 
