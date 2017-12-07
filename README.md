@@ -30,7 +30,7 @@ OpenLDAP.js requires OpenLDAP development libraries.
 ### Debian/Ubuntu
 
 * OpenLDAP development libraries : sudo apt-get install libldap2-dev
-  Currently built with Openldap 2.4.45.
+  currently built with Openldap 2.4.45.
 *  Make sure you have python2.7 and [node-gyp](https://www.npmjs.com/package/node-gyp) installed. Run `npm install`, it should install dependencies and build the c++ source files.
 
 
