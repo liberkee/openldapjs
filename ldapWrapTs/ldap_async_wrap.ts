@@ -5,8 +5,9 @@ import Promise = require('bluebird');
 import _ = require('underscore');
 import { method } from 'bluebird';
 
+import checkParameters = require('./@types/utils/check_variable_format');
+
 const binary = require('node-pre-gyp');
-const checkParameters = require('./utils/check_variable_format');
 const SearchStream = require('./stream_interface.js');
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
@@ -394,7 +395,7 @@ class LDAPAsyncWrap {
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
-  add(dn:string, entry:string, controls:JSON) {
+  add(dn:string, entry:JSON, controls:JSON) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));

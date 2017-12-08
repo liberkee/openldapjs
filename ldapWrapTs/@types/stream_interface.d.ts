@@ -1,4 +1,5 @@
-import {Readable as Readable} from "stream";
+import {Readable as Readable} from 'stream';
+import errorHandler = require('./errors/error_dispenser');
 
 /**
  * @class PagedSearchStream

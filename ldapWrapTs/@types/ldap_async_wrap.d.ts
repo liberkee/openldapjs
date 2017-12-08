@@ -1,5 +1,10 @@
 import Promise = require('bluebird');
 import { method } from 'bluebird';
+import path = require('path');
+import SearchStream = require('./stream_interface');
+import errorHandler = require('./errors/error_dispenser');
+import StateError = require('./errors/state_error');
+import _ = require('underscore');
 
 interface ObjectE_STATE {
   CREATED: number;

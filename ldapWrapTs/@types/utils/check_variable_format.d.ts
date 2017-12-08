@@ -1,4 +1,9 @@
 
+import Promise = require('bluebird');
+import Ajv = require('ajv');
+import _ = require('underscore');
+import ValidationError = require('../errors/validation_error');
+
 /**
  * @module checkVariableFormat
  * @class CheckParam
@@ -13,7 +18,7 @@ declare class CheckParam {
    * strings
     */
 
-  static validateStrings():void;
+  static validateStrings(...arg:Array<string>):void;
 
   /**
     * Verify the modify change parameter.
@@ -23,7 +28,7 @@ declare class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes):JSON;
+  static checkModifyChange(changes:JSON):JSON;
 
   /**
     * Verify the control parameter.
@@ -33,7 +38,7 @@ declare class CheckParam {
     * @return Throws error in case the controls is not valid with the schema
     * members. Return the array of control or null if the control is undefined.
     */
-  static checkControl(controls):any
+  static checkControl(controls:JSON):any
 
   /**
     * Verify the entry parameter.
@@ -43,6 +48,6 @@ declare class CheckParam {
     * @return Throws error in case the entry is not valid. Return the entry as
     * an array in case entry is valid
     */
-  static checkEntryObject(entry):JSON;
+  static checkEntryObject(entry:JSON):JSON;
 }
 export = CheckParam;
