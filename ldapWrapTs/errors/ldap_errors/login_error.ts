@@ -2,7 +2,7 @@
 
 import LdapError = require('./ldap_error');
 
-declare class LoginError extends LdapError {
+class LoginError extends LdapError {
   
 }
   
