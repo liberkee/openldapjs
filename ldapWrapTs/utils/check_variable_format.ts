@@ -133,4 +133,4 @@ class CheckParam {
 
 }
 
-module.exports = CheckParam;
+export = CheckParam;
