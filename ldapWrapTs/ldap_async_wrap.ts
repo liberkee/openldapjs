@@ -160,7 +160,7 @@ class LDAPAsyncWrap {
         if (this._stateClient !== E_STATES.BOUND) {
           reject(new StateError((<any>errorList).bindErrorMessage));
         } else {
-          checkParameters.validateStrings(searchBase, searchFilter, scope);
+          (<any>checkParameters).validateStrings(searchBase, searchFilter, scope);
   
           if (scopeObject[scope] === undefined) {
             throw new Error((<any>errorList).scopeSearchErrorMessage);
@@ -194,7 +194,7 @@ class LDAPAsyncWrap {
   pagedSearch(searchBase:string, scope:string, searchFilter:string, pageSize:number) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {
-        checkParameters.validateStrings(searchBase, searchFilter, scope);
+        (<any>checkParameters).validateStrings(searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error((<any>errorList).scopeSearchErrorMessage);
@@ -234,7 +234,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(dn, attr, value);
+        (<any>checkParameters).validateStrings(dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err:number, result:number) => {
           if (err) {
@@ -268,9 +268,9 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(dn);
-        const changes:JSON = checkParameters.checkModifyChange(jsonChange);
-        const ctrls:JSON = checkParameters.checkControl(controls);
+        (<any>checkParameters).validateStrings(dn);
+        const changes:JSON = (<any>checkParameters).checkModifyChange(jsonChange);
+        const ctrls:JSON = (<any>checkParameters).checkControl(controls);
 
         this._binding.modify(dn, changes, ctrls, (err:number, result:string) => {
           if (err) {
@@ -302,8 +302,8 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(dn, newRdn, newParent);
-        const ctrls:JSON = checkParameters.checkControl(controls);
+        (<any>checkParameters).validateStrings(dn, newRdn, newParent);
+        const ctrls:JSON = (<any>checkParameters).checkControl(controls);
 
         this._binding.rename(dn, newRdn, newParent, ctrls, (err:number, result:string) => {
           if (err) {
@@ -334,8 +334,8 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(dn);
-        const ctrls:JSON = checkParameters.checkControl(controls);
+        (<any>checkParameters).validateStrings(dn);
+        const ctrls:JSON = (<any>checkParameters).checkControl(controls);
 
         this._binding.delete(dn, ctrls, (err:number, result:string) => {
           if (err) {
@@ -365,7 +365,7 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(userDN, oldPassword, newPassword);
+        (<any>checkParameters).validateStrings(userDN, oldPassword, newPassword);
 
         this._binding.changePassword(
           userDN, oldPassword, newPassword, (err:number, result:number) => {
@@ -400,9 +400,9 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
-        checkParameters.validateStrings(dn);
-        const entryAttr:JSON = checkParameters.checkEntryObject(entry);
-        const ctrls:JSON = checkParameters.checkControl(controls);
+        (<any>checkParameters).validateStrings(dn);
+        const entryAttr:JSON = (<any>checkParameters).checkEntryObject(entry);
+        const ctrls:JSON = (<any>checkParameters).checkControl(controls);
 
         this._binding.add(dn, entryAttr, ctrls, (err:number, result:JSON) => {
           if (err) {

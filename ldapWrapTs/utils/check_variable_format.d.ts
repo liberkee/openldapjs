@@ -28,7 +28,7 @@ declare class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes:JSON):JSON;
+  static checkModifyChange(changes:any):Array<any>;
 
   /**
     * Verify the control parameter.
@@ -38,7 +38,7 @@ declare class CheckParam {
     * @return Throws error in case the controls is not valid with the schema
     * members. Return the array of control or null if the control is undefined.
     */
-  static checkControl(controls:JSON):any
+  static checkControl(controls:any):any
 
   /**
     * Verify the entry parameter.
@@ -48,6 +48,6 @@ declare class CheckParam {
     * @return Throws error in case the entry is not valid. Return the entry as
     * an array in case entry is valid
     */
-  static checkEntryObject(entry:JSON):JSON;
+  static checkEntryObject(entry:any):Array<any>;
 }
 export = CheckParam;
