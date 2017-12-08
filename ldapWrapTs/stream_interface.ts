@@ -1,8 +1,9 @@
 'use strict';
 
 import {Readable as Readable} from "stream";
+import * as errorList from '../test/error_list.json'
+
 const errorHandler = require('./errors/error_dispenser').errorFunction;
-const errorList = require('../test/error_list.json');
 
 /**
  * @class PagedSearchStream
@@ -50,7 +51,7 @@ class PagedSearchStream extends Readable {
           (err:number, page:string, morePages:boolean) => {
             if (err) {
               const CustomError = errorHandler(err);
-              this.emit('err', new CustomError(errorList.ldapSearchErrorMessage));
+              this.emit('err', new CustomError((<any>errorList).ldapSearchErrorMessage));
               this.push(null);
             } else {
               if (!morePages) this._lastResult = true;

@@ -5,14 +5,14 @@ import Promise = require('bluebird');
 import _ = require('underscore');
 import { method } from 'bluebird';
 
-import checkParameters = require('./@types/utils/check_variable_format');
+import checkParameters = require('./utils/check_variable_format');
 
-const binary = require('node-pre-gyp');
-const SearchStream = require('./stream_interface.js');
+import SearchStream = require('./@types/stream_interface');
+import StateError = require('./@types/errors/state_error');
+import errorList = require('../test/error_list.json');
+
 const errorHandler = require('./errors/error_dispenser').errorFunction;
-const StateError = require('./errors/state_error');
-const errorList = require('../test/error_list.json');
-
+const binary = require('node-pre-gyp');
 const bindingPath:string = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
 
@@ -73,14 +73,14 @@ class LDAPAsyncWrap {
         this._binding.initialize(this._hostAddress, (err:number, result:boolean) => {
           if(err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapInitializeErrorMessage));
+            reject(new CustomError((<any>errorList).ldapInitializeErrorMessage));
           } else {
             this._stateClient = E_STATES.INITIALIZED;
             resolve();
           }
         });
       } else {
-        reject(new StateError(errorList.initErrorMessage));
+        reject(new StateError((<any>errorList).initErrorMessage));
       }
      });
    }
@@ -103,13 +103,13 @@ class LDAPAsyncWrap {
           this._binding.startTls(pathCert, (err:number, res:boolean) => {
             if (err) {
               const CustomError = errorHandler(err);
-              reject(new CustomError(errorList.ldapStartTlsErrorMessage));
+              reject(new CustomError((<any>errorList).ldapStartTlsErrorMessage));
             } else {
               resolve();
             }
           });
         } else {
-          reject(new StateError(errorList.initErrorMessage));
+          reject(new StateError((<any>errorList).initErrorMessage));
         }
       });
     }
@@ -131,14 +131,14 @@ class LDAPAsyncWrap {
           if (err) {
             const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
-            reject(new CustomError(errorList.ldapBindErrorMessage));
+            reject(new CustomError((<any>errorList).ldapBindErrorMessage));
           } else {
             this._stateClient = E_STATES.BOUND;
             resolve();
           }
         });
       } else {
-        reject(new StateError(errorList.uninitializedErrorMessage));
+        reject(new StateError((<any>errorList).uninitializedErrorMessage));
       }
     });
   }
@@ -158,19 +158,19 @@ class LDAPAsyncWrap {
     search(searchBase:string, scope:string, searchFilter:string) {
       return new Promise((resolve, reject) => {
         if (this._stateClient !== E_STATES.BOUND) {
-          reject(new StateError(errorList.bindErrorMessage));
+          reject(new StateError((<any>errorList).bindErrorMessage));
         } else {
           checkParameters.validateStrings(searchBase, searchFilter, scope);
   
           if (scopeObject[scope] === undefined) {
-            throw new Error(errorList.scopeSearchErrorMessage);
+            throw new Error((<any>errorList).scopeSearchErrorMessage);
           }
   
           this._binding.search(
             searchBase, scopeObject[scope], searchFilter, (err:number, result:string) => {
               if (err) {
                 const CustomError = errorHandler(err);
-                reject(new CustomError(errorList.ldapSearchErrorMessage));
+                reject(new CustomError((<any>errorList).ldapSearchErrorMessage));
               } else {
                 resolve(result);
               }
@@ -197,11 +197,11 @@ class LDAPAsyncWrap {
         checkParameters.validateStrings(searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error(errorList.scopeSearchErrorMessage);
+          throw new Error((<any>errorList).scopeSearchErrorMessage);
         }
 
         if (!_.isNumber(pageSize)) {
-          throw new TypeError(errorList.typeErrorMessage);
+          throw new TypeError((<any>errorList).typeErrorMessage);
         }
         this._searchID += 1;
         resolve(
@@ -209,7 +209,7 @@ class LDAPAsyncWrap {
             searchBase, scopeObject[scope], searchFilter, pageSize,
             this._searchID, this._binding));
       }
-      reject(new StateError(errorList.bindErrorMessage));
+      reject(new StateError((<any>errorList).bindErrorMessage));
     });
   }
 
@@ -232,14 +232,14 @@ class LDAPAsyncWrap {
     const LDAP_COMPARE_TRUE:number = 6;
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, attr, value);
 
         this._binding.compare(dn, attr, value, (err:number, result:number) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapCompareErrorMessage));
+            reject(new CustomError((<any>errorList).ldapCompareErrorMessage));
           } else {
             const res:boolean = result === LDAP_COMPARE_TRUE;
             resolve(res);
@@ -266,7 +266,7 @@ class LDAPAsyncWrap {
   modify(dn:string, jsonChange:JSON, controls:JSON) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const changes:JSON = checkParameters.checkModifyChange(jsonChange);
@@ -275,7 +275,7 @@ class LDAPAsyncWrap {
         this._binding.modify(dn, changes, ctrls, (err:number, result:string) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapModifyErrorMessage));
+            reject(new CustomError((<any>errorList).ldapModifyErrorMessage));
           } else {
             resolve(result);
           }
@@ -300,7 +300,7 @@ class LDAPAsyncWrap {
   rename(dn:string, newRdn:string, newParent:string, controls:JSON) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, newRdn, newParent);
         const ctrls:JSON = checkParameters.checkControl(controls);
@@ -308,7 +308,7 @@ class LDAPAsyncWrap {
         this._binding.rename(dn, newRdn, newParent, ctrls, (err:number, result:string) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapRenameErrorMessage));
+            reject(new CustomError((<any>errorList).ldapRenameErrorMessage));
           } else {
             resolve(result);
           }
@@ -332,7 +332,7 @@ class LDAPAsyncWrap {
   delete(dn:string, controls:JSON) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const ctrls:JSON = checkParameters.checkControl(controls);
@@ -340,7 +340,7 @@ class LDAPAsyncWrap {
         this._binding.delete(dn, ctrls, (err:number, result:string) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapDeleteErrorMessage));
+            reject(new CustomError((<any>errorList).ldapDeleteErrorMessage));
           } else {
             resolve(result);
           }
@@ -363,7 +363,7 @@ class LDAPAsyncWrap {
   changePassword(userDN:string, oldPassword:string, newPassword:string) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(userDN, oldPassword, newPassword);
 
@@ -372,7 +372,7 @@ class LDAPAsyncWrap {
             if (err) {
               const CustomError = errorHandler(err);
               reject(
-                new CustomError(errorList.ldapChangePasswordErrorMessage));
+                new CustomError((<any>errorList).ldapChangePasswordErrorMessage));
             } else {
               resolve();
             }
@@ -398,7 +398,7 @@ class LDAPAsyncWrap {
   add(dn:string, entry:JSON, controls:JSON) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError((<any>errorList).bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const entryAttr:JSON = checkParameters.checkEntryObject(entry);
@@ -407,7 +407,7 @@ class LDAPAsyncWrap {
         this._binding.add(dn, entryAttr, ctrls, (err:number, result:JSON) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapAddErrorMessage));
+            reject(new CustomError((<any>errorList).ldapAddErrorMessage));
           } else {
             resolve(result);
           }
@@ -429,7 +429,7 @@ class LDAPAsyncWrap {
         this._binding.unbind((err:number, state:boolean) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapUnbindErrorMessage));
+            reject(new CustomError((<any>errorList).ldapUnbindErrorMessage));
           } else {
             this._stateClient = E_STATES.UNBOUND;
             resolve();
