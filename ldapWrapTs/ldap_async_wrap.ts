@@ -7,8 +7,8 @@ import { method } from 'bluebird';
 
 import checkParameters = require('./utils/check_variable_format');
 
-import SearchStream = require('./@types/stream_interface');
-import StateError = require('./@types/errors/state_error');
+import SearchStream = require('./stream_interface');
+import StateError = require('./errors/state_error');
 import errorList = require('../test/error_list.json');
 
 const errorHandler = require('./errors/error_dispenser').errorFunction;
