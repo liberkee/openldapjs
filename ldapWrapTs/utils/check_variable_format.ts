@@ -29,7 +29,7 @@ class CheckParam {
     */
 
   static validateStrings() {
-    _.each(arguments, (element) => {
+    _.each(arguments, element => {
       if (!_.isString(element)) {
         throw new TypeError((<any>errorList).typeErrorMessage);
       }
@@ -47,7 +47,7 @@ class CheckParam {
   static checkModifyChange(changes:any) {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
     const changeBuildArr:Array<object> = [];
-    changesAttr.forEach((element) => {
+    changesAttr.forEach(element => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
         throw new ValidationError(
@@ -98,7 +98,7 @@ class CheckParam {
   static checkControl(controls:any) {
     if (controls !== undefined) {
       const ctrls = !_.isArray(controls) ? [controls] : controls;
-      ctrls.forEach((element) => {
+      ctrls.forEach(element => {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
           throw new ValidationError(
@@ -121,7 +121,7 @@ class CheckParam {
   static checkEntryObject(entry:any) {
     const entryAttr = !_.isArray(entry) ? [entry] : entry;
 
-    entryAttr.forEach((element) => {
+    entryAttr.forEach(element => {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
         throw new ValidationError(

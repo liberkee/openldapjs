@@ -38,44 +38,44 @@ import LdapDsasError = require('./ldap_errors/ldap_dsas_error');
 import LdapOtherError = require('./ldap_errors/ldap_other_error');
 
 
-export interface errorList {
-  LdapInvalidDnError: LdapInvalidDnError,
-  LdapSizeLimitError: LdapSizeLimitError,
-  LdapTimeLimitError: LdapTimeLimitError,
-  LdapProtocolError: LdapProtocolError,
-  LdapInvalidSyntaxError: LdapInvalidSyntaxError,
-  LdapOperationError: LdapOperationError,
-  LdapAuthUnsupportedError: LdapAuthUnsupportedError,
-  LdapStrongAuthError: LdapStrongAuthError,
-  LdapReferralError: LdapReferralError,
-  LdapAdminLimitError: LdapAdminLimitError,
-  LdapCriticalExtensionError: LdapCriticalExtensionError,
-  LdapConfidentialityError: LdapConfidentialityError,
-  LdapSaslBindError: LdapSaslBindError,
-  LdapNoSuchAttribute: LdapNoSuchAttribute,
-  LdapUndefinedTypeError: LdapUndefinedTypeError,
-  LdapMatchingError: LdapMatchingError,
-  LdapConstraintError: LdapConstraintError,
-  LdapTypeOrValueAlreadyExistsError: LdapTypeOrValueAlreadyExistsError,
-  LdapNoSuchObjectError: LdapNoSuchObjectError,
-  LdapAliasError: LdapAliasError,
-  LdapLeafError: LdapLeafError,
-  LdapAliasDerefError: LdapAliasDerefError,
-  LdapInappropriateAuthError: LdapInappropriateAuthError,
-  LdapCredentialsError: LdapCredentialsError,
-  LdapAccessError: LdapAccessError,
-  LdapBusyError: LdapBusyError,
-  LdapUnavailable: LdapUnavailable,
-  LdapUnWillingError: LdapUnWillingError,
-  LdapLoopError: LdapLoopError,
-  LdapNamingError: LdapNamingError,
-  LdapObjectClassError: LdapObjectClassError,
-  LdapNonLeafError: LdapNonLeafError,
-  LdapRdnError: LdapRdnError,
-  LdapAlreadyExists: LdapAlreadyExists,
-  LdapClassModsError: LdapClassModsError,
-  LdapDsasError: LdapDsasError,
-  LdapOtherError: LdapOtherError,
+export interface IErrorList {
+  LdapInvalidDnError: LdapInvalidDnError;
+  LdapSizeLimitError: LdapSizeLimitError;
+  LdapTimeLimitError: LdapTimeLimitError;
+  LdapProtocolError: LdapProtocolError;
+  LdapInvalidSyntaxError: LdapInvalidSyntaxError;
+  LdapOperationError: LdapOperationError;
+  LdapAuthUnsupportedError: LdapAuthUnsupportedError;
+  LdapStrongAuthError: LdapStrongAuthError;
+  LdapReferralError: LdapReferralError;
+  LdapAdminLimitError: LdapAdminLimitError;
+  LdapCriticalExtensionError: LdapCriticalExtensionError;
+  LdapConfidentialityError: LdapConfidentialityError;
+  LdapSaslBindError: LdapSaslBindError;
+  LdapNoSuchAttribute: LdapNoSuchAttribute;
+  LdapUndefinedTypeError: LdapUndefinedTypeError;
+  LdapMatchingError: LdapMatchingError;
+  LdapConstraintError: LdapConstraintError;
+  LdapTypeOrValueAlreadyExistsError: LdapTypeOrValueAlreadyExistsError;
+  LdapNoSuchObjectError: LdapNoSuchObjectError;
+  LdapAliasError: LdapAliasError;
+  LdapLeafError: LdapLeafError;
+  LdapAliasDerefError: LdapAliasDerefError;
+  LdapInappropriateAuthError: LdapInappropriateAuthError;
+  LdapCredentialsError: LdapCredentialsError;
+  LdapAccessError: LdapAccessError;
+  LdapBusyError: LdapBusyError;
+  LdapUnavailable: LdapUnavailable;
+  LdapUnWillingError: LdapUnWillingError;
+  LdapLoopError: LdapLoopError;
+  LdapNamingError: LdapNamingError;
+  LdapObjectClassError: LdapObjectClassError;
+  LdapNonLeafError: LdapNonLeafError;
+  LdapRdnError: LdapRdnError;
+  LdapAlreadyExists: LdapAlreadyExists;
+  LdapClassModsError: LdapClassModsError;
+  LdapDsasError: LdapDsasError;
+  LdapOtherError: LdapOtherError;
 }
 /**
  * Function that returns the error class corresponding to the LDAP error code.

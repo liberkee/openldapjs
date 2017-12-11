@@ -3,7 +3,6 @@
 import path = require('path');
 import Promise = require('bluebird');
 import _ = require('underscore');
-import { method } from 'bluebird';
 
 import checkParameters = require('./utils/check_variable_format');
 
@@ -16,29 +15,29 @@ const binary = require('node-pre-gyp');
 const bindingPath:string = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
 
-interface ObjectE_STATE {
+interface IObjectEState {
   CREATED: number;
-  INITIALIZED : number,
-  BOUND : number,
-  UNBOUND : number
-  [key: string]: number
+  INITIALIZED : number;
+  BOUND : number;
+  UNBOUND : number;
+  [key: string]: number;
 }
 
-interface ObjectScopeObject {
+interface IObjectScopeObject {
   BASE: number;
-  ONE : number,
-  SUBTREE : number,
-  [key: string]: number
+  ONE : number;
+  SUBTREE : number;
+  [key: string]: number;
 }
 
-const E_STATES: ObjectE_STATE = {
+const E_STATES: IObjectEState = {
   CREATED : 0,
   INITIALIZED : 1,
   BOUND : 2,
   UNBOUND : 5
 };
 
-const scopeObject: ObjectScopeObject = {
+const scopeObject: IObjectScopeObject = {
   BASE : 0,
   ONE : 1,
   SUBTREE : 2
@@ -70,7 +69,7 @@ class LDAPAsyncWrap {
    initialize() {
      return new Promise((resolve, reject) => {
       if(this._stateClient === E_STATES.CREATED) {
-        this._binding.initialize(this._hostAddress, (err:number, result:boolean) => {
+        this._binding.initialize(this._hostAddress, (err:number) => {
           if(err) {
             const CustomError = errorHandler(err);
             reject(new CustomError((<any>errorList).ldapInitializeErrorMessage));
@@ -100,7 +99,7 @@ class LDAPAsyncWrap {
       return new Promise((resolve, reject) => {
         if (this._stateClient === E_STATES.INITIALIZED) {
           const pathCert = pathToCertFile === undefined ? '' : pathToCertFile;
-          this._binding.startTls(pathCert, (err:number, res:boolean) => {
+          this._binding.startTls(pathCert, (err:number) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(new CustomError((<any>errorList).ldapStartTlsErrorMessage));
@@ -127,7 +126,7 @@ class LDAPAsyncWrap {
   bind(bindDn:string, passwordUser:string) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        this._binding.bind(bindDn, passwordUser, (err:number, state:number) => {
+        this._binding.bind(bindDn, passwordUser, (err:number) => {
           if (err) {
             const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
@@ -368,7 +367,7 @@ class LDAPAsyncWrap {
         (<any>checkParameters).validateStrings(userDN, oldPassword, newPassword);
 
         this._binding.changePassword(
-          userDN, oldPassword, newPassword, (err:number, result:number) => {
+          userDN, oldPassword, newPassword, (err:number) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(
@@ -426,7 +425,7 @@ class LDAPAsyncWrap {
   unbind() {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.UNBOUND) {
-        this._binding.unbind((err:number, state:boolean) => {
+        this._binding.unbind((err:number) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError((<any>errorList).ldapUnbindErrorMessage));

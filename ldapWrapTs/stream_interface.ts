@@ -1,9 +1,9 @@
 'use strict';
 
-import {Readable as Readable} from "stream";
-import * as errorList from '../test/error_list.json'
+import {Readable as Readable} from 'stream';
+import * as errorList from '../test/error_list.json';
 
-const errorHandler = require('./errors/error_dispenser').errorFunction;
+const errorHandler:any = require('./errors/error_dispenser').errorFunction;
 
 /**
  * @class PagedSearchStream

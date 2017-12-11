@@ -1,6 +1,5 @@
 'use strict';
 
-
 import LdapError = require('./ldap_errors/ldap_error');
 import LdapInvalidDnError = require('./ldap_errors/ldap_invalid_dn_error');
 import LdapSizeLimitError = require('./ldap_errors/ldap_size_limit_error');
@@ -42,58 +41,58 @@ import LdapOtherError = require('./ldap_errors/ldap_other_error');
 
 
 const errors:any = {
-  LdapInvalidDnError: LdapInvalidDnError,
-  LdapSizeLimitError: LdapSizeLimitError,
-  LdapTimeLimitError: LdapTimeLimitError,
-  LdapProtocolError: LdapProtocolError,
-  LdapInvalidSyntaxError: LdapInvalidSyntaxError,
-  LdapOperationError: LdapOperationError,
-  LdapAuthUnsupportedError: LdapAuthUnsupportedError,
-  LdapStrongAuthError: LdapStrongAuthError,
-  LdapReferralError: LdapReferralError,
-  LdapAdminLimitError: LdapAdminLimitError,
-  LdapCriticalExtensionError: LdapCriticalExtensionError,
-  LdapConfidentialityError: LdapConfidentialityError,
-  LdapSaslBindError: LdapSaslBindError,
-  LdapNoSuchAttribute: LdapNoSuchAttribute,
-  LdapUndefinedTypeError: LdapUndefinedTypeError,
-  LdapMatchingError: LdapMatchingError,
-  LdapConstraintError: LdapConstraintError,
-  LdapTypeOrValueAlreadyExistsError: LdapTypeOrValueAlreadyExistsError,
-  LdapNoSuchObjectError: LdapNoSuchObjectError,
-  LdapAliasError: LdapAliasError,
-  LdapLeafError: LdapLeafError,
-  LdapAliasDerefError: LdapAliasDerefError,
-  LdapInappropriateAuthError: LdapInappropriateAuthError,
-  LdapCredentialsError: LdapCredentialsError,
-  LdapAccessError: LdapAccessError,
-  LdapBusyError: LdapBusyError,
-  LdapUnavailable: LdapUnavailable,
-  LdapUnWillingError: LdapUnWillingError,
-  LdapLoopError: LdapLoopError,
-  LdapNamingError: LdapNamingError,
-  LdapObjectClassError: LdapObjectClassError,
-  LdapNonLeafError: LdapNonLeafError,
-  LdapRdnError: LdapRdnError,
-  LdapAlreadyExists: LdapAlreadyExists,
-  LdapClassModsError: LdapClassModsError,
-  LdapDsasError: LdapDsasError,
-  LdapOtherError: LdapOtherError,
+  LdapInvalidDnError: ('{LdapInvalidDnError}'),
+  LdapSizeLimitError: ('{LdapSizeLimitError}'),
+  LdapTimeLimitError: ('{LdapTimeLimitError}'),
+  LdapProtocolError: ('{LdapProtocolError}'),
+  LdapInvalidSyntaxError: ('{LdapInvalidSyntaxError}'),
+  LdapOperationError: ('{LdapOperationError}'),
+  LdapAuthUnsupportedError: ('{LdapAuthUnsupportedError}'),
+  LdapStrongAuthError: ('{LdapStrongAuthError}'),
+  LdapReferralError: ('{LdapReferralError}'),
+  LdapAdminLimitError: ('{LdapAdminLimitError}'),
+  LdapCriticalExtensionError: ('{LdapCriticalExtensionError}'),
+  LdapConfidentialityError: ('{LdapConfidentialityError}'),
+  LdapSaslBindError: ('{LdapSaslBindError}'),
+  LdapNoSuchAttribute: ('{LdapNoSuchAttribute}'),
+  LdapUndefinedTypeError: ('{LdapUndefinedTypeError}'),
+  LdapMatchingError: ('{LdapMatchingError}'),
+  LdapConstraintError: ('{LdapConstraintError}'),
+  LdapTypeOrValueAlreadyExistsError: ('{LdapTypeOrValueAlreadyExistsError}'),
+  LdapNoSuchObjectError: ('{LdapNoSuchObjectError}'),
+  LdapAliasError: ('{LdapAliasError}'),
+  LdapLeafError: ('{LdapLeafError}'),
+  LdapAliasDerefError: ('{LdapAliasDerefError}'),
+  LdapInappropriateAuthError: ('{LdapInappropriateAuthError}'),
+  LdapCredentialsError: ('{LdapCredentialsError}'),
+  LdapAccessError: ('{LdapAccessError}'),
+  LdapBusyError: ('{LdapBusyError}'),
+  LdapUnavailable: ('{LdapUnavailable}'),
+  LdapUnWillingError: ('{LdapUnWillingError}'),
+  LdapLoopError: ('{LdapLoopError}'),
+  LdapNamingError: ('{LdapNamingError}'),
+  LdapObjectClassError: ('{LdapObjectClassError}'),
+  LdapNonLeafError: ('{LdapNonLeafError}'),
+  LdapRdnError: ('{LdapRdnError}'),
+  LdapAlreadyExists: ('{LdapAlreadyExists}'),
+  LdapClassModsError: ('{LdapClassModsError}'),
+  LdapDsasError: ('{LdapDsasError}'),
+  LdapOtherError: ('{LdapOtherError}'),
 };
 /**
  * Function that returns the error class corresponding to the LDAP error code.
  * @param {Number} code Ldap error code ranging from 1 to 80 or negative for API errors.
  * @return {Error} DesiredErrorClass Custom error class corresponding to the ldap error code.
  */
-function errorSelection(code:number) {
+function errorSelection(code:number):any {
 
-  const FoundErrorClassKey = Object.keys(errors)
-    .find((key) => {
-      const ClassCandidate = errors[key];
+  const FoundErrorClassKey:any = Object.keys(errors)
+    .find(key => {
+      const ClassCandidate:any = errors[key];
       return code === ClassCandidate.code;
     });
 
-  const DesiredErrorClass = FoundErrorClassKey === undefined
+  const DesiredErrorClass:any = FoundErrorClassKey === undefined
     ? LdapOtherError
     : errors[FoundErrorClassKey];
 

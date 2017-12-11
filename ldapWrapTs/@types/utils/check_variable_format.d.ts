@@ -38,7 +38,7 @@ declare class CheckParam {
     * @return Throws error in case the controls is not valid with the schema
     * members. Return the array of control or null if the control is undefined.
     */
-  static checkControl(controls:any):any
+  static checkControl(controls:any):any;
 
   /**
     * Verify the entry parameter.

@@ -6,19 +6,19 @@ import errorHandler = require('./errors/error_dispenser');
 import StateError = require('./errors/state_error');
 import _ = require('underscore');
 
-interface ObjectE_STATE {
+interface IObjectEState {
   CREATED: number;
-  INITIALIZED : number,
-  BOUND : number,
-  UNBOUND : number
-  [key: string]: number
+  INITIALIZED : number;
+  BOUND : number;
+  UNBOUND : number;
+  [key: string]: number;
 }
 
-interface ObjectScopeObject {
+interface IObjectScopeObject {
   BASE: number;
-  ONE : number,
-  SUBTREE : number,
-  [key: string]: number
+  ONE : number;
+  SUBTREE : number;
+  [key: string]: number;
 }
 
 /**
