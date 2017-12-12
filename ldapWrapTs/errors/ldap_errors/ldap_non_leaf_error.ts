@@ -1,6 +1,5 @@
 'use strict';
 
-import LdapError = require('./ldap_error');
 import OperationalError = require('./operational_error');
 
 class LdapNonLeafError extends OperationalError {

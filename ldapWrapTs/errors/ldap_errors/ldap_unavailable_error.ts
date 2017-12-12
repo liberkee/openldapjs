@@ -1,6 +1,5 @@
 'use strict';
 
-import LdapError = require('./ldap_error');
 import ServerError = require('./server_error');
 
 class LdapUnavailableError extends ServerError {

@@ -49,7 +49,7 @@
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
-    "lint": "eslint ./ldapWrapTs/**/*",
+    "lint": "eslint ./libs/**/*",
     "addData": "node populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
     "package": "node-pre-gyp package"
