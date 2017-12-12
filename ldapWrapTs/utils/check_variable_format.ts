@@ -1,7 +1,5 @@
 'use strict';
 
-import moduleType = require('./check_variable_format');
-import Promise = require('bluebird');
 import Ajv = require('ajv');
 import _ = require('underscore');
 

@@ -33,7 +33,7 @@
     "host": "https://github.com/hufsm/openldapjs/releases/download/"
   },
   "devDependencies": {
-    "@types/node": "^8.0.57",
+    "@types/node": "^8.0.58",
     "aws-sdk": "^2.165.0",
     "eslint": "4.7.1",
     "eslint-config-airbnb": "15.1.0",
