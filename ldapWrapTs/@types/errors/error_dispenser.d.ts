@@ -1,4 +1,3 @@
-import LdapError = require('./ldap_errors/ldap_error');
 import LdapInvalidDnError = require('./ldap_errors/ldap_invalid_dn_error');
 import LdapSizeLimitError = require('./ldap_errors/ldap_size_limit_error');
 import LdapTimeLimitError = require('./ldap_errors/ldap_time_limit_error');
