@@ -24,7 +24,7 @@ newClient.initialize()
     return newClient.add(config.ldapAdd.dnNewEntry, entry);
   })
   .then(() => {
-    console.log('The user was add with success');
+    console.log('The user was added with success');
     return newClient.add(config.ldapAdd.secondDnNewEntry, entry,
       config.ldapControls.ldapModificationControlPostRead);
   })

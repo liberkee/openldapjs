@@ -4,6 +4,11 @@ const configFile = require('./test/config.json');
 const Client = require('./index.js').Client;
 const Promise = require('bluebird');
 
+
+/**
+ * Helper script that adds a bunch of test entries using the library add routine.
+ */
+
 const rdn = 'cn=testUser';
 const dn = configFile.ldapTestEntries.entryDn;
 const validEntryObject = [

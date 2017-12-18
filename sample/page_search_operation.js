@@ -45,7 +45,7 @@ newClient.initialize()
     });
 
     result.on('end', () => {
-      console.log('\nStream end up here');
+      console.log('\nStream ends  here');
     });
   })
   .catch((err) => {

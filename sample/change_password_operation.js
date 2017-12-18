@@ -17,7 +17,7 @@ newClient.initialize()
       config.ldapChangePassword.oldPasswd, config.ldapChangePassword.newPasswd);
   })
   .then(() => {
-    console.log('The user password was changed with success');
+    console.log('The user\'s password was changed with success');
   })
   .catch((err) => {
     console.log(`${err.name} ${err.constructor.description}`);

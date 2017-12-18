@@ -33,7 +33,7 @@ newClient.initialize()
     return newClient.modify(config.ldapModify.firstDNEntry, changes);
   })
   .then(() => {
-    console.log('The user was modify with success');
+    console.log('The user was modified with success');
     return newClient.modify(config.ldapModify.secondDNEntry, changes, prePostReadControls);
   })
   .then((result) => {
