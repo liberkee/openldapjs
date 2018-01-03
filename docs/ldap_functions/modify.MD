@@ -2,9 +2,9 @@
 
 ```javascript
 
-    ldap.modify(dnToBeChanged, changes, optionalControls);
+    ldap.modify(dn, changes, optionalControls);
 ```
-* `dnToBeChanged` entry that will be modified.
+* `dn` entry that will be modified.
 * `changes` Object that contains changes to be made.
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
 
@@ -12,7 +12,7 @@ Modify example:
 
 ```javascript
 
-const dnToBeChanged = 'cn=userDn,ou=users,o=myhost,dc=example,dc=com';
+const dn = 'cn=userDn,ou=users,o=myhost,dc=example,dc=com';
 const changes = {
     op: "replace",
     attr: "address",
@@ -22,7 +22,7 @@ const changes = {
 
 
 //changes the address from the previous value to "New Address,nr 23"
-ldap.modify(dnToBeChanged, changes)
+ldap.modify(dn, changes)
 
 
 

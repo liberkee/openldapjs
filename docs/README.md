@@ -15,7 +15,7 @@ After installing it in your project, and assuming that you have access to a func
 ```javascript
 
 /* creates a new ldap client instance with the host address your_ldap_host_address */
-const ldapClient = new LDAP('your_ldap_host_address');
+const ldapClient = new LDAP('your_ldap_host_address'); // E.g: ldap://192.168.0.1:389 or ldaps://example.com
 
 
 /* in order for the client to be usable, it has to be initialized and bound with a user DN and a password */

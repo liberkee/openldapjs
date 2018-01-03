@@ -1,10 +1,10 @@
 # LDAP Add Operation
 
 ```javascript
-    ldap.add(distinguishedName,entryObject,optionalControls);
+    ldap.add(dn,entryObject,optionalControls);
 ```
 
-* `distinguishedName` Dn where the entryObject is to be added.
+* `dn` Dn where the entryObject is to be added.
 * `entryObject` LDAP entry object to be added to the provided DN
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
 
