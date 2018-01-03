@@ -33,6 +33,9 @@ void LDAPCompareProgress::HandleOKCallback() {
     if (status == LDAP_COMPARE_TRUE || status == LDAP_COMPARE_FALSE) {
       stateClient[1] = Nan::New(status);
       callback->Call(2, stateClient);
+    } else if (status == LDAP_NO_SUCH_ATTRIBUTE || status == LDAP_NO_SUCH_OBJECT){
+      stateClient[1] = Nan::New(LDAP_COMPARE_FALSE);
+      callback->Call(2, stateClient);
     } else {
       // Return ERROR
       stateClient[0] = Nan::New(status);
