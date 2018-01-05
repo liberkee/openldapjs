@@ -121,6 +121,63 @@ class LDAPAsyncWrap {
   }
 
   /**
+     * attributeExists operation.
+     *
+     * @method attributeExists
+     * @param {String} dn the entry for verification.
+     * @param {String} attributeName attribute that is required.
+     * @return {Promise} Will resolve with false in case of noSuchAttribute 
+     * error and true otherwise and reject if there is an error
+     * */
+
+  attributeExists(dn, attributeName) {
+    return new Promise((resolve, reject) => {
+      this.compare(dn, attributeName, '1@a-value')
+        .then((res) => {
+          resolve(true);
+        })
+        .catch((err) => {
+          if (err.constructor.code === errorList.noSuchAttirbute) {
+            resolve(false);
+          } else {
+            reject(err);
+          }
+        });
+    });
+  }
+
+  /**
+     * objectExists operation.
+     *
+     * @method objectExists
+     * @param {String} dn the entry for verification.
+     * @return {Promise} Will resolve with false in case of noSuchObject 
+     * error and the result of compare otherwise and reject if there is an error
+     * */
+
+  objectExists(dn) {
+    return new Promise((resolve, reject) => {
+      let attribute = dn.split('=');
+      attribute = attribute[0];
+      let value = dn.split(',');
+      value = value[0].split('=');
+      value = value[1];
+      this.compare(dn, attribute, value)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          if (err.constructor.code === errorList.ldapNoSuchObject) {
+            resolve(false);
+          } else {
+            reject(err);
+          }
+        });
+    });
+  }
+
+
+  /**
      * Search operation.
      *
      * @method search
