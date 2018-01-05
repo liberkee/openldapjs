@@ -1,7 +1,7 @@
 # LDAP Initialize Operation
 
 ```javascript
-     ldap.initialize('hostaddress');
+     ldap.initialize();
 ```
 * `hostaddress` ldap server address. Example of a local ldap server: 
                 ldap://localhost:389
@@ -13,7 +13,7 @@ In case of success, the client's state is initialized and you can proceed to bin
 Note:  Attempting to start another operation while initialize is not done will most likely fail, I.E:
 ```javascript
 //BAD
-ldap.initialize('host');
+ldap.initialize();
 ldap.bind('username','pass');
 ldap.search(...,...,...);
 ```
@@ -22,7 +22,7 @@ Always wait for initialize/bind to finish before using other ops:
 
 ```javascript
 //Good
-ldap.initialize('host')
+ldap.initialize()
     .then( () => {
         return ldap.bind('username','password')
 

@@ -14,6 +14,7 @@ A Promise returning function that wraps the asynchronous `ldap_search_ext` C fun
 ## References:
 
 * [LDAP search man page](https://linux.die.net/man/3/ldap_search_ext)
-* [LDAP search specs](https://www.ldap.com/the-ldap-search-operation)
+* [LDAP search specs](http://www.openldap.org/search/)
+* [RFC search operation](https://tools.ietf.org/html/rfc4511#section-4.5)
 
 

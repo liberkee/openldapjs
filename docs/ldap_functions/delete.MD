@@ -14,7 +14,7 @@ Example use case:
 
 const toBeDeleted = 'cn=obsoleteData,cn=data,ou=database,o=myhost,dc=example,dc=com';
 
-ldap.initialize(...)
+ldap.initialize()
     .then( () => {
         return ldap.bind(..,..)
     })
@@ -29,5 +29,6 @@ The snippet above will delete the given dn together with all its entry data.
 
 * [LDAP Delete man page](https://linux.die.net/man/3/ldap_delete_ext)
 * [LDAP Delete specs](https://www.ldap.com/the-ldap-delete-operation)
+* [RFC Delete operation](https://tools.ietf.org/html/rfc4511#section-4.8)
 
 

@@ -15,10 +15,9 @@ Example usecase:
 const entryObject = {
     attr: "objectClass",
     vals: ["person"]
-
 };
 
-ldap.initialize(...)
+ldap.initialize()
     .then( () => {
         return ldap.bind(..,..)
     })
@@ -37,4 +36,4 @@ Multiple adds can be executed in parallel (only limit to how many adds can be ch
 
 * [LDAP Add manpage](https://linux.die.net/man/3/ldap_add_ext)
 * [LDAP Add specs](https://www.ldap.com/the-ldap-add-operation)
-
+* [RFC Add Operation](https://tools.ietf.org/html/rfc4511#section-4.7)

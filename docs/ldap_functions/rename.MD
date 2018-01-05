@@ -38,3 +38,4 @@ ldapClient.initialize()
 
 * [LDAP DNs and RDNs](https://www.ldap.com/ldap-dns-and-rdns)
 * [LDAP Rename man page](https://linux.die.net/man/3/ldap_rename)
+* [RFC Rename operation](https://tools.ietf.org/html/rfc4511#section-4.9)

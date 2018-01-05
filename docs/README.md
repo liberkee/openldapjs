@@ -70,7 +70,11 @@ List of commonly asked questions
 ## References 
 
 * [LDAP](https://www.ldap.com/getting-started-with-ldap)
+* [OpenLdap documentation](https://www.openldap.org/doc)
+* [OpenLdap library](https://github.com/openldap/openldap)
 * [BlueBird](https://github.com/petkaantonov/bluebird)
 * [LDAP Error Codes](http://wiki.servicenow.com/index.php?title=LDAP_Error_Codes#gsc.tab=0)
 * [Nan](https://github.com/nodejs/nan)
+* [RFC](https://tools.ietf.org/html/rfc4510)
+
 

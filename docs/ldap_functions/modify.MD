@@ -35,3 +35,4 @@ A promise returning function that wraps the `ldap_modify_ext` asynchronous C fun
 
 * [LDAP Modify man page](https://linux.die.net/man/3/ldap_modify_ext)
 * [LDAP Modify specs](https://www.ldap.com/the-ldap-modify-operation)
+* [RFC Modify operation](https://tools.ietf.org/html/rfc4511#section-4.6)

@@ -14,7 +14,7 @@ A promise returning function that wraps the `ldap_simple_bind` C API. It is used
 Note:  Attempting to start another operation while bind is not done will most likely fail, I.E:
 ```javascript
 //BAD
-ldap.initialize('host');
+ldap.initialize();
 ldap.bind('username','pass');
 ldap.search(...,...,...);
 ```
@@ -23,7 +23,7 @@ Always wait for initialize/bind to finish before using other ops:
 
 ```javascript
 //Good
-ldap.initialize('host')
+ldap.initialize()
     .then( () => {
         return ldap.bind('username','password')
 
@@ -41,3 +41,4 @@ ldap.initialize('host')
 
 * [LDAP Bind manpage](https://linux.die.net/man/3/ldap_simple_bind_s)
 * [LDAP Bind specs](https://www.ldap.com/the-ldap-bind-operation)
+* [RFC Bind operation](https://tools.ietf.org/html/rfc4511#section-4.2)

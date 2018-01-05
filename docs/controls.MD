@@ -72,3 +72,4 @@ Note: LDAP supports a plethora of controls defined by their OID. This library cu
 
 * [LDAP control man page](https://linux.die.net/man/3/ldap_controls) 
 * [LDAP control specs](https://www.ldap.com/basic-ldap-concepts#Controls)
+* [RFC controls](https://tools.ietf.org/html/rfc4511#section-4.1.11)

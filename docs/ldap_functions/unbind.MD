@@ -24,3 +24,4 @@ ldapClient.search(...,...,...); // StateError
 ## References:
 * [Thread safe bind/unbind](https://www.unix.com/man-page/linux/3/ldap_destroy/)
 * [LDAP unbind operation](https://www.ldap.com/the-ldap-unbind-operation)
+* [RFC unbind operation](https://tools.ietf.org/html/rfc4511#section-4.3)
