@@ -7,7 +7,7 @@ const errorList = require('./error_list.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 
-describe.only('Testing the objectExists function', () => {
+describe('Testing the objectExists function', () => {
   const hostAddress = config.ldapAuthentication.host;
   const dn = config.ldapAuthentication.dnAdmin;
   const password = config.ldapAuthentication.passwordAdmin;

@@ -157,11 +157,10 @@ class LDAPAsyncWrap {
 
   objectExists(dn) {
     return new Promise((resolve, reject) => {
-      let attribute = dn.split('=');
-      attribute = attribute[0];
-      let value = dn.split(',');
-      value = value[0].split('=');
-      value = value[1];
+      let dnRes = dn.split(',');
+      dnRes = dnRes[0].split('=');
+      const attribute = dnRes[0];
+      const value = dnRes[1];
       this.compare(dn, attribute, value)
         .then((res) => {
           resolve(res);
