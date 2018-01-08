@@ -3,8 +3,7 @@
 ```javascript
      ldap.initialize();
 ```
-* `hostaddress` ldap server address. Example of a local ldap server: 
-                ldap://localhost:389
+
 
 
 A promise returning function that wraps the `ldap_initialize` C function from the openldap API.
