@@ -16,6 +16,7 @@
 #include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
+#include "ldap_extended_operation.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -36,6 +37,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "add", add);
     Nan::SetPrototypeMethod(tpl, "changePassword", changePassword);
     Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
+    Nan::SetPrototypeMethod(tpl, "extendedOperation", extendedOperation);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -306,7 +308,45 @@ class LDAPClient : public Nan::ObjectWrap {
         new LDAPCompareProgress(callback, progress, newLD, message));
   }
 
-  static NAN_METHOD(changePassword) {
+  static NAN_METHOD(extendedOperation) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    /* Interpret the arguments from JS into string */
+    Nan::Utf8String requestOID(info[0]);
+    Nan::Utf8String requestData(info[1]);
+
+    char *reqOid = *requestOID;
+    static struct berval reqData = {0, NULL};
+
+    reqData.bv_val = strdup(*requestData);
+    reqData.bv_len = strlen(reqData.bv_val);
+
+    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+
+    /* Create the callback function to send the data back to JS */
+    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+
+    int msgID;
+
+    int state = ldap_extended_operation(obj->ld_, reqOid, NULL, NULL, NULL, &msgID);
+
+    if(state != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(state);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
+
+    Nan::AsyncQueueWorker(
+        new LDAPExtendedOperationProgress(callback, progress, newLD, msgID));
+  }
+
+    static NAN_METHOD(changePassword) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
     /* Interpret the arguments from JS into string */

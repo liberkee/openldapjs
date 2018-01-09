@@ -158,6 +158,25 @@ class LDAPAsyncWrap {
   }
 
 
+  extendedOperation(oid, value) {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new StateError(errorList.bindErrorMessage));
+      } else {
+
+        this._binding.extendedOperation(oid, (err, result) => {
+          if (err) {
+            const CustomError = errorHandler(err);
+            reject(new CustomError(errorList.ldapSearchErrorMessage));
+          } else {
+            resolve(result);
+          }
+        });
+      }
+    });
+  }
+
+
   /**
      * Search operation with results displayed page by page.
      *
