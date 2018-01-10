@@ -20,7 +20,7 @@ newClient.initialize()
     return newClient.extendedOperation('1.3.6.1.4.1.4203.1.11.3');
   })
   .then((result) => {
-    console.log(`Compare result: ${result}`);
+    console.log(`Extended result: ${result}`);
   })
   .catch((err) => {
     console.log(`Here ${err.name} ${err.constructor.description}`);

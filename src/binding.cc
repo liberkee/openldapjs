@@ -308,31 +308,25 @@ class LDAPClient : public Nan::ObjectWrap {
         new LDAPCompareProgress(callback, progress, newLD, message));
   }
 
-  static NAN_METHOD(extendedOperation) {
+    static NAN_METHOD(extendedOperation) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
-    /* Interpret the arguments from JS into string */
-    Nan::Utf8String requestOID(info[0]);
+    Nan::Utf8String requestoid(info[0]);
     Nan::Utf8String requestData(info[1]);
 
-    char *reqOid = *requestOID;
-    static struct berval reqData = {0, NULL};
-
-    reqData.bv_val = strdup(*requestData);
-    reqData.bv_len = strlen(reqData.bv_val);
+    char *reqOID = *requestoid;
+    int message{};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    /* Create the callback function to send the data back to JS */
     Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
 
-    int msgID;
+    const auto state = ldap_extended_operation(obj->ld_, reqOID, nullptr, 
+                        nullptr, nullptr, &message);
 
-    int state = ldap_extended_operation(obj->ld_, reqOid, NULL, NULL, NULL, &msgID);
-
-    if(state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(state);
+    if (state != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
       callback->Call(1, stateClient);
       delete callback;
       delete progress;
@@ -341,11 +335,11 @@ class LDAPClient : public Nan::ObjectWrap {
 
     std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
                                 [](LDAP *ld) { ldap_destroy(ld); });
-
+  
     Nan::AsyncQueueWorker(
-        new LDAPExtendedOperationProgress(callback, progress, newLD, msgID));
+        new LDAPExtendedOperationProgress(callback, progress, newLD, message));
   }
-
+  
     static NAN_METHOD(changePassword) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
