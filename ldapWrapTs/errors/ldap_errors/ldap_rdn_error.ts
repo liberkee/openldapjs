@@ -1,18 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapRdnError extends OperationalError {
 
-
-class LdapRdnError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 67;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the modify operation attempted to remove an attribute value that forms the entry\'s relative distinguished name.';
   }
 
 }
-
-export = LdapRdnError;

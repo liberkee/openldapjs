@@ -1,17 +1,13 @@
-'use strict';
+import ServerError from './server_error';
 
-import ServerError = require('./server_error');
+export default class LdapLoopError extends ServerError {
 
-class LdapLoopError extends ServerError {
-
-  static get code() {
+  static get code(): number {
     return 54;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the client discovered an alias or referral loop, and is thus unable to complete this request.';
   }
 
 }
-
-export = LdapLoopError;

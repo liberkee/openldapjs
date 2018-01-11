@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapAttributeExists extends OperationalError {
 
-class LdapAttributeExists extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 20;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the attribute value specified in a modify or add operation already exists as a value for that attribute.';
   }
 
 }
-
-export = LdapAttributeExists;

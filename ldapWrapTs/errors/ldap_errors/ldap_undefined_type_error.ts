@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapUndefinedTypeError extends OperationalError {
 
-class LdapUndefinedTypeError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 17;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the attribute specified in the modify or add operation does not exist in the LDAP server\'s schema.';
   }
 
 }
-
-export = LdapUndefinedTypeError;

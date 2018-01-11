@@ -1,18 +1,14 @@
-'use strict';
+import LoginError from './login_error';
 
-import LoginError = require('./login_error');
+export default class LdapAuthError extends LoginError {
 
-class LdapAuthError extends LoginError {
-
-  static get code() {
+  static get code(): number {
     return 7;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that during a bind operation the client requested ' +
     ' an authentication method not supported by the LDAP server.';
   }
 
 }
-
-export = LdapAuthError;

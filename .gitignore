@@ -40,3 +40,4 @@ modify.ldif
 .vscode/settings.json
 build/*
 libBuildTLS/*
+TSdeclaration/*

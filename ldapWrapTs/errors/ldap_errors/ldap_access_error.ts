@@ -1,17 +1,13 @@
-'use strict';
+import LoginError from './login_error';
 
-import LoginError = require('./login_error');
+export default class LdapAccessError extends LoginError {
 
-class LdapAccessError extends LoginError {
-
-  static get code() {
+  static get code(): number {
     return 50;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the caller does not have sufficient rights to perform the requested operation.';
   }
 
 }
-
-export = LdapAccessError;

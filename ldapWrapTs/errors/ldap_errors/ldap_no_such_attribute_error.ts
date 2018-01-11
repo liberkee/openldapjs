@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapNoSuchAttributeError extends OperationalError {
 
-class LdapNoSuchAttributeError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 16;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the attribute specified in the modify or compare operation does not exist in the entry.';
   }
 
 }
-
-export = LdapNoSuchAttributeError;

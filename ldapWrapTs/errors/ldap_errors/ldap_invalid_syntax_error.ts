@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapInvalidSyntaxError extends OperationalError {
 
-class LdapInvalidSyntaxError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 21;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the attribute value specified in an add, compare, or modify operation is an unrecognized or invalid syntax for the attribute.';
   }
 
 }
-
-export = LdapInvalidSyntaxError;

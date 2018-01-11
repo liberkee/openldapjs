@@ -1,14 +1,12 @@
-'use strict';
+import LoginError from './login_error';
 
-import LoginError = require('./login_error');
+export default class LdapStrongAuthRequired extends LoginError {
 
-class LdapStrongAuthRequired extends LoginError {
-
-  static get code() {
+  static get code(): number {
     return 8;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates one of the following: In bind requests, the LDAP server accepts only strong authentication.' +
     ' In a client request, the client requested an operation such as delete that requires strong authentication.' +
     ' In an unsolicited notice of disconnection, the LDAP server discovers the security protecting the communication' +
@@ -16,5 +14,3 @@ class LdapStrongAuthRequired extends LoginError {
   }
 
 }
-
-export = LdapStrongAuthRequired;

@@ -1,14 +1,12 @@
-'use strict';
+import Ajv from 'ajv';
+import _ from 'underscore';
 
-import Ajv = require('ajv');
-import _ = require('underscore');
-
-import changeSchema = require('../schemas/change_schema.json');
-import controlSchema = require('../schemas/control_schema.json');
-import addEntrySchema = require('../schemas/add_entry_schema.json');
-import updateAttrSchema = require('../schemas/update_attr_schema.json');
-import ValidationError = require('../errors/validation_error');
-import errorList = require('../../test/error_list.json');
+import changeSchema from '../schemas/change_schema.json';
+import controlSchema from '../schemas/control_schema.json';
+import addEntrySchema from '../schemas/add_entry_schema.json';
+import updateAttrSchema from '../schemas/update_attr_schema.json';
+import ValidationError from '../errors/validation_error';
+import errorList from '../../test/error_list.json';
 
 const ajv:any = new Ajv();
 
@@ -16,7 +14,7 @@ const ajv:any = new Ajv();
  * @module checkVariableFormat
  * @class CheckParam
  */
-class CheckParam {
+export default class CheckParam {
 
   /**
     * Checks if the arguments provided are Strings.
@@ -26,7 +24,7 @@ class CheckParam {
    * strings
     */
 
-  static validateStrings() {
+  static validateStrings(): void{
     _.each(arguments, element => {
       if (!_.isString(element)) {
         throw new TypeError((<any>errorList).typeErrorMessage);
@@ -42,7 +40,7 @@ class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes:any) {
+  static checkModifyChange(changes:any): object[] {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
     const changeBuildArr:Array<object> = [];
     changesAttr.forEach(element => {
@@ -93,7 +91,7 @@ class CheckParam {
     * @return Throws error in case the controls is not valid with the schema
     * members. Return the array of control or null if the control is undefined.
     */
-  static checkControl(controls:any) {
+  static checkControl(controls:Object | Array<Object>): Array<Object> | null {
     if (controls !== undefined) {
       const ctrls = !_.isArray(controls) ? [controls] : controls;
       ctrls.forEach(element => {
@@ -116,7 +114,7 @@ class CheckParam {
     * @return Throws error in case the entry is not valid. Return the entry as
     * an array in case entry is valid
     */
-  static checkEntryObject(entry:any) {
+  static checkEntryObject(entry:Object | Array<Object>): Array<Object> {
     const entryAttr = !_.isArray(entry) ? [entry] : entry;
 
     entryAttr.forEach(element => {
@@ -130,5 +128,3 @@ class CheckParam {
   }
 
 }
-
-export = CheckParam;

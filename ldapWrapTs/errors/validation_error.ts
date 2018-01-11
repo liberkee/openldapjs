@@ -1,6 +1,4 @@
-'use strict';
-
-class ValidationError extends Error {
+export default class ValidationError extends Error {
 
   error:Array<any>;
   
@@ -13,4 +11,3 @@ class ValidationError extends Error {
 
 }
 
-export = ValidationError;

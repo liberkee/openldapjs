@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapProtocolError extends OperationalError {
 
-class LdapProtocolError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 2;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the server has received an invalid or malformed request from the client.';
   }
 
 }
-
-export = LdapProtocolError;

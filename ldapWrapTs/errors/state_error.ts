@@ -1,6 +1,4 @@
-'use strict';
-
-class StateError extends Error {
+export default class StateError extends Error {
 
   constructor(message:string) {
     super(message);
@@ -9,5 +7,3 @@ class StateError extends Error {
   }
 
 }
-
-export = StateError;

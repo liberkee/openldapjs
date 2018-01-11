@@ -1,5 +1,3 @@
-'use strict';
-
 import {Readable as Readable} from 'stream';
 import * as errorList from '../test/error_list.json';
 
@@ -9,7 +7,7 @@ const errorHandler:any = require('./errors/error_dispenser').errorFunction;
  * @class PagedSearchStream
  * class that extends the readable stream class
  */
-class PagedSearchStream extends Readable {
+export default class PagedSearchStream extends Readable {
   
     /**
      *
@@ -42,7 +40,7 @@ class PagedSearchStream extends Readable {
       this._lastResult = false;
     }
   
-    _read() {
+    _read(): void {
       if (this._lastResult) {
         this.push(null);
       } else {
@@ -63,4 +61,3 @@ class PagedSearchStream extends Readable {
     }
 
   }
-export = PagedSearchStream;

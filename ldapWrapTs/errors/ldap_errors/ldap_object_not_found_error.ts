@@ -1,17 +1,13 @@
-'use strict';
+import OperationalError from './operational_error';
 
-import OperationalError = require('./operational_error');
+export default class LdapNotFoundError extends OperationalError {
 
-class LdapNotFoundError extends OperationalError {
-
-  static get code() {
+  static get code(): number {
     return 32;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates the target object cannot be found. This code is not returned on following operations: Search operations that find the search base but cannot find any entries that match the search filter. Bind operations.';
   }
 
 }
-
-export = LdapNotFoundError;

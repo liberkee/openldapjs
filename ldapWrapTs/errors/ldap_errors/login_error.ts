@@ -1,9 +1,5 @@
-'use strict';
+import LdapError from './ldap_error';
 
-import LdapError = require('./ldap_error');
-
-class LoginError extends LdapError {
+export default class LoginError extends LdapError {
   
 }
-  
-export = LoginError;

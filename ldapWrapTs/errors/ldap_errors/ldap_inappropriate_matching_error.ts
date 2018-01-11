@@ -1,18 +1,14 @@
-'use strict';
-
-import OperationalError = require('./operational_error');
+import OperationalError from './operational_error';
 
 
-class LdapMatchingError extends OperationalError {
+export default class LdapMatchingError extends OperationalError {
 
-  static get code() {
+  static get code(): number {
     return 18;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that the matching rule specified in the search filter does not match a rule defined for the attribute\'s syntax.';
   }
 
 }
-
-export = LdapMatchingError;

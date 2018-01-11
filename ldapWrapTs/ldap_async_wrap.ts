@@ -1,14 +1,12 @@
-'use strict';
+import path from 'path';
+import Promise from 'bluebird';
+import _ from 'underscore';
 
-import path = require('path');
-import Promise = require('bluebird');
-import _ = require('underscore');
+import checkParameters from './utils/check_variable_format';
 
-import checkParameters = require('./utils/check_variable_format');
-
-import SearchStream = require('./stream_interface');
-import StateError = require('./errors/state_error');
-import errorList = require('../test/error_list.json');
+import SearchStream from './stream_interface';
+import StateError from './errors/state_error';
+import errorList from '../test/error_list.json';
 
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const binary = require('node-pre-gyp');
@@ -48,7 +46,7 @@ const scopeObject: IObjectScopeObject = {
  * @class LDAPAsyncWrap
  */
 
-class LDAPAsyncWrap {
+export default class LDAPAsyncWrap {
    private _hostAddress:string;
    public _binding = new binding.LDAPClient();
    public _stateClient:number;
@@ -66,7 +64,7 @@ class LDAPAsyncWrap {
     ** Rejects if client was not created or ldap_initialize fails.
     * */
 
-   initialize() {
+   initialize(): Promise<{}> {
      return new Promise((resolve, reject) => {
       if(this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAddress, (err:number) => {
@@ -95,7 +93,7 @@ class LDAPAsyncWrap {
     * specified then the client will use the server certificate
     * */
 
-    startTLS(pathToCertFile:string) {
+    startTLS(pathToCertFile:string): Promise<{}> {
       return new Promise((resolve, reject) => {
         if (this._stateClient === E_STATES.INITIALIZED) {
           const pathCert = pathToCertFile === undefined ? '' : pathToCertFile;
@@ -123,7 +121,7 @@ class LDAPAsyncWrap {
     * Rejects if dn or password are incorrect or the client did not initialize.
     * */
 
-  bind(bindDn:string, passwordUser:string) {
+  bind(bindDn:string, passwordUser:string): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
         this._binding.bind(bindDn, passwordUser, (err:number) => {
@@ -154,7 +152,7 @@ class LDAPAsyncWrap {
      * @return {Promise} That resolves and returns a string with the search
      * results. Rejects in case of error.
      * */
-    search(searchBase:string, scope:string, searchFilter:string) {
+    search(searchBase:string, scope:string, searchFilter:string): Promise<{}> {
       return new Promise((resolve, reject) => {
         if (this._stateClient !== E_STATES.BOUND) {
           reject(new StateError((<any>errorList).bindErrorMessage));
@@ -190,7 +188,7 @@ class LDAPAsyncWrap {
      * @return {Promise} that resolves to a readable stream or rejects to a
      * Error;
      */
-  pagedSearch(searchBase:string, scope:string, searchFilter:string, pageSize:number) {
+  pagedSearch(searchBase:string, scope:string, searchFilter:string, pageSize:number): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {
         (<any>checkParameters).validateStrings(searchBase, searchFilter, scope);
@@ -227,7 +225,7 @@ class LDAPAsyncWrap {
    * Rejects if an error occurs.
    */
 
-  compare(dn:string, attr:string, value:string) {
+  compare(dn:string, attr:string, value:string): Promise<{}> {
     const LDAP_COMPARE_TRUE:number = 6;
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
@@ -262,7 +260,7 @@ class LDAPAsyncWrap {
     * Reject if  LDAP rejects the operation or the client's state is not
     * BOUND
     */
-  modify(dn:string, jsonChange:JSON, controls:JSON) {
+  modify(dn:string, jsonChange:JSON, controls:JSON): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
@@ -296,7 +294,7 @@ class LDAPAsyncWrap {
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
-  rename(dn:string, newRdn:string, newParent:string, controls:JSON) {
+  rename(dn:string, newRdn:string, newParent:string, controls:JSON): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
@@ -328,7 +326,7 @@ class LDAPAsyncWrap {
    * deleted
    * or rejects if not.
    * */
-  delete(dn:string, controls:JSON) {
+  delete(dn:string, controls:JSON): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
@@ -359,7 +357,7 @@ class LDAPAsyncWrap {
     * Old password is given correctly, the parameters are string type and
     * the state of client is BOUND else will fail with type error or LDAP ERROR.
     * */
-  changePassword(userDN:string, oldPassword:string, newPassword:string) {
+  changePassword(userDN:string, oldPassword:string, newPassword:string): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
@@ -394,7 +392,7 @@ class LDAPAsyncWrap {
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
-  add(dn:string, entry:JSON, controls:JSON) {
+  add(dn:string, entry:JSON, controls:JSON): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError((<any>errorList).bindErrorMessage));
@@ -422,7 +420,7 @@ class LDAPAsyncWrap {
     * @return {Promise} That resolves if the LDAP structure was unbound.
     * Reject if the LDAP could not unbind.
     */
-  unbind() {
+  unbind(): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.UNBOUND) {
         this._binding.unbind((err:number) => {
@@ -441,5 +439,3 @@ class LDAPAsyncWrap {
   }
 
  }
-
-export = LDAPAsyncWrap;

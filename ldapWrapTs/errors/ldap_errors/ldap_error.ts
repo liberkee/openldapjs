@@ -1,6 +1,4 @@
-'use strict';
-
-class LdapError extends Error {
+export default class LdapError extends Error {
 
   message:string;
   name:string;
@@ -12,5 +10,3 @@ class LdapError extends Error {
   }
 
 }
-
-export = LdapError;

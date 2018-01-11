@@ -1,17 +1,13 @@
-'use strict';
+import ServerError from './server_error';
 
-import ServerError = require('./server_error');
+export default class LdapAdminLimitError extends ServerError {
 
-class LdapAdminLimitError extends ServerError {
-
-  static get code() {
+  static get code(): number {
     return 11;
   }
 
-  static get description() {
+  static get description(): string {
     return 'Indicates that an LDAP server limit set by an administrative authority has been exceeded.';
   }
 
 }
-
-module.exports = LdapAdminLimitError;
