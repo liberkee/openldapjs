@@ -1,5 +1,7 @@
 import {Readable as Readable} from 'stream';
-import * as errorList from '../test/error_list.json';
+import {RootObject} from '../test/error_list';
+
+let errorList:RootObject;
 
 const errorHandler:any = require('./errors/error_dispenser').errorFunction;
 
@@ -49,7 +51,7 @@ export default class PagedSearchStream extends Readable {
           (err:number, page:string, morePages:boolean) => {
             if (err) {
               const CustomError = errorHandler(err);
-              this.emit('err', new CustomError((<any>errorList).ldapSearchErrorMessage));
+              this.emit('err', new CustomError(errorList.ldapSearchErrorMessage));
               this.push(null);
             } else {
               if (!morePages) this._lastResult = true;

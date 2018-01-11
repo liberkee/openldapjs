@@ -1,14 +1,17 @@
 import Ajv from 'ajv';
 import _ from 'underscore';
 
-import changeSchema from '../schemas/change_schema.json';
-import controlSchema from '../schemas/control_schema.json';
-import addEntrySchema from '../schemas/add_entry_schema.json';
-import updateAttrSchema from '../schemas/update_attr_schema.json';
+import {changeProperty} from '../schemas/change_schema';
+import controlSchema from '../schemas/control_schema';
+import addEntrySchema from '../schemas/add_entry_schema';
+import updateAttrSchema from '../schemas/update_attr_schema';
 import ValidationError from '../errors/validation_error';
-import errorList from '../../test/error_list.json';
+import {RootObject} from '../../test/error_list';
 
-const ajv:any = new Ajv();
+let errorList:RootObject;
+let changeSchema:changeProperty;
+
+const ajv: Ajv.Ajv = new Ajv();
 
 /**
  * @module checkVariableFormat
@@ -24,10 +27,10 @@ export default class CheckParam {
    * strings
     */
 
-  static validateStrings(): void{
-    _.each(arguments, element => {
+  static validateStrings(...arg:Array<string>): void{
+    _.each(arg, element => {
       if (!_.isString(element)) {
-        throw new TypeError((<any>errorList).typeErrorMessage);
+        throw new TypeError(errorList.typeErrorMessage);
       }
     });
   }
@@ -40,24 +43,22 @@ export default class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes:any): object[] {
+  static checkModifyChange(changes:changeProperty): object[] {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
     const changeBuildArr:Array<object> = [];
     changesAttr.forEach(element => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
-        throw new ValidationError(
-          (<any>errorList).invalidJSONMessage, undefined, ajv.errors);
+        throw new ValidationError(errorList.invalidJSONMessage, undefined, ajv.errors);
       }
       if (element.op === 'update') {
         const deleteVals:Array<string> = [];
         const addVals:Array<string> = [];
 
-        <any>element.vals.forEach((val:any) => {
+        element.vals.forEach((val) => {
           const validVal = ajv.validate(updateAttrSchema, val);
           if (!validVal) {
-            throw new ValidationError(
-              (<any>errorList).invalidJSONMessage, undefined, ajv.errors);
+            throw new ValidationError(errorList.invalidJSONMessage, undefined, ajv.errors);
           } else {
             deleteVals.push(val.oldVal);
             addVals.push(val.newVal);
@@ -97,8 +98,7 @@ export default class CheckParam {
       ctrls.forEach(element => {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
-          throw new ValidationError(
-            (<any>errorList).controlPropError, undefined, ajv.errors);
+          throw new ValidationError(errorList.controlPropError, undefined, ajv.errors);
         }
       });
       return ctrls;
@@ -120,8 +120,7 @@ export default class CheckParam {
     entryAttr.forEach(element => {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
-        throw new ValidationError(
-          (<any>errorList).entryObjectError, undefined, ajv.errors);
+        throw new ValidationError(errorList.entryObjectError, undefined, ajv.errors);
       }
     });
     return entryAttr;
