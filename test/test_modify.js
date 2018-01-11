@@ -8,6 +8,7 @@ const errorList = require('./error_list.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
+const controlsOID = require('../libs/controlOid.json');
 
 describe('Testing the modify functionalities', () => {
 
@@ -78,13 +79,13 @@ describe('Testing the modify functionalities', () => {
 
   const controlOperation = [
     {
-      oid: config.ldapControls.ldapModificationControlPostRead.oid,
+      oid: controlsOID.postread,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
           config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
-      oid: config.ldapControls.ldapModificationControlPreRead.oid,
+      oid: controlsOID.preread,
       value: config.ldapControls.ldapModificationControlPreRead.value,
       isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },

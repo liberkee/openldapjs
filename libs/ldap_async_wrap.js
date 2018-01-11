@@ -174,8 +174,8 @@ class LDAPAsyncWrap {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
 
-        const valueData = value === undefined ? null : value;
-        this._binding.extendedOperation(oid, value, (err, result) => {
+        const valueData = value === undefined ? '' : value;
+        this._binding.extendedOperation(oid, valueData, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapSearchErrorMessage));

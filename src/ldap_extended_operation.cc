@@ -49,6 +49,11 @@ void LDAPExtendedOperationProgress::HandleOKCallback() {
             callback->Call(1, stateClient);
             break;
           }
+          if (retoidp == nullptr) {
+            stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
+            callback->Call(2, stateClient);
+            break;
+          }
           stateClient[1] = Nan::New(retoidp->bv_val).ToLocalChecked();
           callback->Call(2, stateClient);
           break;

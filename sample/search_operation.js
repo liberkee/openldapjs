@@ -17,8 +17,8 @@ newClient.initialize()
   })
   .then(() => {
 
-    return newClient.search(config.ldapSearch.searchBase, config.ldapSearch.scope.one,
-      config.ldapSearch.filter, config.ldapSearch.pageSize);
+    return newClient.search(config.ldapSearch.searchBase, config.ldapSearch.scope.subtree,
+      config.ldapSearch.filter);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);

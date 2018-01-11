@@ -46,10 +46,10 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     v8::String::Utf8Value controlOperation(
         controls->Get(Nan::New(constants::changeOidMember).ToLocalChecked()));
 
-    if (std::strcmp(*controlOperation, constants::postread) ==
+    if (std::strcmp(*controlOperation, LDAP_CONTROL_POST_READ) ==
         constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = LDAP_CONTROL_POST_READ;
-    } else if (std::strcmp(*controlOperation, constants::preread) ==
+    } else if (std::strcmp(*controlOperation, LDAP_CONTROL_PRE_READ) ==
                constants::STR_COMPARE_TRUE) {
       ctrl->ldctl_oid = LDAP_CONTROL_PRE_READ;
     } else {

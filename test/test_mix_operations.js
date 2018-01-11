@@ -4,6 +4,7 @@ const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
 const errorList = require('./error_list.json');
+const controlsOID = require('../libs/controlOid.json');
 
 describe('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -50,13 +51,13 @@ describe('Testing multiple operations functionalities', () => {
 
   const controlOperation = [
     {
-      oid: config.ldapControls.ldapModificationControlPostRead.oid,
+      oid: controlsOID.postread,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
           config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
-      oid: config.ldapControls.ldapModificationControlPreRead.oid,
+      oid: controlsOID.preread,
       value: config.ldapControls.ldapModificationControlPreRead.value,
       isCritical: config.ldapControls.ldapModificationControlPreRead.isCritical,
     },
