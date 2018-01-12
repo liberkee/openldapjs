@@ -3,7 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 
@@ -61,7 +61,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         StateError,
         (error) => {
-          should.deepEqual(error.message, errorList.bindErrorMessage);
+          should.deepEqual(error.message, errorCodes.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -88,7 +88,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
-    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => { should.fail('should not have passed'); })
@@ -96,7 +96,7 @@ describe('Testing the async LDAP search ', () => {
         CustomError,
         (err) => {
           err.should.be.deepEqual(
-            new CustomError(errorList.ldapSearchErrorMessage));
+            new CustomError(errorCodes.ldapSearchErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -107,7 +107,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+          err.message.should.be.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -117,7 +117,7 @@ describe('Testing the async LDAP search ', () => {
       .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.be.deepEqual(errorList.scopeSearchErrorMessage);
+        err.message.should.be.deepEqual(errorCodes.scopeSearchErrorMessage);
       });
   });
 
@@ -128,7 +128,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+          err.message.should.be.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });

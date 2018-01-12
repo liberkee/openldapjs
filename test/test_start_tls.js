@@ -3,7 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 
@@ -33,7 +33,7 @@ describe('Testing the LDAP start TLS routine', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorList.initErrorMessage);
+        should.deepEqual(error.message, errorCodes.initErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -41,7 +41,7 @@ describe('Testing the LDAP start TLS routine', () => {
   });
 
   it('should start a TLS communication using the default certificate if the path is wrong', () => {
-    const CustomError = errorHandler(errorList.connectionError);
+    const CustomError = errorHandler(errorCodes.connectionError);
     const wrongCred = '/wrong/cred.pam';
     return adminLDAP.startTLS(wrongCred)
       .catch(() => {

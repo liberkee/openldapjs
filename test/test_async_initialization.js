@@ -3,7 +3,7 @@
 const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorList = require('./error_codes.json');
 const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async initialization', () => {

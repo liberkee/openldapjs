@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const controlsOID = require('../libs/controlOid.json');
 
 describe('Testing multiple operations functionalities', () => {
@@ -202,10 +202,10 @@ cn: ${attributeEntry}\n`;
       ])
       .then((results) => {
         results.forEach((element) => {
-          if (element === errorList.ldapNoSuchObject) {
-            should.deepEqual(element, errorList.alreadyExists);
-          } else if (element === errorList.alreadyExists) {
-            should.deepEqual(element, errorList.alreadyExists);
+          if (element === errorCodes.ldapNoSuchObject) {
+            should.deepEqual(element, errorCodes.alreadyExists);
+          } else if (element === errorCodes.alreadyExists) {
+            should.deepEqual(element, errorCodes.alreadyExists);
           } else if (element === true) {
             should.deepEqual(true, element);
           } else {

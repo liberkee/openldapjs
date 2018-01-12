@@ -4,11 +4,12 @@ const LDAP = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./error_list');
+const errorList = require('./error_codes');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 const controlsOID = require('../libs/controlOid.json');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP add operation', () => {
 
@@ -80,7 +81,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -101,7 +102,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(ValidationError, (undefinedTypeErr) => {
-        should.deepEqual(undefinedTypeErr.message, errorList.entryObjectError);
+        should.deepEqual(undefinedTypeErr.message, errorMessages.entryObjectError);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -117,7 +118,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (duplicatedEntryError) => {
-        should.deepEqual(duplicatedEntryError, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(duplicatedEntryError, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -157,7 +158,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapAddErrorMessage));
         personNr += 1;
       })
       .catch((err) => {
@@ -171,7 +172,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(TypeError, (err) => {
-        should.deepEqual(err.message, errorList.typeErrorMessage);
+        should.deepEqual(err.message, errorMessages.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -187,7 +188,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail(' should not succeed');
       })
       .catch(CustomError, (accessError) => {
-        should.deepEqual(accessError, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(accessError, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -204,7 +205,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(StateError, (stateError) => {
-        should.deepEqual(stateError.message, errorList.bindErrorMessage);
+        should.deepEqual(stateError.message, errorMessages.bindErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');

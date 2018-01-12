@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 
@@ -43,7 +43,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (err) => {
-        should.deepEqual(err.message, errorList.bindErrorMessage);
+        should.deepEqual(err.message, errorCodes.bindErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -57,7 +57,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(TypeError, (err) => {
-        should.deepEqual(err.message, errorList.typeErrorMessage);
+        should.deepEqual(err.message, errorCodes.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -70,7 +70,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(TypeError, (err) => {
-        should.deepEqual(err.message, errorList.typeErrorMessage);
+        should.deepEqual(err.message, errorCodes.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -83,7 +83,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(TypeError, (err) => {
-        should.deepEqual(err.message, errorList.typeErrorMessage);
+        should.deepEqual(err.message, errorCodes.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -99,7 +99,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapChangePasswordErrorMessage));
+        should.deepEqual(err, new CustomError(errorCodes.ldapChangePasswordErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -114,7 +114,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapChangePasswordErrorMessage));
+        should.deepEqual(err, new CustomError(errorCodes.ldapChangePasswordErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -128,7 +128,7 @@ describe('Testing the ChangePassword operation', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapChangePasswordErrorMessage));
+        should.deepEqual(err, new CustomError(errorCodes.ldapChangePasswordErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');

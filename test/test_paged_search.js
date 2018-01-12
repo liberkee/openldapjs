@@ -4,7 +4,7 @@ const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 
@@ -67,7 +67,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         StateError,
         (err) => {
-          err.message.should.deepEqual(errorList.bindErrorMessage);
+          err.message.should.deepEqual(errorCodes.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -81,7 +81,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
+          err.message.should.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -94,7 +94,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
+          err.message.should.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -105,7 +105,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
+          err.message.should.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
 
@@ -120,7 +120,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
+          err.message.should.deepEqual(errorCodes.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -132,12 +132,12 @@ describe('Testing the async LDAP paged search ', () => {
         pageSize)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.deepEqual(errorList.scopeSearchErrorMessage);
+        err.message.should.deepEqual(errorCodes.scopeSearchErrorMessage);
       });
   });
 
   it('should reject if filter is not defined correctly ', (next) => {
-    const CustomError = errorHandler(errorList.filterError);
+    const CustomError = errorHandler(errorCodes.filterError);
     adminLDAP.pagedSearch(searchBase, searchScope.subtree, 'aasd', pageSize)
       .then((res) => {
         res.on('data', (data) => {
@@ -152,7 +152,7 @@ describe('Testing the async LDAP paged search ', () => {
   });
 
   it('should reject if searchBase is not an entry in ldap', (next) => {
-    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
     adminLDAP
       .pagedSearch(
@@ -172,7 +172,7 @@ describe('Testing the async LDAP paged search ', () => {
 
   it('should reject if user doesn\'t have the right to read from specified base',
     (next) => {
-      const CustomError = errorHandler(errorList.ldapNoSuchObject);
+      const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
       userLDAP
         .pagedSearch(
@@ -195,7 +195,7 @@ describe('Testing the async LDAP paged search ', () => {
       /* On our server the page size is not set and is default on 500 entries
         */
       const newPageSize = 1000;
-      const CustomError = errorHandler(errorList.sizeLimitExceeded);
+      const CustomError = errorHandler(errorCodes.sizeLimitExceeded);
 
       userLDAP
         .pagedSearch(
