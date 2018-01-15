@@ -8,6 +8,7 @@ const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const ValidationError = require('../libs/errors/validation_error');
 const StateError = require('../libs/errors/state_error');
 const controlsOID = require('../libs/controlOid.json');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the rename functionalities', () => {
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
@@ -51,7 +52,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(TypeError, (error) => {
-        should.deepEqual(error.message, errorCodes.typeErrorMessage);
+        should.deepEqual(error.message, errorMessages.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -65,7 +66,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(TypeError, (error) => {
-        should.deepEqual(error.message, errorCodes.typeErrorMessage);
+        should.deepEqual(error.message, errorMessages.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -79,7 +80,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(TypeError, (error) => {
-        should.deepEqual(error.message, errorCodes.typeErrorMessage);
+        should.deepEqual(error.message, errorMessages.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -95,7 +96,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(ValidationError, (error) => {
-        should.deepEqual(error.message, errorCodes.controlPropError);
+        should.deepEqual(error.message, errorMessages.controlPropError);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -111,7 +112,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(ValidationError, (error) => {
-        should.deepEqual(error.message, errorCodes.controlPropError);
+        should.deepEqual(error.message, errorMessages.controlPropError);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -127,7 +128,7 @@ describe('Testing the rename functionalities', () => {
       })
       .catch(errorHandler(errorCodes.invalidDnSyntax), (error) => {
         const CustomError = errorHandler(errorCodes.invalidDnSyntax);
-        should.deepEqual(error, new CustomError(errorCodes.ldapRenameErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapRenameErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -144,7 +145,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapRenameErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapRenameErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -162,7 +163,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapRenameErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapRenameErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -180,7 +181,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapRenameErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapRenameErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -198,7 +199,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorCodes.bindErrorMessage);
+        should.deepEqual(error.message, errorMessages.bindErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -216,7 +217,7 @@ describe('Testing the rename functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapRenameErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapRenameErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');

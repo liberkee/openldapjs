@@ -6,6 +6,7 @@ const config = require('./config.json');
 const errorCodes = require('./error_codes.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the Compare function', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -36,7 +37,7 @@ describe('Testing the Compare function', () => {
       .catch(
         TypeError,
         (error) => {
-          should.deepEqual(error.message, errorCodes.typeErrorMessage);
+          should.deepEqual(error.message, errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -80,7 +81,7 @@ describe('Testing the Compare function', () => {
         CustomError,
         (err) => {
           should.deepEqual(
-            err, new CustomError(errorCodes.ldapCompareErrorMessage));
+            err, new CustomError(errorMessages.ldapCompareErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -95,7 +96,7 @@ describe('Testing the Compare function', () => {
         CustomError,
         (err) => {
           should.deepEqual(
-            err, new CustomError(errorCodes.ldapCompareErrorMessage));
+            err, new CustomError(errorMessages.ldapCompareErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -117,7 +118,7 @@ describe('Testing the Compare function', () => {
         CustomError,
         (err) => {
           should.deepEqual(
-            err, new CustomError(errorCodes.ldapCompareErrorMessage));
+            err, new CustomError(errorMessages.ldapCompareErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -136,7 +137,7 @@ describe('Testing the Compare function', () => {
       .catch(
         StateError,
         (err) => {
-          should.deepEqual(err.message, errorCodes.bindErrorMessage);
+          should.deepEqual(err.message, errorMessages.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -151,7 +152,7 @@ describe('Testing the Compare function', () => {
         .catch(
           StateError,
           (err) => {
-            should.deepEqual(err.message, errorCodes.bindErrorMessage);
+            should.deepEqual(err.message, errorMessages.bindErrorMessage);
           })
         .catch((err) => { should.fail('did not expect generic error'); });
     });
@@ -164,7 +165,7 @@ describe('Testing the Compare function', () => {
       .catch(
         StateError,
         (err) => {
-          should.deepEqual(err.message, errorCodes.bindErrorMessage);
+          should.deepEqual(err.message, errorMessages.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -187,7 +188,7 @@ describe('Testing the Compare function', () => {
     () => {
       const nonVal = 'nonExistingValue';
       const nonAttr = 'nonExistingAttr';
-      const CustomError = errorHandler(errorCodes.undefinedType);
+      const CustomError = errorHandler(errorMessages.undefinedType);
 
       return ldapAsyncWrap.compare(dn, attr, val)
         .then((result1) => {
@@ -199,7 +200,7 @@ describe('Testing the Compare function', () => {
           CustomError,
           (err) => {
             should.deepEqual(
-              err, new CustomError(errorCodes.ldapCompareErrorMessage));
+              err, new CustomError(errorMessages.ldapCompareErrorMessage));
             return ldapAsyncWrap.compare(dn, attr, nonVal);
           })
         .catch(() => { should.fail('did not expect generic error'); })

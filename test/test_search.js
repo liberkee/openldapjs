@@ -6,6 +6,7 @@ const config = require('./config.json');
 const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -61,7 +62,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         StateError,
         (error) => {
-          should.deepEqual(error.message, errorCodes.bindErrorMessage);
+          should.deepEqual(error.message, errorMessages.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -96,7 +97,7 @@ describe('Testing the async LDAP search ', () => {
         CustomError,
         (err) => {
           err.should.be.deepEqual(
-            new CustomError(errorCodes.ldapSearchErrorMessage));
+            new CustomError(errorMessages.ldapSearchErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -107,7 +108,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -117,7 +118,7 @@ describe('Testing the async LDAP search ', () => {
       .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.be.deepEqual(errorCodes.scopeSearchErrorMessage);
+        err.message.should.be.deepEqual(errorMessages.scopeSearchErrorMessage);
       });
   });
 
@@ -128,7 +129,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });

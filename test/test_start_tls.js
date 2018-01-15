@@ -6,6 +6,7 @@ const config = require('./config.json');
 const errorCodes = require('./error_codes.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the LDAP start TLS routine', () => {
 
@@ -33,7 +34,7 @@ describe('Testing the LDAP start TLS routine', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorCodes.initErrorMessage);
+        should.deepEqual(error.message, errorMessages.initErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');

@@ -5,6 +5,7 @@ const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const errorList = require('./error_codes.json');
 const StateError = require('../libs/errors/state_error');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async initialization', () => {
 
@@ -31,7 +32,7 @@ describe('Testing the async initialization', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorList.initErrorMessage);
+        should.deepEqual(error.message, errorMessages.initErrorMessage);
       });
   });
 

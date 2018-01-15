@@ -7,6 +7,7 @@ const Promise = require('bluebird');
 const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP paged search ', () => {
 
@@ -67,7 +68,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         StateError,
         (err) => {
-          err.message.should.deepEqual(errorCodes.bindErrorMessage);
+          err.message.should.deepEqual(errorMessages.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -81,7 +82,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -94,7 +95,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -105,7 +106,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
 
@@ -120,7 +121,7 @@ describe('Testing the async LDAP paged search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.deepEqual(errorCodes.typeErrorMessage);
+          err.message.should.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -132,7 +133,7 @@ describe('Testing the async LDAP paged search ', () => {
         pageSize)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.deepEqual(errorCodes.scopeSearchErrorMessage);
+        err.message.should.deepEqual(errorMessages.scopeSearchErrorMessage);
       });
   });
 

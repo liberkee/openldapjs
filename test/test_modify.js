@@ -9,6 +9,7 @@ const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 const controlsOID = require('../libs/controlOid.json');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the modify functionalities', () => {
 
@@ -121,7 +122,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have succeeded');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorCodes.bindErrorMessage);
+        should.deepEqual(error.message, errorMessages.bindErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -131,7 +132,7 @@ describe('Testing the modify functionalities', () => {
   it('should reject if attribute parameter is not defined', () => {
     return ldapAsyncWrap
       .modify(config.ldapModify.ldapModificationReplace.change_dn)
-      .catch((error) => { should.deepEqual(error.message, errorCodes.invalidJSONMessage); });
+      .catch((error) => { should.deepEqual(error.message, errorMessages.invalidJSONMessage); });
   });
 
   it('should reject operation if the attribute parameter is not correctly defined', () => {
@@ -149,7 +150,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have succeeded');
       })
       .catch(ValidationError, (error) => {
-        should.deepEqual(error.message, errorCodes.invalidJSONMessage);
+        should.deepEqual(error.message, errorMessages.invalidJSONMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -191,7 +192,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have succeeded');
       })
       .catch(ValidationError, (error) => {
-        should.deepEqual(error.message, errorCodes.controlPropError);
+        should.deepEqual(error.message, errorMessages.controlPropError);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -205,7 +206,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapModifyErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapModifyErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -222,7 +223,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapModifyErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapModifyErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -241,7 +242,7 @@ describe('Testing the modify functionalities', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorCodes.ldapModifyErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapModifyErrorMessage));
       })
       .catch((err) => {
         console.log(err.constructor.code);
