@@ -1,14 +1,17 @@
 import * as Ajv from 'ajv';
 import * as _ from 'underscore';
 
-import {changeProperty} from '../schemas/change_schema';
-import * as controlSchema from '../schemas/control_schema';
-import * as addEntrySchema from '../schemas/add_entry_schema';
-import * as updateAttrSchema from '../schemas/update_attr_schema';
+import {IchangeSchema} from '../schemas/change_schema';
+import {IcontrolSchema} from '../schemas/control_schema';
+import {IaddEntrySchema} from '../schemas/add_entry_schema';
+import {IupdateAttrSchema} from '../schemas/update_attr_schema';
 import * as ValidationError from '../errors/validation_error';
 import {RootObject} from '../messages';
-let changeSchema:changeProperty = require('../schemas/change_schema.json');
 
+let changeSchema:IchangeSchema = require('../schemas/change_schema.json');
+let controlSchema:IcontrolSchema = require('../schemas/control_schema.json');
+let addEntrySchema:IaddEntrySchema = require('../schemas/add_entry_schema.json');
+let updateAttrSchema:IupdateAttrSchema = require('../schemas/update_attr_schema.json');
 let errorMessages:RootObject = require('../messages.json');
 
 const ajv: Ajv.Ajv = new Ajv();
@@ -43,7 +46,7 @@ export default class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes:changeProperty): object[] {
+  static checkModifyChange(changes:IchangeSchema): object[] {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
     const changeBuildArr:Array<object> = [];
     changesAttr.forEach(element => {

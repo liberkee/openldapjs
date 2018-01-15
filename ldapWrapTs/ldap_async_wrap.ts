@@ -7,7 +7,9 @@ import * as checkParameters from './utils/check_variable_format';
 import * as SearchStream from './stream_interface';
 import * as StateError from './errors/state_error';
 import {RootObject} from './messages';
-import {changeProperty} from './schemas/change_schema';
+import {IchangeSchema} from './schemas/change_schema';
+import {IcontrolSchema} from './schemas/control_schema';
+import {IaddEntrySchema} from './schemas/add_entry_schema';
 
 import * as errorHandler from './errors/error_dispenser';
 
@@ -254,8 +256,8 @@ export default class LDAPAsyncWrap {
     *
     * @method modify
     * @param {String} dn The dn of the entry to modify
-    * @param {JSON} jsonChange The attribute and value to be changed
-    * @param {JSON} [controls] Request to execute a specific control
+    * @param {IchangeSchema} jsonChange The attribute and value to be changed
+    * @param {IcontrolSchema} [controls] Request to execute a specific control
    * or
     * multiple controls. This parameter is optional.
     * @return {Promise} That resolves if LDAP modified successfully the
@@ -263,7 +265,7 @@ export default class LDAPAsyncWrap {
     * Reject if  LDAP rejects the operation or the client's state is not
     * BOUND
     */
-  modify(dn:string, jsonChange:changeProperty, controls:JSON): Promise<{}> {
+  modify(dn:string, jsonChange:IchangeSchema, controls:IcontrolSchema): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError.default(errorMessages.bindErrorMessage));
@@ -291,13 +293,13 @@ export default class LDAPAsyncWrap {
    * @param {String} dn The dn of the entry to rename
    * @param {String} newRdn The new rdn for the dn
    * @param {String} newParent New parent for the rdn
-   * @param {JSON} [controls] Request to execute a specific control
+   * @param {IcontrolSchema} [controls] Request to execute a specific control
    * or
    * multiple controls. This parameter is optional.
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
-  rename(dn:string, newRdn:string, newParent:string, controls:JSON): Promise<{}> {
+  rename(dn:string, newRdn:string, newParent:string, controls:IcontrolSchema): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError.default(errorMessages.bindErrorMessage));
@@ -322,14 +324,14 @@ export default class LDAPAsyncWrap {
    *
    * @method delete
    * @param {String} dn the dn entry to be deleted.
-   * @param {JSON} [controls] Request to execute a specific control
+   * @param {IcontrolSchema} [controls] Request to execute a specific control
    * or
    * multiple controls. This parameter is optional.
    * @return {Promise} promise that resolves if the element provided was
    * deleted
    * or rejects if not.
    * */
-  delete(dn:string, controls:JSON): Promise<{}> {
+  delete(dn:string, controls:IcontrolSchema): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError.default(errorMessages.bindErrorMessage));
@@ -387,15 +389,15 @@ export default class LDAPAsyncWrap {
    * @param {String} dn  dn of the entry to add Ex: 'cn=foo, o=example..,
    * NOTE:every entry except the first one,cn=foo in this case, must already
    * exist'
-   * @param {JSON} entry ldif format to be added, needs to have a
+   * @param {IaddEntrySchema} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
-   * @param {JSON} [controls] Request to execute a specific control
+   * @param {IcontrolSchema} [controls] Request to execute a specific control
    * or
    * multiple controls. This parameter is optional.
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
-  add(dn:string, entry:JSON, controls:JSON): Promise<{}> {
+  add(dn:string, entry:IaddEntrySchema, controls:IcontrolSchema): Promise<{}> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError.default(errorMessages.bindErrorMessage));

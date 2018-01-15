@@ -3,7 +3,7 @@ export interface Val {
 	newVal: string;
 }
 
-export interface changeProperty {
+export interface IchangeSchema {
 	op: string;
 	attr: string;
 	vals: Array<Val>;
