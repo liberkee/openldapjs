@@ -7,6 +7,10 @@ Currently this library only supports pre and post read controls for the [Add](./
 
 Note: One or more controls can pe specified.
 
+OID's used:
+- Preread: "1.3.6.1.1.13.1"
+- Postread: "1.3.6.1.1.13.2"
+
 Examples:
 
 ```javascript
@@ -67,6 +71,8 @@ entryCSN: 20171207143939.032387Z#000000#000#000000
 This works similarly for the other functionalities that support optional control parameters.
 
 Note: LDAP supports a plethora of controls defined by their OID. This library currently supports just the pre and post read controls.
+
+
 
 ## References
 
