@@ -1,9 +1,10 @@
 import {Readable as Readable} from 'stream';
 import {RootObject} from './messages';
+import * as errorHandler from './errors/error_dispenser'
 
 let errorMessages:RootObject = require('./messages.json');
 
-const errorHandler:any = require('./errors/error_dispenser').errorFunction;
+//const errorHandler:any = require('./errors/error_dispenser').errorFunction;
 
 /**
  * @class PagedSearchStream
@@ -50,7 +51,7 @@ export default class PagedSearchStream extends Readable {
           this._base, this._scope, this._filter, this._pageSize, this._searchId,
           (err:number, page:string, morePages:boolean) => {
             if (err) {
-              const CustomError = errorHandler(err);
+              const CustomError: any = errorHandler.errorSelection(err);
               this.emit('err', new CustomError(errorMessages.ldapSearchErrorMessage));
               this.push(null);
             } else {

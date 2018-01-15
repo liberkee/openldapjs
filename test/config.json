@@ -1,6 +1,6 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://10.16.0.179:389",
+    "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",

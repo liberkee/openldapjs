@@ -36,7 +36,6 @@ import * as LdapClassModsError from './ldap_errors/ldap_object_class_mods_error'
 import * as LdapDsasError from './ldap_errors/ldap_dsas_error';
 import * as LdapOtherError from './ldap_errors/ldap_other_error';
 
-
 export const errors: any = {
   LdapInvalidDnError: (LdapInvalidDnError.default),
   LdapSizeLimitError: (LdapSizeLimitError.default),
