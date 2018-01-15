@@ -10,7 +10,7 @@ const StateError = require('../libs/errors/state_error');
 const controlsOID = require('../libs/controlOid.json');
 const errorMessages = require('../libs/messages.json');
 
-describe.only('Testing the async LDAP delete operation', () => {
+describe('Testing the async LDAP delete operation', () => {
 
   const host = config.ldapAuthentication.host;
   const dnAdmin = config.ldapAuthentication.dnAdmin;

@@ -1,15 +1,15 @@
-import Ajv from 'ajv';
-import _ from 'underscore';
+import * as Ajv from 'ajv';
+import * as _ from 'underscore';
 
 import {changeProperty} from '../schemas/change_schema';
-import controlSchema from '../schemas/control_schema';
-import addEntrySchema from '../schemas/add_entry_schema';
-import updateAttrSchema from '../schemas/update_attr_schema';
-import ValidationError from '../errors/validation_error';
-import {RootObject} from '../../test/error_list';
+import * as controlSchema from '../schemas/control_schema';
+import * as addEntrySchema from '../schemas/add_entry_schema';
+import * as updateAttrSchema from '../schemas/update_attr_schema';
+import * as ValidationError from '../errors/validation_error';
+import {RootObject} from '../messages';
+let changeSchema:changeProperty = require('../schemas/change_schema.json');
 
-let errorList:RootObject;
-let changeSchema:changeProperty;
+let errorMessages:RootObject = require('../messages.json');
 
 const ajv: Ajv.Ajv = new Ajv();
 
@@ -30,7 +30,7 @@ export default class CheckParam {
   static validateStrings(...arg:Array<string>): void{
     _.each(arg, element => {
       if (!_.isString(element)) {
-        throw new TypeError(errorList.typeErrorMessage);
+        throw new TypeError(errorMessages.typeErrorMessage);
       }
     });
   }
@@ -49,7 +49,7 @@ export default class CheckParam {
     changesAttr.forEach(element => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
-        throw new ValidationError(errorList.invalidJSONMessage, undefined, ajv.errors);
+        throw new ValidationError.default(errorMessages.invalidJSONMessage, undefined, ajv.errors);
       }
       if (element.op === 'update') {
         const deleteVals:Array<string> = [];
@@ -58,7 +58,7 @@ export default class CheckParam {
         element.vals.forEach((val) => {
           const validVal = ajv.validate(updateAttrSchema, val);
           if (!validVal) {
-            throw new ValidationError(errorList.invalidJSONMessage, undefined, ajv.errors);
+            throw new ValidationError.default(errorMessages.invalidJSONMessage, undefined, ajv.errors);
           } else {
             deleteVals.push(val.oldVal);
             addVals.push(val.newVal);
@@ -98,7 +98,7 @@ export default class CheckParam {
       ctrls.forEach(element => {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
-          throw new ValidationError(errorList.controlPropError, undefined, ajv.errors);
+          throw new ValidationError.default(errorMessages.controlPropError, undefined, ajv.errors);
         }
       });
       return ctrls;
@@ -120,7 +120,7 @@ export default class CheckParam {
     entryAttr.forEach(element => {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
-        throw new ValidationError(errorList.entryObjectError, undefined, ajv.errors);
+        throw new ValidationError.default(errorMessages.entryObjectError, undefined, ajv.errors);
       }
     });
     return entryAttr;
