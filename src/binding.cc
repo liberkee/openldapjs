@@ -326,14 +326,12 @@ class LDAPClient : public Nan::ObjectWrap {
     const auto& ldapExtendedOperations = new LdapExtendedOperations();
     
        const auto& functionMap = ldapExtendedOperations->functionMap();
-       const auto& it = functionMap.find(LDAP_EXOP_CANCEL);
+       const auto& it = functionMap.find(reqOID);
        if(it != functionMap.end()) {
         // found
-         std::cout << "-------------- "<<it->first<< std::endl;
-         it->second(objectData);
+         bv = it->second(objectData);
        } else {
            // not found
-         std::cout << "--------------not found-----------------"<< std::endl;
        }
     if(strcmp(reqOID, LDAP_EXOP_CANCEL) == 0) {
       v8::String::Utf8Value requestData(objectData->Get(Nan::New("first").ToLocalChecked()));
