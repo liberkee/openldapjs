@@ -1,5 +1,5 @@
 export interface IcontrolSchema {
 	oid: string;
-	value: Array<string>;
-	isCritical: boolean;
+  value: Array<string>;
+  isCritical: boolean;
 }

@@ -52,25 +52,25 @@ const scopeObject: IObjectScopeObject = {
  */
 
 export default class LDAPAsyncWrap {
-   private _hostAddress:string;
-    _binding = new binding.LDAPClient();
-    _stateClient:number;
-    _searchID:number;
-   constructor(public host:string) {
+  private _hostAddress:string;
+  _binding = new binding.LDAPClient();
+  _stateClient:number;
+  _searchID:number;
+  constructor(public host:string) {
     this._hostAddress = host;
     this._stateClient = E_STATES.CREATED;
-   }
+  }
 
-    /**
-    * Initialize to an LDAP server.
-    *
-    * @method initialize
-    * @return {Promise} That resolves if ldap_initialize succeeds
-    ** Rejects if client was not created or ldap_initialize fails.
-    * */
+  /**
+  * Initialize to an LDAP server.
+  *
+  * @method initialize
+  * @return {Promise} That resolves if ldap_initialize succeeds
+  ** Rejects if client was not created or ldap_initialize fails.
+  * */
 
-   initialize(): Promise<null> {
-     return new Promise((resolve, reject) => {
+  initialize(): Promise<null> {
+    return new Promise((resolve, reject) => {
       if(this._stateClient === E_STATES.CREATED) {
         this._binding.initialize(this._hostAddress, (err:number) => {
           if(err) {
@@ -84,8 +84,8 @@ export default class LDAPAsyncWrap {
       } else {
         reject(new StateError(errorMessages.initErrorMessage));
       }
-     });
-   }
+    });
+  }
 
 
   /**
@@ -98,23 +98,23 @@ export default class LDAPAsyncWrap {
     * specified then the client will use the server certificate
     * */
 
-    startTLS(pathToCertFile:string): Promise<null> {
-      return new Promise((resolve, reject) => {
-        if (this._stateClient === E_STATES.INITIALIZED) {
-          const pathCert = pathToCertFile === undefined ? '' : pathToCertFile;
-          this._binding.startTls(pathCert, (err:number) => {
-            if (err) {
-              const CustomError: any = errorHandler.errorSelection(err);
-              reject(new CustomError(errorMessages.ldapStartTlsErrorMessage));
-            } else {
-              resolve();
-            }
-          });
-        } else {
-          reject(new StateError(errorMessages.initErrorMessage));
-        }
-      });
-    }
+  startTLS(pathToCertFile:string): Promise<null> {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient === E_STATES.INITIALIZED) {
+        const pathCert = pathToCertFile === undefined ? '' : pathToCertFile;
+        this._binding.startTls(pathCert, (err:number) => {
+          if (err) {
+            const CustomError: any = errorHandler.errorSelection(err);
+            reject(new CustomError(errorMessages.ldapStartTlsErrorMessage));
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        reject(new StateError(errorMessages.initErrorMessage));
+      }
+    });
+  }
 
     /**
     * Authenticate to LDAP server.
@@ -145,54 +145,54 @@ export default class LDAPAsyncWrap {
     });
   }
 
-    /**
-     * Search operation.
-     *
-     * @method search
-     * @param {String} searchBase the base for the search.
-     * @param {String} scope  scope for the search, can be BASE, ONE or
-     * SUBTREE
-     * @param {String} searchFilter  search filter.If not provided,
-     * the default filter, (objectClass=*), is used.
-     * @return {Promise} That resolves and returns a string with the search
-     * results. Rejects in case of error.
-     * */
-    search(searchBase:string, scope:string, searchFilter:string): Promise<string> {
-      return new Promise((resolve, reject) => {
-        if (this._stateClient !== E_STATES.BOUND) {
-          reject(new StateError(errorMessages.bindErrorMessage));
-        } else {
-          checkParameters.validateStrings(searchBase, searchFilter, scope);
-  
-          if (scopeObject[scope] === undefined) {
-            throw new Error(errorMessages.scopeSearchErrorMessage);
-          }
-  
-          this._binding.search(
-            searchBase, scopeObject[scope], searchFilter, (err:number, result:string) => {
-              if (err) {
-                const CustomError: any = errorHandler.errorSelection(err);
-                reject(new CustomError(errorMessages.ldapSearchErrorMessage));
-              } else {
-                resolve(result);
-              }
-            });
-        }
-      });
-    }
+  /**
+   * Search operation.
+   *
+   * @method search
+   * @param {String} searchBase the base for the search.
+   * @param {String} scope  scope for the search, can be BASE, ONE or
+   * SUBTREE
+   * @param {String} searchFilter  search filter.If not provided,
+   * the default filter, (objectClass=*), is used.
+   * @return {Promise} That resolves and returns a string with the search
+   * results. Rejects in case of error.
+   * */
+  search(searchBase:string, scope:string, searchFilter:string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this._stateClient !== E_STATES.BOUND) {
+        reject(new StateError(errorMessages.bindErrorMessage));
+      } else {
+        checkParameters.validateStrings(searchBase, searchFilter, scope);
 
-      /**
-     * Search operation with results displayed page by page.
-     *
-     * @method pagedSearch
-     * @param {String} searchBase the base for the search.
-     * @param {String} scope  scope for the search, can be BASE, ONE or
-     * SUBTREE
-     * @param {String} searchFilter search filter.
-     * @param {int} pageSize The number of entries per LDAP page
-     * @return {Promise} that resolves to a readable stream or rejects to a
-     * Error;
-     */
+        if (scopeObject[scope] === undefined) {
+          throw new Error(errorMessages.scopeSearchErrorMessage);
+        }
+
+        this._binding.search(
+          searchBase, scopeObject[scope], searchFilter, (err:number, result:string) => {
+            if (err) {
+              const CustomError: any = errorHandler.errorSelection(err);
+              reject(new CustomError(errorMessages.ldapSearchErrorMessage));
+            } else {
+              resolve(result);
+            }
+          });
+      }
+    });
+  }
+
+    /**
+   * Search operation with results displayed page by page.
+   *
+   * @method pagedSearch
+   * @param {String} searchBase the base for the search.
+   * @param {String} scope  scope for the search, can be BASE, ONE or
+   * SUBTREE
+   * @param {String} searchFilter search filter.
+   * @param {int} pageSize The number of entries per LDAP page
+   * @return {Promise} that resolves to a readable stream or rejects to a
+   * Error;
+   */
   pagedSearch(searchBase:string, scope:string, searchFilter:string, pageSize:number): Promise<SearchStream> {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {

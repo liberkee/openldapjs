@@ -35,7 +35,6 @@ import LdapAlreadyExists from './ldap_errors/ldap_already_exists_error';
 import LdapClassModsError from './ldap_errors/ldap_object_class_mods_error';
 import LdapDsasError from './ldap_errors/ldap_dsas_error';
 import LdapOtherError from './ldap_errors/ldap_other_error';
-// import LdapError from './ldap_errors/ldap_error';
 
 export const errors:any = {
   LdapInvalidDnError: (LdapInvalidDnError),
