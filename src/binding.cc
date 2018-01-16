@@ -323,7 +323,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     struct berval *bv{};
     char *reqOID = *requestoid;
-    const auto& ldapExtendedOperations = new LdapExtendedOperations();
+    const auto& ldapExtendedOperations = std::make_shared<LdapExtendedOperations>();
     
        const auto& functionMap = ldapExtendedOperations->functionMap();
        const auto& it = functionMap.find(reqOID);
