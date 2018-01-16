@@ -5,7 +5,7 @@ import {IchangeSchema} from '../schemas/change_schema';
 import {IcontrolSchema} from '../schemas/control_schema';
 import {IaddEntrySchema} from '../schemas/add_entry_schema';
 import {IupdateAttrSchema} from '../schemas/update_attr_schema';
-import * as ValidationError from '../errors/validation_error';
+import ValidationError from '../errors/validation_error';
 import {RootObject} from '../messages';
 
 let changeSchema:IchangeSchema = require('../schemas/change_schema.json');
@@ -52,7 +52,7 @@ export default class CheckParam {
     changesAttr.forEach(element => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
-        throw new ValidationError.default(errorMessages.invalidJSONMessage, undefined, ajv.errors);
+        throw new ValidationError(errorMessages.invalidJSONMessage, undefined, ajv.errors);
       }
       if (element.op === 'update') {
         const deleteVals:Array<string> = [];
@@ -61,7 +61,7 @@ export default class CheckParam {
         element.vals.forEach((val) => {
           const validVal = ajv.validate(updateAttrSchema, val);
           if (!validVal) {
-            throw new ValidationError.default(errorMessages.invalidJSONMessage, undefined, ajv.errors);
+            throw new ValidationError(errorMessages.invalidJSONMessage, undefined, ajv.errors);
           } else {
             deleteVals.push(val.oldVal);
             addVals.push(val.newVal);
@@ -101,7 +101,7 @@ export default class CheckParam {
       ctrls.forEach(element => {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
-          throw new ValidationError.default(errorMessages.controlPropError, undefined, ajv.errors);
+          throw new ValidationError(errorMessages.controlPropError, undefined, ajv.errors);
         }
       });
       return ctrls;
@@ -123,7 +123,7 @@ export default class CheckParam {
     entryAttr.forEach(element => {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
-        throw new ValidationError.default(errorMessages.entryObjectError, undefined, ajv.errors);
+        throw new ValidationError(errorMessages.entryObjectError, undefined, ajv.errors);
       }
     });
     return entryAttr;
