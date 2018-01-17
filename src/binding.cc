@@ -16,7 +16,6 @@
 #include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
-#include "ldap_extended_operation.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -37,7 +36,6 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "add", add);
     Nan::SetPrototypeMethod(tpl, "changePassword", changePassword);
     Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
-    Nan::SetPrototypeMethod(tpl, "extendedOperation", extendedOperation);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -306,94 +304,6 @@ class LDAPClient : public Nan::ObjectWrap {
                                 [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
         new LDAPCompareProgress(callback, progress, newLD, message));
-  }
-
-    static NAN_METHOD(extendedOperation) {
-    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
-
-    Nan::Utf8String requestoid(info[0]);
-    v8::Local<v8::Object> objectData =v8::Local<v8::Object>::Cast(info[1]);
-    int message{};
-
-    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
-
-    struct berval *bv{};
-    char *reqOID = *requestoid;
-
-    if(strcmp(reqOID, LDAP_EXOP_CANCEL) == 0) {
-      v8::String::Utf8Value requestData(objectData->Get(Nan::New("first").ToLocalChecked()));
-      BerElement *cancelidber = nullptr;
-      struct berval cancelId{};
-      int valueOfString = std::stoi(*requestData);
-      cancelidber = ber_alloc_t(LBER_USE_DER);
-      ber_printf(cancelidber, "{i}", valueOfString);
-      ber_flatten2(cancelidber, &cancelId, 0);
-      bv = &cancelId;
-    } else if(strcmp(reqOID, LDAP_EXOP_MODIFY_PASSWD) == 0) {
-      v8::String::Utf8Value userDN(objectData->Get(Nan::New("userDN").ToLocalChecked()));
-      v8::String::Utf8Value oldPassword(objectData->Get(Nan::New("oldPass").ToLocalChecked()));
-      v8::String::Utf8Value newPassword(objectData->Get(Nan::New("newPass").ToLocalChecked()));
-  
-      static struct berval user = {0, NULL};
-      static struct berval newpw = {0, NULL};
-      static struct berval oldpw = {0, NULL};
-      BerElement *changePass = nullptr;
-      struct berval changePassRes{};
-
-      /* The message ID that the ldap_passwd will have */
-
-      /* Set the pointer data into a berval structure */
-      user.bv_val = strdup(*userDN);
-      user.bv_len = strlen(user.bv_val);
-
-      newpw.bv_val = strdup(*newPassword);
-      newpw.bv_len = strlen(newpw.bv_val);
-
-      oldpw.bv_val = strdup(*oldPassword);
-      oldpw.bv_len = strlen(oldpw.bv_val);
-      changePass = ber_alloc_t(LBER_USE_DER);
-
-      ber_printf( changePass, "{" /*}*/ );
-      ber_printf( changePass, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_ID, user );
-      ber_printf( changePass, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_OLD, oldpw );
-      ber_printf( changePass, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_NEW, newpw );
-      ber_printf( changePass, /*{*/ "N}" );
-      ber_flatten2( changePass, &changePassRes, 0 );
-
-      bv = &changePassRes;
-    } else if (strcmp(reqOID, LDAP_EXOP_REFRESH) == 0) {
-      v8::String::Utf8Value userDN(objectData->Get(Nan::New("userDN").ToLocalChecked()));
-      BerElement *ldapRefresh{};
-      struct berval refresh{};
-      static struct berval user = {0, NULL};
-      user.bv_val = strdup(*userDN);
-      user.bv_len = strlen(user.bv_val);
-      ldapRefresh = ber_alloc_t( LBER_USE_DER );
-      ber_printf( ldapRefresh, "{tOtiN}", LDAP_TAG_EXOP_REFRESH_REQ_DN, user, 
-                  LDAP_TAG_EXOP_REFRESH_REQ_TTL, nullptr );
-      ber_flatten2( ldapRefresh, &refresh, 0);
-      bv = &refresh;
-    }
-
-    const auto state = ldap_extended_operation(obj->ld_, reqOID, bv, 
-                        nullptr, nullptr, &message);
-
-    if (state != LDAP_SUCCESS) {
-      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
-      callback->Call(1, stateClient);
-      delete callback;
-      delete progress;
-      return;
-    }
-
-    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
-                                [](LDAP *ld) { ldap_destroy(ld); });
-  
-    Nan::AsyncQueueWorker(
-      new LDAPExtendedOperationProgress(callback, progress, newLD, message));
   }
 
     static NAN_METHOD(changePassword) {
