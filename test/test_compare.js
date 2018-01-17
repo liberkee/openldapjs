@@ -188,7 +188,7 @@ describe('Testing the Compare function', () => {
     () => {
       const nonVal = 'nonExistingValue';
       const nonAttr = 'nonExistingAttr';
-      const CustomError = errorHandler(errorMessages.undefinedType);
+      const CustomError = errorHandler(errorCodes.undefinedType);
 
       return ldapAsyncWrap.compare(dn, attr, val)
         .then((result1) => {

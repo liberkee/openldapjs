@@ -46,7 +46,7 @@ class PagedSearchStream extends Readable {
             this.push(null);
           } else {
             if (!morePages) this._lastResult = true;
-            const resJSON = ldif.parse(page);
+            const resJSON = JSON.stringify(ldif.parse(page));
             this.push(resJSON);
           }
 
