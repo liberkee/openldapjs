@@ -170,13 +170,9 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, control)
       .then((result) => {
-        let resultOperation;
-        resultOperation = result.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
         should.deepEqual(
-          resultOperation,
-          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+          result.entries[0].dn,
+          config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 
@@ -245,7 +241,6 @@ describe('Testing the modify functionalities', () => {
         should.deepEqual(error, new CustomError(errorMessages.ldapModifyErrorMessage));
       })
       .catch((err) => {
-        console.log(err.constructor.code);
         should.fail('did not expect generic error');
       });
   });
@@ -377,13 +372,9 @@ describe('Testing the modify functionalities', () => {
       ])
       .then((results) => {
         results.forEach((element) => {
-          let resultOperation;
-          resultOperation = element.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
           should.deepEqual(
-            resultOperation,
-            ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+            element.entries[0].dn,
+            config.ldapModify.ldapModificationReplace.change_dn);
         });
       });
   });
@@ -394,13 +385,9 @@ describe('Testing the modify functionalities', () => {
         config.ldapModify.ldapModificationReplace.change_dn,
         changeAttributes, controlOperation)
       .then((result) => {
-        let resultOperation;
-        resultOperation = result.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
         should.deepEqual(
-          resultOperation,
-          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+          result.entries[0].dn,
+          config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 

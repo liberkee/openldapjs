@@ -224,7 +224,9 @@ describe('Testing the async LDAP paged search ', () => {
           searchBase, searchScope.subtree, config.ldapSearch.filterObjAll,
           pageSize)
         .then((res) => {
-          res.on('data', (data) => { numberPage += 1; });
+          res.on('data', (data) => {
+            numberPage += 1;
+          });
           res.on('end', () => {
             numberPage.should.be.above(900);
             next();

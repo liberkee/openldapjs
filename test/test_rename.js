@@ -248,12 +248,8 @@ describe('Testing the rename functionalities', () => {
             config.ldapRename.newparent, controlOperation);
         })
         .then((result) => {
-          let resultOperation;
-          resultOperation = result.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
           should.deepEqual(
-            resultOperation, ` ${config.ldapRename.dnChange}`);
+            result.entries[0].dn, config.ldapRename.dnChange);
         });
     });
 

@@ -72,7 +72,9 @@ describe('Testing the async LDAP search ', () => {
       .search(
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific)
-      .then((result) => { result.should.be.empty; });
+      .then((result) => {
+        result.should.be.empty; 
+      });
   });
   /**
    * case for search with non existing search base
@@ -82,7 +84,9 @@ describe('Testing the async LDAP search ', () => {
         '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
     return adminLDAP
       .search('', searchScope.base, config.ldapSearch.filterObjAll)
-      .then((result) => { should.deepEqual(result, ROOT_NODE); });
+      .then((result) => {
+        should.deepEqual(result, ROOT_NODE);
+      });
   });
   /**
    * test case for search with access denied
@@ -145,8 +149,7 @@ describe('Testing the async LDAP search ', () => {
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific2)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.eql(1);
+        result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -158,8 +161,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(searchBase, searchScope.one, config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(1);
+        result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -243,8 +245,7 @@ describe('Testing the async LDAP search ', () => {
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(1);
+        result.entries[1].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -256,7 +257,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
+        const count = result.entries.length;
         count.should.be.above(10000);
       });
   });

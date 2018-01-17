@@ -63,7 +63,7 @@ describe('Testing the async LDAP add operation', () => {
         return Promise.all([bind1, bind2]);
       })
       .then(() => {
-        dnUser = ` ${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
+        dnUser = `${rdnUser}${personNr}${config.ldapAdd.dnNewEntry}`;
       });
   });
 
@@ -232,11 +232,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should add a new entry and return the attributes that was required in control', () => {
     return clientLDAP.add(dnUser, validEntry, controlOperation)
       .then((result) => {
-        let resultOperation;
-        resultOperation = result.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
-        should.deepEqual(resultOperation, `${dnUser}`);
+        should.deepEqual(result.entries[0].dn, dnUser);
       });
   });
 

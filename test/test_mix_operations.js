@@ -68,14 +68,6 @@ describe('Testing multiple operations functionalities', () => {
   let attributeEntry = newEntry.split('=');
   attributeEntry = attributeEntry[1];
 
-  const searchResult = `\ndn: ${newEntry}${config.ldapAdd.dnNewEntry}
-${config.ldapAdd.firstAttr.attr}: ${config.ldapAdd.firstAttr.vals[0]}
-${config.ldapAdd.secondAttr.attr}: ${config.ldapAdd.secondAttr.vals[0]}
-${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[0]}
-${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[1]}
-${config.ldapAdd.lastAttr.attr}: ${config.ldapAdd.lastAttr.vals[2]}
-cn: ${attributeEntry}\n`;
-
   const pathToCert = config.ldapAuthentication.pathFileToCert;
 
   beforeEach(() => {
@@ -93,36 +85,24 @@ cn: ${attributeEntry}\n`;
     () => {
       return ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
         .then((result1) => {
-          let resultOperation;
-          resultOperation = result1.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(resultOperation, ` ${dnUser}`);
+          should.deepEqual(result1.entries[0].dn, dnUser);
           return ldapAsyncWrap.search(
             searchBase, searchScope.subtree, newEntry);
         })
         .then((result2) => {
-          should.deepEqual(result2, searchResult);
+          should.deepEqual(result2.entries[0].dn, dnUser);
           return ldapAsyncWrap.modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributes, controlOperation);
         })
         .then((result3) => {
-          let resultOperation;
-          resultOperation = result3.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
           should.deepEqual(
-            resultOperation,
-            ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+            result3.entries[0].dn,
+            config.ldapModify.ldapModificationReplace.change_dn);
           return ldapAsyncWrap.delete(dnUser, controlOperation);
         })
         .then((result4) => {
-          let resultOperation;
-          resultOperation = result4.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(resultOperation, ` ${dnUser}`);
+          should.deepEqual(result4.entries[0].dn, dnUser);
           return ldapAsyncWrap.compare(dn, attr, val);
         })
 
@@ -131,36 +111,24 @@ cn: ${attributeEntry}\n`;
           return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
         })
         .then((result6) => {
-          let resultOperation;
-          resultOperation = result6.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(resultOperation, ` ${dnUser}`);
+          should.deepEqual(result6.entries[0].dn, dnUser);
           return ldapAsyncWrap.search(
             searchBase, searchScope.subtree, newEntry);
         })
         .then((result7) => {
-          should.deepEqual(result7, searchResult);
+          should.deepEqual(result7.entries[0].dn, dnUser);
           return ldapAsyncWrap.delete(dnUser, controlOperation);
         })
         .then((result8) => {
-          let resultOperation;
-          resultOperation = result8.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(resultOperation, ` ${dnUser}`);
+          should.deepEqual(result8.entries[0].dn, dnUser);
           return ldapAsyncWrap.modify(
             config.ldapModify.ldapModificationReplace.change_dn,
             changeAttributes, controlOperation);
         })
         .then((result9) => {
-          let resultOperation;
-          resultOperation = result9.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
           should.deepEqual(
-            resultOperation,
-            ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+            result9.entries[0].dn,
+            config.ldapModify.ldapModificationReplace.change_dn);
           return ldapAsyncWrap.compare(dn, attr, val);
         })
 
@@ -209,27 +177,22 @@ cn: ${attributeEntry}\n`;
           } else if (element === true) {
             should.deepEqual(true, element);
           } else {
-            let resultOperation;
-            resultOperation = element.split('\n');
-            resultOperation = resultOperation[1].split(':');
-            resultOperation = resultOperation[1];
+            // let resultOperation;
+            // resultOperation = element.split('\n');
+            // resultOperation = resultOperation[1].split(':');
+            // resultOperation = resultOperation[1];
 
-            if (resultOperation === config.ldapAuthentication.dnUserNoRight) {
+
+            if (element.entries[0].dn === config.ldapAuthentication.dnUserNoRight) {
               should.deepEqual(
-                resultOperation,
-                `${config.ldapAuthentication.dnUserNoRight}`);
-            } else if (
-              resultOperation ===
-                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
-              should.deepEqual(
-                resultOperation,
-                ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
-            } else if (resultOperation === ` ${dnUser}`) {
-              should.deepEqual(resultOperation, ` ${dnUser}`);
+                element.entries[0].dn,
+                config.ldapAuthentication.dnUserNoRight);
+            } else if (element.entries[0].dn === dnUser) {
+              should.deepEqual(element.entries[0].dn, dnUser);
             } else {
               should.deepEqual(
-                resultOperation,
-                ` ${newEntry}1${config.ldapAdd.dnNewEntry}`);
+                element.entries[0].dn,
+                `${newEntry}1${config.ldapAdd.dnNewEntry}`);
             }
           }
         });

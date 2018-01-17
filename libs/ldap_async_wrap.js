@@ -9,6 +9,7 @@ const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
 const _ = require('underscore');
+const ldif = require('ldif');
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
@@ -150,7 +151,8 @@ class LDAPAsyncWrap {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
-              resolve(result);
+              const resJSON = result === '' ? result : ldif.parse(result);
+              resolve(resJSON);
             }
           });
       }
@@ -286,7 +288,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapModifyErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -319,7 +322,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapRenameErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -351,7 +355,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapDeleteErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -418,7 +423,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapAddErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
