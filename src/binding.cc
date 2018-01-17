@@ -17,6 +17,7 @@
 #include "ldap_rename_progress.h"
 #include "ldap_search_progress.h"
 #include "ldap_extended_operation.h"
+#include "ldap_extended_operations.h"
 
 class LDAPClient : public Nan::ObjectWrap {
  public:
@@ -322,7 +323,16 @@ class LDAPClient : public Nan::ObjectWrap {
 
     struct berval *bv{};
     char *reqOID = *requestoid;
-
+    const auto& ldapExtendedOperations = std::make_shared<LdapExtendedOperations>();
+    
+       const auto& functionMap = ldapExtendedOperations->functionMap();
+       const auto& it = functionMap.find(reqOID);
+       if(it != functionMap.end()) {
+        // found
+         bv = it->second(objectData);
+       } else {
+           // not found
+       }
     if(strcmp(reqOID, LDAP_EXOP_CANCEL) == 0) {
       v8::String::Utf8Value requestData(objectData->Get(Nan::New("first").ToLocalChecked()));
       BerElement *cancelidber = nullptr;
