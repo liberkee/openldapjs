@@ -3,6 +3,7 @@ import {RootObject} from './messages';
 import * as errorHandler from './errors/error_dispenser'
 
 let errorMessages:RootObject = require('./messages.json');
+const ldif:any = require('ldif');
 
 /**
  * @class PagedSearchStream
@@ -49,12 +50,13 @@ export default class PagedSearchStream extends Readable {
         this._base, this._scope, this._filter, this._pageSize, this._searchId,
         (err:number, page:string, morePages:boolean) => {
           if (err) {
-            const CustomError: any = errorHandler.errorSelection(err);
+            const CustomError:any = errorHandler.errorSelection(err);
             this.emit('err', new CustomError(errorMessages.ldapSearchErrorMessage));
             this.push(null);
           } else {
             if (!morePages) this._lastResult = true;
-            this.push(page);
+            const resJSON:string = JSON.stringify(ldif.parse(page))
+            this.push(resJSON);
           }
 
         });

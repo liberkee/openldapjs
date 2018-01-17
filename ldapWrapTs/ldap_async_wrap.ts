@@ -13,6 +13,7 @@ import {IaddEntrySchema} from './schemas/add_entry_schema';
 
 import * as errorHandler from './errors/error_dispenser';
 
+const ldif:any = require('ldif');
 let errorMessages:RootObject = require('./messages.json');
 const binary = require('node-pre-gyp');
 const bindingPath:string = binary.find(path.resolve(path.join(__dirname, '../package.json')));
@@ -157,7 +158,7 @@ export default class LDAPAsyncWrap {
    * @return {Promise} That resolves and returns a string with the search
    * results. Rejects in case of error.
    * */
-  search(searchBase:string, scope:string, searchFilter:string): Promise<string> {
+  search(searchBase:string, scope:string, searchFilter:string): Promise<string | JSON> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -174,7 +175,8 @@ export default class LDAPAsyncWrap {
               const CustomError: any = errorHandler.errorSelection(err);
               reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
-              resolve(result);
+              const resJSON: string | JSON = result === '' ? result : ldif.parse(result);
+              resolve(resJSON);
             }
           });
       }
@@ -265,7 +267,7 @@ export default class LDAPAsyncWrap {
     * Reject if  LDAP rejects the operation or the client's state is not
     * BOUND
     */
-  modify(dn:string, jsonChange:IchangeSchema, controls:IcontrolSchema): Promise<string> {
+  modify(dn:string, jsonChange:IchangeSchema, controls:IcontrolSchema): Promise<string | number> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -274,12 +276,13 @@ export default class LDAPAsyncWrap {
         const changes:object[] = checkParameters.checkModifyChange(jsonChange);
         const ctrls:object[] | null = checkParameters.checkControl(controls);
 
-        this._binding.modify(dn, changes, ctrls, (err:number, result:string) => {
+        this._binding.modify(dn, changes, ctrls, (err:number, result:string | number) => {
           if (err) {
             const CustomError: any = errorHandler.errorSelection(err);
             reject(new CustomError(errorMessages.ldapModifyErrorMessage));
           } else {
-            resolve(result);
+            const resJSON: string | number = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -299,7 +302,7 @@ export default class LDAPAsyncWrap {
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
-  rename(dn:string, newRdn:string, newParent:string, controls:IcontrolSchema): Promise<string> {
+  rename(dn:string, newRdn:string, newParent:string, controls:IcontrolSchema): Promise<string | number> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -307,12 +310,13 @@ export default class LDAPAsyncWrap {
         checkParameters.validateStrings(dn, newRdn, newParent);
         const ctrls:object[] | null = checkParameters.checkControl(controls);
 
-        this._binding.rename(dn, newRdn, newParent, ctrls, (err:number, result:string) => {
+        this._binding.rename(dn, newRdn, newParent, ctrls, (err:number, result:string | number) => {
           if (err) {
             const CustomError: any = errorHandler.errorSelection(err);
             reject(new CustomError(errorMessages.ldapRenameErrorMessage));
           } else {
-            resolve(result);
+            const resJSON: string | number = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -331,7 +335,7 @@ export default class LDAPAsyncWrap {
    * deleted
    * or rejects if not.
    * */
-  delete(dn:string, controls:IcontrolSchema): Promise<string> {
+  delete(dn:string, controls:IcontrolSchema): Promise<string | number> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -339,12 +343,13 @@ export default class LDAPAsyncWrap {
         checkParameters.validateStrings(dn);
         const ctrls:object[] | null = checkParameters.checkControl(controls);
 
-        this._binding.delete(dn, ctrls, (err:number, result:string) => {
+        this._binding.delete(dn, ctrls, (err:number, result:string | number) => {
           if (err) {
             const CustomError: any = errorHandler.errorSelection(err);
             reject(new CustomError(errorMessages.ldapDeleteErrorMessage));
           } else {
-            resolve(result);
+            const resJSON: string | number = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -397,7 +402,7 @@ export default class LDAPAsyncWrap {
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
-  add(dn:string, entry:IaddEntrySchema, controls:IcontrolSchema): Promise<string> {
+  add(dn:string, entry:IaddEntrySchema, controls:IcontrolSchema): Promise<string | number> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -406,12 +411,13 @@ export default class LDAPAsyncWrap {
         const entryAttr:object[] = checkParameters.checkEntryObject(entry);
         const ctrls:object[] | null = checkParameters.checkControl(controls);
 
-        this._binding.add(dn, entryAttr, ctrls, (err:number, result:string) => {
+        this._binding.add(dn, entryAttr, ctrls, (err:number, result:string | number) => {
           if (err) {
             const CustomError: any = errorHandler.errorSelection(err);
             reject(new CustomError(errorMessages.ldapAddErrorMessage));
           } else {
-            resolve(result);
+            const resJSON: string | number = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
