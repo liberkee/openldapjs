@@ -1,6 +1,5 @@
 'use strict';
 
-const LdapError = require('./ldap_errors/ldap_error');
 const LdapInvalidDnError = require('./ldap_errors/ldap_invalid_dn_error');
 const LdapSizeLimitError = require('./ldap_errors/ldap_size_limit_error');
 const LdapTimeLimitError = require('./ldap_errors/ldap_time_limit_error');

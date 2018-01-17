@@ -3,9 +3,10 @@
 const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP search ', () => {
 
@@ -61,7 +62,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         StateError,
         (error) => {
-          should.deepEqual(error.message, errorList.bindErrorMessage);
+          should.deepEqual(error.message, errorMessages.bindErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -71,7 +72,9 @@ describe('Testing the async LDAP search ', () => {
       .search(
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific)
-      .then((result) => { result.should.be.empty; });
+      .then((result) => {
+        result.should.be.empty; 
+      });
   });
   /**
    * case for search with non existing search base
@@ -81,14 +84,16 @@ describe('Testing the async LDAP search ', () => {
         '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
     return adminLDAP
       .search('', searchScope.base, config.ldapSearch.filterObjAll)
-      .then((result) => { should.deepEqual(result, ROOT_NODE); });
+      .then((result) => {
+        should.deepEqual(result, ROOT_NODE);
+      });
   });
   /**
    * test case for search with access denied
    */
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
-    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => { should.fail('should not have passed'); })
@@ -96,7 +101,7 @@ describe('Testing the async LDAP search ', () => {
         CustomError,
         (err) => {
           err.should.be.deepEqual(
-            new CustomError(errorList.ldapSearchErrorMessage));
+            new CustomError(errorMessages.ldapSearchErrorMessage));
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -107,7 +112,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+          err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -117,7 +122,7 @@ describe('Testing the async LDAP search ', () => {
       .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.be.deepEqual(errorList.scopeSearchErrorMessage);
+        err.message.should.be.deepEqual(errorMessages.scopeSearchErrorMessage);
       });
   });
 
@@ -128,7 +133,7 @@ describe('Testing the async LDAP search ', () => {
       .catch(
         TypeError,
         (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
+          err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
         })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
@@ -144,8 +149,7 @@ describe('Testing the async LDAP search ', () => {
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjSpecific2)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.eql(1);
+        result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -157,8 +161,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(searchBase, searchScope.one, config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(1);
+        result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -242,8 +245,7 @@ describe('Testing the async LDAP search ', () => {
         searchBase, searchScope.subtree,
         config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
-        count.should.be.above(1);
+        result.entries[1].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -255,7 +257,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = (result.match(/\ndn:/g) || []).length;
+        const count = result.entries.length;
         count.should.be.above(10000);
       });
   });

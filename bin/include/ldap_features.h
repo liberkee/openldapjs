@@ -1,24 +1,30 @@
-/* $OpenLDAP: pkg/ldap/include/ldap_features.nt,v 1.8.2.1 2003/02/09 17:02:17 kurt Exp $ */
-/*
- * Copyright 1998-2003 The OpenLDAP Foundation, Redwood City, California, USA
+/* $OpenLDAP$ */
+/* This work is part of OpenLDAP Software <http://www.openldap.org/>.
+ *
+ * Copyright 1998-2012 The OpenLDAP Foundation.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms are permitted only
- * as authorized by the OpenLDAP Public License.  A copy of this
- * license is available at http://www.OpenLDAP.org/license.html or
- * in file LICENSE in the top-level directory of the distribution.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted only as authorized by the OpenLDAP
+ * Public License.
+ *
+ * A copy of this license is available in file LICENSE in the
+ * top-level directory of the distribution or, alternatively, at
+ * <http://www.OpenLDAP.org/license.html>.
  */
+
 /* 
  * LDAP Features
  */
+
 #ifndef _LDAP_FEATURES_H
 #define _LDAP_FEATURES_H 1
 
 /* OpenLDAP API version macros */
-#define LDAP_VENDOR_VERSION 20437
+#define LDAP_VENDOR_VERSION 20431
 #define LDAP_VENDOR_VERSION_MAJOR 2
 #define LDAP_VENDOR_VERSION_MINOR 4
-#define LDAP_VENDOR_VERSION_PATCH 37
+#define LDAP_VENDOR_VERSION_PATCH 31
 
 /*
 ** WORK IN PROGRESS!
@@ -26,20 +32,16 @@
 ** OpenLDAP reentrancy/thread-safeness should be dynamically
 ** checked using ldap_get_option().
 **
-** The -lldap implementation may or may not be:
-**		LDAP_API_FEATURE_THREAD_SAFE
+** The -lldap implementation is not thread-safe.
 **
-** The preprocessor flag LDAP_API_FEATURE_X_OPENLDAP_REENTRANT can
-** be used to determine if -lldap is LDAP_API_FEATURE_THREAD_SAFE at
-** compile time.
-**
-** The -lldap_r implementation is always THREAD_SAFE but
-** may also be:
+** The -lldap_r implementation is:
+**		LDAP_API_FEATURE_THREAD_SAFE (basic thread safety)
+** but also be:
 **		LDAP_API_FEATURE_SESSION_THREAD_SAFE
 **		LDAP_API_FEATURE_OPERATION_THREAD_SAFE
 **
 ** The preprocessor flag LDAP_API_FEATURE_X_OPENLDAP_THREAD_SAFE
-** can be used to determine if -lldap_r is availalbe at compile
+** can be used to determine if -lldap_r is available at compile
 ** time.  You must define LDAP_THREAD_SAFE if and only if you
 ** link with -lldap_r.
 **
@@ -49,13 +51,10 @@
 **
 */
 
-/* is -lldap reentrant or not */
-/* #undef LDAP_API_FEATURE_X_OPENLDAP_REENTRANT */
-
-/* is threadsafe version of -lldap (ie: -lldap_r) *available* or not */
-#define LDAP_API_FEATURE_X_OPENLDAP_THREAD_SAFE LDAP_VENDOR_VERSION
+/* is -lldap_r available or not */
+#define LDAP_API_FEATURE_X_OPENLDAP_THREAD_SAFE 1
 
 /* LDAP v2 Referrals */
-#define LDAP_API_FEATURE_X_OPENLDAP_V2_REFERRALS LDAP_VENDOR_VERSION
+#undef LDAP_API_FEATURE_X_OPENLDAP_V2_REFERRALS
 
 #endif /* LDAP_FEATURES */

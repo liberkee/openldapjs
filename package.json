@@ -8,28 +8,49 @@
     "url": "https://github.com/hufsm/openldapjs.git"
   },
   "dependencies": {
+    "@types/ajv": "^1.0.0",
+    "@types/bluebird": "^3.5.18",
+    "@types/lodash": "^4.14.88",
+    "@types/underscore": "^1.8.5",
     "ajv": "5.3.0",
     "bluebird": "3.4.3",
     "ldif": "0.5.1",
     "nan": "2.6.0",
+    "github": "^12.1.0",
+    "node-pre-gyp": "^0.6.39",
+    "tslint": "^5.8.0",
     "underscore": "1.8.3"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
+  "binary": {
+    "module_name": "binding",
+    "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
+    "remote_path": "{version}",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
+    "host": "https://github.com/hufsm/openldapjs/releases/download/"
+  },
   "devDependencies": {
-    "istanbul": "0.4.5",
-    "mocha": "4.0.1",
+    "@types/node": "^8.0.58",
     "eslint": "4.7.1",
     "eslint-config-airbnb": "15.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-jsx-a11y": "5.1.1",
+    "eslint-plugin-react": "7.3.0",
+    "istanbul": "0.4.5",
+    "mocha": "4.0.1",
     "should": "11.2.0",
-    "eslint-plugin-react": "7.3.0"
-    
+    "typescript-eslint-parser": "^9.0.1"
   },
   "scripts": {
     "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
-    "lint": "eslint ./libs/ldap_async_wrap.js",
-    "addData": "node populate.js"
+    "lint": "eslint ./libs/**/*",
+    "addData": "node populate.js",
+    "install": "node-pre-gyp install --fallback-to-build",
+    "package": "node-pre-gyp package"
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",
