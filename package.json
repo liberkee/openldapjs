@@ -40,7 +40,7 @@
     "Radu Aribasoiu",
     "Cosmin Ghitea"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "gypfile": true,
   "directories": {
     "test": "test"

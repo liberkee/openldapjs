@@ -121,6 +121,62 @@ class LDAPAsyncWrap {
   }
 
   /**
+     * attributeExists operation.
+     *
+     * @method attributeExists
+     * @param {String} dn the entry for verification.
+     * @param {String} attributeName attribute that is required.
+     * @return {Promise} Will resolve with false in case of noSuchAttribute 
+     * error and true otherwise and reject if there is an error
+     * */
+
+  attributeExists(dn, attributeName) {
+    return new Promise((resolve, reject) => {
+      this.compare(dn, attributeName, '1@a-value')
+        .then((res) => {
+          resolve(true);
+        })
+        .catch((err) => {
+          if (err.constructor.code === errorList.noSuchAttirbute) {
+            resolve(false);
+          } else {
+            reject(err);
+          }
+        });
+    });
+  }
+
+  /**
+     * objectExists operation.
+     *
+     * @method objectExists
+     * @param {String} dn the entry for verification.
+     * @return {Promise} Will resolve with false in case of noSuchObject 
+     * error and the result of compare otherwise and reject if there is an error
+     * */
+
+  objectExists(dn) {
+    return new Promise((resolve, reject) => {
+      let dnRes = dn.split(',');
+      dnRes = dnRes[0].split('=');
+      const attribute = dnRes[0];
+      const value = dnRes[1];
+      this.compare(dn, attribute, value)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          if (err.constructor.code === errorList.ldapNoSuchObject) {
+            resolve(false);
+          } else {
+            reject(err);
+          }
+        });
+    });
+  }
+
+
+  /**
      * Search operation.
      *
      * @method search
@@ -233,8 +289,7 @@ class LDAPAsyncWrap {
     * @param {String} dn The dn of the entry to modify
     * @param {Object || Array} jsonChange The attribute and value to be changed
     * @param {Object || Array} [controls] Request to execute a specific control
-   * or
-    * multiple controls. This parameter is optional.
+    * or multiple controls. This parameter is optional.
     * @return {Promise} That resolves if LDAP modified successfully the
     * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
@@ -330,22 +385,20 @@ class LDAPAsyncWrap {
     * Perform an LDAP password change operation
     *
     * @method changePassword
-    * @param {String} userDN The user dn which the password will be changed
-    * @param {String} oldPassword Old password of user
-    * @param {String} newPassword New password for user
-    * @return {Promise} Will fulfil with a result of success if the
-    * Old password is given correctly, the parameters are string type and
-    * the state of client is BOUND else will fail with type error or LDAP ERROR.
+    * @param {String} userDn The user dn whose password will be changed
+    * @param {String} oldPassword Old password of userDn
+    * @param {String} newPassword New password for userDn
+    * @return {Promise} Will fulfil if the password was changed, fails otherwise. 
     * */
-  changePassword(userDN, oldPassword, newPassword) {
+  changePassword(userDn, oldPassword, newPassword) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        checkParameters.validateStrings(userDN, oldPassword, newPassword);
+        checkParameters.validateStrings(userDn, oldPassword, newPassword);
 
         this._binding.changePassword(
-          userDN, oldPassword, newPassword, (err, result) => {
+          userDn, oldPassword, newPassword, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(

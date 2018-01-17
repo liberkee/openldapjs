@@ -70,6 +70,15 @@ describe('Testing the async LDAP add operation', () => {
     return clientLDAP.unbind()
       .then(() => { return clientLDAP2.unbind(); });
   });
+  
+  it('should add a single entry', () => {
+    return clientLDAP.add(dnUser, validEntry)
+      .then((result) => {
+        result.should.be.deepEqual(0);
+        personNr += 1;
+      });
+
+  });
 
   it('should reject the add operation with a wrong dn', () => {
 
@@ -125,14 +134,7 @@ describe('Testing the async LDAP add operation', () => {
 
   });
 
-  it('should add a single entry', () => {
-    return clientLDAP.add(dnUser, validEntry)
-      .then((result) => {
-        result.should.be.deepEqual(0);
-        personNr += 1;
-      });
-
-  });
+ 
 
   it('should add multiple entries sequentially and reject to add a duplicate', () => {
     const CustomError = errorHandler(errorList.alreadyExists);

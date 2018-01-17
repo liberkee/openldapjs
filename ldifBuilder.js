@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * Helper script that generates a large .ldif file to be used with ldapadd
+ */
+
 const fs = require('fs');
 const os = require('os');
 
