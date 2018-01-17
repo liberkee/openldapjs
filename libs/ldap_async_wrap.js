@@ -184,7 +184,7 @@ class LDAPAsyncWrap {
      * @param {String} scope  scope for the search, can be BASE, ONE or
      * SUBTREE
      * @param {String} searchFilter  search filter.If not provided,
-     * the default filter, (objectClass=*), is used.
+     * the default filter, objectClass=*, is used.
      * @return {Promise} That resolves and returns a string with the search
      * results. Rejects in case of error.
      * */
@@ -193,14 +193,16 @@ class LDAPAsyncWrap {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
-        checkParameters.validateStrings(searchBase, searchFilter, scope);
+        checkParameters.validateStrings(searchBase, scope);
 
         if (scopeObject[scope] === undefined) {
           throw new Error(errorList.scopeSearchErrorMessage);
         }
 
+        const filter = _.isString(searchFilter) ? searchFilter : 'objectClass=*';
+
         this._binding.search(
-          searchBase, scopeObject[scope], searchFilter, (err, result) => {
+          searchBase, scopeObject[scope], filter, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorList.ldapSearchErrorMessage));
@@ -220,7 +222,8 @@ class LDAPAsyncWrap {
      * @param {String} searchBase the base for the search.
      * @param {String} scope  scope for the search, can be BASE, ONE or
      * SUBTREE
-     * @param {String} searchFilter search filter.
+     * @param {String} searchFilter search filter. If not provided,
+     * the default filter, objectClass=*, is used.
      * @param {int} pageSize The number of entries per LDAP page
      * @return {Promise} that resolves to a readable stream or rejects to a
      * Error;
@@ -237,11 +240,12 @@ class LDAPAsyncWrap {
         if (!_.isNumber(pageSize)) {
           throw new TypeError(errorList.typeErrorMessage);
         }
+
+        const filter = _.isString(searchFilter) ? searchFilter : 'objectClass=*';
+
         this._searchID += 1;
         resolve(
-          new SearchStream(
-            searchBase, scopeObject[scope], searchFilter, pageSize,
-            this._searchID, this._binding));
+          new SearchStream(searchBase, scopeObject[scope], pageSize, this._searchID, this._binding));
       }
       reject(new StateError(errorList.bindErrorMessage));
     });

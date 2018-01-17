@@ -7,7 +7,7 @@
 
 * `searchBase` The DN of the entry at which to start the search.
 * `scope` The scope of the search and should be one of BASE, to search the object itself, ONE to search the object's immediate children or SUBTREE to search the object and all its descendants.
-* `searchFilter` A string representation of the filter to apply in the search
+* `searchFilter` A string representation of the filter to apply in the search. If omitted, the default ldap filter will be used, searching for everything.
 * `pageSize` how many results should be displayed on each page.
 
 A Promise returning function that resolves to a readable stream, chunking the results page by page. This should be used instead of the regular search if a large number of results is expected.
