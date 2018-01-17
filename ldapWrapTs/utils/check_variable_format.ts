@@ -1,18 +1,18 @@
 import * as Ajv from 'ajv';
 import * as _ from 'underscore';
 
-import {IchangeSchema} from '../schemas/change_schema';
-import {IcontrolSchema} from '../schemas/control_schema';
-import {IaddEntrySchema} from '../schemas/add_entry_schema';
-import {IupdateAttrSchema} from '../schemas/update_attr_schema';
+import { IchangeSchema } from '../schemas/change_schema';
+import { IcontrolSchema } from '../schemas/control_schema';
+import { IaddEntrySchema } from '../schemas/add_entry_schema';
+import { IupdateAttrSchema } from '../schemas/update_attr_schema';
 import ValidationError from '../errors/validation_error';
-import {RootObject} from '../messages';
+import { RootObject } from '../messages';
 
-let changeSchema:IchangeSchema = require('../schemas/change_schema.json');
-let controlSchema:IcontrolSchema = require('../schemas/control_schema.json');
-let addEntrySchema:IaddEntrySchema = require('../schemas/add_entry_schema.json');
-let updateAttrSchema:IupdateAttrSchema = require('../schemas/update_attr_schema.json');
-let errorMessages:RootObject = require('../messages.json');
+const changeSchema: IchangeSchema = require('../schemas/change_schema.json');
+const controlSchema: IcontrolSchema = require('../schemas/control_schema.json');
+const addEntrySchema: IaddEntrySchema = require('../schemas/add_entry_schema.json');
+const updateAttrSchema: IupdateAttrSchema = require('../schemas/update_attr_schema.json');
+const errorMessages: RootObject = require('../messages.json');
 
 const ajv: Ajv.Ajv = new Ajv();
 
@@ -30,7 +30,7 @@ export default class CheckParam {
    * strings
     */
 
-  static validateStrings(...arg:Array<string>): void{
+  static validateStrings(...arg: string[]): void {
     _.each(arg, element => {
       if (!_.isString(element)) {
         throw new TypeError(errorMessages.typeErrorMessage);
@@ -46,17 +46,17 @@ export default class CheckParam {
     * @return Throws error in case the changes is not valid. Return the changes as
     * an array in case entry is valid
     */
-  static checkModifyChange(changes:IchangeSchema): object[] {
+  static checkModifyChange(changes: IchangeSchema): object[] {
     const changesAttr = !_.isArray(changes) ? [changes] : changes;
-    const changeBuildArr:Array<object> = [];
+    const changeBuildArr: object[] = [];
     changesAttr.forEach(element => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
         throw new ValidationError(errorMessages.invalidJSONMessage, undefined, ajv.errors);
       }
       if (element.op === 'update') {
-        const deleteVals:Array<string> = [];
-        const addVals:Array<string> = [];
+        const deleteVals: string[] = [];
+        const addVals: string[] = [];
 
         element.vals.forEach((val) => {
           const validVal = ajv.validate(updateAttrSchema, val);
@@ -95,7 +95,7 @@ export default class CheckParam {
     * @return Throws error in case the controls is not valid with the schema
     * members. Return the array of control or null if the control is undefined.
     */
-  static checkControl(controls:Object | Array<Object>): Array<Object> | null {
+  static checkControl(controls: Object | Object[]): Object[] | null {
     if (controls !== undefined) {
       const ctrls = !_.isArray(controls) ? [controls] : controls;
       ctrls.forEach(element => {
@@ -117,7 +117,7 @@ export default class CheckParam {
     * @return Throws error in case the entry is not valid. Return the entry as
     * an array in case entry is valid
     */
-  static checkEntryObject(entry:Object | Array<Object>): Array<Object> {
+  static checkEntryObject(entry: Object | Object[]): Object[] {
     const entryAttr = !_.isArray(entry) ? [entry] : entry;
 
     entryAttr.forEach(element => {

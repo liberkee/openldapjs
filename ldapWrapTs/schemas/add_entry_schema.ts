@@ -1,4 +1,4 @@
 export interface IaddEntrySchema {
-	attr: string;
-  vals: Array<string>;
+  attr: string;
+  vals: string[];
 }

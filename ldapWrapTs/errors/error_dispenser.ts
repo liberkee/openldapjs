@@ -36,7 +36,7 @@ import LdapClassModsError from './ldap_errors/ldap_object_class_mods_error';
 import LdapDsasError from './ldap_errors/ldap_dsas_error';
 import LdapOtherError from './ldap_errors/ldap_other_error';
 
-export const errors:any = {
+export const errors: any = {
   LdapInvalidDnError: (LdapInvalidDnError),
   LdapSizeLimitError: (LdapSizeLimitError),
   LdapTimeLimitError: (LdapTimeLimitError),
@@ -80,17 +80,17 @@ export const errors:any = {
  * @param {Number} code Ldap error code ranging from 1 to 80 or negative for API errors.
  * @return {Error} DesiredErrorClass Custom error class corresponding to the ldap error code.
  */
-export function errorSelection(code:number):Error {
+export function errorSelection(code: number): Error {
 
-  const FoundErrorClassKey:string | undefined = Object.keys(errors)
+  const foundErrorClassKey: string | undefined = Object.keys(errors)
     .find(key => {
-      const ClassCandidate = errors[key];
-      return code === ClassCandidate.code;
+      const classCandidate = errors[key];
+      return code === classCandidate.code;
     });
 
-  const DesiredErrorClass:Error = FoundErrorClassKey === undefined
+  const desiredErrorClass: Error = foundErrorClassKey === undefined
     ? LdapOtherError
-    : errors[FoundErrorClassKey];
+    : errors[foundErrorClassKey];
 
-  return DesiredErrorClass;
+  return desiredErrorClass;
 }

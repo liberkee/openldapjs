@@ -4,9 +4,7 @@ export interface Val {
 }
 
 export interface IchangeSchema {
-	op: string;
+  op: string;
   attr: string;
-  vals: Array<Val>;
+  vals: Val[];
 }
-
-
