@@ -6,6 +6,20 @@ const Promise = require('bluebird');
 const rdn = 'cn=testUser';
 const dn = 'cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com';
 
+const control = [
+  {
+    oid: 'preread',
+    value: ['cn'],
+    isCritical: false,
+
+  },
+  {
+    oid: 'postread',
+    value: ['cn'],
+    isCritical: false,
+  },
+];
+
 
 const t0 = process.hrtime();
 const ldapClient = new Client('ldap://localhost:389');
@@ -21,7 +35,7 @@ ldapClient.initialize()
     }
 
     Promise.map(args, (arg) => {
-      return ldapClient.delete(arg);
+      return ldapClient.delete(arg, control);
     }, {concurrency: 4})
       .then(() => {
         const end = process.hrtime(t0);

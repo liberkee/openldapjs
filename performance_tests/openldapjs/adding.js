@@ -26,6 +26,20 @@ const validEntryObject = [
 
 ];
 
+const control = [
+  {
+    oid: 'preread',
+    value: ['cn'],
+    isCritical: false,
+
+  },
+  {
+    oid: 'postread',
+    value: ['cn'],
+    isCritical: false,
+  },
+];
+
 const t0 = process.hrtime();
 const ldapClient = new Client('ldap://localhost:389');
 
@@ -34,7 +48,7 @@ ldapClient.initialize()
     return ldapClient.bind('cn=admin,dc=demoApp,dc=com', 'secret');
   })
   .then(() => {
-    ldapClient.add(dn, validEntryObject)
+    ldapClient.add(dn, validEntryObject, control)
       .then(() => {
         const args = [];
         for (let i = 0; i < 1000; i++) {
@@ -42,7 +56,7 @@ ldapClient.initialize()
         }
 
         Promise.map(args, (arg) => {
-          return ldapClient.add(arg, validEntryObject);
+          return ldapClient.add(arg, validEntryObject, control);
         }, {concurrency: 4})
           .then(() => {
             const end = process.hrtime(t0);

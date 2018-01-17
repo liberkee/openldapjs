@@ -14,13 +14,26 @@ const changes = {
   vals: ['bla'],
 };
 
+const control = [
+  {
+    oid: 'preread',
+    value: ['cn'],
+    isCritical: false,
+  },
+  {
+    oid: 'postread',
+    value: ['cn'],
+    isCritical: false,
+  },
+];
+
 ldapClient.initialize()
   .then(() => {
     return ldapClient.bind('cn=admin,dc=demoApp,dc=com', 'secret');
   })
   .then(() => {
     for (let i = 0; i < 1000; i++) {
-      promiseArray.push(ldapClient.modify('cn=newPoint5,o=myhost,dc=demoApp,dc=com', changes));
+      promiseArray.push(ldapClient.modify('cn=newPoint5,o=myhost,dc=demoApp,dc=com', changes, control));
     }
 
     return Promise.all(promiseArray);
