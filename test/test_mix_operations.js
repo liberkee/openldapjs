@@ -53,8 +53,7 @@ describe('Testing multiple operations functionalities', () => {
     {
       oid: controlsOID.postread,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+      isCritical: config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: controlsOID.preread,
@@ -74,100 +73,84 @@ describe('Testing multiple operations functionalities', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
-      .then(() => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.startTLS(pathToCert);
+      })
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
-  afterEach(() => { return ldapAsyncWrap.unbind(); });
+  afterEach(() => {
+    return ldapAsyncWrap.unbind();
+  });
 
 
-  it('should add, search, compare, modify and delete  multiple times sequentially',
-    () => {
-      return ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
-        .then((result1) => {
-          should.deepEqual(result1.entries[0].dn, dnUser);
-          return ldapAsyncWrap.search(
-            searchBase, searchScope.subtree, newEntry);
-        })
-        .then((result2) => {
-          should.deepEqual(result2.entries[0].dn, dnUser);
-          return ldapAsyncWrap.modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes, controlOperation);
-        })
-        .then((result3) => {
-          should.deepEqual(
-            result3.entries[0].dn,
-            config.ldapModify.ldapModificationReplace.change_dn);
-          return ldapAsyncWrap.delete(dnUser, controlOperation);
-        })
-        .then((result4) => {
-          should.deepEqual(result4.entries[0].dn, dnUser);
-          return ldapAsyncWrap.compare(dn, attr, val);
-        })
+  it('should add, search, compare, modify and delete  multiple times sequentially', () => {
+    return ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
+      .then((result1) => {
+        should.deepEqual(result1.entries[0].dn, dnUser);
+        return ldapAsyncWrap.search(searchBase, searchScope.subtree, newEntry);
+      })
+      .then((result2) => {
+        should.deepEqual(result2.entries[0].dn, dnUser);
+        return ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
+          changeAttributes, controlOperation);
+      })
+      .then((result3) => {
+        should.deepEqual(result3.entries[0].dn,
+          config.ldapModify.ldapModificationReplace.change_dn);
+        return ldapAsyncWrap.delete(dnUser, controlOperation);
+      })
+      .then((result4) => {
+        should.deepEqual(result4.entries[0].dn, dnUser);
+        return ldapAsyncWrap.compare(dn, attr, val);
+      })
+      .then((result5) => {
+        should.deepEqual(result5, true);
+        return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
+      })
+      .then((result6) => {
+        should.deepEqual(result6.entries[0].dn, dnUser);
+        return ldapAsyncWrap.search(searchBase, searchScope.subtree, newEntry);
+      })
+      .then((result7) => {
+        should.deepEqual(result7.entries[0].dn, dnUser);
+        return ldapAsyncWrap.delete(dnUser, controlOperation);
+      })
+      .then((result8) => {
+        should.deepEqual(result8.entries[0].dn, dnUser);
+        return ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
+          changeAttributes, controlOperation);
+      })
+      .then((result9) => {
+        should.deepEqual(result9.entries[0].dn,
+          config.ldapModify.ldapModificationReplace.change_dn);
+        return ldapAsyncWrap.compare(dn, attr, val);
+      })
 
-        .then((result5) => {
-          should.deepEqual(result5, true);
-          return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
-        })
-        .then((result6) => {
-          should.deepEqual(result6.entries[0].dn, dnUser);
-          return ldapAsyncWrap.search(
-            searchBase, searchScope.subtree, newEntry);
-        })
-        .then((result7) => {
-          should.deepEqual(result7.entries[0].dn, dnUser);
-          return ldapAsyncWrap.delete(dnUser, controlOperation);
-        })
-        .then((result8) => {
-          should.deepEqual(result8.entries[0].dn, dnUser);
-          return ldapAsyncWrap.modify(
-            config.ldapModify.ldapModificationReplace.change_dn,
-            changeAttributes, controlOperation);
-        })
-        .then((result9) => {
-          should.deepEqual(
-            result9.entries[0].dn,
-            config.ldapModify.ldapModificationReplace.change_dn);
-          return ldapAsyncWrap.compare(dn, attr, val);
-        })
-
-        .then((result10) => { should.deepEqual(result10, true); });
-    });
+      .then((result10) => { should.deepEqual(result10, true); });
+  });
 
   it('should make multiple operations in parallel', () => {
     const dnUserNew = `${newEntry}1${config.ldapAdd.dnNewEntry}`;
     let searchEntry = config.ldapAuthentication.dnUserNoRight.split(',');
     searchEntry = searchEntry[0];
 
-    const addOP =
-        ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
-          .then(() => {
-            return ldapAsyncWrap.delete(dnUser, controlOperation);
-          });
-    const searchOP =
-        ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
-    const searchOP2 =
-        ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
+    const addOP = ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
+      .then(() => {
+        return ldapAsyncWrap.delete(dnUser, controlOperation);
+      });
+    const searchOP = ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
+    const searchOP2 = ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const compareOP = ldapAsyncWrap.compare(dn, attr, val);
     const compareOP2 = ldapAsyncWrap.compare(dn, attr, val);
-    const modifyOP = ldapAsyncWrap.modify(
-      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-      controlOperation);
-    const modifyOP2 = ldapAsyncWrap.modify(
-      config.ldapModify.ldapModificationReplace.change_dn, changeAttributes,
-      controlOperation);
+    const modifyOP = ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, controlOperation);
+    const modifyOP2 = ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, controlOperation);
 
-    return Promise
-      .all([
-        addOP,
-        searchOP,
-        compareOP,
-        modifyOP,
-        searchOP2,
-        compareOP2,
-        modifyOP2,
-      ])
+    return Promise.all([addOP, searchOP, compareOP, modifyOP, searchOP2, compareOP2, modifyOP2])
       .then((results) => {
         results.forEach((element) => {
           if (element === errorCodes.ldapNoSuchObject) {
@@ -176,24 +159,12 @@ describe('Testing multiple operations functionalities', () => {
             should.deepEqual(element, errorCodes.alreadyExists);
           } else if (element === true) {
             should.deepEqual(true, element);
+          } else if (element.entries[0].dn === config.ldapAuthentication.dnUserNoRight) {
+            should.deepEqual(element.entries[0].dn, config.ldapAuthentication.dnUserNoRight);
+          } else if (element.entries[0].dn === dnUser) {
+            should.deepEqual(element.entries[0].dn, dnUser);
           } else {
-            // let resultOperation;
-            // resultOperation = element.split('\n');
-            // resultOperation = resultOperation[1].split(':');
-            // resultOperation = resultOperation[1];
-
-
-            if (element.entries[0].dn === config.ldapAuthentication.dnUserNoRight) {
-              should.deepEqual(
-                element.entries[0].dn,
-                config.ldapAuthentication.dnUserNoRight);
-            } else if (element.entries[0].dn === dnUser) {
-              should.deepEqual(element.entries[0].dn, dnUser);
-            } else {
-              should.deepEqual(
-                element.entries[0].dn,
-                `${newEntry}1${config.ldapAdd.dnNewEntry}`);
-            }
+            should.deepEqual(element.entries[0].dn, `${newEntry}1${config.ldapAdd.dnNewEntry}`);
           }
         });
       });

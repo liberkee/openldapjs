@@ -69,7 +69,9 @@ describe('Testing the async LDAP add operation', () => {
 
   afterEach(() => {
     return clientLDAP.unbind()
-      .then(() => { return clientLDAP2.unbind(); });
+      .then(() => {
+        return clientLDAP2.unbind();
+      });
   });
 
   it('should reject the add operation with a wrong dn', () => {
@@ -182,8 +184,7 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should reject the request if try to rebind', () => {
     const CustomError = errorHandler(errorList.insufficientAccess);
-    return clientLDAP2
-      .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
+    return clientLDAP2.add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
       .then(() => {
         should.fail(' should not succeed');
       })
@@ -198,8 +199,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should reject requests done from an unbound state', () => {
     return clientLDAP.unbind()
       .then(() => {
-        return clientLDAP.add(
-          `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
+        return clientLDAP.add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
       })
       .then(() => {
         should.fail('should not succeed');
@@ -225,7 +225,9 @@ describe('Testing the async LDAP add operation', () => {
 
     return Promise.all([first, second, third])
       .then((values) => {
-        values.forEach((result) => { result.should.be.deepEqual(0); });
+        values.forEach((result) => {
+          result.should.be.deepEqual(0);
+        });
       });
   });
 

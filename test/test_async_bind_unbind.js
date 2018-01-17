@@ -72,8 +72,7 @@ describe('Testing the async LDAP bind/unbind', () => {
   it('should reject if the client is not initialized', () => {
     return clientLDAP.unbind()
       .then(() => {
-        return clientLDAP.bind(
-          config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
+        return clientLDAP.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
       })
       .then(() => {
         should.fail('Didn\'t expect success');

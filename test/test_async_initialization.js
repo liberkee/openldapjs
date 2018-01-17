@@ -12,7 +12,9 @@ describe('Testing the async initialization', () => {
   const host = config.ldapAuthentication.host;
   let ldapWrap;
 
-  beforeEach(() => { ldapWrap = new LDAPWrap(host); });
+  beforeEach(() => {
+    ldapWrap = new LDAPWrap(host);
+  });
 
   afterEach(() => {});
 

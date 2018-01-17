@@ -29,11 +29,17 @@ describe('Testing the ChangePassword operation', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
-      .then(() => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.startTLS(pathToCert);
+      })
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
-  afterEach(() => { return ldapAsyncWrap.unbind(); });
+  afterEach(() => {
+    return ldapAsyncWrap.unbind();
+  });
 
   it('should reject the client is not bound', () => {
     ldapAsyncWrap.unbind()
