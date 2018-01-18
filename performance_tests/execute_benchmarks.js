@@ -72,7 +72,7 @@ const openldapjsCommands = [
 
 function proc(obj) {
   const begin = process.hrtime();
-  cp.execSync(obj.cmd);
+  cp.execSync(obj.cmd, {cwd: __dirname});
   const end = gShared.takeSnap(begin);
   obj.durations.push(gShared.asSeconds(end));
   obj.sum += gShared.asSeconds(end);

@@ -3,7 +3,7 @@
   "bindDn": "cn=admin,dc=ldap,dc=example,dc=org",
   "password": "mysecretpassword",
   "dummyOu": "ou=people,dc=ldap,dc=example,dc=org",
-  "entryCount": 1000,
+  "entryCount": 100,
   "sampleEntry": {
     "cn": "foo",
     "sn": "bar",
