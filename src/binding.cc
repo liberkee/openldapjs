@@ -6,12 +6,14 @@
 #include <map>
 #include <memory>
 #include "constants.h"
+#include "expo_construct_structure.h"
 #include "ldap_add_progress.h"
 #include "ldap_bind_progress.h"
 #include "ldap_changePassword_progress.h"
 #include "ldap_compare_progress.h"
 #include "ldap_control.h"
 #include "ldap_delete_progress.h"
+#include "ldap_extended_operation.h"
 #include "ldap_modify_progress.h"
 #include "ldap_paged_search_progress.h"
 #include "ldap_rename_progress.h"
@@ -36,6 +38,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::SetPrototypeMethod(tpl, "add", add);
     Nan::SetPrototypeMethod(tpl, "changePassword", changePassword);
     Nan::SetPrototypeMethod(tpl, "pagedSearch", pagedSearch);
+    Nan::SetPrototypeMethod(tpl, "extendedOperation", extendedOperation);
 
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
     Nan::Set(target, Nan::New("LDAPClient").ToLocalChecked(),
@@ -97,6 +100,7 @@ class LDAPClient : public Nan::ObjectWrap {
     callback = nullptr;
     return;
   }
+
   static NAN_METHOD(startTls) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
 
@@ -114,12 +118,12 @@ class LDAPClient : public Nan::ObjectWrap {
     state = ldap_set_option(nullptr, LDAP_OPT_X_TLS_REQUIRE_CERT, &verifyCert);
 
     if (state != LDAP_OPT_SUCCESS) {
-        stateClient[0] = Nan::New<v8::Number>(state);
-        callback->Call(1, stateClient);
-        delete callback;
-        callback = nullptr;
-        return;
-      }
+      stateClient[0] = Nan::New<v8::Number>(state);
+      callback->Call(1, stateClient);
+      delete callback;
+      callback = nullptr;
+      return;
+    }
 
     if (pathToCertificate.length()) {
       state = ldap_set_option(obj->ld_, LDAP_OPT_X_TLS_CACERTFILE, pathToCert);
@@ -228,6 +232,45 @@ class LDAPClient : public Nan::ObjectWrap {
                                 [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
         new LDAPSearchProgress(callback, progress, newLD, message));
+  }
+
+  static NAN_METHOD(extendedOperation) {
+    LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
+
+    Nan::Utf8String requestoid(info[0]);
+    v8::Local<v8::Object> objectData = v8::Local<v8::Object>::Cast(info[1]);
+    int message{};
+
+    v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
+    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+
+    struct berval *bv{};
+    char *reqOID = *requestoid;
+    const auto &ldapExtendedOperations =
+        std::make_shared<ExpoConstructStructure>();
+    const auto &functionMap = ldapExtendedOperations->functionMap();
+    const auto &it = functionMap.find(reqOID);
+
+    if (it != functionMap.end()) {
+      bv = &it->second(objectData);
+    }
+
+    const auto state = ldap_extended_operation(obj->ld_, reqOID, bv, nullptr,
+                                               nullptr, &message);
+
+    if (state != LDAP_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(constants::INVALID_LD);
+      callback->Call(1, stateClient);
+      delete callback;
+      delete progress;
+      return;
+    }
+    std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
+                                [](LDAP *ld) { ldap_destroy(ld); });
+
+    Nan::AsyncQueueWorker(
+        new LDAPExtendedOperationProgress(callback, progress, newLD, message));
   }
 
   static NAN_METHOD(pagedSearch) {
