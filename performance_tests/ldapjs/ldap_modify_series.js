@@ -30,6 +30,7 @@ async.waterfall(steps, (err) => {
 });
 
 function modify(ldapClient, cb) {
+  change.modification.sn = new Date().toISOString();
   async.times(config.entryCount, (n, next) => {
     ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, (err) => {
       next(err, 'ok');
