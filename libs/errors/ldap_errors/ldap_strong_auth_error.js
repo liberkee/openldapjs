@@ -16,6 +16,10 @@ class LdapStrongAuthRequired extends LoginError {
     ' between the client and server has unexpectedly failed or been compromised.';
   }
 
+  get code() {
+    return LdapStrongAuthRequired.code;
+  }
+
 }
 
 module.exports = LdapStrongAuthRequired;

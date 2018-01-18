@@ -13,6 +13,10 @@ class LdapLoopError extends ServerError {
     return 'Indicates that the client discovered an alias or referral loop, and is thus unable to complete this request.';
   }
 
+  get code() {
+    return LdapLoopError.code;
+  }
+
 }
 
 module.exports = LdapLoopError;

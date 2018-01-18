@@ -14,6 +14,10 @@ class LdapObjectClassModsError extends OperationalError {
     return 'Indicates that the modify operation attempted to modify the structure rules of an object class.';
   }
 
+  get code() {
+    return LdapObjectClassModsError.code;
+  }
+
 }
 
 module.exports = LdapObjectClassModsError;

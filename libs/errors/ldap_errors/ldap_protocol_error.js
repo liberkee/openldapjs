@@ -13,6 +13,11 @@ class LdapProtocolError extends OperationalError {
     return 'Indicates that the server has received an invalid or malformed request from the client.';
   }
 
+  get code() {
+    return LdapProtocolError.code;
+  }
+
+
 }
 
 module.exports = LdapProtocolError;

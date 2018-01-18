@@ -15,6 +15,10 @@ class LdapSizeLimitError extends OperationalError {
     ' has been exceeded. Incomplete results are returned.';
   }
 
+  get code() {
+    return LdapSizeLimitError.code;
+  }
+
 }
 
 module.exports = LdapSizeLimitError;

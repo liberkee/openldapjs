@@ -13,6 +13,10 @@ class LdapInvalidSyntaxError extends OperationalError {
     return 'Indicates that the attribute value specified in an add, compare, or modify operation is an unrecognized or invalid syntax for the attribute.';
   }
 
+  get code() {
+    return LdapInvalidSyntaxError.code;
+  }
+
 }
 
 module.exports = LdapInvalidSyntaxError;

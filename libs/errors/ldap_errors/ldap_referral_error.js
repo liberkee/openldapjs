@@ -13,6 +13,10 @@ class LdapReferralError extends LdapError {
     ' does not hold the target entry of the request, but that the servers in the referral field may.';
   }
 
+  get code() {
+    return LdapReferralError.code;
+  }
+
 }
 
 module.exports = LdapReferralError;

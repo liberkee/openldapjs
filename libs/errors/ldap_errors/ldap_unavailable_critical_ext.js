@@ -14,6 +14,10 @@ class LdapCriticalExtensionError extends ServerError {
     ' extensions were not available. Either the server does not support the control or the control is not appropriate for the operation type.';
   }
 
+  get code() {
+    return LdapCriticalExtensionError.code;
+  }
+
 }
 
 module.exports = LdapCriticalExtensionError;
