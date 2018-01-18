@@ -1,0 +1,12 @@
+{
+  "url": "ldap://localhost:389",
+  "bindDn": "cn=admin,dc=ldap,dc=example,dc=org",
+  "password": "mysecretpassword",
+  "dummyOu": "ou=people,dc=ldap,dc=example,dc=org",
+  "entryCount": 1000,
+  "sampleEntry": {
+    "cn": "foo",
+    "sn": "bar",
+    "objectClass": "person"
+  }
+}
