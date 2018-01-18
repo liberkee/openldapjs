@@ -3,7 +3,7 @@
 const binding = require('../build/Release/binding.node');
 const Promise = require('bluebird');
 const checkParameters = require('./utils/check_variable_format');
-const SearchStream = require('./stream_interface.js');
+const SearchStream = require('./paged_search_stream.js');
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
 const errorList = require('../test/error_list.json');
@@ -245,7 +245,7 @@ class LDAPAsyncWrap {
 
         this._searchID += 1;
         resolve(
-          new SearchStream(searchBase, scopeObject[scope], pageSize, this._searchID, this._binding));
+          new SearchStream(searchBase, scopeObject[scope], filter, pageSize, this._searchID, this._binding));
       }
       reject(new StateError(errorList.bindErrorMessage));
     });
