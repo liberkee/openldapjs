@@ -46,6 +46,6 @@ ldapClient.initialize()
 
         Promise.map(args, (arg) => {
           return ldapClient.add(arg, validEntryObject);
-        }, {concurrency: 1});
+        }, {concurrency: 4});
       });
   });
