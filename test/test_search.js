@@ -91,24 +91,22 @@ describe('Testing the async LDAP search ', () => {
     const CustomError = errorHandler(errorList.ldapNoSuchObject);
     return userLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .then(() => { should.fail('should not have passed'); })
-      .catch(
-        CustomError,
-        (err) => {
-          err.should.be.deepEqual(
-            new CustomError(errorList.ldapSearchErrorMessage));
-        })
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(
+          new CustomError(errorList.ldapSearchErrorMessage));
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
       .then(() => { should.fail('should not have passed'); })
-      .catch(
-        TypeError,
-        (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
-        })
+      .catch(TypeError, (err) => {
+        err.message.should.be.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -125,11 +123,9 @@ describe('Testing the async LDAP search ', () => {
     return userLDAP
       .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => { should.fail('should not have passed'); })
-      .catch(
-        TypeError,
-        (err) => {
-          err.message.should.be.deepEqual(errorList.typeErrorMessage);
-        })
+      .catch(TypeError, (err) => {
+        err.message.should.be.deepEqual(errorList.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
