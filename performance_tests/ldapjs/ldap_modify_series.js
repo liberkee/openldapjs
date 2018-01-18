@@ -34,6 +34,7 @@ const t0 = gShared.takeSnap();
 async.waterfall(steps, (err) => {
   if (err) {
     console.log('oww', err);
+    shared.unbind();
   } else {
     const duration = gShared.asSeconds(gShared.takeSnap(t0));
     console.log(`Modify [${config.entryCount}] took: ${duration} s`);

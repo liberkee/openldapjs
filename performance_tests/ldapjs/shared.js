@@ -3,22 +3,32 @@
 const ldap = require('ldapjs');
 
 const config = require('./../config');
+let sharedClient = null;
 
 function bind(cb) {
-  const ldapClient = ldap.createClient({url: config.url});
-  ldapClient.bind(config.bindDn, config.password, (err) => {
+  sharedClient = ldap.createClient({url: config.url});
+  sharedClient.bind(config.bindDn, config.password, (err) => {
     if (err) {
       cb(err);
     } else {
-      cb(null, ldapClient);
+      cb(null, sharedClient);
     }
   });
 }
 
-function unbind(ldapClient, cb) {
-  ldapClient.unbind(cb);
+function fatalUnbind() {
+  sharedClient.unbind(() => {
+    process.exit(1);
+  });
 }
 
+function unbind(ldapClient, cb) {
+  if (ldapClient === null || ldapClient === void 0 || typeof ldapClient === 'Function') {
+    fatalUnbind();
+  } else {
+    ldapClient.unbind(cb);
+  }
+}
 
 module.exports = {
   bind: bind,
