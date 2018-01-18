@@ -1,15 +1,15 @@
 'use strict';
 
-const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
+const LdapAsyncWrap = require('../index').Client;
 const config = require('./config.json');
 const should = require('should');
 const Promise = require('bluebird');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
+const errorHandler = require('../index').errorHandler;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 
-describe('Testing the modify functionalities', () => {
+describe.only('Testing the modify functionalities', () => {
 
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
