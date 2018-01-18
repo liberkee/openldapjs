@@ -6,13 +6,15 @@ const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
 
-const opts = {
-  scope: 'sub',
+const change = {
+  op: 'replace',
+  attr: 'sn',
+  vals: ['boox'],
 };
 
 const steps = [
   shared.bind,
-  search,
+  modify,
   shared.unbind,
 ];
 
@@ -22,27 +24,17 @@ async.waterfall(steps, (err) => {
     console.log('oww', err);
   } else {
     const duration = gShared.asSeconds(gShared.takeSnap(t0));
-    console.log(`Search [${config.entryCount}] took: ${duration} s`);
+    console.log(`Modify [${config.entryCount}] took: ${duration} s`);
 
   }
 });
 
-function search(ldapClient, cb) {
+function modify(ldapClient, cb) {
+  change.vals[0] = new Date().toISOString();
   async.times(config.entryCount, (n, next) => {
-    ldapClient.search(config.dummyOu, opts, (err, res) => {
-      if (err) {
-        console.error('oops', err);
-      } else {
-        res.on('end', () => {
-          next(err, 'ok');
-        });
-
-        res.on('error', () => {
-          next(err, 'ok');
-        });
-      }
-    });
+    ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, [])
+      .asCallback(next);
   }, (err, elements) => {
-    cb(err, ldapClient);
+    cb(err);
   });
 }

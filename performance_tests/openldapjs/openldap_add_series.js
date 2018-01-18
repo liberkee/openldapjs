@@ -12,7 +12,7 @@ const opts = {
 
 const steps = [
   shared.bind,
-  search,
+  add,
   shared.unbind,
 ];
 
@@ -22,27 +22,16 @@ async.waterfall(steps, (err) => {
     console.log('oww', err);
   } else {
     const duration = gShared.asSeconds(gShared.takeSnap(t0));
-    console.log(`Search [${config.entryCount}] took: ${duration} s`);
+    console.log(`Add [${config.entryCount}] took: ${duration} s`);
 
   }
 });
 
-function search(ldapClient, cb) {
+function add(ldapClient, cb) {
   async.times(config.entryCount, (n, next) => {
-    ldapClient.search(config.dummyOu, opts, (err, res) => {
-      if (err) {
-        console.error('oops', err);
-      } else {
-        res.on('end', () => {
-          next(err, 'ok');
-        });
-
-        res.on('error', () => {
-          next(err, 'ok');
-        });
-      }
-    });
+    ldapClient.add(`cn=person_${n},${config.dummyOu}`, config.sampleOpenldapjsEntry, [])
+      .asCallback(next);
   }, (err, elements) => {
-    cb(err, ldapClient);
+    cb(err);
   });
 }

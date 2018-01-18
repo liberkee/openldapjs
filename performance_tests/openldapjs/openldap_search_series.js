@@ -6,10 +6,6 @@ const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
 
-const opts = {
-  scope: 'sub',
-};
-
 const steps = [
   shared.bind,
   search,
@@ -29,20 +25,9 @@ async.waterfall(steps, (err) => {
 
 function search(ldapClient, cb) {
   async.times(config.entryCount, (n, next) => {
-    ldapClient.search(config.dummyOu, opts, (err, res) => {
-      if (err) {
-        console.error('oops', err);
-      } else {
-        res.on('end', () => {
-          next(err, 'ok');
-        });
-
-        res.on('error', () => {
-          next(err, 'ok');
-        });
-      }
-    });
+    ldapClient.search(config.dummyOu, 'SUBTREE', 'objectClass=*')
+      .asCallback(next);
   }, (err, elements) => {
-    cb(err, ldapClient);
+    cb(err);
   });
 }

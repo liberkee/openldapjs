@@ -8,5 +8,17 @@
     "cn": "foo",
     "sn": "bar",
     "objectClass": "person"
-  }
+  },
+  "sampleOpenldapjsEntry": [
+    {
+      "attr": "cn",
+      "vals": ["foo"]
+    }, {
+      "attr": "sn",
+      "vals": ["bar"]
+    }, {
+      "attr": "objectClass",
+      "vals": ["person"]
+    }
+  ]
 }
