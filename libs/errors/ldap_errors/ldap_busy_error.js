@@ -13,6 +13,11 @@ class LdapBusyError extends ServerError {
     return 'Indicates that the LDAP server is too busy to process the client request at this time but if the client waits and resubmits the request, the server may be able to process it then.';
   }
 
+  get code() {
+    return LdapBusyError.code;
+  }
+
+
 }
 
 module.exports = LdapBusyError;

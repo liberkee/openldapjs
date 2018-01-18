@@ -14,6 +14,11 @@ class LdapMatchingError extends OperationalError {
     return 'Indicates that the matching rule specified in the search filter does not match a rule defined for the attribute\'s syntax.';
   }
 
+  get code() {
+    return LdapMatchingError.code;
+  }
+
+
 }
 
 module.exports = LdapMatchingError;

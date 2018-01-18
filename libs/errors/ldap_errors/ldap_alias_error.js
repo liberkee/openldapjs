@@ -13,6 +13,11 @@ class LdapAliasError extends ServerError {
     return 'Indicates that an error occurred when an alias was dereferenced.';
   }
 
+  get code() {
+    return LdapAliasError.code;
+  }
+
+
 }
 
 module.exports = LdapAliasError;
