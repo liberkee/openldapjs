@@ -6,9 +6,15 @@ const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
 
-const opts = {
-  scope: 'sub',
-};
+function add(ldapClient, cb) {
+  async.times(config.entryCount, (n, next) => {
+    ldapClient.add(`cn=person_${n},${config.dummyOu}`, config.sampleOpenldapjsEntry, [])
+      .asCallback(next);
+  }, (err, elements) => {
+    cb(err);
+  });
+}
+
 
 const steps = [
   shared.bind,
@@ -27,11 +33,3 @@ async.waterfall(steps, (err) => {
   }
 });
 
-function add(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
-    ldapClient.add(`cn=person_${n},${config.dummyOu}`, config.sampleOpenldapjsEntry, [])
-      .asCallback(next);
-  }, (err, elements) => {
-    cb(err);
-  });
-}

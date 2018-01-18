@@ -10,23 +10,6 @@ const opts = {
   scope: 'sub',
 };
 
-const steps = [
-  shared.bind,
-  search,
-  shared.unbind,
-];
-
-const t0 = gShared.takeSnap();
-async.waterfall(steps, (err) => {
-  if (err) {
-    console.log('oww', err);
-  } else {
-    const duration = gShared.asSeconds(gShared.takeSnap(t0));
-    console.log(`Search [${config.entryCount}] took: ${duration} s`);
-
-  }
-});
-
 function search(ldapClient, cb) {
   async.times(config.entryCount, (n, next) => {
     ldapClient.search(config.dummyOu, opts, (err, res) => {
@@ -46,3 +29,21 @@ function search(ldapClient, cb) {
     cb(err, ldapClient);
   });
 }
+
+const steps = [
+  shared.bind,
+  search,
+  shared.unbind,
+];
+
+const t0 = gShared.takeSnap();
+async.waterfall(steps, (err) => {
+  if (err) {
+    console.log('oww', err);
+  } else {
+    const duration = gShared.asSeconds(gShared.takeSnap(t0));
+    console.log(`Search [${config.entryCount}] took: ${duration} s`);
+
+  }
+});
+

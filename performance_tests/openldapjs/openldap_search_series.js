@@ -6,6 +6,15 @@ const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
 
+function search(ldapClient, cb) {
+  async.times(config.entryCount, (n, next) => {
+    ldapClient.search(config.dummyOu, 'SUBTREE', 'objectClass=*')
+      .asCallback(next);
+  }, (err, elements) => {
+    cb(err);
+  });
+}
+
 const steps = [
   shared.bind,
   search,
@@ -19,15 +28,6 @@ async.waterfall(steps, (err) => {
   } else {
     const duration = gShared.asSeconds(gShared.takeSnap(t0));
     console.log(`Search [${config.entryCount}] took: ${duration} s`);
-
   }
 });
 
-function search(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
-    ldapClient.search(config.dummyOu, 'SUBTREE', 'objectClass=*')
-      .asCallback(next);
-  }, (err, elements) => {
-    cb(err);
-  });
-}

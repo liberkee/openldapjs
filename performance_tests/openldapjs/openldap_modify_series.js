@@ -12,6 +12,16 @@ const change = {
   vals: ['boox'],
 };
 
+function modify(ldapClient, cb) {
+  change.vals[0] = new Date().toISOString();
+  async.times(config.entryCount, (n, next) => {
+    ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, [])
+      .asCallback(next);
+  }, (err, elements) => {
+    cb(err);
+  });
+}
+
 const steps = [
   shared.bind,
   modify,
@@ -29,12 +39,4 @@ async.waterfall(steps, (err) => {
   }
 });
 
-function modify(ldapClient, cb) {
-  change.vals[0] = new Date().toISOString();
-  async.times(config.entryCount, (n, next) => {
-    ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, [])
-      .asCallback(next);
-  }, (err, elements) => {
-    cb(err);
-  });
-}
+

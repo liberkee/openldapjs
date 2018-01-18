@@ -6,9 +6,14 @@ const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
 
-const opts = {
-  scope: 'sub',
-};
+function del(ldapClient, cb) {
+  async.times(config.entryCount, (n, next) => {
+    ldapClient.delete(`cn=person_${n},${config.dummyOu}`, [])
+      .asCallback(next);
+  }, (err, elements) => {
+    cb(err);
+  });
+}
 
 const steps = [
   shared.bind,
@@ -27,11 +32,4 @@ async.waterfall(steps, (err) => {
   }
 });
 
-function del(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
-    ldapClient.delete(`cn=person_${n},${config.dummyOu}`, [])
-      .asCallback(next);
-  }, (err, elements) => {
-    cb(err);
-  });
-}
+
