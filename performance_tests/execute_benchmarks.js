@@ -10,7 +10,7 @@ const _ = require('underscore');
 const gShared = require('./global_shared');
 const config = require('./config');
 
-const rawIterations = 10;
+const rawIterations = 100;
 
 const ldapjsCommands = [
   {
