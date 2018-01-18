@@ -25,6 +25,8 @@ const scopeObject = {
 
 const LDAP_COMPARE_TRUE = 6;
 
+const TIME_OUT_DEFAULT_VAL = 10;
+
 
 /**
  * @module LDAPTransition
@@ -97,14 +99,16 @@ class LDAPAsyncWrap {
     * @method bind
     * @param {String} bindDn The client user DN.
     * @param {String} passwordUser The client's password.
+    * @param {Number} timeVal Optional parameter to set the time to wait for the operation
     * @return {Promise} That resolves if the credentials are correct.
     * Rejects if dn or password are incorrect or the client did not initialize.
     * */
 
-  bind(bindDn, passwordUser) {
+  bind(bindDn, passwordUser, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        this._binding.bind(bindDn, passwordUser, (err, state) => {
+        const timeValue = timeVal === undefined ? TIME_OUT_DEFAULT_VAL : timeVal;
+        this._binding.bind(bindDn, passwordUser, timeValue, (err, state) => {
           if (err) {
             const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
@@ -185,10 +189,11 @@ class LDAPAsyncWrap {
      * SUBTREE
      * @param {String} searchFilter  search filter.If not provided,
      * the default filter, (objectClass=*), is used.
+     * @param {Number} timeVal Optional parameter to set the time to wait for the operation
      * @return {Promise} That resolves and returns a string with the search
      * results. Rejects in case of error.
      * */
-  search(searchBase, scope, searchFilter) {
+  search(searchBase, scope, searchFilter, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
@@ -198,9 +203,10 @@ class LDAPAsyncWrap {
         if (scopeObject[scope] === undefined) {
           throw new Error(errorList.scopeSearchErrorMessage);
         }
+        const timeValue = timeVal === undefined ? TIME_OUT_DEFAULT_VAL : timeVal;
 
         this._binding.search(
-          searchBase, scopeObject[scope], searchFilter, (err, result) => {
+          searchBase, scopeObject[scope], searchFilter, timeValue, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorList.ldapSearchErrorMessage));

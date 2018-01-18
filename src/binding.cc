@@ -154,9 +154,11 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
 
+    struct timeval timeOut = {(long)info[2]->NumberValue(), constants::ZERO_USECONDS};
+
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     char *username = *userArg;
     char *password = *passArg;
@@ -178,7 +180,7 @@ class LDAPClient : public Nan::ObjectWrap {
       return;
     }
 
-    AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld_, msgID));
+    AsyncQueueWorker(new LDAPBindProgress(callback, progress, obj->ld_, msgID, timeOut));
   }
 
   static NAN_METHOD(search) {
@@ -190,16 +192,13 @@ class LDAPClient : public Nan::ObjectWrap {
     char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
 
-    struct timeval timeOut = {constants::TEN_SECONDS,
-                              constants::ZERO_USECONDS};  // if search exceeds
-                                                          // 10 seconds, throws
-                                                          // error
+    struct timeval timeOut = {(long)info[3]->NumberValue(), constants::ZERO_USECONDS};
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[4].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[5].As<v8::Function>());
 
-    int scopeSearch = info[1]->NumberValue();
+    int scopeSearch = (int)info[1]->NumberValue();
 
     if (obj->ld_ == nullptr) {
       /* We verify the ld before an operation to see if we should continue or
@@ -227,15 +226,15 @@ class LDAPClient : public Nan::ObjectWrap {
     std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
                                 [](LDAP *ld) { ldap_destroy(ld); });
     Nan::AsyncQueueWorker(
-        new LDAPSearchProgress(callback, progress, newLD, message));
+        new LDAPSearchProgress(callback, progress, newLD, message, timeOut));
   }
 
   static NAN_METHOD(pagedSearch) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String baseArg(info[0]);
-    int scopeSearch = info[1]->NumberValue();
+    int scopeSearch = (int)info[1]->NumberValue();
     Nan::Utf8String filterArg(info[2]);
-    int pageSize = info[3]->NumberValue();
+    int pageSize = (int)info[3]->NumberValue();
     Nan::Utf8String cookieID(info[4]);
     std::string dnBase = *baseArg;
     std::string filterSearch = *filterArg;

@@ -11,6 +11,7 @@ class LDAPBindProgress : public Nan::AsyncProgressWorker {
   int msgID_{};
   int result_{};
   LDAPMessage *resultMsg_{};
+  struct timeval timeOut_{};
 
  public:
   /**
@@ -21,7 +22,7 @@ class LDAPBindProgress : public Nan::AsyncProgressWorker {
    **@param msgID, operation identifier.
    **/
   LDAPBindProgress(Nan::Callback *callback, Nan::Callback *progress, LDAP *ld,
-                   const int msgID);
+                   const int msgID, struct timeval timeOut);
 
   /**
     **@brief Execute Method, runs outside the event loop.

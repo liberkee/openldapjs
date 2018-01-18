@@ -6,24 +6,26 @@
 LDAPSearchProgress::LDAPSearchProgress(Nan::Callback *callback,
                                        Nan::Callback *progress,
                                        const std::shared_ptr<LDAP> &ld,
-                                       const int msgID)
+                                       const int msgID, struct timeval timeOut)
     : Nan::AsyncProgressWorker(callback),
       ld_(ld),
       progress_(progress),
-      msgID_(msgID) {}
+      msgID_(msgID),
+      timeOut_(timeOut) {}
 
 LDAPSearchProgress::~LDAPSearchProgress() {}
 
 void LDAPSearchProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
-  struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
-
   LDAPMessage *l_result{};
   int result{};
 
-  while (result == constants::LDAP_NOT_FINISHED) {
-    result = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
+  result = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut_,
                          &l_result);
+  
+  if (result == constants::LDAP_NOT_FINISHED) {
+    status_ = constants::LDAP_ERROR;
+    return;
   }
 
   status_ = ldap_result2error(ld_.get(), l_result, false);
