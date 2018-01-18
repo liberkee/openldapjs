@@ -1,10 +1,9 @@
 #include "ldap_extended_operation.h"
 #include "constants.h"
 
-LDAPExtendedOperationProgress::LDAPExtendedOperationProgress(Nan::Callback *callback,
-                                         Nan::Callback *progress,
-                                         const std::shared_ptr<LDAP> &ld,
-                                         const int msgID)
+LDAPExtendedOperationProgress::LDAPExtendedOperationProgress(
+    Nan::Callback *callback, Nan::Callback *progress,
+    const std::shared_ptr<LDAP> &ld, const int msgID)
     : Nan::AsyncProgressWorker(callback),
       ld_(ld),
       progress_(progress),
@@ -43,8 +42,9 @@ void LDAPExtendedOperationProgress::HandleOKCallback() {
       const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       switch (status) {
         case LDAP_SUCCESS: {
-          const auto resExt = ldap_parse_extended_result(ld_.get(), resultMsg_, nullptr, &retoidp, 0);
-          if(resExt != LDAP_SUCCESS) {
+          const auto resExt = ldap_parse_extended_result(ld_.get(), resultMsg_,
+                                                         nullptr, &retoidp, 0);
+          if (resExt != LDAP_SUCCESS) {
             stateClient[0] = Nan::New<v8::Number>(resExt);
             callback->Call(1, stateClient);
             break;
@@ -79,6 +79,5 @@ void LDAPExtendedOperationProgress::HandleOKCallback() {
   progress_->Reset();
 }
 
-
 void LDAPExtendedOperationProgress::HandleProgressCallback(const char *data,
-                                                 size_t size) {}
+                                                           size_t size) {}

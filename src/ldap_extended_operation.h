@@ -6,7 +6,7 @@
 #include <memory>
 
 class LDAPExtendedOperationProgress : public Nan::AsyncProgressWorker {
-private:
+ private:
   const std::shared_ptr<LDAP> ld_{};
   Nan::Callback *progress_{};
   int result_{};
@@ -21,8 +21,10 @@ private:
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
    **/
-  LDAPExtendedOperationProgress(Nan::Callback *callback, Nan::Callback *progress,
-                     const std::shared_ptr<LDAP> &ld, const int msgID);
+  LDAPExtendedOperationProgress(Nan::Callback *callback,
+                                Nan::Callback *progress,
+                                const std::shared_ptr<LDAP> &ld,
+                                const int msgID);
   ~LDAPExtendedOperationProgress();
 
   /**
