@@ -2,12 +2,13 @@
 
 ```javascript
 
-ldap.bind('userDn,dc=example,dc=com','secret')
+ldap.bind('userDn,dc=example,dc=com','secret', 2)
 
 ```
 
 * `userDn,dc=example,dc=com`  represents the ldap user distinguished name.
 * `secret` represents the password for the user DN.
+* `2` The maxim amount of time the server should take in responding the bind operation (in seconds). _Optional_
 
 A promise returning function that wraps the `ldap_simple_bind` C API. It is used after initialize has finished and ,in case of success,  the client's state is upgraded from initialized to bound and the client may proceed to issue other requests. In case of failure a custom error is returned that provides details why the request failed.
 

@@ -1,12 +1,13 @@
 # LDAP Add Operation
 
 ```javascript
-    ldap.add(dn,entryObject,optionalControls);
+    ldap.add(dn,entryObject,optionalControls,timeVal);
 ```
 
 * `dn` Dn where the entryObject is to be added.
 * `entryObject` LDAP entry object to be added to the provided DN
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
+* `timeVal` The maxim amount of time the server should take in responding the add operation (in seconds). _Optional_
 
 Example usecase:
 
@@ -22,7 +23,7 @@ ldap.initialize()
         return ldap.bind(..,..)
     })
     .then( () => {
-        ldap.add(dn,entryObject,optionalControls)
+        ldap.add(dn,entryObject,optionalControls,timeVal)
     })
 
 ```
