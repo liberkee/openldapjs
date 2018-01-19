@@ -154,7 +154,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String userArg(info[0]);
     Nan::Utf8String passArg(info[1]);
 
-    struct timeval timeOut = {(long)info[2]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[2]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -194,14 +194,14 @@ class LDAPClient : public Nan::ObjectWrap {
     char *dnBase = *baseArg;
     char *filterSearch = *filterArg;
 
-    struct timeval timeOut = {(long)info[3]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[3]->NumberValue()),
                               constants::ZERO_USECONDS};
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
     Nan::Callback *callback = new Nan::Callback(info[4].As<v8::Function>());
     Nan::Callback *progress = new Nan::Callback(info[5].As<v8::Function>());
 
-    int scopeSearch = (int)info[1]->NumberValue();
+    const int scopeSearch = static_cast<int32_t>(info[1]->NumberValue());
 
     if (obj->ld_ == nullptr) {
       /* We verify the ld before an operation to see if we should continue or
@@ -235,11 +235,11 @@ class LDAPClient : public Nan::ObjectWrap {
   static NAN_METHOD(pagedSearch) {
     LDAPClient *obj = Nan::ObjectWrap::Unwrap<LDAPClient>(info.Holder());
     Nan::Utf8String baseArg(info[0]);
-    int scopeSearch = (int)info[1]->NumberValue();
+    const int scopeSearch = static_cast<int32_t>(info[1]->NumberValue());
     Nan::Utf8String filterArg(info[2]);
-    int pageSize = (int)info[3]->NumberValue();
+    const int pageSize = static_cast<int32_t>(info[3]->NumberValue());
     Nan::Utf8String cookieID(info[4]);
-    struct timeval timeOut = {(long)info[5]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[5]->NumberValue()),
                               constants::ZERO_USECONDS};
     std::string dnBase = *baseArg;
     std::string filterSearch = *filterArg;
@@ -279,7 +279,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String DNArg(info[0]);
     Nan::Utf8String attrArg(info[1]);
     Nan::Utf8String valueArg(info[2]);
-    struct timeval timeOut = {(long)info[3]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[3]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     char *DNEntry = *DNArg;
@@ -319,7 +319,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String userDN(info[0]);
     Nan::Utf8String oldPassword(info[1]);
     Nan::Utf8String newPassword(info[2]);
-    struct timeval timeOut = {(long)info[3]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[3]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -383,7 +383,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     v8::Local<v8::Array> mods = v8::Local<v8::Array>::Cast(info[1]);
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[2]);
-    struct timeval timeOut = {(long)info[3]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[3]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     unsigned int nummods = mods->Length();
@@ -481,7 +481,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String newrdn(info[1]);
     Nan::Utf8String newparent(info[2]);
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[3]);
-    struct timeval timeOut = {(long)info[4]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[4]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -523,7 +523,7 @@ class LDAPClient : public Nan::ObjectWrap {
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
     Nan::Utf8String dn(info[0]);
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[1]);
-    struct timeval timeOut = {(long)info[2]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[2]->NumberValue()),
                               constants::ZERO_USECONDS};
     char *dns = *dn;
 
@@ -573,7 +573,7 @@ class LDAPClient : public Nan::ObjectWrap {
     v8::Local<v8::Array> entries = v8::Local<v8::Array>::Cast(info[1]);
     v8::Local<v8::Array> controlHandle = v8::Local<v8::Array>::Cast(info[2]);
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    struct timeval timeOut = {(long)info[3]->NumberValue(),
+    struct timeval timeOut = {static_cast<int32_t>(info[3]->NumberValue()),
                               constants::ZERO_USECONDS};
 
     unsigned int nummods = entries->Length();
