@@ -236,7 +236,8 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should return results in entire subtree', () => {
+  it('should return results in entire subtree', function searchTime() {
+    this.timeout(0);
     return adminLDAP
       .search(
         searchBase, searchScope.subtree,

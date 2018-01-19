@@ -34,7 +34,8 @@ const TIME_OUT_DEFAULT_VAL = 10;
  */
 class LDAPAsyncWrap {
 
-  constructor(host) {
+  constructor(host, timeOut) {
+    this._timeVal = timeOut === undefined ? TIME_OUT_DEFAULT_VAL : timeOut;
     this._hostAddress = host;
     this._binding = new binding.LDAPClient();
     this._stateClient = E_STATES.CREATED;
@@ -107,7 +108,7 @@ class LDAPAsyncWrap {
   bind(bindDn, passwordUser, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        const timeValue = timeVal === undefined ? TIME_OUT_DEFAULT_VAL : timeVal;
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
         this._binding.bind(bindDn, passwordUser, timeValue, (err, state) => {
           if (err) {
             const CustomError = errorHandler(err);
@@ -203,7 +204,7 @@ class LDAPAsyncWrap {
         if (scopeObject[scope] === undefined) {
           throw new Error(errorList.scopeSearchErrorMessage);
         }
-        const timeValue = timeVal === undefined ? TIME_OUT_DEFAULT_VAL : timeVal;
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
         this._binding.search(
           searchBase, scopeObject[scope], searchFilter, timeValue, (err, result) => {
@@ -228,10 +229,11 @@ class LDAPAsyncWrap {
      * SUBTREE
      * @param {String} searchFilter search filter.
      * @param {int} pageSize The number of entries per LDAP page
+     * @param {Number} timeVal Optional parameter to set the time to wait for the operation
      * @return {Promise} that resolves to a readable stream or rejects to a
      * Error;
      */
-  pagedSearch(searchBase, scope, searchFilter, pageSize) {
+  pagedSearch(searchBase, scope, searchFilter, pageSize, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.BOUND) {
         checkParameters.validateStrings(searchBase, searchFilter, scope);
@@ -244,10 +246,11 @@ class LDAPAsyncWrap {
           throw new TypeError(errorList.typeErrorMessage);
         }
         this._searchID += 1;
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
         resolve(
           new SearchStream(
             searchBase, scopeObject[scope], searchFilter, pageSize,
-            this._searchID, this._binding));
+            this._searchID, this._binding, timeValue));
       }
       reject(new StateError(errorList.bindErrorMessage));
     });
@@ -261,21 +264,20 @@ class LDAPAsyncWrap {
    * @param {String} dn The dn of the entry to compare.
    * @param {String} attr The attribute given for comparison.
    * @param {String} value Value sent to compare.
+   * @param {Number} timeVal Optional parameter to set the time to wait for the operation
    * @return {Promise} That resolves and returns True if the elements are
-   * equal
-   * or
-   * False otherwise.
-   * Rejects if an error occurs.
+   * equal or False otherwise. Rejects if an error occurs.
    */
 
-  compare(dn, attr, value) {
+  compare(dn, attr, value, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, attr, value);
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
-        this._binding.compare(dn, attr, value, (err, result) => {
+        this._binding.compare(dn, attr, value, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapCompareErrorMessage));
@@ -296,12 +298,13 @@ class LDAPAsyncWrap {
     * @param {Object || Array} jsonChange The attribute and value to be changed
     * @param {Object || Array} [controls] Request to execute a specific control
     * or multiple controls. This parameter is optional.
+    * @param {Number} timeVal Optional parameter to set the time to wait for the operation
     * @return {Promise} That resolves if LDAP modified successfully the
     * entry.
     * Reject if  LDAP rejects the operation or the client's state is not
     * BOUND
     */
-  modify(dn, jsonChange, controls) {
+  modify(dn, jsonChange, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
@@ -310,7 +313,8 @@ class LDAPAsyncWrap {
         const changes = checkParameters.checkModifyChange(jsonChange);
         const ctrls = checkParameters.checkControl(controls);
 
-        this._binding.modify(dn, changes, ctrls, (err, result) => {
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
+        this._binding.modify(dn, changes, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapModifyErrorMessage));
@@ -330,20 +334,21 @@ class LDAPAsyncWrap {
    * @param {String} newRdn The new rdn for the dn
    * @param {String} newParent New parent for the rdn
    * @param {Object || Array} [controls] Request to execute a specific control
-   * or
-   * multiple controls. This parameter is optional.
+   * or multiple controls. This parameter is optional.
+   * @param {Number} timeVal Optional parameter to set the time to wait for the operation
    * @return {Promise} Will fulfil with a result from a control if the
    * operation is successful, else will reject with an LDAP error number.
    * */
-  rename(dn, newRdn, newParent, controls) {
+  rename(dn, newRdn, newParent, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, newRdn, newParent);
         const ctrls = checkParameters.checkControl(controls);
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
-        this._binding.rename(dn, newRdn, newParent, ctrls, (err, result) => {
+        this._binding.rename(dn, newRdn, newParent, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapRenameErrorMessage));
@@ -361,21 +366,22 @@ class LDAPAsyncWrap {
    * @method delete
    * @param {String} dn the dn entry to be deleted.
    * @param {Object || Array} [controls] Request to execute a specific control
-   * or
-   * multiple controls. This parameter is optional.
+   * or multiple controls. This parameter is optional.
+   * @param {Number} timeVal Optional parameter to set the time to wait for the operation
    * @return {Promise} promise that resolves if the element provided was
    * deleted
    * or rejects if not.
    * */
-  delete(dn, controls) {
+  delete(dn, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const ctrls = checkParameters.checkControl(controls);
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
-        this._binding.delete(dn, ctrls, (err, result) => {
+        this._binding.delete(dn, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapDeleteErrorMessage));
@@ -394,17 +400,20 @@ class LDAPAsyncWrap {
     * @param {String} userDn The user dn whose password will be changed
     * @param {String} oldPassword Old password of userDn
     * @param {String} newPassword New password for userDn
+    * @param {Number} timeVal Optional parameter to set the time to wait for the operation
     * @return {Promise} Will fulfil if the password was changed, fails otherwise. 
     * */
-  changePassword(userDn, oldPassword, newPassword) {
+  changePassword(userDn, oldPassword, newPassword, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
       } else {
         checkParameters.validateStrings(userDn, oldPassword, newPassword);
 
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
+
         this._binding.changePassword(
-          userDn, oldPassword, newPassword, (err, result) => {
+          userDn, oldPassword, newPassword, timeValue, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
               reject(
@@ -426,12 +435,12 @@ class LDAPAsyncWrap {
    * @param {Object || Array} entry ldif format to be added, needs to have a
    * structure that is mappable to a LDAPMod structure
    * @param {Object || Array} [controls] Request to execute a specific control
-   * or
-   * multiple controls. This parameter is optional.
+   * or multiple controls. This parameter is optional.
+   * @param {Number} timeVal Optional parameter to set the time to wait for the operation
    * @return {Promise} that fulfils if the add was successful, rejects
    * otherwise.
    * */
-  add(dn, entry, controls) {
+  add(dn, entry, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorList.bindErrorMessage));
@@ -439,8 +448,9 @@ class LDAPAsyncWrap {
         checkParameters.validateStrings(dn);
         const entryAttr = checkParameters.checkEntryObject(entry);
         const ctrls = checkParameters.checkControl(controls);
+        const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
-        this._binding.add(dn, entryAttr, ctrls, (err, result) => {
+        this._binding.add(dn, entryAttr, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapAddErrorMessage));

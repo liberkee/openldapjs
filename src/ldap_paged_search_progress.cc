@@ -6,7 +6,8 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
     Nan::Callback *callback, Nan::Callback *progress,
     const std::shared_ptr<LDAP> &ld, std::string base, int scope,
     std::string filter, const std::string &cookieID, int pgSize,
-    const std::shared_ptr<std::map<std::string, berval *>> &cookies)
+    const std::shared_ptr<std::map<std::string, berval *>> &cookies,
+    struct timeval timeOut)
     : Nan::AsyncProgressWorker(callback),
       cookies_(cookies),
       ld_(ld),
@@ -15,9 +16,8 @@ LDAPPagedSearchProgress::LDAPPagedSearchProgress(
       filter_(filter),
       scope_(scope),
       pageSize_(pgSize),
-      cookieID_(cookieID) {}
-
-
+      cookieID_(cookieID),
+      timeOut_(timeOut) {}
 
 // Executes in worker thread
 void LDAPPagedSearchProgress::Execute(
@@ -33,7 +33,6 @@ void LDAPPagedSearchProgress::Execute(
   LDAPControl **returnedControls = nullptr;
   LDAPMessage *l_result{};
   int msgId{};
-  struct timeval timeOut = {constants::ONE_SECOND, constants::ZERO_USECONDS};
 
   /******************************************************************/
   /* Get one page of the returned results each time                 */
@@ -47,24 +46,26 @@ void LDAPPagedSearchProgress::Execute(
   M_controls[0] = pageControl;
 
   /* Search for entries in the directory using the parmeters.       */
-
   status_ = ldap_search_ext(ld_.get(), base_.c_str(), scope_, filter_.c_str(),
                             nullptr, constants::ATTR_VALS_WANTED, M_controls,
                             nullptr, nullptr, LDAP_NO_LIMIT, &msgId);
-
   if ((status_ != LDAP_SUCCESS)) {
     return;
   }
 
-  while (pagedResult == constants::LDAP_NOT_FINISHED) {
-    pagedResult = ldap_result(ld_.get(), msgId, constants::ALL_RESULTS,
-                              &timeOut, &l_result);
-  }
+  pagedResult = ldap_result(ld_.get(), msgId, constants::ALL_RESULTS, &timeOut_,
+                            &l_result);
   /**
   ** Check for errors and return
   **/
-  if (pagedResult != LDAP_RES_SEARCH_RESULT) {
+
+  if (pagedResult == constants::LDAP_ERROR) {
     status_ = pagedResult;
+    return;
+  }
+
+  if (pagedResult == constants::LDAP_NOT_FINISHED) {
+    status_ = LDAP_TIMEOUT;
     return;
   }
 

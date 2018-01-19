@@ -21,10 +21,15 @@ void LDAPSearchProgress::Execute(
   int result{};
 
   result = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut_,
-                         &l_result);
-  
+                       &l_result);
+
+  if (result == constants::LDAP_ERROR) {
+    status_ = result;
+    return;
+  }
+
   if (result == constants::LDAP_NOT_FINISHED) {
-    status_ = constants::LDAP_ERROR;
+    status_ = LDAP_TIMEOUT;
     return;
   }
 

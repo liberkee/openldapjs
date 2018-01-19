@@ -12,6 +12,7 @@ class LDAPChangePasswordProgress : public Nan::AsyncProgressWorker {
   int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
+  struct timeval timeOut_ {};
 
  public:
   /**
@@ -20,9 +21,11 @@ class LDAPChangePasswordProgress : public Nan::AsyncProgressWorker {
   **@param progress, callback used to pass intermediate results to js
   **@param ld, LDAP structure that holds ldap internal data.
   **@param msgID, operation identifier.
+  **@param timeOut_, This will determin was much to spend on the operation.
   **/
   LDAPChangePasswordProgress(Nan::Callback *callback, Nan::Callback *progress,
-                             const std::shared_ptr<LDAP> &ld, const int msgID);
+                             const std::shared_ptr<LDAP> &ld, const int msgID,
+                             struct timeval timeOut_);
 
   /**
   **@brief Execute Method, runs outside the event loop.
