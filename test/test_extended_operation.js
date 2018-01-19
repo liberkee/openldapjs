@@ -83,10 +83,10 @@ describe.only('Testing the async LDAP extended operation', () => {
   });
 
   it('should reject if you don\'t provide a good message ID for the cancel operation', () => {
-    const CustomError = errorHandler(errorList.ldapProtocolError);
+    const CustomError = errorHandler(errorList.LdapNoSuchOperation);
     const msgID = 10;
 
-    return clientLDAP2.extendedOperation(config.ldapExtendedOperation.oid.cancelRequest, msgID)
+    return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.cancelRequest, msgID)
       .then(() => {
         should.fail('should not have succeeded');
       })
@@ -95,6 +95,16 @@ describe.only('Testing the async LDAP extended operation', () => {
       })
       .catch(() => {
         should.fail('did not expect generic error');
+      });
+  });
+
+  it('should change a password of a specific user', () => {
+    return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
+      config.ldapChangePassword.user, config.ldapChangePassword.oldPasswd,
+      config.ldapChangePassword.newPasswd)
+      .then((result) => {
+        const successStart = 0;
+        result.should.be.deepEqual(successStart);
       });
   });
 

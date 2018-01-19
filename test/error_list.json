@@ -7,6 +7,7 @@
   "invalidCredentials": 49,
   "ldapOther": 80,
   "resultSuccess": 0,
+  "LdapNoSuchOperation": 119,
   "typeErrorMessage": "Expected Valid String parameter",
   "comparisonResTrue": 6,
   "comparisonResFalse": 5,
