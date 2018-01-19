@@ -5,16 +5,28 @@
 #include <nan.h>
 #include <functional>
 #include <map>
+
 class ExpoConstructStructure {
+ private:
+  BerElement *valueConstr{};
+  struct berval valueBer {};
+  /**
+   * @brief functionMap_
+   * @return
+   */
+  std::map<std::string,
+           std::function<struct berval(const v8::Local<v8::Object> &)>>
+      functionMap_{};
+
  public:
   /**
-   * @brief ExpoConstructStructure
+   * @brief Constructor
    */
   ExpoConstructStructure();
 
   /**
-   * @brief LdapExopCancel
-   * @param objectData
+   * @brief LdapExopChangePassword Method, return the berval structure for change password operation
+   * @param objectData The value send it from nodejs for the operation
    * @return
    */
 
@@ -22,8 +34,8 @@ class ExpoConstructStructure {
       const v8::Local<v8::Object> &objectData);
 
   /**
-   * @brief LdapExopCancel
-   * @param objectData
+   * @brief LdapExopRefresh Method, return the berval structure for refresh operation
+   * @param objectData The value send it from nodejs for the operation
    * @return
    */
 
@@ -31,8 +43,8 @@ class ExpoConstructStructure {
       const v8::Local<v8::Object> &objectData);
 
   /**
-   * @brief LdapExopCancel
-   * @param objectData
+   * @brief LdapExopCancel Method, return the berval structure for cancel operation
+   * @param objectData The value send it from nodejs for the operation
    * @return
    */
   struct berval LdapExopCancel(const v8::Local<v8::Object> &objectData);
@@ -44,13 +56,6 @@ class ExpoConstructStructure {
   std::map<std::string,
            std::function<struct berval(const v8::Local<v8::Object> &)>>
   functionMap() const;
-
- private:
-  BerElement *valueConstr{};
-  struct berval valueBer {};
-  std::map<std::string,
-           std::function<struct berval(const v8::Local<v8::Object> &)>>
-      functionMap_{};
 };
 
 #endif  // OPENLDAPJS_SRC_LDAP_EXTENDED_OPERATIONS_H_

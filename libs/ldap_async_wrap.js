@@ -317,32 +317,34 @@ class LDAPAsyncWrap {
   }
 
   /**
-     * Search operation with results displayed page by page.
+     * Extended operation for operation using there OID and value.
      *
      * @method extendedOperation
-     * @param {String} oid the base for the search.
-     * @param {String} value  scope for the search, can be BASE, ONE or
-     * SUBTREE
+     * @param {String} oid the operation specific OID.
+     * @param {String | Number} arguments the values that are required for the operation.
      * @return {Promise} Will resolve with the response from the server 
      * and reject in case of error
      */
 
-  extendedOperation(oid, value) {
+  extendedOperation(oid) {
     return new Promise((resolve, reject) => {
-      if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
-      } else {
+      const objectValue = {};
+      _.each(arguments, (element, index) => {
+        if (index > 0) {
+          const j = index - 1;
+          objectValue[j] = element;
+        }
+      });
 
-        const valueData = value === undefined ? '' : value;
-        this._binding.extendedOperation(oid, valueData, (err, result) => {
-          if (err) {
-            const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapSearchErrorMessage));
-          } else {
-            resolve(result);
-          }
-        });
-      }
+      const valueData = objectValue === undefined ? '' : objectValue;
+      this._binding.extendedOperation(oid, valueData, (err, result) => {
+        if (err) {
+          const CustomError = errorHandler(err);
+          reject(new CustomError(errorList.ldapExtendedOperationMessage));
+        } else {
+          resolve(result);
+        }
+      });
     });
   }
 
