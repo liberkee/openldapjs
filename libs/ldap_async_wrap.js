@@ -34,6 +34,13 @@ const TIME_OUT_DEFAULT_VAL = 10;
  */
 class LDAPAsyncWrap {
 
+  /**
+    * Constructor of LDAPAsyncWrap.
+    *
+    * @method constructor
+    * @param {String} host The address host of the ldapServer
+    * @param {Number} timeOut Optional value to change for all operation the time for a request
+    * */
   constructor(host, timeOut) {
     this._timeVal = timeOut === undefined ? TIME_OUT_DEFAULT_VAL : timeOut;
     this._hostAddress = host;
