@@ -14,7 +14,7 @@
 * The server ran on the client machine within a docker container based on [dinkel/openldap](https://github.com/dinkel/docker-openldap)
 * OS: Linux 4.14.13-1
 
-### Testresults for 100 iterations with each 100 function calls:
+### Test results for 100 iterations with each 100 function calls:
 ```plain
 Running ldapjs for 100 iterations and 100 entries:
 ## add ##
@@ -70,4 +70,76 @@ sum:     82.50075322300002 s
 slowest: 3.793282758 s
 fastest: 0.334937755 s
 average: 0.8250075322300002 s
+```
+
+## Radu94
+### Host Machine
+* CPU: Intel(R) Core(TM) i5-6500 CPu @ 3.20GHz
+* Cores/Threads: 4/4
+* Memory: 8GB
+
+### Client Machine
+* CPU: Intel(R) Core(TM) i5-6500 CPu @ 3.20GHz
+* Cores/Threads: 4/4
+* Memory: 4GB
+
+* The server ran on the client Virtual machine using VirtualBox
+* OS: Ubuntu 16.04.3 LTS
+
+### Test results for 100 iterations with each 100 function calls:
+```plain
+Running ldapjs for 100 iterations and 100 entries:
+## add ##
+sum:     4.79 s
+slowest: 1.30 s
+fastest: 0.49 s
+average: 0.79 s
+## compare ##
+sum:     1.24 s
+slowest: 0.25 s
+fastest: 0.18 s
+average: 0.20 s
+## modify ##
+sum:     1.51 s
+slowest: 0.27 s
+fastest: 0.23 s
+average: 0.25 s
+## search (10k entries) ##
+sum:     62.5 s
+slowest: 10.75 s
+fastest: 10.27 s
+average: 10.41 s
+## delete ##
+sum:     2.36 s
+slowest: 0.51 s
+fastest: 0.28 s
+average: 0.39 s
+
+
+Running openldapjs for 100 iterations and 100 entries:
+## add ##
+sum:     3.11 s
+slowest: 0.77 s
+fastest: 0.29 s
+average: 0.51 s
+## compare ##
+sum:     0.3 s
+slowest: 0.06 s
+fastest: 0.04 s
+average: 0.05 s
+## modify ##
+sum:     1.68 s
+slowest: 0.38 s
+fastest: 0.25 s
+average: 0.28 s
+## search(10k entries) ##
+sum:     Time Limit Exceeded
+slowest: Time Limit Exceeded
+fastest: Time Limit Exceeded
+average: Time Limit Exceeded
+## delete ##
+sum:     1.62 s
+slowest: 0.55 s
+fastest: 0.12 s
+average: 0.27 s
 ```
