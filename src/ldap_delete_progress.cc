@@ -40,9 +40,9 @@ void LDAPDeleteProgress::HandleOKCallback() {
       const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       switch (status) {
         case LDAP_SUCCESS: {
-          const auto &ldap_controls = new LdapControls();
-          std::string deleteResult =
-              ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
+          const auto &ldapControls = new LdapControls();
+          const std::string deleteResult =
+              ldapControls->PrintModificationControls(ld_.get(), resultMsg_);
           if (!deleteResult.empty()) {
             stateClient[1] = Nan::New(deleteResult).ToLocalChecked();
             callback->Call(2, stateClient);
@@ -50,7 +50,7 @@ void LDAPDeleteProgress::HandleOKCallback() {
             stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
             callback->Call(2, stateClient);
           }
-          delete ldap_controls;
+          delete ldapControls;
           break;
         }
         default: {

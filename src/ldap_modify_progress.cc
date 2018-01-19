@@ -25,8 +25,6 @@ void LDAPModifyProgress::HandleOKCallback() {
   Nan::HandleScope scope;
   v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
 
-  std::string modifyResult;
-
   switch (result_) {
     case constants::LDAP_ERROR: {
       stateClient[0] = Nan::New<v8::Number>(result_);
@@ -42,9 +40,9 @@ void LDAPModifyProgress::HandleOKCallback() {
       const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       switch (status) {
         case LDAP_SUCCESS: {
-          const auto &ldap_controls = new LdapControls();
-          modifyResult =
-              ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
+          const auto &ldapControls = new LdapControls();
+          const std::string modifyResult =
+              ldapControls->PrintModificationControls(ld_.get(), resultMsg_);
           if (!modifyResult.empty()) {
             stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
             callback->Call(2, stateClient);
@@ -52,7 +50,7 @@ void LDAPModifyProgress::HandleOKCallback() {
             stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
             callback->Call(2, stateClient);
           }
-          delete ldap_controls;
+          delete ldapControls;
           break;
         }
         default: {

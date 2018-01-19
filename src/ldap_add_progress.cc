@@ -39,9 +39,9 @@ void LDAPAddProgress::HandleOKCallback() {
       const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       switch (status) {
         case LDAP_SUCCESS: {
-          const auto &ldap_controls = new LdapControls();
-          std::string addResult =
-              ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
+          const auto &ldapControls = new LdapControls();
+          const std::string addResult =
+              ldapControls->PrintModificationControls(ld_.get(), resultMsg_);
           if (!addResult.empty()) {
             stateClient[1] = Nan::New(addResult).ToLocalChecked();
             callback->Call(2, stateClient);
@@ -50,7 +50,7 @@ void LDAPAddProgress::HandleOKCallback() {
             stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
             callback->Call(2, stateClient);
           }
-          delete ldap_controls;
+          delete ldapControls;
           break;
         }
         default: {

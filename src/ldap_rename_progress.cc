@@ -39,9 +39,9 @@ void LDAPRenameProgress::HandleOKCallback() {
       const auto status = ldap_result2error(ld_.get(), resultMsg_, false);
       switch (status) {
         case LDAP_SUCCESS: {
-          const auto &ldap_controls = new LdapControls();
-          std::string modifyResult =
-              ldap_controls->PrintModificationControls(ld_.get(), resultMsg_);
+          const auto &ldapControls = new LdapControls();
+          const std::string modifyResult =
+              ldapControls->PrintModificationControls(ld_.get(), resultMsg_);
           if (!modifyResult.empty()) {
             stateClient[1] = Nan::New(modifyResult).ToLocalChecked();
             callback->Call(2, stateClient);
@@ -50,7 +50,7 @@ void LDAPRenameProgress::HandleOKCallback() {
             stateClient[1] = Nan::New<v8::Number>(LDAP_SUCCESS);
             callback->Call(2, stateClient);
           }
-          delete ldap_controls;
+          delete ldapControls;
           break;
         }
         default: {

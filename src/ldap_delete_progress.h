@@ -11,7 +11,7 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
   int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
-  struct timeval timeOut_ {};
+  struct timeval timeOut_{};
 
  public:
   /**
@@ -20,7 +20,8 @@ class LDAPDeleteProgress : public Nan::AsyncProgressWorker {
    **@param progress, callback used to pass intermediate results to js
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
-   **@param timeOut_, This will determin was much to spend on the operation.
+   **@param timeOut, timeval structure that holds the time value that is used to determin how 
+   ** much to spend on the request operation.
    **/
   LDAPDeleteProgress(Nan::Callback *callback, Nan::Callback *progress,
                      const std::shared_ptr<LDAP> &ld, const int msgID,
