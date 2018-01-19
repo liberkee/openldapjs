@@ -13,7 +13,6 @@ adminClient.initialize()
     return adminClient.search('dc=demoApp,dc=com', 'SUBTREE', 'objectClass=*');
   })
   .then((result) => {
-    console.log(result);
     const end = process.hrtime(t0);
     console.log('Searching took: %ds %dms', end[0], end[1] / 1e6);
 
