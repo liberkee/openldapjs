@@ -1,11 +1,13 @@
 'use strict';
 
-function takeSnap(oldSnap) {
+const _ = require('underscore');
 
-  if (typeof oldSnap === void 0) {
+function takeSnap(oldSnap) {
+  if (!_.isArray(oldSnap)) {
     const t0 = process.hrtime();
     return t0;
   }
+
 
   const diff = process.hrtime(oldSnap);
   return diff;
