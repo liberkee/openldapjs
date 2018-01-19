@@ -13,6 +13,10 @@ class LdapNotFoundError extends OperationalError {
     return 'Indicates the target object cannot be found. This code is not returned on following operations: Search operations that find the search base but cannot find any entries that match the search filter. Bind operations.';
   }
 
+  get code() {
+    return LdapNotFoundError.code;
+  }
+
 }
 
 module.exports = LdapNotFoundError;

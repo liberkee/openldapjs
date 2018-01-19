@@ -12,6 +12,10 @@ class LdapOtherError extends LdapError {
     return 'Indicates an unknown error condition. This is the default value for NDS error codes which do not map to other LDAP error codes.';
   }
 
+  get code() {
+    return LdapOtherError.code;
+  }
+
 }
 
 module.exports = LdapOtherError;

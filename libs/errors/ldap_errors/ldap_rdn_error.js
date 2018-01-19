@@ -14,6 +14,10 @@ class LdapRdnError extends OperationalError {
     return 'Indicates that the modify operation attempted to remove an attribute value that forms the entry\'s relative distinguished name.';
   }
 
+  get code() {
+    return LdapRdnError.code;
+  }
+
 }
 
 module.exports = LdapRdnError;

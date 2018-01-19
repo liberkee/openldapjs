@@ -13,6 +13,11 @@ class LdapAdminLimitError extends ServerError {
     return 'Indicates that an LDAP server limit set by an administrative authority has been exceeded.';
   }
 
+  get code() {
+    return LdapAdminLimitError.code;
+  }
+
+
 }
 
 module.exports = LdapAdminLimitError;

@@ -16,6 +16,10 @@ class LdapObjectClassError extends OperationalError {
     ' The modify operation tries to remove a required attribute without removing the auxiliary class that defines the attribute as required.';
   }
 
+  get code() {
+    return LdapObjectClassError.code;
+  }
+
 }
 
 module.exports = LdapObjectClassError;

@@ -13,6 +13,10 @@ class LdapUnavailableError extends ServerError {
     return 'Indicates that the LDAP server cannot process the client\'s bind request, usually because it is shutting down.';
   }
 
+  get code() {
+    return LdapUnavailableError.code;
+  }
+
 }
 
 module.exports = LdapUnavailableError;

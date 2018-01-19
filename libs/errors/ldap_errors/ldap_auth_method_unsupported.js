@@ -14,6 +14,11 @@ class LdapAuthError extends LoginError {
     ' an authentication method not supported by the LDAP server.';
   }
 
+  get code() {
+    return LdapAuthError.code;
+  }
+
+
 }
 
 module.exports = LdapAuthError;

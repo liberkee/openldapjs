@@ -13,6 +13,10 @@ class LdapNoSuchAttributeError extends OperationalError {
     return 'Indicates that the attribute specified in the modify or compare operation does not exist in the entry.';
   }
 
+  get code() {
+    return LdapNoSuchAttributeError.code;
+  }
+
 }
 
 module.exports = LdapNoSuchAttributeError;

@@ -14,6 +14,11 @@ class LdapCredentialsError extends LoginError {
     ' or the password is incorrect because it has expired, intruder detection has locked the account, or another similar reason. See the data code for more information.';
   }
 
+  get code() {
+    return LdapCredentialsError.code;
+  }
+
+
 }
 
 module.exports = LdapCredentialsError;

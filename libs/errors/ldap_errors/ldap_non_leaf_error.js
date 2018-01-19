@@ -15,6 +15,10 @@ class LdapNonLeafError extends OperationalError {
     ' The client request a modify DN operation on a parent entry.';
   }
 
+  get code() {
+    return LdapNonLeafError.code;
+  }
+
 }
 
 module.exports = LdapNonLeafError;

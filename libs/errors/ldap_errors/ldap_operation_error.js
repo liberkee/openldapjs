@@ -15,6 +15,10 @@ class LdapOperationError extends LdapError {
     ' To conform to the new LDAP drafts, NDS 8.5 uses 80 (0x50) for such errors.';
   }
 
+  get code() {
+    return LdapOperationError.code;
+  }
+
 }
 
 module.exports = LdapOperationError;

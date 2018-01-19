@@ -15,6 +15,10 @@ class LdapNamingError extends OperationalError {
     ' The request places the entry subordinate to a container that is forbidden by the containment rules. The RDN for the entry uses a forbidden attribute type.';
   }
 
+  get code() {
+    return LdapNamingError.code;
+  }
+
 }
 
 module.exports = LdapNamingError;

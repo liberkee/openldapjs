@@ -13,6 +13,10 @@ class LdapUnwillingError extends ServerError {
     return 'Indicates that the LDAP server cannot process the client\'s bind request, usually because it is shutting down.';
   }
 
+  get code() {
+    return LdapUnwillingError.code;
+  }
+
 }
 
 module.exports = LdapUnwillingError;

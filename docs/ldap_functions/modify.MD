@@ -12,19 +12,54 @@ Modify example:
 
 ```javascript
 
-const dn = 'cn=userDn,ou=users,o=myhost,dc=example,dc=com';
+const dn = 'cn=newPoint999,o=myhost,dc=demoApp,dc=com';
+const preRead = '1.3.6.1.1.13.1';
+const postRead = '1.3.6.1.1.13.2';
+
 const changes = {
-    op: "replace",
-    attr: "address",
-    vals: "New Address, nr 23"
+    op: 'replace', // type of change required, can be either add, replace or delete
+    attr: 'sn', // attribute to be modified
+    vals: ['New Address, nr 23'] // new value(s)
 
 }
 
+const control = [
+    {
+        oid: preRead, // oid that identifies the extended op
+        value: ['cn'], // array of server response you want before the modify
+        isCritical: false, // whether or not the modify should fail if the required response can not be retrieved 
+    },
+    {
+        oid: postRead,
+        value: ['objectClass','sn'],
+        isCritical: true
+    }
+]
 
+
+
+// init, bind, etc.
 //changes the address from the previous value to "New Address,nr 23"
-ldap.modify(dn, changes)
+ldap.modify(dn, changes, control)
+    .then((result) => {
+        console.log(result);
+    })
 
 
+
+```
+
+## Output
+
+```
+dn: cn=newPoint999,o=myhost,dc=demoApp,dc=com
+cn:  foo
+cn: newPoint999
+sn: oldValue
+
+dn: cn=newPoint999,o=myhost,dc=demoApp,dc=com
+objectClass: person
+sn: New Address, nr 23
 
 ```
 

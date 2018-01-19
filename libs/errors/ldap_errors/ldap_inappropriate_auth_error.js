@@ -15,6 +15,11 @@ class LdapInappropriateAuthError extends LoginError {
     '...OR...The client returns a DN and a password for a simple bind when the entry does not have a password defined.';
   }
 
+  get code() {
+    return LdapInappropriateAuthError.code;
+  }
+
+
 }
 
 module.exports = LdapInappropriateAuthError;

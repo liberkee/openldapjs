@@ -1,11 +1,11 @@
 'use strict';
 
 const should = require('should');
-const LDAPWrap = require('../libs/ldap_async_wrap.js');
+const LDAPWrap = require('../index').Client;
 const config = require('./config');
 const Promise = require('bluebird');
 const errorList = require('./error_list.json');
-const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
+const errorHandler = require('../index').errorHandler;
 const StateError = require('../libs/errors/state_error');
 
 describe('Testing the async LDAP paged search ', () => {
@@ -99,17 +99,6 @@ describe('Testing the async LDAP paged search ', () => {
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
-  it('should reject if searchFilter is not string type', () => {
-    return adminLDAP.pagedSearch(searchBase, searchScope.subtree, 1, pageSize)
-      .then(() => { should.fail('Didn\'t expect success'); })
-      .catch(
-        TypeError,
-        (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
-        })
-      .catch((err) => { should.fail('did not expect generic error'); });
-
-  });
 
   it('should reject if pageSize is not integer type', () => {
     return adminLDAP

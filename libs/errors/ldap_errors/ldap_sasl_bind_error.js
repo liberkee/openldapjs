@@ -13,6 +13,10 @@ class LdapBindInProgressError extends LdapError {
     ' The client must send the server the same SASL mechanism to continue the process.';
   }
 
+  get code() {
+    return LdapBindInProgressError.code;
+  }
+
 }
 
 module.exports = LdapBindInProgressError;

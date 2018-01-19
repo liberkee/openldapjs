@@ -14,6 +14,10 @@ class LdapTimeLimitError extends OperationalError {
     ' has been exceeded. On search operations, incomplete results are returned.';
   }
 
+  get code() {
+    return LdapTimeLimitError.code;
+  }
+
 }
 
 module.exports = LdapTimeLimitError;
