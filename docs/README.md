@@ -56,7 +56,7 @@ The Async C functions are processed using [AsyncProgressWorkers](https://github.
 
 State Machine illustrating library usage:
 
-![state machine]((https://user-images.githubusercontent.com/22966207/35210587-81626eaa-ff5b-11e7-8ef2-ff0d932fe328.png)
+![state machine](https://user-images.githubusercontent.com/22966207/35210587-81626eaa-ff5b-11e7-8ef2-ff0d932fe328.png)
 
 ## Error Handling
 
