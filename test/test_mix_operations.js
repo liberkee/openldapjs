@@ -16,7 +16,7 @@ describe('Testing multiple operations functionalities', () => {
   const val = config.ldapCompare.value;
   const searchBase = config.ldapSearch.searchBase;
 
-  const newEntry = 'cn=newPointChild111';
+  const newEntry = config.ldapAdd.rdnUser;
 
   const searchScope = {
     base: 'BASE',
@@ -62,7 +62,7 @@ describe('Testing multiple operations functionalities', () => {
     },
   ];
 
-  const dnUser = `${newEntry}${config.ldapAdd.dnNewEntry}`;
+  const dnUser = `${newEntry}0${config.ldapAdd.dnNewEntry}`;
 
   let attributeEntry = newEntry.split('=');
   attributeEntry = attributeEntry[1];

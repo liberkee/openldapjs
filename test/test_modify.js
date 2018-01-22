@@ -198,7 +198,7 @@ describe('Testing the modify functionalities', () => {
   });
 
 
-  it('should add  new attributes to an existing entry', () => {
+  it('should add new attributes to an existing entry', () => {
     return ldapAsyncWrap
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,

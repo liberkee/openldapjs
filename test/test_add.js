@@ -14,7 +14,7 @@ describe('Testing the async LDAP add operation', () => {
 
   let personNr = 1;
   let dnUser;
-  const rdnUser = 'cn=testUsers';
+  const rdnUser = config.ldapAdd.rdnUser;
 
   const validEntry = [
     config.ldapAdd.firstAttr,

@@ -1,6 +1,6 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://10.16.0.194:389",
+    "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
@@ -66,6 +66,7 @@
   "ldapAdd": {
     "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnNewEntryAdmin": ",dc=demoApp,dc=com",
+    "rdnUser": "cn=testUsersAdd",
     "firstAttr": {
       "attr": "objectClass",
       "vals": ["person"]
@@ -100,11 +101,11 @@
     "filterObjSpecific3": "objectClass=inetOrgPerson"
   },
   "ldapDelete": {
-    "rdnUser": "cn=testUsers",
+    "rdnUser": "cn=testUsersDelete",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapTestEntries": {
-    "host": "ldap://10.16.0.194:389",
+    "host": "ldap://localhost:389",
     "entryDn":"cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "userDn": "cn=admin,dc=demoApp,dc=com",
     "userPassword": "secret"
