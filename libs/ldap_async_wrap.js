@@ -10,6 +10,10 @@ const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
 const _ = require('underscore');
 const ldif = require('ldif');
+const ldifConstruct = require('./utils/construct_ldif');
+const ldifMine = require('./utils/mappingStringJson');
+
+const ldifMineClass = new ldifMine();
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
@@ -151,44 +155,18 @@ class LDAPAsyncWrap {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
-              const resJSON = result === '' ? result : ldif.parse(result);
+              let resJSON;
+              try {
+                resJSON = result === '' ? result : ldif.parse(result);
+              } catch (ldifErr) {
+                resJSON = ldifConstruct(result);
+              }
               resolve(resJSON);
             }
           });
       }
     });
   }
-
-  /**
-     * Search operation with results displayed page by page.
-     *
-     * @method extendedOperation
-     * @param {String} oid the base for the search.
-     * @param {String} value  scope for the search, can be BASE, ONE or
-     * SUBTREE
-     * @return {Promise} Will resolve with the response from the server 
-     * and reject in case of error
-     */
-
-  extendedOperation(oid, value) {
-    return new Promise((resolve, reject) => {
-      if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorMessages.bindErrorMessage));
-      } else {
-
-        const valueData = value === undefined ? '' : value;
-        this._binding.extendedOperation(oid, valueData, (err, result) => {
-          if (err) {
-            const CustomError = errorHandler(err);
-            reject(new CustomError(errorMessages.ldapSearchErrorMessage));
-          } else {
-            resolve(result);
-          }
-        });
-      }
-    });
-  }
-
 
   /**
      * Search operation with results displayed page by page.

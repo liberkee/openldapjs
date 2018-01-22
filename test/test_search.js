@@ -81,10 +81,10 @@ describe('Testing the async LDAP search ', () => {
    * case for search with non existing search base
    */
   it('should return the root node', () => {
-    const ROOT_NODE = '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
+    const dnName = ' ';
     return adminLDAP.search('', searchScope.base, config.ldapSearch.filterObjAll)
       .then((result) => {
-        should.deepEqual(result, ROOT_NODE);
+        should.deepEqual(result.entries[0].dn, dnName);
       });
   });
   /**
@@ -238,7 +238,8 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should return results in entire subtree', () => {
+  it('should return results in entire subtree', function searchTime() {
+    this.timeout(0);
     return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
         result.entries[1].dn.should.be.deepEqual(dnAdmin);
