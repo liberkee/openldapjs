@@ -239,11 +239,13 @@ class LDAPClient : public Nan::ObjectWrap {
 
     Nan::Utf8String requestoid(info[0]);
     v8::Local<v8::Object> objectData = v8::Local<v8::Object>::Cast(info[1]);
+    struct timeval timeOut = {static_cast<int32_t>(info[2]->NumberValue()),
+                          constants::ZERO_USECONDS};
     int message{};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
-    Nan::Callback *callback = new Nan::Callback(info[2].As<v8::Function>());
-    Nan::Callback *progress = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *callback = new Nan::Callback(info[3].As<v8::Function>());
+    Nan::Callback *progress = new Nan::Callback(info[4].As<v8::Function>());
 
     struct berval *bv{};
     char *reqOID = *requestoid;
@@ -270,7 +272,7 @@ class LDAPClient : public Nan::ObjectWrap {
                                 [](LDAP *ld) { ldap_destroy(ld); });
 
     Nan::AsyncQueueWorker(
-        new LDAPExtendedOperationProgress(callback, progress, newLD, message));
+        new LDAPExtendedOperationProgress(callback, progress, newLD, message, timeOut));
   }
 
   static NAN_METHOD(pagedSearch) {

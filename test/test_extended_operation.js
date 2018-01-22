@@ -100,11 +100,29 @@ describe.only('Testing the async LDAP extended operation', () => {
 
   it('should change a password of a specific user', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
-      config.ldapChangePassword.user, config.ldapChangePassword.oldPasswd,
-      config.ldapChangePassword.newPasswd)
+      [config.ldapChangePassword.user,
+        config.ldapChangePassword.oldPasswd,
+        config.ldapChangePassword.newPasswd])
       .then((result) => {
         const successStart = 0;
         result.should.be.deepEqual(successStart);
+      });
+  });
+
+  it('should reject if the old password is not correct', () => {
+    const CustomError = errorHandler(errorList.unwillingToPerform);
+    return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
+      [config.ldapChangePassword.user,
+        'Wrong password',
+        config.ldapChangePassword.newPasswd])
+      .then((result) => {
+        should.fail('should not have succeeded');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err, new CustomError(errorList.ldapExtendedOperationMessage));
+      })
+      .catch(() => {
+        should.fail('did not expect generic error');
       });
   });
 
