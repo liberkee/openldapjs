@@ -14,7 +14,8 @@ const change = {
 };
 
 function modify(ldapClient, cb) {
-  change.modification.sn = new Date().toISOString();
+  change.modification.sn = new Date()
+    .toISOString();
   async.times(config.entryCount, (n, next) => {
     ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, (err) => {
       next(err, 'ok');
@@ -41,5 +42,4 @@ async.waterfall(steps, (err) => {
 
   }
 });
-
 
