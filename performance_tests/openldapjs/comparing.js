@@ -13,7 +13,7 @@ ldapClient.initialize()
     return ldapClient.bind('cn=admin,dc=demoApp,dc=com', 'secret');
   })
   .then(() => {
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       promiseArray.push(ldapClient.compare('cn=admin,dc=demoApp,dc=com', 'objectClass', 'simpleSecurityObject'));
     }
 

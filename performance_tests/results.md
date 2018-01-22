@@ -143,3 +143,62 @@ slowest: 0.55 s
 fastest: 0.12 s
 average: 0.27 s
 ```
+
+### Test results for 100 iterations with each 100 function calls in parallel:
+```plain
+Running ldapjs for 100 iterations and 100 entries:
+## add ##
+sum:    7.75
+slowest: 2.13 s
+fastest: 0.29 s
+average: 1.10 s
+## compare ##
+sum:     2.81 s
+slowest: 0.42 s
+fastest: 0.39 s
+average: 0.40 s
+## modify ##
+sum:     1.19 s
+slowest: 0.20 s
+fastest: 0.14 s
+average: 0.17 s
+## search  ##
+sum:     0.50 s
+slowest: 0.08 s
+fastest: 0.07 s
+average: 0.07 s
+## delete ##
+sum:     3.55 s
+slowest: 0.81 s
+fastest: 0.11 s
+average: 0.50 s
+
+
+Running openldapjs for 100 iterations and 100 entries:
+## add ##
+sum:    5.04 s
+slowest: 0.93 s
+fastest: 0.57 s
+average: 0.72 s
+## compare ##
+sum:     0.007 s
+slowest: 0.001 s
+fastest: 0.001 s
+average: 0.001 s
+## modify ##
+sum:     3.8 s
+slowest: 0.80 s
+fastest: 0.44 s
+average: 0.54 s
+## search ##
+sum:     1.56 s
+slowest: 0.28 s
+fastest: 0.21 s
+average: 0.22 s
+## delete ##
+sum:     4.22 s
+slowest: 0.66 s
+fastest: 0.58 s
+average: 0.60 s
+```
+

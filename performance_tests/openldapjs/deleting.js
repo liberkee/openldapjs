@@ -30,15 +30,16 @@ ldapClient.initialize()
   })
   .then(() => {
     const args = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       args.push(`${`${rdn + i}`},${dn}`);
     }
 
     Promise.map(args, (arg) => {
-      return ldapClient.delete(arg, control);
+      return ldapClient.delete(arg);
     }, {concurrency: 4})
       .then(() => {
         const end = process.hrtime(t0);
         console.log('Deleting took: %ds %dms', end[0], end[1] / 1e6);
+        ldapClient.delete(dn);
       });
   });

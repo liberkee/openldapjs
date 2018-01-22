@@ -32,8 +32,8 @@ ldapClient.initialize()
     return ldapClient.bind('cn=admin,dc=demoApp,dc=com', 'secret');
   })
   .then(() => {
-    for (let i = 0; i < 1000; i++) {
-      promiseArray.push(ldapClient.modify('cn=newPoint5,o=myhost,dc=demoApp,dc=com', changes, control));
+    for (let i = 0; i < 100; i++) {
+      promiseArray.push(ldapClient.modify('cn=testUser1,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com', changes, control));
     }
 
     return Promise.all(promiseArray);

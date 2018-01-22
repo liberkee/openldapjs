@@ -51,7 +51,7 @@ ldapClient.initialize()
     ldapClient.add(dn, validEntryObject, control)
       .then(() => {
         const args = [];
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 100; i++) {
           args.push(`${`${rdn + i}`},${dn}`);
         }
 
