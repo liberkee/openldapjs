@@ -20,6 +20,7 @@ class LDAPPagedSearchProgress : public Nan::AsyncProgressWorker {
   int status_{};
   bool morePages_{};
   std::string cookieID_{};
+  struct timeval timeOut_{};
 
  public:
   /**
@@ -34,12 +35,15 @@ class LDAPPagedSearchProgress : public Nan::AsyncProgressWorker {
   **@param cookieID, ID cookie for the next page
   **@param pgSize, length in entries of a page to be return
   **@param cookies, the berval cookie structure for a page
+  **@param timeOut, timeval structure that holds the time value that is used to determin how 
+  ** much to spend on the request operation.
   **/
   LDAPPagedSearchProgress(
       Nan::Callback *callback, Nan::Callback *progress,
       const std::shared_ptr<LDAP> &ld, std::string base, int scope,
       std::string filter, const std::string &cookieID, int pgSize,
-      const std::shared_ptr<std::map<std::string, berval *>> &cookies);
+      const std::shared_ptr<std::map<std::string, berval *>> &cookies,
+      struct timeval timeOut);
 
   /**
    **@brief Execute Method, runs outside the event loop.

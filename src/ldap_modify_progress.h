@@ -12,6 +12,7 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
   int result_{};
   LDAPMessage *resultMsg_{};
   int msgID_{};
+  struct timeval timeOut_{};
 
  public:
   /**
@@ -20,9 +21,12 @@ class LDAPModifyProgress : public Nan::AsyncProgressWorker {
    **@param progress, callback used to pass intermediate results to js
    **@param ld, LDAP structure that holds ldap internal data.
    **@param msgID, operation identifier.
+   **@param timeOut, timeval structure that holds the time value that is used to determin how 
+   ** much to spend on the request operation.
    **/
   LDAPModifyProgress(Nan::Callback *callback, Nan::Callback *progress,
-                     const std::shared_ptr<LDAP> &ld, const int msgID);
+                     const std::shared_ptr<LDAP> &ld, const int msgID,
+                     struct timeval timeOut);
   ~LDAPModifyProgress();
 
   /**

@@ -9,7 +9,7 @@ const errorHandler = require('../index').errorHandler;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 
-describe.only('Testing the modify functionalities', () => {
+describe('Testing the modify functionalities', () => {
 
   let ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 

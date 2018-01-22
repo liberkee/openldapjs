@@ -110,6 +110,22 @@ describe('Testing the async LDAP search ', () => {
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
+  it('should reject if the time required expired', () => {
+    const CustomError = errorHandler(errorList.ldapOther);
+    return adminLDAP
+      .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll, 1)
+      .then((result) => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (err) => {
+        err.should.be.deepEqual(
+          new CustomError(errorList.ldapSearchErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
   it('should reject if the scope doesn\'t exist', () => {
     return userLDAP
       .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
@@ -232,7 +248,8 @@ describe('Testing the async LDAP search ', () => {
       });
   });
 
-  it('should return results in entire subtree', () => {
+  it('should return results in entire subtree', function searchTime() {
+    this.timeout(0);
     return adminLDAP
       .search(
         searchBase, searchScope.subtree,

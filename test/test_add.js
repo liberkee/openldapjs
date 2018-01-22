@@ -70,7 +70,7 @@ describe('Testing the async LDAP add operation', () => {
     return clientLDAP.unbind()
       .then(() => { return clientLDAP2.unbind(); });
   });
-  
+
   it('should add a single entry', () => {
     return clientLDAP.add(dnUser, validEntry)
       .then((result) => {
@@ -133,8 +133,6 @@ describe('Testing the async LDAP add operation', () => {
       });
 
   });
-
- 
 
   it('should add multiple entries sequentially and reject to add a duplicate', () => {
     const CustomError = errorHandler(errorList.alreadyExists);

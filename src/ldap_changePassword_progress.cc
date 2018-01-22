@@ -4,22 +4,19 @@
 
 LDAPChangePasswordProgress::LDAPChangePasswordProgress(
     Nan::Callback *callback, Nan::Callback *progress,
-    const std::shared_ptr<LDAP> &ld, const int msgID)
+    const std::shared_ptr<LDAP> &ld, const int msgID, struct timeval timeOut)
     : Nan::AsyncProgressWorker(callback),
       ld_(ld),
       progress_(progress),
-      msgID_(msgID) {}
+      msgID_(msgID),
+      timeOut_(timeOut) {}
 
 void LDAPChangePasswordProgress::Execute(
     const Nan::AsyncProgressWorker::ExecutionProgress &progress) {
   /* Interval time to the function to verify the message */
-  struct timeval timeOut = {constants::ZERO_SECONDS, constants::ONE_USECOND};
 
-  /* Wait until the result is not LDAP_RES_UNSOLICITED*/
-  while (result_ == LDAP_RES_UNSOLICITED) {
-    result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut,
-                          &resultMsg_);
-  }
+  result_ = ldap_result(ld_.get(), msgID_, constants::ALL_RESULTS, &timeOut_,
+                        &resultMsg_);
 }
 
 void LDAPChangePasswordProgress::HandleOKCallback() {
@@ -30,6 +27,12 @@ void LDAPChangePasswordProgress::HandleOKCallback() {
     /* If the result is constants::LDAP_ERROR then we throw the error */
     case constants::LDAP_ERROR: {
       stateClient[0] = Nan::New<v8::Number>(result_);
+      callback->Call(1, stateClient);
+      break;
+    }
+    /* If the timeout goes out we send a error of Timeing */
+    case constants::LDAP_NOT_FINISHED: {
+      stateClient[0] = Nan::New<v8::Number>(LDAP_TIMEOUT);
       callback->Call(1, stateClient);
       break;
     }

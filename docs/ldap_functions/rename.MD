@@ -1,12 +1,13 @@
 # LDAP Rename Operation
 
 ```javascript
-    ldap.rename(dn, newRdn, newParent, controls)
+    ldap.rename(dn, newRdn, newParent, controls, timeVal)
 ```
 * `dn` The distinguished name of the entry to be renamed.
 * `newRdn` The new relative distinguished name for the dn.
 * `newParent` The new parent for the rdn.
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
+* `timeVal` The maxim amount of time the server should take in responding the rename operation (in seconds). _Optional_
 
 A promise returning function that wraps the `ldap_rename` C function from the openldap API.  In Case of success it fulfils with  the result from the rename function ( whichever controls the user specified). In case of failure, it throws a custom error that can be further inspected for the cause.
 

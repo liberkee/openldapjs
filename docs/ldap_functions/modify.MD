@@ -7,6 +7,7 @@
 * `dn` entry that will be modified.
 * `changes` Object that contains changes to be made.
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
+* `timeVal` The maxim amount of time the server should take in responding the modify operation (in seconds). _Optional_
 
 Modify example:
 

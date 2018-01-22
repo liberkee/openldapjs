@@ -20,7 +20,7 @@ class PagedSearchStream extends Readable {
    * @param {unsigned int} searchId unique search id.
    * @param {Object} ldapInstance the ldap instance the search belongs to.
    */
-  constructor(base, scope, filter, pageSize, searchId, ldapInstance) {
+  constructor(base, scope, filter, pageSize, searchId, ldapInstance, timeOut) {
     super();
     this.objectMode = true;
     this._binding = ldapInstance;
@@ -30,6 +30,7 @@ class PagedSearchStream extends Readable {
     this._pageSize = pageSize;
     this._searchId = searchId;
     this._lastResult = false;
+    this._timeOut = timeOut;
   }
 
   _read() {
@@ -37,7 +38,7 @@ class PagedSearchStream extends Readable {
       this.push(null);
     } else {
       this._binding.pagedSearch(
-        this._base, this._scope, this._filter, this._pageSize, this._searchId,
+        this._base, this._scope, this._filter, this._pageSize, this._searchId, this._timeOut,
         (err, page, morePages) => {
           if (err) {
             const CustomError = errorHandler(err);

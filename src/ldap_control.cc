@@ -16,7 +16,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     ctrl = new LDAPControl;
 
     const auto controls = v8::Local<v8::Object>::Cast(
-        control_handle->Get(Nan::New(static_cast<unsigned int>(index))));
+        control_handle->Get(Nan::New(static_cast<uint32_t>(index))));
     const auto value_controles = v8::Local<v8::Array>::Cast(
         controls->Get(Nan::New(constants::changeValueMember).ToLocalChecked()));
     const auto value_controles_length = value_controles->Length();
@@ -27,7 +27,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
     for (auto &attr : attributes) {
       const auto index = &attr - &attributes[0];
       Nan::Utf8String modValue(
-          value_controles->Get(Nan::New(static_cast<int>(index))));
+          value_controles->Get(Nan::New(static_cast<int32_t>(index))));
       attr = strdup(*modValue);
     }
     attributes.push_back(nullptr);

@@ -15,6 +15,8 @@ After installing it in your project, and assuming that you have access to a func
 ```javascript
 
 /* creates a new ldap client instance with the host address your_ldap_host_address */
+/* There is an optional parameter timeLimit for setting the maximum amount of time the server should take in responding for a operations */
+/* The default value is 10 */
 const ldapClient = new LDAP('your_ldap_host_address'); // E.g: ldap://192.168.0.1:389 or ldaps://example.com
 
 
