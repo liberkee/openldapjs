@@ -240,7 +240,7 @@ class LDAPClient : public Nan::ObjectWrap {
     Nan::Utf8String requestoid(info[0]);
     v8::Local<v8::Object> objectData = v8::Local<v8::Object>::Cast(info[1]);
     struct timeval timeOut = {static_cast<int32_t>(info[2]->NumberValue()),
-                          constants::ZERO_USECONDS};
+                              constants::ZERO_USECONDS};
     int message{};
 
     v8::Local<v8::Value> stateClient[2] = {Nan::Null(), Nan::Null()};
@@ -249,13 +249,15 @@ class LDAPClient : public Nan::ObjectWrap {
 
     struct berval *bv{};
     char *reqOID = *requestoid;
-    const auto &ldapExtendedOperations =
-        std::make_shared<ExpoConstructStructure>();
-    const auto &functionMap = ldapExtendedOperations->functionMap();
-    const auto &it = functionMap.find(reqOID);
+    if (!info[1]->IsNull()) {
+      const auto &ldapExtendedOperations =
+          std::make_shared<ExpoConstructStructure>();
+      const auto &functionMap = ldapExtendedOperations->functionMap();
+      const auto &it = functionMap.find(reqOID);
 
-    if (it != functionMap.end()) {
-      bv = &it->second(objectData);
+      if (it != functionMap.end()) {
+        bv = &it->second(objectData);
+      }
     }
 
     const auto state = ldap_extended_operation(obj->ld_, reqOID, bv, nullptr,
@@ -271,8 +273,8 @@ class LDAPClient : public Nan::ObjectWrap {
     std::shared_ptr<LDAP> newLD(ldap_dup(obj->ld_),
                                 [](LDAP *ld) { ldap_destroy(ld); });
 
-    Nan::AsyncQueueWorker(
-        new LDAPExtendedOperationProgress(callback, progress, newLD, message, timeOut));
+    Nan::AsyncQueueWorker(new LDAPExtendedOperationProgress(
+        callback, progress, newLD, message, timeOut));
   }
 
   static NAN_METHOD(pagedSearch) {

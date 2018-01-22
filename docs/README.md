@@ -19,6 +19,7 @@ const ldapClient = new LDAP('your_ldap_host_address'); // E.g: ldap://192.168.0.
 
 
 /* in order for the client to be usable, it has to be initialized and bound with a user DN and a password */
+/* The anonymous users can use just the ldap extended operation */
 ldapClient.initialize()
     .then( () => {
        return ldapClient.bind('validDn','password')
@@ -50,6 +51,7 @@ The Async C functions are processed using [AsyncProgressWorkers](https://github.
 * [LDAP Modify](./ldap_functions/modify.MD)
 * [LDAP Rename](./ldap_functions/rename.MD)
 * [LDAP Change Password](./ldap_functions/changePassword.MD)
+* [LDAP Extended Operation](./ldap_functions/extendedOperation.MD)
 * [LDAP Unbind](./ldap_functions/unbind.MD)
 
 State Machine illustrating library usage:

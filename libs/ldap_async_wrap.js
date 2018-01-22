@@ -333,11 +333,13 @@ class LDAPAsyncWrap {
   extendedOperation(oid, values, timeVal) {
     return new Promise((resolve, reject) => {
       const objectValue = {};
-      _.each(Array.isArray(values) ? values : [values], (element, index) => {
-        objectValue[index] = element;
-      });
+      if (values !== undefined) {
+        _.each(Array.isArray(values) ? values : [values], (element, index) => {
+          objectValue[index] = element;
+        });
+      }
 
-      const valueData = _.isEmpty(objectValue) ? '' : objectValue;
+      const valueData = _.isEmpty(objectValue) ? null : objectValue;
       const timeValue = timeVal === undefined ? this._timeVal : timeVal;
       this._binding.extendedOperation(oid, valueData, timeValue, (err, result) => {
         if (err) {
