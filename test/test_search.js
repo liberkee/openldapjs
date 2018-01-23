@@ -113,7 +113,7 @@ describe('Testing the async LDAP search ', () => {
   it('should reject if the time required expired', () => {
     const CustomError = errorHandler(errorList.ldapOther);
     return adminLDAP
-      .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll, 1)
+      .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll, 0)
       .then((result) => {
         should.fail('should not have passed');
       })
