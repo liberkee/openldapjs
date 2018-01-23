@@ -16,7 +16,6 @@ ExpoConstructStructure::ExpoConstructStructure()
 
 struct berval ExpoConstructStructure::LdapExopCancel(
     const v8::Local<v8::Object> &objectData) {
-        
   v8::String::Utf8Value idOperation(
       objectData->Get(Nan::New("0").ToLocalChecked()));
 
@@ -24,15 +23,13 @@ struct berval ExpoConstructStructure::LdapExopCancel(
   ber_printf(valueConstr_, "{i}", id);
 
   ber_flatten2(valueConstr_, &valueBer_, 0);
-  
+
   return valueBer_;
 }
 
 struct berval ExpoConstructStructure::LdapExopChangePassword(
     const v8::Local<v8::Object> &objectData) {
-
-  v8::String::Utf8Value userDN(
-      objectData->Get(Nan::New("0").ToLocalChecked()));
+  v8::String::Utf8Value userDN(objectData->Get(Nan::New("0").ToLocalChecked()));
   v8::String::Utf8Value oldPassword(
       objectData->Get(Nan::New("1").ToLocalChecked()));
   v8::String::Utf8Value newPassword(
@@ -63,9 +60,7 @@ struct berval ExpoConstructStructure::LdapExopChangePassword(
 }
 struct berval ExpoConstructStructure::LdapExopRefresh(
     const v8::Local<v8::Object> &objectData) {
-
-  v8::String::Utf8Value userDN(
-      objectData->Get(Nan::New("0").ToLocalChecked()));
+  v8::String::Utf8Value userDN(objectData->Get(Nan::New("0").ToLocalChecked()));
 
   static struct berval user = {0, NULL};
 
@@ -80,7 +75,8 @@ struct berval ExpoConstructStructure::LdapExopRefresh(
   return valueBer_;
 }
 
-std::map<std::string, std::function<struct berval(const v8::Local<v8::Object> &)>>
-    ExpoConstructStructure::functionMap() const {
+std::map<std::string,
+         std::function<struct berval(const v8::Local<v8::Object> &)>>
+ExpoConstructStructure::functionMap() const {
   return functionMap_;
 }

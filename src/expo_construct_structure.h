@@ -9,7 +9,7 @@
 class ExpoConstructStructure {
  private:
   BerElement *valueConstr_{};
-  struct berval valueBer_ {};
+  struct berval valueBer_{};
   /**
    * @brief functionMap_
    * @return
@@ -25,25 +25,26 @@ class ExpoConstructStructure {
   ExpoConstructStructure();
 
   /**
-   * @brief LdapExopChangePassword Method, return the berval structure for change password operation
+   * @brief LdapExopChangePassword Method, return the berval structure for
+   * change password operation
    * @param objectData The value send it from nodejs for the operation
    * @return
    */
 
-  struct berval LdapExopChangePassword(
-      const v8::Local<v8::Object> &objectData);
+  struct berval LdapExopChangePassword(const v8::Local<v8::Object> &objectData);
 
   /**
-   * @brief LdapExopRefresh Method, return the berval structure for refresh operation
+   * @brief LdapExopRefresh Method, return the berval structure for refresh
+   * operation
    * @param objectData The value send it from nodejs for the operation
    * @return
    */
 
-  struct berval LdapExopRefresh(
-      const v8::Local<v8::Object> &objectData);
+  struct berval LdapExopRefresh(const v8::Local<v8::Object> &objectData);
 
   /**
-   * @brief LdapExopCancel Method, return the berval structure for cancel operation
+   * @brief LdapExopCancel Method, return the berval structure for cancel
+   * operation
    * @param objectData The value send it from nodejs for the operation
    * @return
    */
