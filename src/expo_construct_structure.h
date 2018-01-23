@@ -8,8 +8,8 @@
 
 class ExpoConstructStructure {
  private:
-  BerElement *valueConstr{};
-  struct berval valueBer {};
+  BerElement *valueConstr_{};
+  struct berval valueBer_ {};
   /**
    * @brief functionMap_
    * @return
@@ -30,7 +30,7 @@ class ExpoConstructStructure {
    * @return
    */
 
-  struct berval ExpoConstructStructure::LdapExopChangePassword(
+  struct berval LdapExopChangePassword(
       const v8::Local<v8::Object> &objectData);
 
   /**
@@ -39,7 +39,7 @@ class ExpoConstructStructure {
    * @return
    */
 
-  struct berval ExpoConstructStructure::LdapExopRefresh(
+  struct berval LdapExopRefresh(
       const v8::Local<v8::Object> &objectData);
 
   /**

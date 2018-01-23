@@ -10,7 +10,7 @@ const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
 
 
-describe.only('Testing the async LDAP extended operation', () => {
+describe('Testing the async LDAP extended operation', () => {
 
   let clientLDAP = new LDAP(config.ldapAuthentication.host);
   let clientLDAP2 = new LDAP(config.ldapAuthentication.host);

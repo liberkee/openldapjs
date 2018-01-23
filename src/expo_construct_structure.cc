@@ -11,7 +11,7 @@ ExpoConstructStructure::ExpoConstructStructure()
            std::bind(&ExpoConstructStructure::LdapExopRefresh, this,
                      std::placeholders::_1)},
       } {
-  valueConstr = ber_alloc_t(LBER_USE_DER);
+  valueConstr_ = ber_alloc_t(LBER_USE_DER);
 }
 
 struct berval ExpoConstructStructure::LdapExopCancel(
@@ -21,11 +21,11 @@ struct berval ExpoConstructStructure::LdapExopCancel(
       objectData->Get(Nan::New("0").ToLocalChecked()));
 
   int id = std::stoi(*idOperation);
-  ber_printf(valueConstr, "{i}", id);
+  ber_printf(valueConstr_, "{i}", id);
 
-  ber_flatten2(valueConstr, &valueBer, 0);
+  ber_flatten2(valueConstr_, &valueBer_, 0);
   
-  return valueBer;
+  return valueBer_;
 }
 
 struct berval ExpoConstructStructure::LdapExopChangePassword(
@@ -51,15 +51,15 @@ struct berval ExpoConstructStructure::LdapExopChangePassword(
   oldpw.bv_val = strdup(*oldPassword);
   oldpw.bv_len = strlen(oldpw.bv_val);
 
-  ber_printf(valueConstr, "{" /*}*/);
-  ber_printf(valueConstr, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_ID, user);
-  ber_printf(valueConstr, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_OLD, oldpw);
-  ber_printf(valueConstr, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_NEW, newpw);
-  ber_printf(valueConstr, /*{*/ "N}");
+  ber_printf(valueConstr_, "{" /*}*/);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_ID, user);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_OLD, oldpw);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_NEW, newpw);
+  ber_printf(valueConstr_, /*{*/ "N}");
 
-  ber_flatten2(valueConstr, &valueBer, 0);
+  ber_flatten2(valueConstr_, &valueBer_, 0);
 
-  return valueBer;
+  return valueBer_;
 }
 struct berval ExpoConstructStructure::LdapExopRefresh(
     const v8::Local<v8::Object> &objectData) {
@@ -72,12 +72,12 @@ struct berval ExpoConstructStructure::LdapExopRefresh(
   user.bv_val = strdup(*userDN);
   user.bv_len = strlen(user.bv_val);
 
-  ber_printf(valueConstr, "{tOtiN}", LDAP_TAG_EXOP_REFRESH_REQ_DN, user,
+  ber_printf(valueConstr_, "{tOtiN}", LDAP_TAG_EXOP_REFRESH_REQ_DN, user,
              LDAP_TAG_EXOP_REFRESH_REQ_TTL, nullptr);
 
-  ber_flatten2(valueConstr, &valueBer, 0);
+  ber_flatten2(valueConstr_, &valueBer_, 0);
 
-  return valueBer;
+  return valueBer_;
 }
 
 std::map<std::string, std::function<struct berval(const v8::Local<v8::Object> &)>>
