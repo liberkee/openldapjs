@@ -16,30 +16,8 @@ newClient.initialize()
     return newClient.bind('cn=admin,dc=demoApp,dc=com', config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-    console.log('Bind success');
     return newClient.extendedOperation('1.3.6.1.4.1.4203.1.11.1',
-      {userDN: 'cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com',
-        oldPass: 'secret1',
-        newPass: 'secret'});
-  })
-  /* .then((result) => {
-    console.log(`Extended result: ${result}`);
-    return newClient.extendedOperation('1.3.6.1.1.8',
-      {first: 1});
-  }) */
-  .then((result) => {
-    console.log(result);
-    // console.log(`Extended result: ${result}`);
-    // return newClient.extendedOperation('1.3.6.1.4.1.1466.101.119.1', 'cn=admin,dc=demoApp,dc=com');
-  })
-  .catch((err) => {
-    console.log(`Here ${err.name} ${err.constructor.code}`);
-
+      ['cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com',
+        'secret1',
+        'secret']);
   });
-/* .then((result) => {
-    console.log(`Extended result: ${result}`);
-  })
-  .catch((err) => {
-    console.log(`Here ${err.name} ${err.constructor.code}`);
-
-  }); */

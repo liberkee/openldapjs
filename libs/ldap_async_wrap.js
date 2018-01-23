@@ -325,7 +325,7 @@ class LDAPAsyncWrap {
      * @param {String} oid the operation specific OID.
      * @param {String | Number | String[] | Number[]} values the values that 
      * are required for the operation.
-     * @param {Number} lastArgument Optional parameter to set the time to wait for the operation
+     * @param {Number} timeVal Optional parameter to set the time to wait for the operation
      * @return {Promise} Will resolve with the response from the server 
      * and reject in case of error
      */

@@ -5,8 +5,8 @@
 ```
 
 * `oid` The operation OID that is send it for request.
-* `values` This parameter is used to provide the specific value for operation. The value can be an Array of element or just a single element _Optional_
-* `timeOut` The maxim amount of time the server should take in responding the add operation (in seconds).. _Optional_
+* `values` This parameter is used to provide the specific value for operation. The value can be an Array of elements or just a single element _Optional_
+* `timeOut` The maximum amount of time the server should take in responding the add operation (in seconds).. _Optional_
 
 Example usecase:
 
