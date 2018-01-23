@@ -16,6 +16,7 @@
   "noSuchAttirbute": 16,
   "objectClassViolation": 65,
   "namingViolation": 64,
+  "ldapCriticalExtension": 12,
   "confidentialityRequired": 13,
   "sizeLimitExceeded": 4,
   "typeOrValueExists": 20,

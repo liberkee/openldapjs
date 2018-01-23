@@ -184,10 +184,29 @@ describe('Testing the async LDAP add operation', () => {
     return clientLDAP2
       .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
       .then(() => {
-        should.fail(' should not succeed');
+        should.fail('should not succeed');
       })
       .catch(CustomError, (accessError) => {
         should.deepEqual(accessError, new CustomError(errorList.ldapAddErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject if the requested control is not recognized or could not be processed', () => {
+    const CustomError = errorHandler(errorList.ldapCriticalExtension);
+    const criticalControls = {
+      oid: config.ldapControls.ldapModificationControlPreRead.oid,
+      value: config.ldapControls.ldapModificationControlPreRead.value,
+      isCritical: true,
+    };
+    return clientLDAP.add(dnUser, validEntry, criticalControls)
+      .then(() => {
+        should.fail('should not succeed');
+      })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
