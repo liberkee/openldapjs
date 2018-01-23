@@ -28,7 +28,7 @@ const char dn[] = "dn";
 const char separator[] = ": ";
 const char newLine[] = "\n";
 const int ATTR_VALS_WANTED = 0;
-
+const int NEW_CTX_VAL = 0;
 const int LDAP_NOT_FINISHED = 0;  // ldap_ext op not finished yet.
 }  // namespace constants
 

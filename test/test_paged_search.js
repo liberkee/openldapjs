@@ -38,10 +38,8 @@ describe('Testing the async LDAP paged search ', () => {
 
     const init1 = adminLDAP.initialize();
     const init2 = userLDAP.initialize();
-    const startTLS1 = adminLDAP.startTLS(pathToCert);
-    const startTLS2 = userLDAP.startTLS(pathToCert);
 
-    return Promise.all([init1, init2, startTLS1, startTLS2])
+    return Promise.all([init1, init2])
       .then(() => {
         const bind1 = adminLDAP.bind(dnAdmin, password);
         const bind2 = userLDAP.bind(dnUser, password);

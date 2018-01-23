@@ -28,7 +28,6 @@ describe('Testing the ChangePassword operation', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
       .then(() => { return ldapAsyncWrap.bind(dn, password); });
   });
 
