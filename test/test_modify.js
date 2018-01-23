@@ -32,8 +32,8 @@ describe('Testing the modify functionalities', () => {
   const changeAttributesDelete = [
     {
       op: config.ldapModify.ldapModificationDelete.operation,
-      attr: config.ldapModify.ldapModificationDelete.attribute,
-      vals: config.ldapModify.ldapModificationDelete.vals,
+      attr: config.ldapModify.ldapModificationReplace.attribute,
+      vals: config.ldapModify.ldapModificationReplace.vals,
     },
   ];
 
@@ -50,8 +50,8 @@ describe('Testing the modify functionalities', () => {
     },
     {
       op: config.ldapModify.ldapModificationDelete.operation,
-      attr: config.ldapModify.ldapModificationDelete.attribute,
-      vals: config.ldapModify.ldapModificationDelete.vals,
+      attr: config.ldapModify.ldapModificationAdd.attribute,
+      vals: config.ldapModify.ldapModificationAdd.vals,
     },
   ];
 
@@ -206,8 +206,15 @@ describe('Testing the modify functionalities', () => {
       .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should add  new attributes to an existing entry', () => {
+  it('should reject if the value already exist', () => {
     const CustomError = errorHandler(errorList.typeOrValueExists);
+    const changeAttribute = [
+      {
+        op: config.ldapModify.ldapModificationAdd.operation,
+        attr: config.ldapModify.ldapModificationReplace.attribute,
+        vals: config.ldapModify.ldapModificationReplace.vals,
+      },
+    ];
     return ldapAsyncWrap
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,
@@ -266,7 +273,7 @@ describe('Testing the modify functionalities', () => {
   });
 
 
-  it('should delete an  attribute from an existing entry', () => {
+  it('should delete an attribute from an existing entry', () => {
     return ldapAsyncWrap
       .modify(
         config.ldapModify.ldapModificationReplace.change_dn,

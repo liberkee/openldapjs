@@ -12,13 +12,6 @@ const Promise = require('bluebird');
 const rdn = configFile.ldapAdd.rdnUser;
 const dn = configFile.ldapAdd.dnNewEntry;
 
-const changeAttributesDelete = [
-  {
-    op: configFile.ldapModify.ldapModificationDelete.operation,
-    attr: configFile.ldapModify.ldapModificationAdd.attribute,
-    vals: configFile.ldapModify.ldapModificationAdd.vals,
-  },
-];
 
 const ldapClient = new Client(configFile.ldapAuthentication.host);
 
@@ -35,9 +28,6 @@ ldapClient.initialize()
       args.push(`${rdn}${i}${dn}`);
     }
 
-    /* For LDAP modify operation */
-    const modifyOp = ldapClient.modify(configFile.ldapModify.ldapModificationReplace.change_dn,
-      changeAttributesDelete);
     /* For LDAP rename operation */
     const deleteOp = ldapClient.delete(`${configFile.ldapRename.newrdn},${configFile.ldapRename.newparent}`);
     /* For LDAP add operation */
@@ -45,7 +35,7 @@ ldapClient.initialize()
       return ldapClient.delete(arg);
     });
 
-    return Promise.all([modifyOp, deleteOp, promiseRes]
+    return Promise.all([deleteOp, promiseRes]
       .map((p) => {
         return p.catch((e) => {
           return e;

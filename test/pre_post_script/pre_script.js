@@ -17,7 +17,12 @@ const validEntry = [
   configFile.ldapAdd.lastAttr,
 ];
 
-const changeAttributesAdd = [
+const changeAttributes = [
+  {
+    op: configFile.ldapModify.ldapModificationReplace.operation,
+    attr: configFile.ldapModify.ldapModificationReplace.attribute,
+    vals: configFile.ldapModify.ldapModificationReplace.vals,
+  },
   {
     op: configFile.ldapModify.ldapModificationAdd.operation,
     attr: configFile.ldapModify.ldapModificationDelete.attribute,
@@ -41,7 +46,7 @@ ldapClient.initialize()
 
     /* For LDAP modify operation */
     const modifyOp = ldapClient.modify(configFile.ldapModify.ldapModificationReplace.change_dn,
-      changeAttributesAdd);
+      changeAttributes);
     /* For LDAP rename operation */
     const addOp = ldapClient.add(configFile.ldapRename.dnChange, validEntry);
     /* For LDAP delete operation */

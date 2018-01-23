@@ -43,8 +43,8 @@ describe('Testing multiple operations functionalities', () => {
     },
     {
       op: config.ldapModify.ldapModificationDelete.operation,
-      attr: config.ldapModify.ldapModificationDelete.attribute,
-      vals: config.ldapModify.ldapModificationDelete.vals,
+      attr: config.ldapModify.ldapModificationAdd.attribute,
+      vals: config.ldapModify.ldapModificationAdd.vals,
     },
   ];
 
