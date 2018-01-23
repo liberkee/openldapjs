@@ -27,7 +27,6 @@ const LDAP_COMPARE_TRUE = 6;
 
 const TIME_OUT_DEFAULT_VAL = 10;
 
-
 /**
  * @module LDAPTransition
  * @class LDAPAsyncWrap
@@ -338,6 +337,41 @@ class LDAPAsyncWrap {
       }
     });
   }
+
+  /**
+     * Extended operation for operation using there OID and value.
+     *
+     * @method extendedOperation
+     * @param {String} oid the operation specific OID.
+     * @param {String | Number | String[] | Number[]} values the values that 
+     * are required for the operation.
+     * @param {Number} timeVal Optional parameter to set the time to wait for the operation
+     * @return {Promise} Will resolve with the response from the server 
+     * and reject in case of error
+     */
+
+  extendedOperation(oid, values, timeVal) {
+    return new Promise((resolve, reject) => {
+      const objectValue = {};
+      if (values !== undefined) {
+        _.each(Array.isArray(values) ? values : [values], (element, index) => {
+          objectValue[index] = element;
+        });
+      }
+
+      const valueData = _.isEmpty(objectValue) ? null : objectValue;
+      const timeValue = timeVal === undefined ? this._timeVal : timeVal;
+      this._binding.extendedOperation(oid, valueData, timeValue, (err, result) => {
+        if (err) {
+          const CustomError = errorHandler(err);
+          reject(new CustomError(errorList.ldapExtendedOperationMessage));
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+
 
   /**
    * Perform an LDAP rename  operation

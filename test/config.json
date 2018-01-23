@@ -1,12 +1,21 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://10.16.0.194:389",
+    "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
     "pathFileToCert": "D:/HSM/ca_certs.pem"
+  },
+  "ldapExtendedOperation": {
+    "oid": {
+      "startTLS": "1.3.6.1.4.1.1466.20037",
+      "changePassword": "1.3.6.1.4.1.4203.1.11.1",
+      "cancelRequest": "1.3.6.1.1.8",
+      "refresh": "1.3.6.1.4.1.1466.101.119.1",
+      "whoAmI": "1.3.6.1.4.1.4203.1.11.3"
+    }
   },
   "ldapChangePassword": {
     "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
@@ -104,7 +113,7 @@
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapTestEntries": {
-    "host": "ldap://10.16.0.194:389",
+    "host": "ldap://localhost:389",
     "entryDn":"cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "userDn": "cn=admin,dc=demoApp,dc=com",
     "userPassword": "secret"
