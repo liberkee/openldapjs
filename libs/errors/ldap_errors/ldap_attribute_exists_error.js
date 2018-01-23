@@ -9,12 +9,16 @@ class LdapAttributeExists extends OperationalError {
     return 20;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the attribute value specified in a modify or add operation already exists as a value for that attribute.';
   }
 
   get code() {
     return LdapAttributeExists.code;
+  }
+
+  toString() {
+    return `${this.code}:${this.description}`;
   }
 
 

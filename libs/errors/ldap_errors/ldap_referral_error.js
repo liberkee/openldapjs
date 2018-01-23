@@ -8,7 +8,7 @@ class LdapReferralError extends LdapError {
     return 10;
   }
 
-  static get description() {
+  get description() {
     return 'Does not indicate an error condition. In LDAPv3, indicates that the server' +
     ' does not hold the target entry of the request, but that the servers in the referral field may.';
   }
@@ -16,6 +16,11 @@ class LdapReferralError extends LdapError {
   get code() {
     return LdapReferralError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

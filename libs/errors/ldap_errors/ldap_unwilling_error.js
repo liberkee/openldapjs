@@ -9,13 +9,18 @@ class LdapUnwillingError extends ServerError {
     return 53;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the LDAP server cannot process the client\'s bind request, usually because it is shutting down.';
   }
 
   get code() {
     return LdapUnwillingError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

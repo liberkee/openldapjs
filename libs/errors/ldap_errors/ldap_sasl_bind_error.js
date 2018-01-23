@@ -8,7 +8,7 @@ class LdapBindInProgressError extends LdapError {
     return 14;
   }
 
-  static get description() {
+  get description() {
     return 'Does not indicate an error condition, but indicates that the server is ready for the next step in the process.' +
     ' The client must send the server the same SASL mechanism to continue the process.';
   }
@@ -16,6 +16,11 @@ class LdapBindInProgressError extends LdapError {
   get code() {
     return LdapBindInProgressError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

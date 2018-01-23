@@ -46,4 +46,5 @@ adminClient.initialize()
 const ErrorClass = errorHandler(50);
 const newError = new ErrorClass('bla');
 
-console.log(newError.code);
+
+console.log(newError.toString());

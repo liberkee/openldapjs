@@ -9,7 +9,7 @@ class LdapStrongAuthRequired extends LoginError {
     return 8;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates one of the following: In bind requests, the LDAP server accepts only strong authentication.' +
     ' In a client request, the client requested an operation such as delete that requires strong authentication.' +
     ' In an unsolicited notice of disconnection, the LDAP server discovers the security protecting the communication' +
@@ -19,6 +19,11 @@ class LdapStrongAuthRequired extends LoginError {
   get code() {
     return LdapStrongAuthRequired.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

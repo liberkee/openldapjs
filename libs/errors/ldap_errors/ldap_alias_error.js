@@ -9,12 +9,16 @@ class LdapAliasError extends ServerError {
     return 33;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that an error occurred when an alias was dereferenced.';
   }
 
   get code() {
     return LdapAliasError.code;
+  }
+
+  toString() {
+    return `${this.code}:${this.description}`;
   }
 
 

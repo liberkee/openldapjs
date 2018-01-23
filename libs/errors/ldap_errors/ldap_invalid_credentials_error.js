@@ -9,7 +9,7 @@ class LdapCredentialsError extends LoginError {
     return 49;
   }
 
-  static get description() {
+  staic get description() {
     return 'Indicates that during a bind operation one of the following occurred: The client passed either an incorrect DN or password,' +
     ' or the password is incorrect because it has expired, intruder detection has locked the account, or another similar reason. See the data code for more information.';
   }
@@ -17,6 +17,11 @@ class LdapCredentialsError extends LoginError {
   get code() {
     return LdapCredentialsError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 
 }

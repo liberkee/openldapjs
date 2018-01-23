@@ -10,13 +10,18 @@ class LdapObjectClassModsError extends OperationalError {
     return 69;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the modify operation attempted to modify the structure rules of an object class.';
   }
 
   get code() {
     return LdapObjectClassModsError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

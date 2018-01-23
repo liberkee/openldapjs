@@ -9,12 +9,16 @@ class LdapAccessError extends LoginError {
     return 50;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the caller does not have sufficient rights to perform the requested operation.';
   }
 
   get code() {
-    return LdapAccessError.code;
+    return 50;
+  }
+
+  toString() {
+    return `${this.code}:${this.description}`;
   }
 
 }

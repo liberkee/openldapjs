@@ -9,7 +9,7 @@ class LdapInappropriateAuthError extends LoginError {
     return 48;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that during a bind operation, the client is attempting to use an authentication method that the client cannot use correctly.' +
     ' For example, either of the following cause this error: The client returns simple credentials when strong credentials are required' +
     '...OR...The client returns a DN and a password for a simple bind when the entry does not have a password defined.';
@@ -17,6 +17,10 @@ class LdapInappropriateAuthError extends LoginError {
 
   get code() {
     return LdapInappropriateAuthError.code;
+  }
+
+  toString() {
+    return `${this.code}:${this.description}`;
   }
 
 

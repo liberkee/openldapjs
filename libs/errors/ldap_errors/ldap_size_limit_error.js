@@ -10,7 +10,7 @@ class LdapSizeLimitError extends OperationalError {
     return 4;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that in a search operation, the size limit specified by the client or the server' +
     ' has been exceeded. Incomplete results are returned.';
   }
@@ -18,6 +18,11 @@ class LdapSizeLimitError extends OperationalError {
   get code() {
     return LdapSizeLimitError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 

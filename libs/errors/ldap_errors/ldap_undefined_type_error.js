@@ -9,13 +9,18 @@ class LdapUndefinedTypeError extends OperationalError {
     return 17;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the attribute specified in the modify or add operation does not exist in the LDAP server\'s schema.';
   }
 
   get code() {
     return LdapUndefinedTypeError.code;
   }
+
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 
 }
 
