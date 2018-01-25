@@ -11,7 +11,7 @@ const opts = {
 };
 
 function search(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
+  async.timesSeries(config.entryCount, (n, next) => {
     ldapClient.search(config.dummyOu, opts, (err, res) => {
       if (err) {
         console.error('oops', err);

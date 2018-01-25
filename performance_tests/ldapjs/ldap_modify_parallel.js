@@ -1,14 +1,10 @@
 'use strict';
 
 const async = require('async');
+
 const shared = require('./shared');
 const gShared = require('./../global_shared');
 const config = require('./../config');
-
-const ldap = require('ldapjs');
-
-
-const adminClient = ldap.createClient({url: config.url});
 
 const change = {
   operation: 'replace',
@@ -17,31 +13,33 @@ const change = {
   },
 };
 
-adminClient.bind(config.bindDn, config.password, (err) => {
-
-  if (err) {
-    console.log(`stuff went wrong${err}`);
-    adminClient.unbind();
-    process.exit();
-  } else {
-    change.modification.sn = new Date()
-      .toISOString();
-    const t0 = gShared.takeSnap();
-    async.times(config.entryCount, (n, next) => {
-      adminClient.modify(`cn=person_${n},${config.dummyOu}`, change, (modifyError) => {
-        next(modifyError, 'ok');
-      });
-    }, (timesError, elements) => {
-      if (timesError) {
-        console.log(`shit went wrong: ${timesError}`);
-        adminClient.unbind();
-        process.exit();
-      }
-      const duration = gShared.asSeconds(gShared.takeSnap(t0));
-      console.log(`Modify [${config.entryCount}] took: ${duration} s`);
-      adminClient.unbind();
-
+function modify(ldapClient, cb) {
+  change.modification.sn = new Date()
+    .toISOString();
+  async.times(config.entryCount, (n, next) => {
+    ldapClient.modify(`cn=person_${n},${config.dummyOu}`, change, (err) => {
+      next(err, 'ok');
     });
+  }, (err, elements) => {
+    cb(err, ldapClient);
+  });
+}
+
+const steps = [
+  shared.bind,
+  modify,
+  shared.unbind,
+];
+
+const t0 = gShared.takeSnap();
+async.waterfall(steps, (err) => {
+  if (err) {
+    console.log('oww', err);
+    shared.unbind();
+  } else {
+    const duration = gShared.asSeconds(gShared.takeSnap(t0));
+    console.log(`Modify [${config.entryCount}] took: ${duration} s`);
+
   }
 });
 

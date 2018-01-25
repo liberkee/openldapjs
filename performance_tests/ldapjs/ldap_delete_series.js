@@ -7,7 +7,7 @@ const gShared = require('./../global_shared');
 const config = require('./../config');
 
 function del(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
+  async.timesSeries(config.entryCount, (n, next) => {
     ldapClient.del(`cn=person_${n},${config.dummyOu}`, (err) => {
       next(err, 'ok');
     });

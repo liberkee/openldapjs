@@ -7,7 +7,7 @@ const gShared = require('./../global_shared');
 const config = require('./../config');
 
 function add(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
+  async.timesSeries(config.entryCount, (n, next) => {
     ldapClient.add(`cn=person_${n},${config.dummyOu}`, config.sampleEntry, (err) => {
       next(err, 'ok');
     });

@@ -7,7 +7,7 @@ const gShared = require('./../global_shared');
 const config = require('./../config');
 
 function compare(ldapClient, cb) {
-  async.times(config.entryCount, (n, next) => {
+  async.timesSeries(config.entryCount, (n, next) => {
     ldapClient.compare(config.bindDn, 'objectClass', 'simpleSecurityObject', (err, matched) => {
       next(err, 'ok');
     });
