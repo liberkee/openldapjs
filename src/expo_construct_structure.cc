@@ -49,9 +49,9 @@ struct berval ExpoConstructStructure::LdapExopChangePassword(
   oldpw.bv_len = strlen(oldpw.bv_val);
 
   ber_printf(valueConstr_, "{" /*}*/);
-  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_ID, user);
-  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_OLD, oldpw);
-  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_NEW, newpw);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_ID, &user);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_OLD, &oldpw);
+  ber_printf(valueConstr_, "tO", LDAP_TAG_EXOP_MODIFY_PASSWD_NEW, &newpw);
   ber_printf(valueConstr_, /*{*/ "N}");
 
   ber_flatten2(valueConstr_, &valueBer_, 0);
@@ -67,7 +67,7 @@ struct berval ExpoConstructStructure::LdapExopRefresh(
   user.bv_val = strdup(*userDN);
   user.bv_len = strlen(user.bv_val);
 
-  ber_printf(valueConstr_, "{tOtiN}", LDAP_TAG_EXOP_REFRESH_REQ_DN, user,
+  ber_printf(valueConstr_, "{tOtiN}", LDAP_TAG_EXOP_REFRESH_REQ_DN, &user,
              LDAP_TAG_EXOP_REFRESH_REQ_TTL, nullptr);
 
   ber_flatten2(valueConstr_, &valueBer_, 0);

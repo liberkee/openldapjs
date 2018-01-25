@@ -251,6 +251,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     struct berval *bv{};
     char *reqOID = *requestoid;
+    struct berval bvVal{};
     if (!info[1]->IsNull()) {
       const auto &ldapExtendedOperations =
           std::make_shared<ExpoConstructStructure>();
@@ -258,7 +259,8 @@ class LDAPClient : public Nan::ObjectWrap {
       const auto &it = functionMap.find(reqOID);
 
       if (it != functionMap.end()) {
-        bv = &it->second(objectData);
+        bvVal = it->second(objectData);
+        bv = &bvVal;
       }
     }
 
