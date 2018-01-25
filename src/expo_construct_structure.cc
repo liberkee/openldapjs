@@ -20,7 +20,7 @@ struct berval ExpoConstructStructure::LdapExopCancel(
       objectData->Get(Nan::New("0").ToLocalChecked()));
 
   int id = std::stoi(*idOperation);
-  ber_printf(valueConstr_, "{i}", &id);
+  ber_printf(valueConstr_, "{i}", id);
 
   ber_flatten2(valueConstr_, &valueBer_, 0);
 
