@@ -1,13 +1,40 @@
-'use strict';
 
-function constructLdif(ldifString) {
-  const ldifObject = {
+export interface Iattribute {
+  type: string,
+  options: never[],
+  attribute: string,
+}
+
+export interface Ivalue {
+  type: string,
+  value: string,
+}
+
+export interface IattributeObject {
+  attribute: Iattribute,
+  value: Ivalue,
+}
+
+export interface IentryObject {
+  type: string,
+  dn: string,
+  attributes: IattributeObject[],
+}
+
+export interface IldifObject {
+  type: string,
+  version: null,
+  entries: IentryObject[],
+}
+
+export default function constructLdif(ldifString: string) {
+  const ldifObject: IldifObject = {
     type: 'content',
     version: null,
     entries: [],
   };
-  const resultArr = ldifString.split('\n');
-  const entryObject = {
+  const resultArr: string[] = ldifString.split('\n');
+  const entryObject: IentryObject = {
     type: 'record',
     dn: '',
     attributes: [],
@@ -41,5 +68,3 @@ function constructLdif(ldifString) {
   });
   return ldifObject;
 }
-
-module.exports = constructLdif;

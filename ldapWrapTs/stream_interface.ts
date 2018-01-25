@@ -1,6 +1,7 @@
 import { Readable as Readable } from 'stream';
 import { RootObject } from './messages';
 import * as errorHandler from './errors/error_dispenser';
+import ldifConstruct, { IldifObject } from './utils/construct_ldif';
 
 const errorMessages: RootObject = require('./messages.json');
 const ldif: any = require('ldif');
@@ -56,8 +57,13 @@ export default class PagedSearchStream extends Readable {
             this.push(null);
           } else {
             if (!morePages) this._lastResult = true;
-            const resJSON: string = JSON.stringify(ldif.parse(page));
-            this.push(resJSON);
+            let resJSON: string | JSON | IldifObject;
+            try {
+              resJSON = page === '' ? page : ldif.parse(page);
+            } catch (ldifErr) {
+              resJSON = ldifConstruct(page);
+            }
+            this.push(JSON.stringify(resJSON));
           }
 
         });

@@ -11,9 +11,6 @@ const errorMessages = require('./messages.json');
 const _ = require('underscore');
 const ldif = require('ldif');
 const ldifConstruct = require('./utils/construct_ldif');
-const ldifMine = require('./utils/mappingStringJson');
-
-const ldifMineClass = new ldifMine();
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);

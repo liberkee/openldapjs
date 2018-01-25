@@ -49,11 +49,11 @@ class PagedSearchStream extends Readable {
             if (!morePages) this._lastResult = true;
             let resJSON;
             try {
-              resJSON = JSON.stringify(ldif.parse(page));
+              resJSON = ldif.parse(page);
             } catch (ldifErr) {
-              resJSON = JSON.stringify(ldifConstruct(page));
+              resJSON = ldifConstruct(page);
             }
-            this.push(resJSON);
+            this.push(JSON.stringify(resJSON));
           }
 
         });

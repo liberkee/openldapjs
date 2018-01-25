@@ -6,6 +6,7 @@ import checkParameters from './utils/check_variable_format';
 
 import SearchStream from './stream_interface';
 import StateError from './errors/state_error';
+import ldifConstruct, { IldifObject } from './utils/construct_ldif';
 import { RootObject } from './messages';
 import { IchangeSchema } from './schemas/change_schema';
 import { IcontrolSchema } from './schemas/control_schema';
@@ -158,7 +159,7 @@ export default class LDAPAsyncWrap {
    * @return {Promise} That resolves and returns a string with the search
    * results. Rejects in case of error.
    * */
-  search(searchBase: string, scope: string, searchFilter: string): Promise<string | JSON> {
+  search(searchBase: string, scope: string, searchFilter: string): Promise<string | JSON | IldifObject> {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
         reject(new StateError(errorMessages.bindErrorMessage));
@@ -175,7 +176,12 @@ export default class LDAPAsyncWrap {
               const customError: any = errorHandler.errorSelection(err);
               reject(new customError(errorMessages.ldapSearchErrorMessage));
             } else {
-              const resJSON: string | JSON = result === '' ? result : ldif.parse(result);
+              let resJSON: string | JSON | IldifObject;
+              try {
+                resJSON = result === '' ? result : ldif.parse(result);
+              } catch (ldifErr) {
+                resJSON = ldifConstruct(result);
+              }
               resolve(resJSON);
             }
           });
