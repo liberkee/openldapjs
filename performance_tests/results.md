@@ -86,29 +86,29 @@ average: 0.8250075322300002 s
 * The server ran on the client Virtual machine using VirtualBox
 * OS: Ubuntu 16.04.3 LTS
 
-### Test results for 100 iterations with each 100 function calls:
+### Test results for 100 iterations with each 100 function calls in series:
 ```plain
 Running ldapjs for 100 iterations and 100 entries:
 ## add ##
-sum:     4.79 s
-slowest: 1.30 s
-fastest: 0.49 s
-average: 0.79 s
-## compare ##
-sum:     1.24 s
-slowest: 0.25 s
+sum:    1.56 s
+slowest: 0.32 s
 fastest: 0.18 s
-average: 0.20 s
+average: 0.26 s
+## compare ##
+sum:     0.53 s
+slowest: 0.09 s
+fastest: 0.08 s
+average: 0.08 s
 ## modify ##
-sum:     1.51 s
-slowest: 0.27 s
-fastest: 0.23 s
-average: 0.25 s
+sum:     1.6  s
+slowest: 0.37 s
+fastest: 0.16 s
+average: 0.26 s
 ## search (10k entries) ##
-sum:     62.5 s
-slowest: 10.75 s
-fastest: 10.27 s
-average: 10.41 s
+sum:     256.61 s
+slowest: 43.06 s
+fastest: 42.30 s
+average: 42.76 s
 ## delete ##
 sum:     2.36 s
 slowest: 0.51 s
@@ -148,30 +148,35 @@ average: 0.27 s
 ```plain
 Running ldapjs for 100 iterations and 100 entries:
 ## add ##
-sum:    7.75
-slowest: 2.13 s
-fastest: 0.29 s
-average: 1.10 s
+sum:     1.79 s
+slowest: 0.34 s
+fastest: 0.17 s
+average: 0.29 s
 ## compare ##
-sum:     2.81 s
-slowest: 0.42 s
-fastest: 0.39 s
-average: 0.40 s
-## modify ##
-sum:     1.19 s
-slowest: 0.20 s
-fastest: 0.14 s
-average: 0.17 s
-## search  ##
 sum:     0.50 s
-slowest: 0.08 s
-fastest: 0.07 s
-average: 0.07 s
+slowest: 0.09 s
+fastest: 0.074 s
+average: 00.08 s
+## modify ##
+sum:     0.84 s
+slowest: 0.16 s
+fastest: 0.12 s
+average: 0.14 s
+## search  ##
+sum:     3.07 s
+slowest: 0.57 s
+fastest: 0.48 s
+average: 0.51 s
 ## delete ##
-sum:     3.55 s
-slowest: 0.81 s
-fastest: 0.11 s
-average: 0.50 s
+sum:     2.08 s
+slowest: 0.99 s
+fastest: 0.17 s
+average: 0.34 s
+## search (10k entries) ##
+sum:    63.64 s
+slowest: 10.85 s
+fastest: 10.38 s
+average: 10.60 s
 
 
 Running openldapjs for 100 iterations and 100 entries:
