@@ -76,9 +76,6 @@ describe('Testing the modify functionalities', () => {
 
     return ldapAsyncWrap.initialize()
       .then(() => {
-        return ldapAsyncWrap.startTLS(pathToCert);
-      })
-      .then(() => {
         return ldapAsyncWrap.bind(
           config.ldapAuthentication.dnAdmin,
           config.ldapAuthentication.passwordAdmin);

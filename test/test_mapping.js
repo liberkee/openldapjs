@@ -24,10 +24,7 @@ describe('Test mapping string to JSON', () => {
   beforeEach(() => {
     adminLDAP = new LDAPWrap(host);
 
-    const init1 = adminLDAP.initialize();
-    const startTLS1 = adminLDAP.startTLS(pathToCert);
-
-    return Promise.all([init1, startTLS1])
+    return adminLDAP.initialize()
       .then(() => {
         return adminLDAP.bind(
           config.ldapAuthentication.dnAdmin,

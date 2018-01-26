@@ -47,10 +47,7 @@ describe('Testing the async LDAP add operation', () => {
     const init1 = clientLDAP.initialize();
     const init2 = clientLDAP2.initialize();
 
-    const startTLS1 = clientLDAP.startTLS(pathToCert);
-    const startTLS2 = clientLDAP2.startTLS(pathToCert);
-
-    return Promise.all([init1, init2, startTLS1, startTLS2])
+    return Promise.all([init1, init2])
       .then(() => {
         const bind1 = clientLDAP.bind(
           config.ldapAuthentication.dnAdmin,

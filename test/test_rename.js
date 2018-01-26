@@ -32,9 +32,6 @@ describe('Testing the rename functionalities', () => {
 
     return ldapAsyncWrap.initialize()
       .then(() => {
-        return ldapAsyncWrap.startTLS(pathToCert);
-      })
-      .then(() => {
         return ldapAsyncWrap.bind(
           config.ldapAuthentication.dnAdmin,
           config.ldapAuthentication.passwordAdmin);

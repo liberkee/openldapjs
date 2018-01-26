@@ -115,7 +115,17 @@ class LDAPClient : public Nan::ObjectWrap {
     int state{};
     int verifyCert = LDAP_OPT_X_TLS_NEVER;
 
-    state = ldap_set_option(nullptr, LDAP_OPT_X_TLS_REQUIRE_CERT, &verifyCert);
+    state = ldap_set_option(obj->ld_, LDAP_OPT_X_TLS_REQUIRE_CERT, &verifyCert);
+
+    if (state != LDAP_OPT_SUCCESS) {
+      stateClient[0] = Nan::New<v8::Number>(state);
+      callback->Call(1, stateClient);
+      delete callback;
+      callback = nullptr;
+      return;
+    }
+
+    state = ldap_set_option(obj->ld_, LDAP_OPT_X_TLS_NEWCTX, &constants::NEW_CTX_VAL);
 
     if (state != LDAP_OPT_SUCCESS) {
       stateClient[0] = Nan::New<v8::Number>(state);
@@ -251,6 +261,7 @@ class LDAPClient : public Nan::ObjectWrap {
 
     struct berval *bv{};
     char *reqOID = *requestoid;
+    struct berval bvVal{};
     if (!info[1]->IsNull()) {
       const auto &ldapExtendedOperations =
           std::make_shared<ExpoConstructStructure>();
@@ -258,7 +269,8 @@ class LDAPClient : public Nan::ObjectWrap {
       const auto &it = functionMap.find(reqOID);
 
       if (it != functionMap.end()) {
-        bv = &it->second(objectData);
+        bvVal = it->second(objectData);
+        bv = &bvVal;
       }
     }
 

@@ -22,7 +22,6 @@ describe('Testing the attributeExists function', () => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.startTLS(pathToCert); })
       .then(() => { return ldapAsyncWrap.bind(dn, password); });
   });
 
