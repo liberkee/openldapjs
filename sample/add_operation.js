@@ -14,13 +14,15 @@ const entry = [
 
 newClient.initialize()
   .then(() => {
+    console.log('Init successfully');
     return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
+    console.log('TLS successfully');
     return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-
+    console.log('Bind successfully');
     return newClient.add(config.ldapAdd.dnNewEntry, entry);
   })
   .then(() => {

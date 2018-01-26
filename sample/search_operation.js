@@ -10,15 +10,17 @@ const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 newClient.initialize()
   .then(() => {
+    console.log('Init successfully');
     return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
+    console.log('TLS successfully');
+    return newClient.bind('cn=admin,dc=demoApp,dc=com', config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-
+    console.log('Bind successfully');
     return newClient.search(config.ldapSearch.searchBase, config.ldapSearch.scope.one,
-      config.ldapSearch.filter, config.ldapSearch.pageSize);
+      config.ldapSearch.filter);
   })
   .then((result) => {
     const resultJson = ldif.parse(result);
