@@ -134,7 +134,8 @@ See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/c
 
 ## License
 
-- openldap:   OpenLDAP Public License Version 2.8
+- This Project is published under the **MIT License**
+- All references: [Licenses in use](LICENSE.md)
 
 ## Acknowledgments
 
