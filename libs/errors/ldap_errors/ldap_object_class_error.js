@@ -9,7 +9,7 @@ class LdapObjectClassError extends OperationalError {
     return 65;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the add, modify, or modify DN operation violates the object class rules for the entry.' +
     ' For example, the following types of request return this error: The add or modify operation tries to add an entry without a value for a required attribute.' +
     ' The add or modify operation tries to add an entry with a value for an attribute which the class definition does not contain.' +
@@ -19,6 +19,7 @@ class LdapObjectClassError extends OperationalError {
   get code() {
     return LdapObjectClassError.code;
   }
+
 
 }
 

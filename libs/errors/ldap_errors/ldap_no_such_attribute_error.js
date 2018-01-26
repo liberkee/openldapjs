@@ -17,6 +17,7 @@ class LdapNoSuchAttributeError extends OperationalError {
     return LdapNoSuchAttributeError.code;
   }
 
+
 }
 
 module.exports = LdapNoSuchAttributeError;

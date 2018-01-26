@@ -9,13 +9,14 @@ class LdapInvalidSyntaxError extends OperationalError {
     return 21;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the attribute value specified in an add, compare, or modify operation is an unrecognized or invalid syntax for the attribute.';
   }
 
   get code() {
     return LdapInvalidSyntaxError.code;
   }
+
 
 }
 

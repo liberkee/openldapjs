@@ -9,7 +9,7 @@ class LdapAuthError extends LoginError {
     return 7;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that during a bind operation the client requested ' +
     ' an authentication method not supported by the LDAP server.';
   }

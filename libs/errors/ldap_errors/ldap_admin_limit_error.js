@@ -9,7 +9,7 @@ class LdapAdminLimitError extends ServerError {
     return 11;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that an LDAP server limit set by an administrative authority has been exceeded.';
   }
 

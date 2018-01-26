@@ -10,13 +10,14 @@ class LdapRdnError extends OperationalError {
     return 67;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the modify operation attempted to remove an attribute value that forms the entry\'s relative distinguished name.';
   }
 
   get code() {
     return LdapRdnError.code;
   }
+
 
 }
 

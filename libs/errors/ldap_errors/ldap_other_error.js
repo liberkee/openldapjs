@@ -8,13 +8,14 @@ class LdapOtherError extends LdapError {
     return 80;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates an unknown error condition. This is the default value for NDS error codes which do not map to other LDAP error codes.';
   }
 
   get code() {
     return LdapOtherError.code;
   }
+
 
 }
 

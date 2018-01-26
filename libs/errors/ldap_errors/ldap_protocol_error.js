@@ -9,7 +9,7 @@ class LdapProtocolError extends OperationalError {
     return 2;
   }
 
-  static get description() {
+  get description() {
     return 'Indicates that the server has received an invalid or malformed request from the client.';
   }
 
