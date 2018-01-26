@@ -9,6 +9,10 @@ class LdapError extends Error {
     Error.captureStackTrace(this, this.constructor.name);
   }
 
+  toString() {
+    return `${this.code}:${this.description}`;
+  }
+
 }
 
 module.exports = LdapError;

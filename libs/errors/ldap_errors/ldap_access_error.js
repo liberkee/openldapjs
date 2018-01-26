@@ -17,9 +17,6 @@ class LdapAccessError extends LoginError {
     return 50;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
 
 }
 
