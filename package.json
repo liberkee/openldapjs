@@ -26,8 +26,8 @@
     
   },
   "scripts": {
-    "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
-    "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/test_start_tls.js ./test/*.js",
+    "coverage": "istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
+    "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
     "addData": "node populate.js"
   },

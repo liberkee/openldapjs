@@ -38,7 +38,6 @@ describe('Testing the async LDAP delete operation', () => {
     clientLDAP = new LDAP(host);
 
     return clientLDAP.initialize()
-      .then(() => { return clientLDAP.startTLS(pathToCert); })
       .then(() => { return clientLDAP.bind(dnAdmin, password); })
       .then(() => {
         dnUser =

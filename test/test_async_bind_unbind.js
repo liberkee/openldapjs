@@ -17,10 +17,7 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   beforeEach(() => {
     clientLDAP = new LDAPWrap(host);
-    return clientLDAP.initialize()
-      .then(() => {
-        return clientLDAP.startTLS(pathToCert);
-      });
+    return clientLDAP.initialize();
   });
   afterEach(() => {});
 
