@@ -19,10 +19,6 @@ class LdapNamingError extends OperationalError {
     return LdapNamingError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

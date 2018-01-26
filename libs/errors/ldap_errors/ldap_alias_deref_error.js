@@ -18,10 +18,6 @@ class LdapAliasDerefError extends ServerError {
     return LdapAliasDerefError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

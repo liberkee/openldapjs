@@ -19,10 +19,6 @@ class LdapSizeLimitError extends OperationalError {
     return LdapSizeLimitError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

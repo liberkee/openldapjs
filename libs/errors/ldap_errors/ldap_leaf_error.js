@@ -17,10 +17,6 @@ class LdapLeafError extends OperationalError {
     return LdapLeafError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

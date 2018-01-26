@@ -17,10 +17,6 @@ class LdapProtocolError extends OperationalError {
     return LdapProtocolError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

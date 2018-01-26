@@ -16,10 +16,6 @@ class LdapOtherError extends LdapError {
     return LdapOtherError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

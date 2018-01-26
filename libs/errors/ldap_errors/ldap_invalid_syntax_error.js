@@ -17,10 +17,6 @@ class LdapInvalidSyntaxError extends OperationalError {
     return LdapInvalidSyntaxError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

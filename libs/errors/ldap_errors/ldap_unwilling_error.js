@@ -17,10 +17,6 @@ class LdapUnwillingError extends ServerError {
     return LdapUnwillingError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

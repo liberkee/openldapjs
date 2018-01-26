@@ -17,10 +17,6 @@ class LdapInvalidDnError extends OperationalError {
     return LdapInvalidDnError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

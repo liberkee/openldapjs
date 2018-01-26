@@ -17,10 +17,6 @@ class LdapAttributeExists extends OperationalError {
     return LdapAttributeExists.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

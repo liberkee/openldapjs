@@ -20,10 +20,6 @@ class LdapObjectClassError extends OperationalError {
     return LdapObjectClassError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

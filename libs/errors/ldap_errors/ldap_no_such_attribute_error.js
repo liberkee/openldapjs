@@ -17,10 +17,6 @@ class LdapNoSuchAttributeError extends OperationalError {
     return LdapNoSuchAttributeError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

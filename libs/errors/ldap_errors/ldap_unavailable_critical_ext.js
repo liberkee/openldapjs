@@ -18,10 +18,6 @@ class LdapCriticalExtensionError extends ServerError {
     return LdapCriticalExtensionError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

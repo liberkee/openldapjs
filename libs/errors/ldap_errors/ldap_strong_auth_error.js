@@ -20,10 +20,6 @@ class LdapStrongAuthRequired extends LoginError {
     return LdapStrongAuthRequired.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

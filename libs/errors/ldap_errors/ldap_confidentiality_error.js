@@ -16,10 +16,6 @@ class LdapConfidentialityError extends LdapError {
     return LdapConfidentialityError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

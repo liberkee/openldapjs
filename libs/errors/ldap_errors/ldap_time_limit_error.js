@@ -18,10 +18,6 @@ class LdapTimeLimitError extends OperationalError {
     return LdapTimeLimitError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

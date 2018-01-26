@@ -17,10 +17,6 @@ class LdapUnavailableError extends ServerError {
     return LdapUnavailableError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

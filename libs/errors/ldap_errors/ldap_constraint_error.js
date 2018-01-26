@@ -16,10 +16,6 @@ class LdapConstraintError extends OperationalError {
     return LdapConstraintError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

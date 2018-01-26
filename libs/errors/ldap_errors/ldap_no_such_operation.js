@@ -17,10 +17,6 @@ class LdapNoSuchOperationError extends OperationalError {
     return LdapNoSuchOperationError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

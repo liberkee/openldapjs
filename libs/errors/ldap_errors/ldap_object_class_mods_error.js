@@ -18,10 +18,6 @@ class LdapObjectClassModsError extends OperationalError {
     return LdapObjectClassModsError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

@@ -18,10 +18,6 @@ class LdapRdnError extends OperationalError {
     return LdapRdnError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

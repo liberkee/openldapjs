@@ -17,10 +17,6 @@ class LdapUndefinedTypeError extends OperationalError {
     return LdapUndefinedTypeError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

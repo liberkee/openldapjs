@@ -19,10 +19,6 @@ class LdapInappropriateAuthError extends LoginError {
     return LdapInappropriateAuthError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

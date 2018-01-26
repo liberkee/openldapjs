@@ -17,10 +17,6 @@ class LdapBusyError extends ServerError {
     return LdapBusyError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

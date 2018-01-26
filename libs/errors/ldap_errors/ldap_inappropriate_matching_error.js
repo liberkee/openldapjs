@@ -18,10 +18,6 @@ class LdapMatchingError extends OperationalError {
     return LdapMatchingError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

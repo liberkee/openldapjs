@@ -17,10 +17,6 @@ class LdapBindInProgressError extends LdapError {
     return LdapBindInProgressError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

@@ -17,10 +17,6 @@ class LdapAdminLimitError extends ServerError {
     return LdapAdminLimitError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

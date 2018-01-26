@@ -17,10 +17,6 @@ class LdapReferralError extends LdapError {
     return LdapReferralError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

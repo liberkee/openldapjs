@@ -17,10 +17,6 @@ class LdapLoopError extends ServerError {
     return LdapLoopError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

@@ -16,10 +16,6 @@ class LdapAlreadyExistsError extends OperationalError {
     return LdapAlreadyExistsError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

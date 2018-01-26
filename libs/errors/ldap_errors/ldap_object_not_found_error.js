@@ -17,10 +17,6 @@ class LdapNotFoundError extends OperationalError {
     return LdapNotFoundError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 

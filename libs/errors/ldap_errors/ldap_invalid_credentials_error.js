@@ -18,10 +18,6 @@ class LdapCredentialsError extends LoginError {
     return LdapCredentialsError.code;
   }
 
-  toString() {
-    return `${this.code}:${this.description}`;
-  }
-
 
 }
 
