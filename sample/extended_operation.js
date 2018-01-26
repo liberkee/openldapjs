@@ -10,14 +10,30 @@ const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
 
 newClient.initialize()
   .then(() => {
+    console.log('Init successfully');
     return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
-    return newClient.bind('cn=admin,dc=demoApp,dc=com', config.ldapAuthentication.passwordUser);
+    console.log('TLS successfully');
+    return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-    return newClient.extendedOperation('1.3.6.1.4.1.4203.1.11.1',
-      ['cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com',
-        'secret1',
-        'secret']);
+    console.log('Bind successfully');
+    return newClient.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
+      [config.ldapAuthentication.dnUser,
+        config.ldapChangePassword.oldPasswd,
+        config.ldapChangePassword.newPasswd]);
+  })
+  .then(() => {
+    console.log('The user\'s password was changed with success');
+  })
+  .then(() => {
+    return newClient.extendedOperation(config.ldapExtendedOperation.oid.whoAmI);
+  })
+  .then((res) => {
+    console.log(`The current user is: ${res}`);
+  })
+  .catch((err) => {
+    console.log(`${err.name} ${err.constructor.description}`);
   });
+

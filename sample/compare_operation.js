@@ -10,18 +10,22 @@ const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
 
 newClient.initialize()
   .then(() => {
+    console.log('Init successfully');
     return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
+    console.log('TLS successfully');
     return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-
-    return newClient.compare(config.ldapAuthentication.dnUser, config.ldapCompare.attribute, config.ldapCompare.value);
+    console.log('Bind successfully');
+    return newClient.compare(config.ldapAuthentication.dnUser,
+      config.ldapCompare.attribute, config.ldapCompare.value);
   })
   .then((result) => {
     console.log(`Compare result: ${result}`);
-    return newClient.compare(config.ldapAuthentication.dnUser, config.ldapCompare.attribute, config.ldapCompare.wrongValue);
+    return newClient.compare(config.ldapAuthentication.dnUser,
+      config.ldapCompare.attribute, config.ldapCompare.wrongValue);
   })
   .then((result) => {
     console.log(`Compare result: ${result}`);

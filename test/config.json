@@ -2,8 +2,8 @@
   "ldapAuthentication": {
     "host": "ldap://localhost:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
-    "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
-    "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUser": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUserNoRight": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
     "pathFileToCert": "D:/HSM/ca_certs.pem"
@@ -18,13 +18,13 @@
     }
   },
   "ldapChangePassword": {
-    "user": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
+    "user": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "oldPasswd": "secret",
     "newPasswd": "secret"
   },
   "ldapModify": {
     "ldapModificationReplace": {
-      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
       "operation": "replace",
       "attribute": "description",
       "vals": [
@@ -34,7 +34,7 @@
       ]
     },
     "ldapModificationAdd": {
-      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
       "operation": "add",
       "attribute": "description",
       "vals": [
@@ -44,7 +44,7 @@
       ]
     },
     "ldapModificationDelete": {
-      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
       "operation": "delete",
       "attribute": "description",
       "vals": [
@@ -89,20 +89,20 @@
     }
   },
   "ldapRename": {
-    "dnChange": "cn=mrotaru,ou=users,o=myhost,dc=demoApp,dc=com",
-    "newrdn": "cn=rmaxim",
+    "dnChange": "cn=renameTestUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "newrdn": "cn=testRenameUser",
     "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapCompare": {
     "attribute": "cn",
     "value": "admin",
-    "invalidUser": "cn=cghitea,ou=user55s,o=myhost,dc=demoApp,dc=com",
+    "invalidUser": "cn=simpleUser,ou=user55s,o=myhost,dc=demoApp,dc=com",
     "invalidPassword": "wrongPass"
   },
   "ldapSearch": {
     "searchBase": "dc=demoApp,dc=com",
     "searchBaseUser": "ou=users,o=myhost,dc=demoApp,dc=com",
-    "rdnUser": "cn=cghitea",
+    "rdnUser": "cn=simpleUser",
     "filterObjAll": "objectclass=*",
     "filterObjSpecific": "objectclass=aliens",
     "filterObjSpecific2": "objectClass=simpleSecurityObject",

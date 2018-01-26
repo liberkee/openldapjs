@@ -1,13 +1,19 @@
 {
   "ldapAuthentication": {
     "host": "ldap://localhost:389",
-    "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUser": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordUser": "secret",
     "pathFileToCert": "/etc/ldap/ca_certs.pem"
   },
   "ldapChangePassword": {
     "oldPasswd": "secret",
     "newPasswd": "secret"
+  },
+  "ldapExtendedOperation": {
+    "oid": {
+      "changePassword": "1.3.6.1.4.1.4203.1.11.1",
+      "whoAmI": "1.3.6.1.4.1.4203.1.11.3"
+    }
   },
   "ldapModify": {
     "firstDNEntry": "cn=newUser01,cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
@@ -87,12 +93,12 @@
   },
   "ldapCompare": {
     "attribute": "cn",
-    "value": "cbuta",
+    "value": "managerUser",
     "wrongValue": "example"
   },
   "ldapSearch": {
     "searchBase": "ou=users,o=myhost,dc=demoApp,dc=com",
-    "rdnUser": "cn=cghitea",
+    "rdnUser": "cn=simpleUser",
     "filter": "objectclass=*",
     "pageSize": 10,
     "scope": {

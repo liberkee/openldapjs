@@ -9,13 +9,15 @@ const newClient = new LdapClientLib(config.ldapAuthentication.host);
 
 newClient.initialize()
   .then(() => {
+    console.log('Init successfully');
     return newClient.startTLS(config.ldapAuthentication.pathFileToCert);
   })
   .then(() => {
+    console.log('TLS successfully');
     return newClient.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
   })
   .then(() => {
-
+    console.log('Bind successfully');
     return newClient.delete(config.ldapDelete.dnNewEntry);
   })
   .then(() => {
