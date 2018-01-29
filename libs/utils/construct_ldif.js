@@ -1,5 +1,7 @@
 'use strict';
 
+const ldif = require('ldif');
+
 function constructLdif(ldifString) {
   const ldifObject = {
     type: 'content',
@@ -42,4 +44,38 @@ function constructLdif(ldifString) {
   return ldifObject;
 }
 
-module.exports = constructLdif;
+function constructLdifString(ldifString, error) {
+  const errorMsg = 'Expected DN, WHITESPACE, entry or version but "d" found.';
+  if (error.message !== errorMsg) {
+    throw error;
+  }
+
+  let resultJSON;
+  const ldifStringArr = ldifString.split('\n');
+  const arrayElements = [];
+  ldifStringArr.forEach((element) => {
+    if (element.trim()) {
+      arrayElements.push(element);
+    }
+  });
+
+  arrayElements.forEach((element) => {
+    const dnAttrKey = 'dn';
+    const dnVal = ' ';
+    const filter = ':';
+    const giveDNVal = 'defaultName';
+    const elementSplit = element.split(':');
+    const attribute = elementSplit[0];
+    const value = elementSplit[1];
+
+    if (attribute === dnAttrKey && value === dnVal) {
+      const newLdifString = ldifString.replace(`${dnAttrKey}${filter}${dnVal}`,
+        `${dnAttrKey}${filter}${dnVal}${giveDNVal}`);
+      resultJSON = ldif.parse(newLdifString);
+      resultJSON.entries[0].dn = ' ';
+    }
+  });
+  return resultJSON;
+}
+
+module.exports = constructLdifString;

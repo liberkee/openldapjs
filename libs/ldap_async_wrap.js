@@ -156,7 +156,7 @@ class LDAPAsyncWrap {
               try {
                 resJSON = result === '' ? result : ldif.parse(result);
               } catch (ldifErr) {
-                resJSON = ldifConstruct(result);
+                resJSON = ldifConstruct(result, ldifErr);
               }
               resolve(resJSON);
             }

@@ -51,7 +51,7 @@ class PagedSearchStream extends Readable {
             try {
               resJSON = ldif.parse(page);
             } catch (ldifErr) {
-              resJSON = ldifConstruct(page);
+              resJSON = ldifConstruct(page, ldifErr);
             }
             this.push(JSON.stringify(resJSON));
           }
