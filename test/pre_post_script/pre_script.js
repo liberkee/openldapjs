@@ -9,8 +9,12 @@ const Promise = require('bluebird');
  * Helper script that is used to make tests without dependence.
  */
 
-const rdn = configFile.ldapDelete.rdnUser;
-const dn = configFile.ldapDelete.dn;
+const rdnAdd = configFile.ldapDelete.rdnUser;
+const dnAdd = configFile.ldapDelete.dn;
+
+const rdnDelete = configFile.ldapAdd.rdnUser;
+const dnDelete = configFile.ldapAdd.dnNewEntry;
+
 const validEntry = [
   configFile.ldapAdd.firstAttr,
   configFile.ldapAdd.secondAttr,
@@ -39,22 +43,30 @@ ldapClient.initialize()
       configFile.ldapAuthentication.passwordAdmin);
   })
   .then(() => {
-    const args = [];
+    const argsAdd = [];
+    const argsDelete = [];
     for (let i = 0; i < 10; i += 1) {
-      args.push(`${rdn}${i}${dn}`);
+      argsAdd.push(`${rdnAdd}${i}${dnAdd}`);
+      argsDelete.push(`${rdnDelete}${i}${dnDelete}`);
     }
 
+    /* For LDAP rename operation */
+    const deleteOp = ldapClient.delete(`${configFile.ldapRename.newrdn},${configFile.ldapRename.newparent}`);
+    /* For LDAP delete operation */
+    const promiseDeleteRes = Promise.map(argsDelete, (arg) => {
+      return ldapClient.delete(arg);
+    });
     /* For LDAP modify operation */
     const modifyOp = ldapClient.modify(configFile.ldapModify.ldapModificationReplace.change_dn,
       changeAttributes);
     /* For LDAP rename operation */
     const addOp = ldapClient.add(configFile.ldapRename.dnChange, validEntry);
-    /* For LDAP delete operation */
-    const promiseRes = Promise.map(args, (arg) => {
+    /* For LDAP add operation */
+    const promiseAddRes = Promise.map(argsAdd, (arg) => {
       return ldapClient.add(arg, validEntry);
     });
 
-    return Promise.all([modifyOp, addOp, promiseRes]
+    return Promise.all([deleteOp, promiseDeleteRes, modifyOp, addOp, promiseAddRes]
       .map((p) => {
         return p.catch((e) => {
           return e;
