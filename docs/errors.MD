@@ -16,6 +16,8 @@ ldapClient.add(dn,entry)
         //LdapAlreadyExistsError with error code 68
     })
     .catch(LdapInvalidSyntaxError, (err) => {
+        // toString() displays error.code: error.description
+        console.log(err.toString());
         //catching specific errors
     })
 ```
