@@ -17,8 +17,16 @@ const changes = [
 ];
 
 const prePostReadControls = [
-  config.ldapControls.ldapModificationControlPostRead,
-  config.ldapControls.ldapModificationControlPreRead,
+  {
+    oid: 'preread',
+    value: ['cn'],
+    isCritical: false,
+  },
+  {
+    oid: 'postread',
+    value: ['cn'],
+    isCritical: false,
+  },
 ];
 
 newClient.initialize()

@@ -14,3 +14,5 @@ Sample code for all function calls:
 
 
 The samples use credentials and parameter values from the [config](./config.json) file, check that out for further  info on how to use the library.
+
+For more details on the control parameters, please check the [documentation](../docs/controls.MD)
