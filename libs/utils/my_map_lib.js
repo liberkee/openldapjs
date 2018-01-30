@@ -1,13 +1,13 @@
 'use strict';
 
-/**		
-    * Interogate the attribute array by his type to see if exist		
-    *		
-    * @function alreadyExist		
-    * @param {array} attributeObjectArray		
-    * @param {string} type		
-    * @return {object} The function will return an object if the type exist.		
-    * Undefined otherwise		
+/**
+    * Interogate the attribute array by his type to see if exist
+    *
+    * @function alreadyExist
+    * @param {array} attributeObjectArray
+    * @param {string} type
+    * @return {object} The function will return an object if the type exist.
+    * Undefined otherwise
     */
 function alreadyExist(attributeObjectArray, type) {
   const lengthArray = attributeObjectArray.length;
@@ -19,13 +19,13 @@ function alreadyExist(attributeObjectArray, type) {
   return undefined;
 }
 
-/**		
-    * Return the object of an Attribute.		
-    *		
-    * @function objectLDAPAttribute		
-    * @param {string} type		
-    * @param {string} value		
-    * @return {object} The function will return an object of attribute		
+/**
+    * Return the object of an Attribute.
+    *
+    * @function objectLDAPAttribute
+    * @param {string} type
+    * @param {string} value
+    * @return {object} The function will return an object of attribute
     */
 
 function objectLDAPAttribute(type, value) {
@@ -40,12 +40,12 @@ function objectLDAPAttribute(type, value) {
   return attributeObject;
 }
 
-/**		
-    * Take an entry of LDAP and put it into an object.		
-    *		
-    * @function objectLDAPEntry		
-    * @param {string} LDAPentry		
-    * @return {object} The function will return an object of given entry		
+/**
+    * Take an entry of LDAP and put it into an object.
+    *
+    * @function objectLDAPEntry
+    * @param {string} LDAPentry
+    * @return {object} The function will return an object of given entry
     */
 
 function objectLDAPEntry(LDAPentry) {
@@ -65,12 +65,12 @@ function objectLDAPEntry(LDAPentry) {
     const type = attributeArray[0];
     const value = attributeArray[1];
 
-    // Verify if is an attribute or the DN		
+    // Verify if is an attribute or the DN
     if (type !== '' && type !== undefined) {
 
       const currentType = alreadyExist(entryObject.attribute, type);
 
-      // Verify if the type alreadyExist		
+      // Verify if the type alreadyExist
       if (currentType) {
         currentType.value.push(value);
       } else {
@@ -88,20 +88,20 @@ function objectLDAPEntry(LDAPentry) {
 
 }
 
-/**		
-  * @module LDAPtranzition		
-  * @class stringJSON		
+/**
+  * @module LDAPtranzition
+  * @class stringJSON
   */
 
 class stringJSON {
 
-  /**		
-    * Transform a string message from LDAP search operation to JSON.		
-    *		
-    * @method stringLDAPtoJSON		
-    * @param {string} LDAPstring		
-    * @return {Promise} That resolves if the stringLDAPtoJSON was successful.		
-    * Rejects if is not a string and don't have the LDIF structure.		
+  /**
+    * Transform a string message from LDAP search operation to JSON.
+    *
+    * @method stringLDAPtoJSON
+    * @param {string} LDAPstring
+    * @return {Promise} That resolves if the stringLDAPtoJSON was successful.
+    * Rejects if is not a string and don't have the LDIF structure.
     */
 
   stringLDAPtoJSON(LDAPstring) {
@@ -109,7 +109,7 @@ class stringJSON {
       entry: [],
     };
 
-    // Test to interogate the given string		
+    // Test to interogate the given string
     if (LDAPstring === null) {
       throw new Error('The string is null');
     }
@@ -126,7 +126,7 @@ class stringJSON {
       throw new Error('Must be a string');
     }
 
-    // If basic test are past interogate to see if is an Ldap structure		
+    // If basic test are past interogate to see if is an Ldap structure
     const entryArray = LDAPstring.split('\ndn');
     const lengthEntryArray = entryArray.length;
 
