@@ -2,80 +2,49 @@
 
 const ldif = require('ldif');
 
-function constructLdif(ldifString) {
-  const ldifObject = {
-    type: 'content',
-    version: null,
-    entries: [],
-  };
-  const resultArr = ldifString.split('\n');
-  const entryObject = {
-    type: 'record',
-    dn: '',
-    attributes: [],
-  };
-
-  resultArr.forEach((element, index, array) => {
-    if (element.trim()) {
-      const elementArr = element.split(':');
-      const objectKey = elementArr[0];
-      const objectVal = elementArr[1];
-      if (objectKey !== 'dn') {
-        const constructAttrObj = {
-          attribute: {
-            type: 'attribute',
-            options: [],
-            attribute: objectKey,
-          },
-          value:
-          {
-            type: 'value',
-            value: objectVal,
-          },
-        };
-        entryObject.attributes.push(constructAttrObj);
-      } else {
-        entryObject.dn = objectVal;
-      }
-    } else if (index === array.length - 1) {
-      ldifObject.entries.push(entryObject);
-    }
-  });
-  return ldifObject;
-}
-
-function constructLdifString(ldifString, error) {
-  const errorMsg = 'Expected DN, WHITESPACE, entry or version but "d" found.';
-  if (error.message !== errorMsg) {
-    throw error;
-  }
-
+function constructLdifString(ldifString) {
   let resultJSON;
-  const ldifStringArr = ldifString.split('\n');
-  const arrayElements = [];
-  ldifStringArr.forEach((element) => {
-    if (element.trim()) {
-      arrayElements.push(element);
-    }
-  });
 
-  arrayElements.forEach((element) => {
-    const dnAttrKey = 'dn';
-    const dnVal = ' ';
-    const filter = ':';
-    const giveDNVal = 'defaultName';
-    const elementSplit = element.split(':');
-    const attribute = elementSplit[0];
-    const value = elementSplit[1];
+  try {
+    resultJSON = ldifString === '' ? ldifString : ldif.parse(ldifString);
+    return resultJSON;
+  } catch (ldifErr) {
 
-    if (attribute === dnAttrKey && value === dnVal) {
-      const newLdifString = ldifString.replace(`${dnAttrKey}${filter}${dnVal}`,
-        `${dnAttrKey}${filter}${dnVal}${giveDNVal}`);
-      resultJSON = ldif.parse(newLdifString);
-      resultJSON.entries[0].dn = ' ';
+    const errorMsg = 'Expected DN, WHITESPACE, entry or version but "d" found.';
+    if (ldifErr.message !== errorMsg) {
+      throw ldifErr;
     }
-  });
-  return resultJSON;
+
+    const ldifStringArr = ldifString.split('\n');
+    const arrayElements = [];
+    ldifStringArr.forEach((element) => {
+      if (element.trim()) {
+        arrayElements.push(element);
+      }
+    });
+
+    arrayElements.forEach((element) => {
+      const dnAttrKey = 'dn';
+      const dnVal = ' ';
+      const filter = ':';
+      const giveDNVal = 'defaultName';
+      const elementSplit = element.split(':');
+      const attribute = elementSplit[0];
+      const value = elementSplit[1];
+      const elementLength = element.trim().length;
+
+      /* This is a hack for the error that comes from the node-ldif library
+        When the dn is empty */
+      if (attribute === dnAttrKey && value === dnVal && elementLength === 3) {
+        const newLdifString = ldifString.replace(`${dnAttrKey}${filter}${dnVal}`,
+          `${dnAttrKey}${filter}${dnVal}${giveDNVal}`);
+        resultJSON = ldif.parse(newLdifString);
+        resultJSON.entries[0].dn = ' ';
+      }
+    });
+
+    return resultJSON;
+  }
 }
 
 module.exports = constructLdifString;

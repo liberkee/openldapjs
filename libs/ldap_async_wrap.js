@@ -152,12 +152,7 @@ class LDAPAsyncWrap {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
-              let resJSON;
-              try {
-                resJSON = result === '' ? result : ldif.parse(result);
-              } catch (ldifErr) {
-                resJSON = ldifConstruct(result, ldifErr);
-              }
+              const resJSON = ldifConstruct(result);
               resolve(resJSON);
             }
           });
