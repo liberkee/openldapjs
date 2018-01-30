@@ -1,0 +1,18 @@
+{
+  "id": "https://www.hufsm.com/openldap/update/",
+  "type": "object",
+  "properties": {
+    "oldVal": {
+      "id": "https://www.hufsm.com/openldap/update/oldVal",
+      "type": "string"
+    },
+    "attr": {
+      "id": "https://www.hufsm.com/openldap/update/newVal",
+      "type": "string"
+    }
+  },
+  "required": [
+    "oldVal",
+    "newVal"
+  ]
+}

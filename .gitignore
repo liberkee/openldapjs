@@ -8,6 +8,7 @@ npm-debug.log
 **/npm-debug.log
 **/npm-debug.log*
 **/node_modules
+**/docs
 .idea
 **/logs/*.log
 **/pids/*.pid
@@ -22,6 +23,7 @@ static_server_npm_helper.pid
 */out
 **/.jscsrc
 **/.jshintrc
+**/docs/*
 !**/docs/.gitkeep
 **/coverage/*
 !**/coverage/.gitkeep
@@ -37,3 +39,5 @@ modify.ldif
 ./build/**
 .vscode/settings.json
 build/*
+libBuildTLS/*
+TSdeclaration/*
