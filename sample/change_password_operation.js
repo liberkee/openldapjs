@@ -1,6 +1,6 @@
 'use strict';
 
-const LdapClientLib = require('../libs/ldap_async_wrap.js');
+const LdapClientLib = require('../index').Client;
 const config = require('./config.json');
 
 const newClient = new LdapClientLib(config.ldapAuthentication.host);
@@ -23,5 +23,5 @@ newClient.initialize()
     console.log('The user\'s password was changed with success');
   })
   .catch((err) => {
-    console.log(`${err.name} ${err.constructor.description}`);
+    console.log(err.toString());
   });

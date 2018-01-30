@@ -1,6 +1,6 @@
 'use strict';
 
-const LdapClientLib = require('../libs/ldap_async_wrap.js');
+const LdapClientLib = require('../index').Client;
 
 const ldif = require('ldif');
 
@@ -41,8 +41,8 @@ newClient.initialize()
     result.on('err', (err) => {
       console.log('-----------------');
       console.error(`Error name: ${err.name}`);
-      console.error(`Error code: ${err.constructor.code}`);
-      console.error(`Error description: ${err.constructor.description}`);
+      console.error(`Error code: ${err.code}`);
+      console.error(`Error description: ${err.description}`);
       console.log('-----------------');
     });
 
@@ -51,5 +51,5 @@ newClient.initialize()
     });
   })
   .catch((err) => {
-    console.log(`${err.name} ${err.constructor.description}`);
+    console.log(err.toString());
   });
