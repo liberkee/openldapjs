@@ -1,0 +1,23 @@
+{
+  "id": "https://www.hufsm.com/openldap/controlJson/",
+  "type": "object",
+  "properties": {
+    "oid": {
+      "id": "https://www.hufsm.com/openldap/controlJson/oid",
+      "type": "string"
+    },
+    "value": {
+      "id": "https://www.hufsm.com/openldap/controlJson/value",
+      "type": "array"
+    },
+    "isCritical": {
+      "id": "https://www.hufsm.com/openldap/controlJson/isCritical",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "oid",
+    "value",
+    "isCritical"
+  ]
+}
