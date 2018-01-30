@@ -219,37 +219,22 @@ describe('Testing the rename functionalities', () => {
       });
   });
 
-  it('should rename the dn',
-    () => { // this looks like an over complicated unit test
-      const validEntry = [
-        config.ldapAdd.firstAttr,
-        config.ldapAdd.secondAttr,
-        config.ldapAdd.lastAttr,
-      ];
+  it('should rename the dn', () => {
+    const validEntry = [
+      config.ldapAdd.firstAttr,
+      config.ldapAdd.secondAttr,
+      config.ldapAdd.lastAttr,
+    ];
 
-      return ldapAsyncWrap
-        .delete(`${config.ldapRename.newrdn},${config.ldapRename.newparent}`)
-        .then(() => {
-          return ldapAsyncWrap.add(config.ldapRename.dnChange, validEntry);
-        })
-        .then(() => {
-          return ldapAsyncWrap.rename(
-            config.ldapRename.dnChange, config.ldapRename.newrdn,
-            config.ldapRename.newparent, controlOperation);
-        })
-        .catch(() => { // shouldn't we place catch at the end ?
-          return ldapAsyncWrap.rename(
-            config.ldapRename.dnChange, config.ldapRename.newrdn,
-            config.ldapRename.newparent, controlOperation);
-        })
-        .then((result) => {
-          let resultOperation;
-          resultOperation = result.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(
-            resultOperation, ` ${config.ldapRename.dnChange}`);
-        });
-    });
+    ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn,
+      config.ldapRename.newparent, controlOperation)
+      .then((result) => {
+        let resultOperation;
+        resultOperation = result.split('\n');
+        resultOperation = resultOperation[1].split(':');
+        resultOperation = resultOperation[1];
+        should.deepEqual(resultOperation, ` ${config.ldapRename.dnChange}`);
+      });
+  });
 
 });
