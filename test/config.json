@@ -1,6 +1,6 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://10.16.0.179:389",
+    "host": "ldap://10.16.0.194:389",
     "dnAdmin": "cn=admin,dc=demoApp,dc=com",
     "dnUser": "cn=cbuta,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnUserNoRight": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
@@ -108,6 +108,8 @@
     "host": "ldap://localhost:389",
     "entryDn":"cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret"
+    "userPassword": "secret",
+    "nrOfResults": 10000,
+    "pageSize": 10
   }
 }
