@@ -28,7 +28,6 @@
     "coverage": "node ./test/pre_post_script/pre_script.js & istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "lint": "eslint ./libs/ldap_async_wrap.js",
-    "clean": "node ./test/pre_post_script/clean_up_script.js",
     "pretest": "node ./test/pre_post_script/pre_script.js",
     "addData": "node populate.js"
   },

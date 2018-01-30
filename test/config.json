@@ -125,6 +125,8 @@
     "host": "ldap://localhost:389",
     "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret"
+    "userPassword": "secret",
+    "nrOfResults": 10000,
+    "pageSize": 10
   }
 }
