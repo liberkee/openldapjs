@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const Ajv = require('ajv');
 const _ = require('underscore');
 const changeSchema = require('../schemas/change_schema');
+const updateAttrSchema = require('../schemas/update_attr_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
 const ValidationError = require('../errors/validation_error');
@@ -55,7 +56,7 @@ class CheckParam {
         const addVals = [];
 
         element.vals.forEach((val) => {
-          const validVal = ajv.validate(errorList, val);
+          const validVal = ajv.validate(updateAttrSchema, val);
           if (!validVal) {
             throw new ValidationError(
               errorList.invalidJSONMessage, ajv.errors);
