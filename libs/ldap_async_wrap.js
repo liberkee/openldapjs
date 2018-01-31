@@ -1,6 +1,7 @@
 'use strict';
 
-const binding = require('../build/Release/binding.node');
+const binary = require('node-pre-gyp');
+const path = require('path');
 const Promise = require('bluebird');
 const checkParameters = require('./utils/check_variable_format');
 const SearchStream = require('./paged_search_stream.js');
@@ -9,6 +10,8 @@ const StateError = require('./errors/state_error');
 const errorList = require('../test/error_list.json');
 const _ = require('underscore');
 
+const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
+const binding = require(bindingPath);
 
 const E_STATES = {
   CREATED: 0,

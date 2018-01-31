@@ -12,22 +12,20 @@
             'link_settings': {
               'libraries': [
                 'LIBLDAP_R.lib',
-                'LDAP_SSL.lib',
                 'LIBLBER.lib',
               ],
               'library_dirs': [
-                './bin/dll',
                 './bin/lib'
               ],
             },
             'copies':[
               {
-                'destination':'<(module_root_dir)/build/Release/',
-                'files':['<(module_root_dir)/bin/dll/libeay32.dll','<(module_root_dir)/bin/dll/liblber.dll','<(module_root_dir)/bin/dll/libldap_r.dll','<(module_root_dir)/bin/dll/nldapextd.dll','<(module_root_dir)/bin/dll/ssleay32.dll']
+                'destination':'<(module_root_dir)/lib/binding/Release/node-v57-win32-x64',
+                'files':['<(module_root_dir)/bin/dll/libeay32.dll','<(module_root_dir)/bin/dll/liblber.dll','<(module_root_dir)/bin/dll/libldap_r.dll','<(module_root_dir)/bin/dll/ssleay32.dll']
               }
             ]
           }
-        ], 
+        ],
         ['OS=="linux"',
           {
             'include_dirs' : [
@@ -46,7 +44,8 @@
             ],
           }
         ]
-      ],      
+      ],
+      'product_dir': '<(module_path)',      
       'defines': [ 'V8_DEPRECATION_WARNINGS=1', 
         'LDAP_DEPRECATED' 
       ],
