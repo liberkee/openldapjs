@@ -75,17 +75,26 @@
   "ldapAdd": {
     "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "dnNewEntryAdmin": ",dc=demoApp,dc=com",
+    "rdnUser": "cn=testUsersAdd",
     "firstAttr": {
       "attr": "objectClass",
-      "vals": ["person"]
+      "vals": [
+        "person"
+      ]
     },
     "secondAttr": {
       "attr": "sn",
-      "vals": ["Entry"]
+      "vals": [
+        "Entry"
+      ]
     },
     "lastAttr": {
       "attr": "description",
-      "vals": ["Tesst1", "Tesst2", "weCanAddMultipleVals"]
+      "vals": [
+        "Tesst1",
+        "Tesst2",
+        "weCanAddMultipleVals"
+      ]
     }
   },
   "ldapRename": {
@@ -109,13 +118,15 @@
     "filterObjSpecific3": "objectClass=inetOrgPerson"
   },
   "ldapDelete": {
-    "rdnUser": "cn=testUsers",
+    "rdnUser": "cn=testUsersDelete",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapTestEntries": {
     "host": "ldap://localhost:389",
-    "entryDn":"cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
     "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret"
+    "userPassword": "secret",
+    "nrOfResults": 10000,
+    "pageSize": 10
   }
 }

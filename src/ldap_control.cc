@@ -58,8 +58,7 @@ std::vector<LDAPControl *> LdapControls::CreateModificationControls(
 
     const auto isCritical = v8::Local<v8::Number>::Cast(controls->Get(
         Nan::New(constants::changeIsCriticalMember).ToLocalChecked()));
-    const auto isC = isCritical->NumberValue();
-    ctrl->ldctl_iscritical = isC;
+    ctrl->ldctl_iscritical = static_cast<char>(isCritical->NumberValue());
   }
 
   return controlsVector;
