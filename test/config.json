@@ -23,6 +23,25 @@
     "newPasswd": "secret"
   },
   "ldapModify": {
+    "ldapModificationUpdate": {
+      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "operation": "update",
+      "attribute": "description",
+      "vals": [
+        {
+          "oldVal": "1Modification",
+          "newVal": "1NewModification"
+        },
+        {
+          "oldVal": "2Modification",
+          "newVal": "2NewModification"
+        },
+        {
+          "oldVal": "3Modification",
+          "newVal": "3NewModification"
+        }
+      ]
+    },
     "ldapModificationReplace": {
       "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
       "operation": "replace",

@@ -21,6 +21,27 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
+  const changeAttributesError = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: [
+        {
+          oldVal: 'nonExistingValue',
+          newVal: 'repeat',
+        },
+      ],
+    },
+  ];
+
+  const changeAttributesUpdate = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: config.ldapModify.ldapModificationUpdate.vals,
+    },
+  ];
+
   const changeAttributesReplace = [
     {
       op: config.ldapModify.ldapModificationReplace.operation,
@@ -270,6 +291,46 @@ describe('Testing the modify functionalities', () => {
       config.ldapModify.ldapModificationReplace.change_dn,
       changeAttributesDelete)
       .then((result) => { should.deepEqual(result, 0); });
+  });
+
+  it('should reject the update if the oldVal don\'t exit', () => {
+    const CustomError = errorHandler(errorList.noSuchAttirbute);
+    return ldapAsyncWrap
+      .modify(config.ldapModify.ldapModificationUpdate.change_dn, changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject the update if the newVal already exit', () => {
+    const CustomError = errorHandler(errorList.typeOrValueExists);
+    changeAttributesError[0].vals[0].oldVal = '2Modification';
+    changeAttributesError[0].vals[0].newVal = '1Modification';
+    return ldapAsyncWrap.modify(config.ldapModify.ldapModificationUpdate.change_dn,
+      changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should update the old existing attributes with new ones from an entry', () => {
+    return ldapAsyncWrap.modify(config.ldapModify.ldapModificationUpdate.change_dn,
+      changeAttributesUpdate)
+      .then((result) => {
+        should.deepEqual(result, 0);
+      });
   });
 
   it('should make multiple modifications to an entry', () => {
