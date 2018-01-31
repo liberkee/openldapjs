@@ -22,8 +22,10 @@ class PagedSearchStream extends Readable {
    * @param {Object} ldapInstance the ldap instance the search belongs to.
    */
   constructor(base, scope, filter, pageSize, searchId, ldapInstance, timeOut) {
-    super();
-    this.objectMode = true;
+    const options = {
+      objectMode: true,
+    };
+    super(options);
     this._binding = ldapInstance;
     this._base = base;
     this._scope = scope;
@@ -48,7 +50,7 @@ class PagedSearchStream extends Readable {
           } else {
             if (!morePages) this._lastResult = true;
             const resJSON = page.length === 0 ? page : ldif.parse(page);
-            this.push(JSON.stringify(resJSON));
+            this.push(resJSON);
           }
 
         });
