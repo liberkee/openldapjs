@@ -21,7 +21,7 @@ describe('Testing the async LDAP delete operation', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -41,7 +41,7 @@ describe('Testing the async LDAP delete operation', () => {
       .then(() => { return clientLDAP.bind(dnAdmin, password); })
       .then(() => {
         dnUser =
-              `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+          `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
       });
   });
   afterEach(() => { return clientLDAP.unbind(); });
@@ -157,7 +157,7 @@ describe('Testing the async LDAP delete operation', () => {
       .catch(CustomError, (err) => {
         personNr += 1;
         dnUser =
-              `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+          `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
         should.deepEqual(err, new CustomError(errorList.ldapDeleteErrorMessage));
         return clientLDAP.delete(dnUser);
       })
@@ -197,11 +197,7 @@ describe('Testing the async LDAP delete operation', () => {
     () => {
       return clientLDAP.delete(dnUser, controlOperation)
         .then((result) => {
-          let resultOperation;
-          resultOperation = result.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
-          should.deepEqual(resultOperation, ` ${dnUser}`);
+          should.deepEqual(result.entries[0].dn, dnUser);
         });
     });
 

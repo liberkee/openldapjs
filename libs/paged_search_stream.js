@@ -3,6 +3,7 @@
 const Readable = require('stream').Readable;
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const errorList = require('../test/error_list.json');
+const ldif = require('ldif');
 
 /**
  * @class PagedSearchStream
@@ -46,7 +47,8 @@ class PagedSearchStream extends Readable {
             this.push(null);
           } else {
             if (!morePages) this._lastResult = true;
-            this.push(page);
+            const resJSON = page.length === 0 ? page : ldif.parse(page);
+            this.push(JSON.stringify(resJSON));
           }
 
         });
