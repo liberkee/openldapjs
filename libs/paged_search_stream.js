@@ -3,6 +3,7 @@
 const Readable = require('stream').Readable;
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const errorList = require('../test/error_list.json');
+const ldif = require('ldif');
 
 /**
  * @class PagedSearchStream
@@ -21,8 +22,10 @@ class PagedSearchStream extends Readable {
    * @param {Object} ldapInstance the ldap instance the search belongs to.
    */
   constructor(base, scope, filter, pageSize, searchId, ldapInstance, timeOut) {
-    super();
-    this.objectMode = true;
+    const options = {
+      objectMode: true,
+    };
+    super(options);
     this._binding = ldapInstance;
     this._base = base;
     this._scope = scope;
@@ -46,7 +49,8 @@ class PagedSearchStream extends Readable {
             this.push(null);
           } else {
             if (!morePages) this._lastResult = true;
-            this.push(page);
+            const resJSON = page.length === 0 ? page : ldif.parse(page);
+            this.push(resJSON);
           }
 
         });

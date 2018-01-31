@@ -8,7 +8,7 @@ const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
 const errorList = require('../test/error_list.json');
 const _ = require('underscore');
-
+const ldif = require('ldif');
 
 const E_STATES = {
   CREATED: 0,
@@ -220,7 +220,8 @@ class LDAPAsyncWrap {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorList.ldapSearchErrorMessage));
             } else {
-              resolve(result);
+              const resJSON = result.length === 0 ? result : ldif.parse(result);
+              resolve(resJSON);
             }
           });
       }
@@ -331,7 +332,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapModifyErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -400,7 +402,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapRenameErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -433,7 +436,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapDeleteErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }
@@ -502,7 +506,8 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorList.ldapAddErrorMessage));
           } else {
-            resolve(result);
+            const resJSON = result === 0 ? result : ldif.parse(result);
+            resolve(resJSON);
           }
         });
       }

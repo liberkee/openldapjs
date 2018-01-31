@@ -60,7 +60,7 @@ describe('Testing the modify functionalities', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -87,8 +87,8 @@ describe('Testing the modify functionalities', () => {
   it('should replace the old attributes with new one from an entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesReplace)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesReplace)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -127,7 +127,7 @@ describe('Testing the modify functionalities', () => {
 
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn, attribute)
+      config.ldapModify.ldapModificationReplace.change_dn, attribute)
       .then(() => {
         should.fail('should not have succeeded');
       })
@@ -144,20 +144,14 @@ describe('Testing the modify functionalities', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     };
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, control)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, control)
       .then((result) => {
-        let resultOperation;
-        resultOperation = result.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
-        should.deepEqual(
-          resultOperation,
-          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+        should.deepEqual(result.entries[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 
@@ -167,8 +161,8 @@ describe('Testing the modify functionalities', () => {
     }];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, control)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, control)
       .then(() => {
         should.fail('should not have succeeded');
       })
@@ -198,8 +192,8 @@ describe('Testing the modify functionalities', () => {
   it('should add new attributes to an existing entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesAdd)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesAdd)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -214,8 +208,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesAdd)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesAdd)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -236,8 +230,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        change)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      change)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -258,8 +252,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        change)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      change)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -273,16 +267,16 @@ describe('Testing the modify functionalities', () => {
   it('should delete an attribute from an existing entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesDelete)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesDelete)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
   it('should make multiple modifications to an entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -313,13 +307,9 @@ describe('Testing the modify functionalities', () => {
       ])
       .then((results) => {
         results.forEach((element) => {
-          let resultOperation;
-          resultOperation = element.split('\n');
-          resultOperation = resultOperation[1].split(':');
-          resultOperation = resultOperation[1];
           should.deepEqual(
-            resultOperation,
-            ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+            element.entries[0].dn,
+            config.ldapModify.ldapModificationReplace.change_dn);
         });
       });
   });
@@ -327,16 +317,10 @@ describe('Testing the modify functionalities', () => {
   it('should return a specific attribute from the entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, controlOperation)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, controlOperation)
       .then((result) => {
-        let resultOperation;
-        resultOperation = result.split('\n');
-        resultOperation = resultOperation[1].split(':');
-        resultOperation = resultOperation[1];
-        should.deepEqual(
-          resultOperation,
-          ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
+        should.deepEqual(result.entries[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 
