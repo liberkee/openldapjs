@@ -21,6 +21,27 @@ describe('Testing the modify functionalities', () => {
     },
   ];
 
+  const changeAttributesError = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: [
+        {
+          oldVal: 'nonExistingValue',
+          newVal: 'repeat',
+        },
+      ],
+    },
+  ];
+
+  const changeAttributesUpdate = [
+    {
+      op: config.ldapModify.ldapModificationUpdate.operation,
+      attr: config.ldapModify.ldapModificationUpdate.attribute,
+      vals: config.ldapModify.ldapModificationUpdate.vals,
+    },
+  ];
+
   const changeAttributesReplace = [
     {
       op: config.ldapModify.ldapModificationReplace.operation,
@@ -60,7 +81,7 @@ describe('Testing the modify functionalities', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -87,8 +108,8 @@ describe('Testing the modify functionalities', () => {
   it('should replace the old attributes with new one from an entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesReplace)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesReplace)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -127,7 +148,7 @@ describe('Testing the modify functionalities', () => {
 
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn, attribute)
+      config.ldapModify.ldapModificationReplace.change_dn, attribute)
       .then(() => {
         should.fail('should not have succeeded');
       })
@@ -144,12 +165,12 @@ describe('Testing the modify functionalities', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     };
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, control)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, control)
       .then((result) => {
         let resultOperation;
         resultOperation = result.split('\n');
@@ -167,8 +188,8 @@ describe('Testing the modify functionalities', () => {
     }];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, control)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, control)
       .then(() => {
         should.fail('should not have succeeded');
       })
@@ -198,8 +219,8 @@ describe('Testing the modify functionalities', () => {
   it('should add new attributes to an existing entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesAdd)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesAdd)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -214,8 +235,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesAdd)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesAdd)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -236,8 +257,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        change)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      change)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -258,8 +279,8 @@ describe('Testing the modify functionalities', () => {
     ];
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        change)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      change)
       .then((result) => { should.fail('should not have passed'); })
       .catch(CustomError, (err) => {
         should.deepEqual(err.constructor.description, CustomError.description);
@@ -273,16 +294,56 @@ describe('Testing the modify functionalities', () => {
   it('should delete an attribute from an existing entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributesDelete)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributesDelete)
       .then((result) => { should.deepEqual(result, 0); });
+  });
+
+  it('should reject the update if the oldVal don\'t exit', () => {
+    const CustomError = errorHandler(errorList.noSuchAttirbute);
+    return ldapAsyncWrap
+      .modify(config.ldapModify.ldapModificationUpdate.change_dn, changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should reject the update if the newVal already exit', () => {
+    const CustomError = errorHandler(errorList.typeOrValueExists);
+    changeAttributesError[0].vals[0].oldVal = '2Modification';
+    changeAttributesError[0].vals[0].newVal = '1Modification';
+    return ldapAsyncWrap.modify(config.ldapModify.ldapModificationUpdate.change_dn,
+      changeAttributesError)
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(CustomError, (error) => {
+        should.deepEqual(error, new CustomError(errorList.ldapModifyErrorMessage));
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
+  });
+
+  it('should update the old existing attributes with new ones from an entry', () => {
+    return ldapAsyncWrap.modify(config.ldapModify.ldapModificationUpdate.change_dn,
+      changeAttributesUpdate)
+      .then((result) => {
+        should.deepEqual(result, 0);
+      });
   });
 
   it('should make multiple modifications to an entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes)
       .then((result) => { should.deepEqual(result, 0); });
   });
 
@@ -327,8 +388,8 @@ describe('Testing the modify functionalities', () => {
   it('should return a specific attribute from the entry', () => {
     return ldapAsyncWrap
       .modify(
-        config.ldapModify.ldapModificationReplace.change_dn,
-        changeAttributes, controlOperation)
+      config.ldapModify.ldapModificationReplace.change_dn,
+      changeAttributes, controlOperation)
       .then((result) => {
         let resultOperation;
         resultOperation = result.split('\n');
