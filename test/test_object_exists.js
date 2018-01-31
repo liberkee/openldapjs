@@ -3,7 +3,6 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 
@@ -38,6 +37,9 @@ describe('Testing the objectExists function', () => {
     return ldapAsyncWrap.objectExists(wrongDN)
       .then((res) => {
         res.should.be.false();
+      })
+      .catch((err) => {
+        console.log(err);
       });
   });
 

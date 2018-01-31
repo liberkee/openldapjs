@@ -3,9 +3,10 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
+const errorCodes = require('./error_codes');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the attributeExists function', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -45,14 +46,14 @@ describe('Testing the attributeExists function', () => {
 
   it('should reject in case of an error', () => {
     const wrongDN = 'cn=wrong';
-    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
     return ldapAsyncWrap.attributeExists(wrongDN, attr)
       .then(() => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
         should.deepEqual(
-          err, new CustomError(errorList.ldapCompareErrorMessage));
+          err, new CustomError(errorMessages.ldapCompareErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');

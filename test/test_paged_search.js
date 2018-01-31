@@ -4,9 +4,10 @@ const should = require('should');
 const LDAPWrap = require('../index').Client;
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./error_list.json');
 const errorHandler = require('../index').errorHandler;
 const StateError = require('../libs/errors/state_error');
+const errorCodes = require('./error_codes');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP paged search ', () => {
 
@@ -65,37 +66,37 @@ describe('Testing the async LDAP paged search ', () => {
       })
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch(
-        StateError,
-        (err) => {
-          err.message.should.deepEqual(errorList.bindErrorMessage);
-        })
+      StateError,
+      (err) => {
+        err.message.should.deepEqual(errorMessages.bindErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if searchBase is not string type', () => {
     return adminLDAP
       .pagedSearch(
-        1, searchScope.subtree, config.ldapSearch.filterObjSpecific,
-        pageSize)
+      1, searchScope.subtree, config.ldapSearch.filterObjSpecific,
+      pageSize)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch(
-        TypeError,
-        (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
-        })
+      TypeError,
+      (err) => {
+        err.message.should.deepEqual(errorMessages.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if scope is not string type', () => {
     return adminLDAP
       .pagedSearch(
-        searchBase, 1, config.ldapSearch.filterObjSpecific, pageSize)
+      searchBase, 1, config.ldapSearch.filterObjSpecific, pageSize)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch(
-        TypeError,
-        (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
-        })
+      TypeError,
+      (err) => {
+        err.message.should.deepEqual(errorMessages.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -103,30 +104,30 @@ describe('Testing the async LDAP paged search ', () => {
   it('should reject if pageSize is not integer type', () => {
     return adminLDAP
       .pagedSearch(
-        searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjSpecific, '20')
+      searchBase, searchScope.subtree,
+      config.ldapSearch.filterObjSpecific, '20')
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch(
-        TypeError,
-        (err) => {
-          err.message.should.deepEqual(errorList.typeErrorMessage);
-        })
+      TypeError,
+      (err) => {
+        err.message.should.deepEqual(errorMessages.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should reject if scope parameter doesn\'t exist', () => {
     return adminLDAP
       .pagedSearch(
-        searchBase, 'noScope', config.ldapSearch.filterObjSpecific,
-        pageSize)
+      searchBase, 'noScope', config.ldapSearch.filterObjSpecific,
+      pageSize)
       .then(() => { should.fail('Didn\'t expect success'); })
       .catch((err) => {
-        err.message.should.deepEqual(errorList.scopeSearchErrorMessage);
+        err.message.should.deepEqual(errorMessages.scopeSearchErrorMessage);
       });
   });
 
   it('should reject if filter is not defined correctly ', (next) => {
-    const CustomError = errorHandler(errorList.filterError);
+    const CustomError = errorHandler(errorCodes.filterError);
     adminLDAP.pagedSearch(searchBase, searchScope.subtree, 'aasd', pageSize)
       .then((res) => {
         res.on('data', (data) => {
@@ -141,12 +142,12 @@ describe('Testing the async LDAP paged search ', () => {
   });
 
   it('should reject if searchBase is not an entry in ldap', (next) => {
-    const CustomError = errorHandler(errorList.ldapNoSuchObject);
+    const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
     adminLDAP
       .pagedSearch(
-        'dc=notEntry,dc=com', searchScope.subtree,
-        config.ldapSearch.filterObjSpecific, pageSize)
+      'dc=notEntry,dc=com', searchScope.subtree,
+      config.ldapSearch.filterObjSpecific, pageSize)
       .then((res) => {
         res.on('data', (data) => {
           should.fail('Didn\'t expect success');
@@ -161,12 +162,12 @@ describe('Testing the async LDAP paged search ', () => {
 
   it('should reject if user doesn\'t have the right to read from specified base',
     (next) => {
-      const CustomError = errorHandler(errorList.ldapNoSuchObject);
+      const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
       userLDAP
         .pagedSearch(
-          searchBase, searchScope.subtree,
-          config.ldapSearch.filterObjSpecific, pageSize)
+        searchBase, searchScope.subtree,
+        config.ldapSearch.filterObjSpecific, pageSize)
         .then((res) => {
           res.on('data', (data) => {
             should.fail('Didn\'t expect success');
@@ -184,12 +185,12 @@ describe('Testing the async LDAP paged search ', () => {
       /* On our server the page size is not set and is default on 500 entries
         */
       const newPageSize = 1000;
-      const CustomError = errorHandler(errorList.sizeLimitExceeded);
+      const CustomError = errorHandler(errorCodes.sizeLimitExceeded);
 
       userLDAP
         .pagedSearch(
-          searchBaseUser, searchScope.subtree,
-          config.ldapSearch.filterObjAll, newPageSize)
+        searchBaseUser, searchScope.subtree,
+        config.ldapSearch.filterObjAll, newPageSize)
         .then((res) => {
           res.on('data', (data) => {
             should.fail('Didn\'t expect success');
@@ -209,12 +210,12 @@ describe('Testing the async LDAP paged search ', () => {
       /* Our LDAP database has ~50k entries */
       adminLDAP
         .pagedSearch(
-          searchBase, searchScope.subtree, config.ldapSearch.filterObjAll,
-          pageSize)
+        searchBase, searchScope.subtree, config.ldapSearch.filterObjAll,
+        pageSize)
         .then((res) => {
           res.on('data', (data) => { numberPage += 1; });
           res.on('end', () => {
-            numberPage.should.be.above(nrOfResults / pageSize -1 );
+            numberPage.should.be.above(nrOfResults / pageSize - 1);
             next();
           });
         });

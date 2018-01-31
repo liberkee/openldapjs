@@ -4,11 +4,11 @@ const LDAP = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./error_list');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
-
+const errorCodes = require('./error_codes');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP extended operation', () => {
 
@@ -68,14 +68,14 @@ describe('Testing the async LDAP extended operation', () => {
 
   it('should reject if the server don\'t support the extended operation', () => {
     const userDN = `dn:${config.ldapAuthentication.dnUser}`;
-    const CustomError = errorHandler(errorList.ldapProtocolError);
+    const CustomError = errorHandler(errorCodes.ldapProtocolError);
 
     return clientLDAP2.extendedOperation(config.ldapExtendedOperation.oid.refresh, userDN)
       .then(() => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapExtendedOperationMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapExtendedOperationMessage));
       })
       .catch(() => {
         should.fail('did not expect generic error');
@@ -83,7 +83,7 @@ describe('Testing the async LDAP extended operation', () => {
   });
 
   it('should reject if you don\'t provide a good message ID for the cancel operation', () => {
-    const CustomError = errorHandler(errorList.LdapNoSuchOperation);
+    const CustomError = errorHandler(errorCodes.LdapNoSuchOperation);
     const msgID = 10;
 
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.cancelRequest, msgID)
@@ -91,7 +91,7 @@ describe('Testing the async LDAP extended operation', () => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapExtendedOperationMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapExtendedOperationMessage));
       })
       .catch(() => {
         should.fail('did not expect generic error');
@@ -101,8 +101,8 @@ describe('Testing the async LDAP extended operation', () => {
   it('should change a password of a specific user', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
-        config.ldapChangePassword.oldPasswd,
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.oldPasswd,
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         const successStart = 0;
         result.should.be.deepEqual(successStart);
@@ -110,16 +110,16 @@ describe('Testing the async LDAP extended operation', () => {
   });
 
   it('should reject if the old password is not correct', () => {
-    const CustomError = errorHandler(errorList.unwillingToPerform);
+    const CustomError = errorHandler(errorCodes.unwillingToPerform);
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
         'Wrong password',
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapExtendedOperationMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapExtendedOperationMessage));
       })
       .catch(() => {
         should.fail('did not expect generic error');

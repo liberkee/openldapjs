@@ -6,7 +6,8 @@ const checkParameters = require('./utils/check_variable_format');
 const SearchStream = require('./paged_search_stream.js');
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
-const errorList = require('../test/error_list.json');
+const errorMessages = require('./messages.json');
+const errorCode = require('../test/error_codes.json')
 const _ = require('underscore');
 
 
@@ -60,14 +61,14 @@ class LDAPAsyncWrap {
         this._binding.initialize(this._hostAddress, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapInitializeErrorMessage));
+            reject(new CustomError(errorMessages.ldapInitializeErrorMessage));
           } else {
             this._stateClient = E_STATES.INITIALIZED;
             resolve();
           }
         });
       } else {
-        reject(new StateError(errorList.initErrorMessage));
+        reject(new StateError(errorMessages.initErrorMessage));
       }
     });
   }
@@ -89,13 +90,13 @@ class LDAPAsyncWrap {
         this._binding.startTls(path, (err, res) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapStartTlsErrorMessage));
+            reject(new CustomError(errorMessages.ldapStartTlsErrorMessage));
           } else {
             resolve();
           }
         });
       } else {
-        reject(new StateError(errorList.initErrorMessage));
+        reject(new StateError(errorMessages.initErrorMessage));
       }
     });
   }
@@ -119,14 +120,14 @@ class LDAPAsyncWrap {
           if (err) {
             const CustomError = errorHandler(err);
             this._stateClient = E_STATES.INITIALIZED;
-            reject(new CustomError(errorList.ldapBindErrorMessage));
+            reject(new CustomError(errorMessages.ldapBindErrorMessage));
           } else {
             this._stateClient = E_STATES.BOUND;
             resolve();
           }
         });
       } else {
-        reject(new StateError(errorList.uninitializedErrorMessage));
+        reject(new StateError(errorMessages.uninitializedErrorMessage));
       }
     });
   }
@@ -148,7 +149,7 @@ class LDAPAsyncWrap {
           resolve(true);
         })
         .catch((err) => {
-          if (err.constructor.code === errorList.noSuchAttirbute) {
+          if (err.constructor.code === errorCode.noSuchAttirbute) {
             resolve(false);
           } else {
             reject(err);
@@ -177,7 +178,7 @@ class LDAPAsyncWrap {
           resolve(res);
         })
         .catch((err) => {
-          if (err.constructor.code === errorList.ldapNoSuchObject) {
+          if (err.constructor.code === errorCode.ldapNoSuchObject) {
             resolve(false);
           } else {
             reject(err);
@@ -203,12 +204,12 @@ class LDAPAsyncWrap {
   search(searchBase, scope, searchFilter, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(searchBase, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error(errorList.scopeSearchErrorMessage);
+          throw new Error(errorMessages.scopeSearchErrorMessage);
         }
         const timeValue = timeVal === undefined ? this._timeVal : timeVal;
 
@@ -218,7 +219,7 @@ class LDAPAsyncWrap {
           searchBase, scopeObject[scope], searchFilter, timeValue, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
-              reject(new CustomError(errorList.ldapSearchErrorMessage));
+              reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
               resolve(result);
             }
@@ -248,11 +249,11 @@ class LDAPAsyncWrap {
         checkParameters.validateStrings(searchBase, searchFilter, scope);
 
         if (scopeObject[scope] === undefined) {
-          throw new Error(errorList.scopeSearchErrorMessage);
+          throw new Error(errorMessages.scopeSearchErrorMessage);
         }
 
         if (!_.isNumber(pageSize)) {
-          throw new TypeError(errorList.typeErrorMessage);
+          throw new TypeError(errorMessages.typeErrorMessage);
         }
 
         const filter = _.isString(searchFilter) ? searchFilter : 'objectClass=*';
@@ -264,7 +265,7 @@ class LDAPAsyncWrap {
             searchBase, scopeObject[scope], searchFilter, pageSize,
             this._searchID, this._binding, timeValue));
       }
-      reject(new StateError(errorList.bindErrorMessage));
+      reject(new StateError(errorMessages.bindErrorMessage));
     });
   }
 
@@ -284,7 +285,7 @@ class LDAPAsyncWrap {
   compare(dn, attr, value, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, attr, value);
         const timeValue = timeVal === undefined ? this._timeVal : timeVal;
@@ -292,7 +293,7 @@ class LDAPAsyncWrap {
         this._binding.compare(dn, attr, value, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapCompareErrorMessage));
+            reject(new CustomError(errorMessages.ldapCompareErrorMessage));
           } else {
             const res = result === LDAP_COMPARE_TRUE;
             resolve(res);
@@ -319,7 +320,7 @@ class LDAPAsyncWrap {
   modify(dn, jsonChange, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const changes = checkParameters.checkModifyChange(jsonChange);
@@ -329,7 +330,7 @@ class LDAPAsyncWrap {
         this._binding.modify(dn, changes, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapModifyErrorMessage));
+            reject(new CustomError(errorMessages.ldapModifyErrorMessage));
           } else {
             resolve(result);
           }
@@ -364,7 +365,7 @@ class LDAPAsyncWrap {
       this._binding.extendedOperation(oid, valueData, timeValue, (err, result) => {
         if (err) {
           const CustomError = errorHandler(err);
-          reject(new CustomError(errorList.ldapExtendedOperationMessage));
+          reject(new CustomError(errorMessages.ldapExtendedOperationMessage));
         } else {
           resolve(result);
         }
@@ -389,7 +390,7 @@ class LDAPAsyncWrap {
   rename(dn, newRdn, newParent, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn, newRdn, newParent);
         const ctrls = checkParameters.checkControl(controls);
@@ -398,7 +399,7 @@ class LDAPAsyncWrap {
         this._binding.rename(dn, newRdn, newParent, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapRenameErrorMessage));
+            reject(new CustomError(errorMessages.ldapRenameErrorMessage));
           } else {
             resolve(result);
           }
@@ -422,7 +423,7 @@ class LDAPAsyncWrap {
   delete(dn, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const ctrls = checkParameters.checkControl(controls);
@@ -431,7 +432,7 @@ class LDAPAsyncWrap {
         this._binding.delete(dn, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapDeleteErrorMessage));
+            reject(new CustomError(errorMessages.ldapDeleteErrorMessage));
           } else {
             resolve(result);
           }
@@ -453,7 +454,7 @@ class LDAPAsyncWrap {
   changePassword(userDn, oldPassword, newPassword, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(userDn, oldPassword, newPassword);
 
@@ -464,7 +465,7 @@ class LDAPAsyncWrap {
             if (err) {
               const CustomError = errorHandler(err);
               reject(
-                new CustomError(errorList.ldapChangePasswordErrorMessage));
+                new CustomError(errorMessages.ldapChangePasswordErrorMessage));
             } else {
               resolve();
             }
@@ -490,7 +491,7 @@ class LDAPAsyncWrap {
   add(dn, entry, controls, timeVal) {
     return new Promise((resolve, reject) => {
       if (this._stateClient !== E_STATES.BOUND) {
-        reject(new StateError(errorList.bindErrorMessage));
+        reject(new StateError(errorMessages.bindErrorMessage));
       } else {
         checkParameters.validateStrings(dn);
         const entryAttr = checkParameters.checkEntryObject(entry);
@@ -500,7 +501,7 @@ class LDAPAsyncWrap {
         this._binding.add(dn, entryAttr, ctrls, timeValue, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapAddErrorMessage));
+            reject(new CustomError(errorMessages.ldapAddErrorMessage));
           } else {
             resolve(result);
           }
@@ -522,7 +523,7 @@ class LDAPAsyncWrap {
         this._binding.unbind((err, state) => {
           if (err) {
             const CustomError = errorHandler(err);
-            reject(new CustomError(errorList.ldapUnbindErrorMessage));
+            reject(new CustomError(errorMessages.ldapUnbindErrorMessage));
           } else {
             this._stateClient = E_STATES.UNBOUND;
             resolve();

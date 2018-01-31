@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('./error_codes');
 
 describe('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -53,7 +53,7 @@ describe('Testing multiple operations functionalities', () => {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
       isCritical:
-          config.ldapControls.ldapModificationControlPostRead.isCritical,
+        config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -172,14 +172,14 @@ cn: ${attributeEntry}\n`;
     searchEntry = searchEntry[0];
 
     const addOP =
-        ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
-          .then(() => {
-            return ldapAsyncWrap.delete(dnUser, controlOperation);
-          });
+      ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
+        .then(() => {
+          return ldapAsyncWrap.delete(dnUser, controlOperation);
+        });
     const searchOP =
-        ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
+      ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const searchOP2 =
-        ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
+      ldapAsyncWrap.search(searchBase, searchScope.subtree, searchEntry);
     const compareOP = ldapAsyncWrap.compare(dn, attr, val);
     const compareOP2 = ldapAsyncWrap.compare(dn, attr, val);
     const modifyOP = ldapAsyncWrap.modify(
@@ -201,10 +201,10 @@ cn: ${attributeEntry}\n`;
       ])
       .then((results) => {
         results.forEach((element) => {
-          if (element === errorList.ldapNoSuchObject) {
-            should.deepEqual(element, errorList.alreadyExists);
-          } else if (element === errorList.alreadyExists) {
-            should.deepEqual(element, errorList.alreadyExists);
+          if (element === errorCodes.ldapNoSuchObject) {
+            should.deepEqual(element, errorCodes.alreadyExists);
+          } else if (element === errorCodes.alreadyExists) {
+            should.deepEqual(element, errorCodes.alreadyExists);
           } else if (element === true) {
             should.deepEqual(true, element);
           } else {
@@ -219,7 +219,7 @@ cn: ${attributeEntry}\n`;
                 `${config.ldapAuthentication.dnUserNoRight}`);
             } else if (
               resultOperation ===
-                  ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
+              ` ${config.ldapModify.ldapModificationReplace.change_dn}`) {
               should.deepEqual(
                 resultOperation,
                 ` ${config.ldapModify.ldapModificationReplace.change_dn}`);
