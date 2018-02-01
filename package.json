@@ -41,7 +41,8 @@
     "pretest": "node ./test/pre_post_script/pre_script.js",
     "addData": "node populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
-    "buildPackage": "node-pre-gyp rebuild & node-pre-gyp package",
+    "build": "node-pre-gyp rebuild",
+    "package": "node-pre-gyp package",
     "publish": "node-pre-gyp publish"
   },
   "author": {
