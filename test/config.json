@@ -1,0 +1,148 @@
+{
+  "ldapAuthentication": {
+    "host": "ldap://localhost:389",
+    "dnAdmin": "cn=admin,dc=demoApp,dc=com",
+    "dnUser": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnUserNoRight": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "passwordAdmin": "secret",
+    "passwordUser": "secret",
+    "pathFileToCert": "ca_certs.pem"
+  },
+  "ldapExtendedOperation": {
+    "oid": {
+      "startTLS": "1.3.6.1.4.1.1466.20037",
+      "changePassword": "1.3.6.1.4.1.4203.1.11.1",
+      "cancelRequest": "1.3.6.1.1.8",
+      "refresh": "1.3.6.1.4.1.1466.101.119.1",
+      "whoAmI": "1.3.6.1.4.1.4203.1.11.3"
+    }
+  },
+  "ldapChangePassword": {
+    "user": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "oldPasswd": "secret",
+    "newPasswd": "secret"
+  },
+  "ldapModify": {
+    "ldapModificationUpdate": {
+      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "operation": "update",
+      "attribute": "description",
+      "vals": [
+        {
+          "oldVal": "1Modification",
+          "newVal": "1NewModification"
+        },
+        {
+          "oldVal": "2Modification",
+          "newVal": "2NewModification"
+        },
+        {
+          "oldVal": "3Modification",
+          "newVal": "3NewModification"
+        }
+      ]
+    },
+    "ldapModificationReplace": {
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
+      "operation": "replace",
+      "attribute": "description",
+      "vals": [
+        "1Modification",
+        "2Modification",
+        "3Modification"
+      ]
+    },
+    "ldapModificationAdd": {
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
+      "operation": "add",
+      "attribute": "description",
+      "vals": [
+        "4Modification",
+        "5Modification",
+        "6Modification"
+      ]
+    },
+    "ldapModificationDelete": {
+      "change_dn": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
+      "operation": "delete",
+      "attribute": "description",
+      "vals": [
+        "4Modification",
+        "5Modification",
+        "6Modification"
+      ]
+    }
+  },
+  "ldapControls": {
+    "ldapModificationControlPostRead": {
+      "oid": "1.3.6.1.1.13.2",
+      "value": [
+        "entryCSN",
+        "entryUUID"
+      ],
+      "isCritical": false
+    },
+    "ldapModificationControlPreRead": {
+      "oid": "1.3.6.1.1.13.1",
+      "value": [
+        "cn",
+        "sn"
+      ],
+      "isCritical": false
+    }
+  },
+  "ldapAdd": {
+    "dnNewEntry": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
+    "dnNewEntryAdmin": ",dc=demoApp,dc=com",
+    "rdnUser": "cn=testUsersAdd",
+    "firstAttr": {
+      "attr": "objectClass",
+      "vals": [
+        "person"
+      ]
+    },
+    "secondAttr": {
+      "attr": "sn",
+      "vals": [
+        "Entry"
+      ]
+    },
+    "lastAttr": {
+      "attr": "description",
+      "vals": [
+        "Tesst1",
+        "Tesst2",
+        "weCanAddMultipleVals"
+      ]
+    }
+  },
+  "ldapRename": {
+    "dnChange": "cn=renameTestUser,ou=users,o=myhost,dc=demoApp,dc=com",
+    "newrdn": "cn=testRenameUser",
+    "newparent": "ou=users,o=myhost,dc=demoApp,dc=com"
+  },
+  "ldapCompare": {
+    "attribute": "cn",
+    "value": "admin",
+    "invalidUser": "cn=simpleUser,ou=user55s,o=myhost,dc=demoApp,dc=com",
+    "invalidPassword": "wrongPass"
+  },
+  "ldapSearch": {
+    "searchBase": "dc=demoApp,dc=com",
+    "searchBaseUser": "ou=users,o=myhost,dc=demoApp,dc=com",
+    "rdnUser": "cn=simpleUser",
+    "filterObjAll": "objectclass=*",
+    "filterObjSpecific": "objectclass=aliens",
+    "filterObjSpecific2": "objectClass=simpleSecurityObject",
+    "filterObjSpecific3": "objectClass=inetOrgPerson",
+    "nrOfResults": 10000,
+    "pageSize": 10
+  },
+  "ldapDelete": {
+    "rdnUser": "cn=testUsersDelete",
+    "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
+  },
+  "ldapTestEntries": {
+    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
+  }
+}

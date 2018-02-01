@@ -1,0 +1,24 @@
+dn: o=myhost,dc=demoApp,dc=com
+objectClass: organization
+o: myhost
+
+dn: ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: organizationalUnit
+ou: user
+ou: users
+
+dn: cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: managerUser
+sn: Manager User
+description: something
+userPassword: {SSHA}BjYpH0aW3DEhjBKZjjMsI9hMsRE29EH0
+
+dn: cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: simpleUser
+sn: Simple User
+userPassword: {SSHA}vWDkTc9e+2ojECzkfDWLAYbWmtSGj3Cu
+description: 1Modification
+description: 2Modification
+description: 3Modification
