@@ -1,6 +1,6 @@
 'use strict';
 
-const LdapClientLib = require('../libs/ldap_async_wrap.js');
+const LdapClientLib = require('../index').Client;
 
 const config = require('./config.json');
 
@@ -31,5 +31,5 @@ newClient.initialize()
     console.log(`Compare result: ${result}`);
   })
   .catch((err) => {
-    console.log(`${err.name} ${err.constructor.description}`);
+    console.log(err.toString());
   });

@@ -37,5 +37,3 @@ modify.ldif
 ./build/**
 .vscode/settings.json
 build/*
-TSdeclaration/**/*
-libBuildTLS/**/*

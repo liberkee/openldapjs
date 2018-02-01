@@ -1,8 +1,6 @@
 'use strict';
 
-const LdapClientLib = require('../libs/ldap_async_wrap.js');
-
-const ldif = require('ldif');
+const LdapClientLib = require('../index').Client;
 
 const config = require('./config.json');
 
@@ -23,9 +21,8 @@ newClient.initialize()
       config.ldapSearch.filter);
   })
   .then((result) => {
-    const resultJson = ldif.parse(result);
     const outputOptions = {};
-    const JSONstructure = resultJson.toObject(outputOptions);
+    const JSONstructure = result.toObject(outputOptions);
     console.log(`LDIF structure: ${result}`);
     console.log('\n\n');
     JSONstructure.entries.forEach((element) => {
@@ -33,5 +30,5 @@ newClient.initialize()
     });
   })
   .catch((err) => {
-    console.log(`${err.name} ${err.constructor.description}`);
+    console.log(err.toString());
   });

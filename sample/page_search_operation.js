@@ -1,8 +1,6 @@
 'use strict';
 
-const LdapClientLib = require('../libs/ldap_async_wrap.js');
-
-const ldif = require('ldif');
+const LdapClientLib = require('../index').Client;
 
 const config = require('./config.json');
 
@@ -28,10 +26,9 @@ newClient.initialize()
       console.log('-----------------------------------');
       console.log(`The page number is ${pageNumber += 1}`);
       console.log('-----------------------------------');
-      const resultJson = ldif.parse(data.toString());
       const outputOptions = {};
 
-      const JSONstructure = resultJson.toObject(outputOptions);
+      const JSONstructure = data.toObject(outputOptions);
       console.log(`LDIF structure: ${data.toString()}`);
       JSONstructure.entries.forEach((element) => {
         console.log(element);
@@ -41,8 +38,8 @@ newClient.initialize()
     result.on('err', (err) => {
       console.log('-----------------');
       console.error(`Error name: ${err.name}`);
-      console.error(`Error code: ${err.constructor.code}`);
-      console.error(`Error description: ${err.constructor.description}`);
+      console.error(`Error code: ${err.code}`);
+      console.error(`Error description: ${err.description}`);
       console.log('-----------------');
     });
 
@@ -51,5 +48,5 @@ newClient.initialize()
     });
   })
   .catch((err) => {
-    console.log(`${err.name} ${err.constructor.description}`);
+    console.log(err.toString());
   });

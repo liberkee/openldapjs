@@ -23,9 +23,9 @@ describe('Testing the async LDAP paged search ', () => {
   let userLDAP = new LDAPWrap(host);
   let pagedSearchPromise;
 
-  const nrOfResults = config.ldapTestEntries.nrOfResults;
+  const nrOfResults = config.ldapSearch.nrOfResults;
 
-  const pageSize = config.ldapTestEntries.pageSize;
+  const pageSize = config.ldapSearch.pageSize;
 
   const searchScope = {
     base: 'BASE',

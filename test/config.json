@@ -6,7 +6,7 @@
     "dnUserNoRight": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
-    "pathFileToCert": "D:/HSM/ca_certs.pem"
+    "pathFileToCert": "ca_certs.pem"
   },
   "ldapExtendedOperation": {
     "oid": {
@@ -134,18 +134,15 @@
     "filterObjAll": "objectclass=*",
     "filterObjSpecific": "objectclass=aliens",
     "filterObjSpecific2": "objectClass=simpleSecurityObject",
-    "filterObjSpecific3": "objectClass=inetOrgPerson"
+    "filterObjSpecific3": "objectClass=inetOrgPerson",
+    "nrOfResults": 10000,
+    "pageSize": 10
   },
   "ldapDelete": {
     "rdnUser": "cn=testUsersDelete",
     "dn": ",cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   },
   "ldapTestEntries": {
-    "host": "ldap://localhost:389",
-    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com",
-    "userDn": "cn=admin,dc=demoApp,dc=com",
-    "userPassword": "secret",
-    "nrOfResults": 10000,
-    "pageSize": 10
+    "entryDn": "cn=newPoint,ou=users,o=myhost,dc=demoApp,dc=com"
   }
 }
