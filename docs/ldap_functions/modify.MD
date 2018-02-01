@@ -9,12 +9,12 @@
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
 * `timeVal` The maximum amount of time the server should take in responding to the request (in seconds). _Optional_
 
-Modify Operation have four operation that can be use to manipulate the attribute data from LDAP:
+The Modify Operation has four ways in which it can be used to change attribute data from LDAP entries:
 
-* `add` The add operation will add new value to an existing attribute.
+* `add`  Will add a new attribute value to an existing ldap entry.
 * `delete` Will remove an existing value from an attribute.
-* `replace` This operation will delete all the old values from an attribute and add the new list of values provided by user.
-* `update` This operation take a value or multiple values of an attribute and update them to new values.
+* `replace` This operation will delete all the old values from an attribute and add the new list of values provided by the user.
+* `update` This operation take a value or multiple values of an attribute and updates them to new values.
 
 Update object example:
 
