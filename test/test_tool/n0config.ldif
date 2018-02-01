@@ -9,9 +9,6 @@ structuralObjectClass: olcGlobal
 entryUUID: 2b28b82c-93c0-1037-82d6-09218412c9d9
 creatorsName: cn=config
 createTimestamp: 20180122130156Z
-olcTLSCACertificateFile: /home/travis/build/6labs/openldapjs/test/test_tool/cacert.pem
-olcTLSCertificateFile: /home/travis/build/6labs/openldapjs/test/test_tool/ldap01_slapd_cert.pem
-olcTLSCertificateKeyFile: /home/travis/build/6labs/openldapjs/test/test_tool/ldap01_slapd_key.pem
 entryCSN: 20180122130156.117850Z#000000#000#000000
 modifiersName: cn=config
 modifyTimestamp: 20180122130156Z
