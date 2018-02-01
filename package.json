@@ -1,5 +1,5 @@
 {
-  "name": "ldapclientwrapper",
+  "name": "openldapjs",
   "version": "0.0.1",
   "description": "A ldap client nodejs",
   "main": "index.js",
@@ -19,11 +19,11 @@
     "node-pre-gyp"
   ],
   "binary": {
-    "module_name": "binding",
+    "module_name": "openldapjs_binding",
     "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
-    "remote_path": "{version}",
-    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/hufsm/openldapjs/releases/download/"
+    "remote_path": "./{name}/v{version}",
+    "package_name": "{node_abi}-{platform}-{arch}.tar.gz",
+    "host": "https://hufsm-opensource.s3-eu-west-1.amazonaws.com"
   },
   "devDependencies": {
     "istanbul": "0.4.5",
@@ -41,7 +41,8 @@
     "pretest": "node ./test/pre_post_script/pre_script.js",
     "addData": "node populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
-    "package": "node-pre-gyp package"
+    "buildPackage": "node-pre-gyp rebuild & node-pre-gyp package",
+    "publish": "node-pre-gyp publish"
   },
   "author": {
     "name": "Huf Secure Mobile GmbH",

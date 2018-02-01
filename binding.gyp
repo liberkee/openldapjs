@@ -1,7 +1,7 @@
 {
   'targets': [
     {
-      'target_name': 'binding',
+      'target_name': 'openldapjs_binding',
       'conditions': [
         ['OS=="win"',
           {
