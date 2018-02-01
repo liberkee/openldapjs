@@ -15,11 +15,12 @@ addons:
 
 before_script:
   - sudo service slapd stop 
-  - sudo  slapcat -n 0 
-  
   - sudo rm -R /etc/ldap/slapd.d/
   - sudo mkdir /etc/ldap/slapd.d/
-  - sudo slapadd -F /etc/ldap/slapd.d/ -n 0 -l ./n0config.ldif
+  - sudo slapadd -F /etc/ldap/slapd.d/ -n 0 -l ./test/test_tool/n0config.ldif
+  - sudo cp ./test/test_tool/cacert.pem /etc/ssl/certs/
+  - sudo cp ./test/test_tool/ldap01_slapd_cert.pem /etc/ssl/certs/
+  - sudo cp ./test/test_tool/ldap01_slapd_key.pem /etc/ssl/private/
   - sudo chmod 777 -R /etc/ldap/
   - sudo service slapd restart
   - ldapadd -D cn=admin,dc=demoApp,dc=com -w secret -f ./light_db.ldif -c

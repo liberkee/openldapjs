@@ -39,7 +39,7 @@
     "coverage": "node ./test/pre_post_script/pre_script.js & istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "test": "istanbul test \"./node_modules/mocha/bin/_mocha\" ./test/*.js",
     "pretest": "node ./test/pre_post_script/pre_script.js",
-    "addData": "node populate.js",
+    "addData": "node ./test/test_tool/populate.js",
     "install": "node-pre-gyp install --fallback-to-build",
     "build": "node-pre-gyp rebuild",
     "package": "node-pre-gyp package",
