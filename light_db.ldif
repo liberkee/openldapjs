@@ -9,10 +9,6 @@ dn: o=myhost,dc=demoApp,dc=com
 objectClass: organization
 o: myhost
 
-dn: o=myhost,dc=demoApp,dc=com
-objectClass: organization
-o: myhost
-
 dn: ou=users,o=myhost,dc=demoApp,dc=com
 objectClass: organizationalUnit
 ou: user

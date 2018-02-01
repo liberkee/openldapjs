@@ -21,6 +21,6 @@ before_script:
   - sudo slapadd -F /etc/ldap/slapd.d/ -n 0 -l ./n0config.ldif
   - sudo chmod 777 -R /etc/ldap/
   - sudo service slapd restart
-  - ldapadd -D cn=admin,dc=demoApp,dc=com -w secret -f ./light_db.ldif
+  - ldapadd -D cn=admin,dc=demoApp,dc=com -w secret -f ./light_db.ldif -c
   - ldapsearch -D cn=admin,dc=demoApp,dc=com -w secret -b dc=demoApp,dc=com
   - npm run addData
