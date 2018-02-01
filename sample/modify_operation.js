@@ -2,8 +2,6 @@
 
 const LdapClientLib = require('../index').Client;
 
-const ldif = require('ldif');
-
 const dn = 'ou=users,o=myhost,dc=demoApp,dc=com';
 
 const config = require('./config.json');
@@ -18,12 +16,12 @@ const changes = [
 
 const prePostReadControls = [
   {
-    oid: 'preread',
+    oid: '1.3.6.1.1.13.1',
     value: ['cn'],
     isCritical: false,
   },
   {
-    oid: 'postread',
+    oid: '1.3.6.1.1.13.2',
     value: ['cn'],
     isCritical: false,
   },
@@ -47,10 +45,9 @@ newClient.initialize()
     return newClient.modify(config.ldapModify.secondDNEntry, changes, prePostReadControls);
   })
   .then((result) => {
-    const resultJson = ldif.parse(result);
     const outputOptions = {};
 
-    const JSONstructure = resultJson.toObject(outputOptions);
+    const JSONstructure = result.toObject(outputOptions);
     JSONstructure.entries.forEach((element) => {
       console.log(element);
     });

@@ -1,7 +1,6 @@
 'use strict';
 
 const LdapClientLib = require('../index').Client;
-const ldif = require('ldif');
 const config = require('./config.json');
 
 const newClient = new LdapClientLib(config.ldapAuthentication.host);
@@ -31,10 +30,9 @@ newClient.initialize()
       config.ldapControls.ldapModificationControlPostRead);
   })
   .then((result) => {
-    const resultJson = ldif.parse(result);
     const outputOptions = {};
 
-    const JSONstructure = resultJson.toObject(outputOptions);
+    const JSONstructure = result.toObject(outputOptions);
     JSONstructure.entries.forEach((element) => {
       console.log(element);
     });

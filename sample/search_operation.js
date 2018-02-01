@@ -2,8 +2,6 @@
 
 const LdapClientLib = require('../index').Client;
 
-const ldif = require('ldif');
-
 const config = require('./config.json');
 
 const newClient = new LdapClientLib(config.ldapAuthentication.host);
@@ -23,9 +21,8 @@ newClient.initialize()
       config.ldapSearch.filter);
   })
   .then((result) => {
-    const resultJson = ldif.parse(result);
     const outputOptions = {};
-    const JSONstructure = resultJson.toObject(outputOptions);
+    const JSONstructure = result.toObject(outputOptions);
     console.log(`LDIF structure: ${result}`);
     console.log('\n\n');
     JSONstructure.entries.forEach((element) => {

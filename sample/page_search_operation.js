@@ -2,8 +2,6 @@
 
 const LdapClientLib = require('../index').Client;
 
-const ldif = require('ldif');
-
 const config = require('./config.json');
 
 const newClient = new LdapClientLib(config.ldapAuthentication.host);
@@ -28,10 +26,9 @@ newClient.initialize()
       console.log('-----------------------------------');
       console.log(`The page number is ${pageNumber += 1}`);
       console.log('-----------------------------------');
-      const resultJson = ldif.parse(data.toString());
       const outputOptions = {};
 
-      const JSONstructure = resultJson.toObject(outputOptions);
+      const JSONstructure = data.toObject(outputOptions);
       console.log(`LDIF structure: ${data.toString()}`);
       JSONstructure.entries.forEach((element) => {
         console.log(element);

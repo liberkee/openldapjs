@@ -33,13 +33,13 @@ const validEntryObject = [
 ];
 
 
-const ldapClient = new Client(configFile.ldapTestEntries.host);
+const ldapClient = new Client(configFile.ldapAuthentication.host);
 
 ldapClient.initialize()
   .then(() => {
     return ldapClient.bind(
-      configFile.ldapTestEntries.userDn,
-      configFile.ldapTestEntries.userPassword);
+      configFile.ldapAuthentication.dnAdmin,
+      configFile.ldapAuthentication.passwordAdmin);
   })
   .then(() => {
     ldapClient.add(dn, validEntryObject)
@@ -51,6 +51,6 @@ ldapClient.initialize()
 
         Promise.map(args, (arg) => {
           return ldapClient.add(arg, validEntryObject);
-        }, {concurrency: 1});
+        }, {concurrency: 4});
       });
   });
