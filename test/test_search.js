@@ -5,7 +5,7 @@ const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
-const errorCodes = require('./error_codes');
+const errorCodes = require('../libs/error_codes');
 const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP search ', () => {
@@ -58,18 +58,18 @@ describe('Testing the async LDAP search ', () => {
       })
       .then(() => { should.fail('should not have passed'); })
       .catch(
-      StateError,
-      (error) => {
-        should.deepEqual(error.message, errorMessages.bindErrorMessage);
-      })
+        StateError,
+        (error) => {
+          should.deepEqual(error.message, errorMessages.bindErrorMessage);
+        })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
   it('should return an empty search', () => {
     return adminLDAP
       .search(
-      searchBase, searchScope.subtree,
-      config.ldapSearch.filterObjSpecific)
+        searchBase, searchScope.subtree,
+        config.ldapSearch.filterObjSpecific)
       .then((result) => { result.should.be.empty; });
   });
   /**
@@ -152,8 +152,8 @@ describe('Testing the async LDAP search ', () => {
   it('should return a single result', () => {
     return adminLDAP
       .search(
-      searchBase, searchScope.subtree,
-      config.ldapSearch.filterObjSpecific2)
+        searchBase, searchScope.subtree,
+        config.ldapSearch.filterObjSpecific2)
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.eql(1);
@@ -201,8 +201,8 @@ describe('Testing the async LDAP search ', () => {
 
     return adminLDAP
       .search(
-      searchBase, searchScope.subtree,
-      config.ldapSearch.filterObjSpecific2)
+        searchBase, searchScope.subtree,
+        config.ldapSearch.filterObjSpecific2)
       .then((res1) => {
         result1 = res1;
         return adminLDAP.search(
@@ -251,8 +251,8 @@ describe('Testing the async LDAP search ', () => {
     this.timeout(0);
     return adminLDAP
       .search(
-      searchBase, searchScope.subtree,
-      config.ldapSearch.filterObjAll)
+        searchBase, searchScope.subtree,
+        config.ldapSearch.filterObjAll)
       .then((result) => {
         const count = (result.match(/\ndn:/g) || []).length;
         count.should.be.above(1);

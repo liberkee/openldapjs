@@ -7,7 +7,7 @@ const SearchStream = require('./paged_search_stream.js');
 const errorHandler = require('./errors/error_dispenser').errorFunction;
 const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
-const errorCode = require('../test/error_codes.json')
+const errorCode = require('./error_codes.json');
 const _ = require('underscore');
 
 

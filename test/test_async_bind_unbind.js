@@ -6,7 +6,7 @@ const config = require('./config.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const LdapOtherError = require('../libs/errors/ldap_errors/ldap_other_error');
-const errorCodes = require('./error_codes');
+const errorCodes = require('../libs/error_codes');
 const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP bind/unbind', () => {
@@ -27,7 +27,7 @@ describe('Testing the async LDAP bind/unbind', () => {
     const CustomError = errorHandler(errorCodes.invalidCredentials);
     return clientLDAP
       .bind(
-      config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
+        config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
       .then(() => {
         should.fail('should not have succeeded');
       })

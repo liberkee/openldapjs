@@ -6,7 +6,7 @@ const should = require('should');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const ValidationError = require('../libs/errors/validation_error');
 const StateError = require('../libs/errors/state_error');
-const errorCodes = require('./error_codes');
+const errorCodes = require('../libs/error_codes');
 const errorMessages = require('../libs/messages.json');
 
 describe('Testing the rename functionalities', () => {
@@ -86,8 +86,8 @@ describe('Testing the rename functionalities', () => {
   it('should reject if control is not a valid control object', () => {
     return ldapAsyncWrap
       .rename(
-      config.ldapRename.dnChange, config.ldapRename.newrdn,
-      config.ldapRename.newparent, { test: 'test' })
+        config.ldapRename.dnChange, config.ldapRename.newrdn,
+        config.ldapRename.newparent, {test: 'test'})
       .then(() => {
         should.fail('should not have passed');
       })
@@ -102,8 +102,8 @@ describe('Testing the rename functionalities', () => {
   it('should reject if control is not properly defined', () => {
     return ldapAsyncWrap
       .rename(
-      config.ldapRename.dnChange, config.ldapRename.newrdn,
-      config.ldapRename.newparent, [{ test: 'test' }])
+        config.ldapRename.dnChange, config.ldapRename.newrdn,
+        config.ldapRename.newparent, [{test: 'test'}])
       .then(() => {
         should.fail('should not have passed');
       })
@@ -136,7 +136,7 @@ describe('Testing the rename functionalities', () => {
     const CustomError = errorHandler(errorCodes.invalidDnSyntax);
     return ldapAsyncWrap
       .rename(
-      config.ldapRename.dnChange, config.ldapRename.newrdn, badNewParent)
+        config.ldapRename.dnChange, config.ldapRename.newrdn, badNewParent)
       .then(() => {
         should.fail('should not have passed');
       })
@@ -153,8 +153,8 @@ describe('Testing the rename functionalities', () => {
     const CustomError = errorHandler(errorCodes.unwillingToPerform);
     return ldapAsyncWrap
       .rename(
-      incorrectDefinedDn, config.ldapRename.newrdn,
-      config.ldapRename.newparent)
+        incorrectDefinedDn, config.ldapRename.newrdn,
+        config.ldapRename.newparent)
       .then(() => {
         should.fail('should not have passed');
       })
@@ -171,8 +171,8 @@ describe('Testing the rename functionalities', () => {
     const CustomError = errorHandler(errorCodes.affectMultipleDsas);
     return ldapAsyncWrap
       .rename(
-      config.ldapRename.dnChange, config.ldapRename.newrdn,
-      incorrectDefinedNewParent)
+        config.ldapRename.dnChange, config.ldapRename.newrdn,
+        incorrectDefinedNewParent)
       .then(() => {
         should.fail('should not have passed');
       })
@@ -207,8 +207,8 @@ describe('Testing the rename functionalities', () => {
     const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
     return ldapAsyncWrap
       .rename(
-      existDn, config.ldapRename.newrdn, config.ldapRename.newparent,
-      controlOperation)
+        existDn, config.ldapRename.newrdn, config.ldapRename.newparent,
+        controlOperation)
       .then(() => {
         should.fail('should not have passed');
       })

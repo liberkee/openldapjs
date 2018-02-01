@@ -5,7 +5,7 @@ const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
 const StateError = require('../libs/errors/state_error');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
-const errorCodes = require('./error_codes');
+const errorCodes = require('../libs/error_codes');
 const errorMessages = require('../libs/messages.json');
 
 describe('Testing the LDAP start TLS routine', () => {
