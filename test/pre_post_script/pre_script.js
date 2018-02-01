@@ -21,12 +21,16 @@ const validEntry = [
   configFile.ldapAdd.lastAttr,
 ];
 
-const changeAttributes = [
+const changeAttributesReplace = [
   {
     op: configFile.ldapModify.ldapModificationReplace.operation,
     attr: configFile.ldapModify.ldapModificationReplace.attribute,
     vals: configFile.ldapModify.ldapModificationReplace.vals,
   },
+];
+
+const changeAttributes = [
+  changeAttributesReplace,
   {
     op: configFile.ldapModify.ldapModificationAdd.operation,
     attr: configFile.ldapModify.ldapModificationDelete.attribute,
@@ -57,8 +61,10 @@ ldapClient.initialize()
       return ldapClient.delete(arg);
     });
     /* For LDAP modify operation */
-    const modifyOp = ldapClient.modify(configFile.ldapModify.ldapModificationReplace.change_dn,
+    const modifyOp1 = ldapClient.modify(configFile.ldapModify.ldapModificationReplace.change_dn,
       changeAttributes);
+    const modifyOp2 = ldapClient.modify(configFile.ldapModify.ldapModificationUpdate.change_dn,
+      changeAttributesReplace);
     /* For LDAP rename operation */
     const addOp = ldapClient.add(configFile.ldapRename.dnChange, validEntry);
     /* For LDAP add operation */
@@ -66,7 +72,7 @@ ldapClient.initialize()
       return ldapClient.add(arg, validEntry);
     });
 
-    return Promise.all([deleteOp, promiseDeleteRes, modifyOp, addOp, promiseAddRes]
+    return Promise.all([deleteOp, promiseDeleteRes, modifyOp1, modifyOp2, addOp, promiseAddRes]
       .map((p) => {
         return p.catch((e) => {
           return e;
