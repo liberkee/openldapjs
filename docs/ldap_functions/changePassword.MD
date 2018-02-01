@@ -15,5 +15,5 @@ A promise returning function that wraps the `ldap_paswd` C function from the ope
 
 ## References:
 
-* [Nan Add Wrapper](../../src/binding.cc) & [AsyncProgress Worker](../../src/ldap_changePassword_progress.cc)
+* [Nan Wrapper](../../src/binding.cc) & [AsyncProgress Worker](../../src/ldap_changePassword_progress.cc)
 * [Javascript Source Code](../../libs/ldap_async_wrap.js)

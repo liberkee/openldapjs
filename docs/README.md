@@ -21,15 +21,15 @@ const ldapClient = new LDAP('your_ldap_host_address'); // E.g: ldap://192.168.0.
 
 
 /* in order for the client to be usable, it has to be initialized and bound with a user DN and a password */
-/* The anonymous users can use just the ldap extended operation */
+/* The anonymous users(unbound) can only use  the ldap extended operation */
 ldapClient.initialize()
-    .then( () => {
+    .then(() => {
        return ldapClient.bind('validDn','password')
     })
-    .then( () => {
+    .then(() => {
         //after the client is initialized and bound, you can add,search,etc.
     })
-    .catch( (customError) => {
+    .catch((customError) => {
         //custom errors have a description and a code field that you can inspect
     })
 

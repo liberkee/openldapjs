@@ -7,7 +7,36 @@
 * `dn` entry that will be modified.
 * `changes` Object that contains changes to be made.
 * `optionalControls` One or more ldap [Control](../controls.MD). _Optional_
-* `timeVal` The maxim amount of time the server should take in responding the modify operation (in seconds). _Optional_
+* `timeVal` The maximum amount of time the server should take in responding to the request (in seconds). _Optional_
+
+The Modify Operation has four ways in which it can be used to change attribute data from LDAP entries:
+
+* `add`  Will add a new attribute value to an existing ldap entry.
+* `delete` Will remove an existing value from an attribute.
+* `replace` This operation will delete all the old values from an attribute and add the new list of values provided by the user.
+* `update` This operation take a value or multiple values of an attribute and updates them to new values.
+
+Update object example:
+
+```javascript
+
+const changes = {
+    op: 'update', // type of change required, can be either add, replace, delete or update
+    attr: 'description', // attribute to be modified
+    vals: [
+        {
+            oldVal: 'OldDescription',
+            newVal: 'NewDescription'
+        }
+        {
+            oldVal: 'OldDescription2',
+            newVal: 'NewDescription2'
+        }
+    ]
+}
+
+
+```
 
 Modify example:
 
@@ -18,7 +47,7 @@ const preRead = '1.3.6.1.1.13.1';
 const postRead = '1.3.6.1.1.13.2';
 
 const changes = {
-    op: 'replace', // type of change required, can be either add, replace or delete
+    op: 'replace', // type of change required, can be either add, replace, delete or update
     attr: 'sn', // attribute to be modified
     vals: ['New Address, nr 23'] // new value(s)
 
