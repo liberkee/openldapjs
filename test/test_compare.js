@@ -119,25 +119,6 @@ describe('Testing the Compare function', () => {
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
-  it('should not compare if the binding failed', () => {
-    ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
-
-    return ldapAsyncWrap.initialize()
-      .then(() => {
-        const noPass = config.ldapCompare.invalidPassword;
-        return ldapAsyncWrap.bind(dn, noPass);
-      })
-      .then(() => { should.fail('should not have succeeded'); })
-      .catch(() => { return ldapAsyncWrap.compare(dn, attr, val); })
-      .then(() => { should.fail('should not have succeeded'); })
-      .catch(
-        StateError,
-        (err) => {
-          should.deepEqual(err.message, errorMessages.bindErrorMessage);
-        })
-      .catch((err) => { should.fail('did not expect generic error'); });
-  });
-
   it('should throw an error if the binding was not done before comparing',
     () => {
       ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
