@@ -15,7 +15,7 @@ addons:
 
 before_script:
   - sudo service slapd stop 
-  - sudo service slapcat -n 0 
+  - sudo  slapcat -n 0 
   
   - sudo rm -R /etc/ldap/slapd.d/
   - sudo mkdir /etc/ldap/slapd.d/
