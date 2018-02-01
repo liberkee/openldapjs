@@ -9,9 +9,6 @@ structuralObjectClass: olcGlobal
 entryUUID: 2b28b82c-93c0-1037-82d6-09218412c9d9
 creatorsName: cn=config
 createTimestamp: 20180122130156Z
-olcTLSCACertificateFile: /etc/ssl/certs/cacert.pem
-olcTLSCertificateFile: /etc/ssl/certs/ldap01_slapd_cert.pem
-olcTLSCertificateKeyFile: /etc/ssl/private/ldap01_slapd_key.pem
 entryCSN: 20180122130156.117850Z#000000#000#000000
 modifiersName: cn=config
 modifyTimestamp: 20180122130156Z
