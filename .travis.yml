@@ -17,7 +17,7 @@ before_script:
   - sudo service slapd stop 
   - sudo rm -R /etc/ldap/slapd.d/
   - sudo mkdir /etc/ldap/slapd.d/
-  - sudo slapadd -F /etc/ldap/slapd.d/ -n 0 -l ./test/test_tool/n0config.ldif
+  - sudo slapadd  /etc/ldap/slapd.d/ -n 0 -l ./test/test_tool/n0config.ldif
   - sudo cp ./test/test_tool/cacert.pem /etc/ssl/certs/
   - sudo cp ./test/test_tool/ldap01_slapd_cert.pem /etc/ssl/certs/
   - sudo cp ./test/test_tool/ldap01_slapd_key.pem /etc/ssl/private/
