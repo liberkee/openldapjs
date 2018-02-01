@@ -50,13 +50,15 @@ OpenLDAP.js requires OpenLDAP development libraries.
 
 ## Testing
 
-For the tests to run, you'll need some sample test data. In order to do this manually edit the ldapTestEntries section of the [config](./test/config.json) file and configure your local ldap data :
+For the tests to run, you'll need some sample test data. In order to do this manually edit the `ldapAuthentication` section of the [config](./test/config.json) file and configure your local ldap data :
 
  * __host__: address of your ldap server, E.g: `ldap://localhost:389`
 
  * __userDn__: LDAP login Dn, this will be used for authentication. E.g: `cn=admin,dc=demoApp,dc=com`
 
  * __userPassword__: Password for your userDn
+ 
+ Also, configure the `ldapTestEntries` section in order to tell it where to put the test data:
 
 * __entryDn__: Entry point for your test data, E.g: `cn=newPoint,o=myhost,dc=demoApp,dc=com`
 
@@ -140,7 +142,6 @@ See also the list of [contributors](https://github.com/hufsm/openldapjs/graphs/c
 ## Acknowledgments
 
 * Hat tip to anyone who's code was used
-* TODO
 * [node-ldapjs](https://github.com/mcavage/node-ldapjs)
 * [Nan](https://github.com/nodejs/nan) and [v8](https://github.com/v8/v8)
 * [OpenLDAP](https://github.com/openldap/openldap)
