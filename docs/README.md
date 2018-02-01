@@ -1,12 +1,8 @@
 # Documentation and guides
 
-## Installing 
-
- TODO
-
 ## Usage
 
-TODO : We will probably publish it as an npm package and just `npm install openldapjs`  and  
+TODO : We will  publish it as an npm package and just `npm install openldapjs`  and  
 ```javascript
 const LDAP = require('openldapjs');
 ```
