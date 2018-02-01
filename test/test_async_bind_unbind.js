@@ -3,10 +3,11 @@
 const should = require('should');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const LdapOtherError = require('../libs/errors/ldap_errors/ldap_other_error');
+const errorCodes = require('../libs/error_codes');
+const errorMessages = require('../libs/messages.json');
 
 describe('Testing the async LDAP bind/unbind', () => {
   const host = config.ldapAuthentication.host;
@@ -19,11 +20,11 @@ describe('Testing the async LDAP bind/unbind', () => {
     clientLDAP = new LDAPWrap(host);
     return clientLDAP.initialize();
   });
-  afterEach(() => {});
+  afterEach(() => { });
 
   it('should not bind to the server using invalid credentials', () => {
 
-    const CustomError = errorHandler(errorList.invalidCredentials);
+    const CustomError = errorHandler(errorCodes.invalidCredentials);
     return clientLDAP
       .bind(
         config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword)
@@ -31,7 +32,7 @@ describe('Testing the async LDAP bind/unbind', () => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapBindErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapBindErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -47,7 +48,7 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   it('should reject if the credential are not correct', () => {
     const newClient = new LDAPWrap(host);
-    const CustomError = errorHandler(errorList.invalidCredentials);
+    const CustomError = errorHandler(errorCodes.invalidCredentials);
     return newClient.initialize()
       .then((result) => {
         return newClient.startTLS();
@@ -76,7 +77,7 @@ describe('Testing the async LDAP bind/unbind', () => {
         should.fail('Didn\'t expect success');
       })
       .catch(StateError, (error) => {
-        should.deepEqual(error.message, errorList.uninitializedErrorMessage);
+        should.deepEqual(error.message, errorMessages.uninitializedErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -85,13 +86,13 @@ describe('Testing the async LDAP bind/unbind', () => {
 
   it('should reject with server error', () => {
     const newClient = new LDAPWrap(host);
-    const CustomError = errorHandler(errorList.ldapOther);
+    const CustomError = errorHandler(errorCodes.ldapOther);
     return newClient.unbind()
       .then(() => {
         should.fail('Didn\'t expect success');
       })
       .catch(CustomError, (error) => {
-        should.deepEqual(error, new CustomError(errorList.ldapUnbindErrorMessage));
+        should.deepEqual(error, new CustomError(errorMessages.ldapUnbindErrorMessage));
       });
   });
 

@@ -3,7 +3,7 @@
 const LdapAsyncWrap = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config.json');
-const errorList = require('./error_list.json');
+const errorCodes = require('../libs/error_codes');
 
 describe('Testing multiple operations functionalities', () => {
   const hostAddress = config.ldapAuthentication.host;
@@ -152,10 +152,10 @@ describe('Testing multiple operations functionalities', () => {
     return Promise.all([addOP, searchOP, compareOP, modifyOP, searchOP2, compareOP2, modifyOP2])
       .then((results) => {
         results.forEach((element) => {
-          if (element === errorList.ldapNoSuchObject) {
-            should.deepEqual(element, errorList.alreadyExists);
-          } else if (element === errorList.alreadyExists) {
-            should.deepEqual(element, errorList.alreadyExists);
+          if (element === errorCodes.ldapNoSuchObject) {
+            should.deepEqual(element, errorCodes.alreadyExists);
+          } else if (element === errorCodes.alreadyExists) {
+            should.deepEqual(element, errorCodes.alreadyExists);
           } else if (element === true) {
             should.deepEqual(true, element);
           } else if (element.entries[0].dn === config.ldapAuthentication.dnUserNoRight) {

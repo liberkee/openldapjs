@@ -8,7 +8,7 @@ const updateAttrSchema = require('../schemas/update_attr_schema');
 const controlSchema = require('../schemas/control_schema');
 const addEntrySchema = require('../schemas/add_entry_schema');
 const ValidationError = require('../errors/validation_error');
-const errorList = require('../../test/error_list.json');
+const errorMessages = require('../messages.json');
 
 const ajv = new Ajv();
 
@@ -29,7 +29,7 @@ class CheckParam {
   static validateStrings() {
     _.each(arguments, (element) => {
       if (!_.isString(element)) {
-        throw new TypeError(errorList.typeErrorMessage);
+        throw new TypeError(errorMessages.typeErrorMessage);
       }
     });
   }
@@ -49,7 +49,7 @@ class CheckParam {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
         throw new ValidationError(
-          errorList.invalidJSONMessage, ajv.errors);
+          errorMessages.invalidJSONMessage, ajv.errors);
       }
       if (element.op === 'update') {
         const deleteVals = [];
@@ -100,7 +100,7 @@ class CheckParam {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
           throw new ValidationError(
-            errorList.controlPropError, ajv.errors);
+            errorMessages.controlPropError, ajv.errors);
         }
       });
       return ctrls;
@@ -123,7 +123,7 @@ class CheckParam {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
         throw new ValidationError(
-          errorList.entryObjectError, ajv.errors);
+          errorMessages.entryObjectError, ajv.errors);
       }
     });
     return entryAttr;

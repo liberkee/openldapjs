@@ -4,10 +4,11 @@ const LDAP = require('../libs/ldap_async_wrap.js');
 const should = require('should');
 const config = require('./config');
 const Promise = require('bluebird');
-const errorList = require('./error_list');
 const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const StateError = require('../libs/errors/state_error');
 const ValidationError = require('../libs/errors/validation_error');
+const errorCodes = require('../libs/error_codes');
+const errorMessages = require('../libs/messages.json');
 
 
 describe('Testing the async LDAP add operation', () => {
@@ -79,14 +80,14 @@ describe('Testing the async LDAP add operation', () => {
 
   it('should reject the add operation with a wrong dn', () => {
 
-    const CustomError = errorHandler(errorList.invalidDnSyntax);
+    const CustomError = errorHandler(errorCodes.invalidDnSyntax);
 
     return clientLDAP.add('garbage', validEntry)
       .then(() => {
         should.fail('should not have succeeded');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -107,7 +108,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(ValidationError, (undefinedTypeErr) => {
-        should.deepEqual(undefinedTypeErr.message, errorList.entryObjectError);
+        should.deepEqual(undefinedTypeErr.message, errorMessages.entryObjectError);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -117,13 +118,13 @@ describe('Testing the async LDAP add operation', () => {
 
 
   it('should reject the add operation with a duplicated entry', () => {
-    const CustomError = errorHandler(errorList.alreadyExists);
+    const CustomError = errorHandler(errorCodes.alreadyExists);
     return clientLDAP.add(config.ldapAuthentication.dnUser, validEntry)
       .then(() => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (duplicatedEntryError) => {
-        should.deepEqual(duplicatedEntryError, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(duplicatedEntryError, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -132,7 +133,7 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should add multiple entries sequentially and reject to add a duplicate', () => {
-    const CustomError = errorHandler(errorList.alreadyExists);
+    const CustomError = errorHandler(errorCodes.alreadyExists);
     return clientLDAP.add(dnUser, validEntry)
       .then((res1) => {
         personNr += 1;
@@ -154,7 +155,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapAddErrorMessage));
         personNr += 1;
       })
       .catch((err) => {
@@ -168,7 +169,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(TypeError, (err) => {
-        should.deepEqual(err.message, errorList.typeErrorMessage);
+        should.deepEqual(err.message, errorMessages.typeErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
@@ -177,14 +178,14 @@ describe('Testing the async LDAP add operation', () => {
 
 
   it('should reject the request if try to rebind', () => {
-    const CustomError = errorHandler(errorList.insufficientAccess);
+    const CustomError = errorHandler(errorCodes.insufficientAccess);
     return clientLDAP2
       .add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry)
       .then(() => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (accessError) => {
-        should.deepEqual(accessError, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(accessError, new CustomError(errorMessages.ldapAddErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -192,7 +193,7 @@ describe('Testing the async LDAP add operation', () => {
   });
 
   it('should reject if the requested control is not recognized or could not be processed', () => {
-    const CustomError = errorHandler(errorList.ldapCriticalExtension);
+    const CustomError = errorHandler(errorCodes.ldapCriticalExtension);
     const criticalControls = {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
       value: config.ldapControls.ldapModificationControlPreRead.value,
@@ -203,9 +204,9 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(CustomError, (err) => {
-        should.deepEqual(err, new CustomError(errorList.ldapAddErrorMessage));
+        should.deepEqual(err, new CustomError(errorMessages.ldapAddErrorMessage));
       })
-      .catch((err) => {
+      .catch(() => {
         should.fail('did not expect generic error');
       });
   });
@@ -220,7 +221,7 @@ describe('Testing the async LDAP add operation', () => {
         should.fail('should not succeed');
       })
       .catch(StateError, (stateError) => {
-        should.deepEqual(stateError.message, errorList.bindErrorMessage);
+        should.deepEqual(stateError.message, errorMessages.bindErrorMessage);
       })
       .catch((err) => {
         should.fail('did not expect generic Error');
