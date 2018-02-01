@@ -297,6 +297,7 @@ class LDAPAsyncWrap {
 
         this._binding.compare(dn, attr, value, timeValue, (err, result) => {
           if (err) {
+            console.log(err);
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapCompareErrorMessage));
           } else {

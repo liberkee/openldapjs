@@ -58,7 +58,7 @@ describe('Testing the async LDAP extended operation', () => {
       });
   });
 
-  it('should start a TLS communication with LDAP server', () => {
+  xit('should start a TLS communication with LDAP server', () => {
     return clientLDAP2.extendedOperation(config.ldapExtendedOperation.oid.startTLS)
       .then((result) => {
         const successStart = 0;
