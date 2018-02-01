@@ -3,29 +3,6 @@
     {
       'target_name': 'openldapjs_binding',
       'conditions': [
-        ['OS=="win"',
-          {
-            'include_dirs' : [
-              "<!(node -e \"require('nan')\")",
-              './bin/include'
-            ],
-            'link_settings': {
-              'libraries': [
-                'LIBLDAP_R.lib',
-                'LIBLBER.lib',
-              ],
-              'library_dirs': [
-                './bin/lib'
-              ],
-            },
-            'copies':[
-              {
-                'destination':'<(module_root_dir)/lib/binding/Release/node-v57-win32-x64',
-                'files':['<(module_root_dir)/bin/dll/libeay32.dll','<(module_root_dir)/bin/dll/liblber.dll','<(module_root_dir)/bin/dll/libldap_r.dll','<(module_root_dir)/bin/dll/ssleay32.dll']
-              }
-            ]
-          }
-        ],
         ['OS=="linux"',
           {
             'include_dirs' : [
