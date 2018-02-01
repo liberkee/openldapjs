@@ -49,10 +49,7 @@ describe('Testing the async LDAP bind/unbind', () => {
   it('should reject if the credential are not correct', () => {
     const newClient = new LDAPWrap(host);
     const CustomError = errorHandler(errorCodes.invalidCredentials);
-    return newClient.initialize()
-      .then((result) => {
-        return newClient.startTLS();
-      })
+    newClient.initialize()
       .then((result) => {
         return newClient.bind(config.ldapCompare.invalidUser, config.ldapCompare.invalidPassword);
       })

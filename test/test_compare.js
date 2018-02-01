@@ -106,10 +106,7 @@ describe('Testing the Compare function', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
     const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
-    return ldapAsyncWrap.initialize()
-      .then(() => {
-        return ldapAsyncWrap.startTLS(pathToCert);
-      })
+    ldapAsyncWrap.initialize()
       .then(() => { return ldapAsyncWrap.bind(noAccessDn, password); })
       .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
       .then(() => { should.fail('should not have succeeded'); })

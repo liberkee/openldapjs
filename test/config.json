@@ -24,7 +24,7 @@
   },
   "ldapModify": {
     "ldapModificationUpdate": {
-      "change_dn": "cn=cghitea,ou=users,o=myhost,dc=demoApp,dc=com",
+      "change_dn": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
       "operation": "update",
       "attribute": "description",
       "vals": [

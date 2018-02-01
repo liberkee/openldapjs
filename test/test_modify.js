@@ -294,7 +294,7 @@ describe('Testing the modify functionalities', () => {
       .then((result) => { should.deepEqual(result, 0); });
   });
 
-  it('should reject the update if the oldVal don\'t exit', () => {
+  it('should reject the update if the oldVal doesn\'t exist', () => {
     const CustomError = errorHandler(errorCodes.noSuchAttirbute);
     return ldapAsyncWrap
       .modify(config.ldapModify.ldapModificationUpdate.change_dn, changeAttributesError)
@@ -309,7 +309,7 @@ describe('Testing the modify functionalities', () => {
       });
   });
 
-  it('should reject the update if the newVal already exit', () => {
+  it('should reject the update if the newVal already exists', () => {
     const CustomError = errorHandler(errorCodes.typeOrValueExists);
     changeAttributesError[0].vals[0].oldVal = '2Modification';
     changeAttributesError[0].vals[0].newVal = '1Modification';
