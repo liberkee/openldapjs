@@ -1,0 +1,24 @@
+{
+  "id": "https://www.hufsm.com/openldap/change/",
+  "type": "object",
+  "properties": {
+    "op": {
+      "id": "https://www.hufsm.com/openldap/change/op",
+      "type": "string",
+      "enum": ["add", "replace", "delete", "update"]
+    },
+    "attr": {
+      "id": "https://www.hufsm.com/openldap/change/attr",
+      "type": "string"
+    },
+    "vals": {
+      "id": "https://www.hufsm.com/openldap/change/vals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "op",
+    "attr",
+    "vals"
+  ]
+}
