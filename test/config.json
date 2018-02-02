@@ -6,7 +6,7 @@
     "dnUserNoRight": "cn=simpleUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordAdmin": "secret",
     "passwordUser": "secret",
-    "pathFileToCert": "ca_certs.pem"
+    "pathFileToCert": "/etc/ssl/certs/ca_certificates.pem"
   },
   "ldapExtendedOperation": {
     "oid": {
