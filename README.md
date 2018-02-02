@@ -1,4 +1,7 @@
-# OpenLDAP.JS[![Build Status](https://travis-ci.org/6labs/openldapjs.svg?branch=master)](https://travis-ci.org/6labs/openldapjs)
+# OpenLDAP.JS
+ [![Build Status](https://travis-ci.org/6labs/openldapjs.svg?branch=development)](https://travis-ci.org/6labs/openldapjs) **Development**
+
+ [![Build Status](https://travis-ci.org/6labs/openldapjs.svg?branch=master)](https://travis-ci.org/6labs/openldapjs) **Master**
 
 Node.js wrapper for [OpenLDAP](https://github.com/openldap/openldap).
 This library allows you to interact through Node.js with a LDAP backend.
