@@ -46,31 +46,33 @@ describe('Testing the async LDAP search ', () => {
 
   afterEach(() => {
     return adminLDAP.unbind()
-      .then(() => { return userLDAP.unbind(); });
+      .then(() => {
+        return userLDAP.unbind();
+      });
   });
 
   it('should reject if the state is not BOUND', () => {
     return adminLDAP.unbind()
       .then(() => {
-        return adminLDAP.search(
-          searchBase, searchScope.subtree,
-          config.ldapSearch.filterObjSpecific);
+        return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific);
       })
-      .then(() => { should.fail('should not have passed'); })
-      .catch(
-        StateError,
-        (error) => {
-          should.deepEqual(error.message, errorMessages.bindErrorMessage);
-        })
-      .catch((err) => { should.fail('did not expect generic error'); });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch(StateError, (error) => {
+        should.deepEqual(error.message, errorMessages.bindErrorMessage);
+      })
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should return an empty search', () => {
     return adminLDAP
-      .search(
-        searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjSpecific)
-      .then((result) => { result.should.be.empty; });
+      .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific)
+      .then((result) => {
+        result.should.be.empty;
+      });
   });
   /**
    * case for search with non existing search base
@@ -78,9 +80,10 @@ describe('Testing the async LDAP search ', () => {
   xit('should return the root node', () => {
     const ROOT_NODE =
       '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
-    return adminLDAP
-      .search('', searchScope.base, config.ldapSearch.filterObjAll)
-      .then((result) => { should.deepEqual(result, ROOT_NODE); });
+    return adminLDAP.search('', searchScope.base, config.ldapSearch.filterObjAll)
+      .then((result) => {
+        should.deepEqual(result, ROOT_NODE);
+      });
   });
   /**
    * test case for search with access denied
@@ -88,25 +91,29 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return an LDAP_OBJECT_NOT_FOUND error', () => {
     const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
-    return userLDAP
-      .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
+    return userLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then(() => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (err) => {
-        err.should.be.deepEqual(
-          new CustomError(errorMessages.ldapSearchErrorMessage));
+        err.should.be.deepEqual(new CustomError(errorMessages.ldapSearchErrorMessage));
       })
-      .catch((err) => { should.fail('did not expect generic error'); });
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if the scope is not a string', () => {
     return userLDAP.search(searchBase, 2, config.ldapSearch.filterObjAll)
-      .then(() => { should.fail('should not have passed'); })
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch(TypeError, (err) => {
         err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
       })
-      .catch((err) => { should.fail('did not expect generic error'); });
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should reject if the time required expired', () => {
@@ -117,8 +124,7 @@ describe('Testing the async LDAP search ', () => {
         should.fail('should not have passed');
       })
       .catch(CustomError, (err) => {
-        err.should.be.deepEqual(
-          new CustomError(errorMessages.ldapSearchErrorMessage));
+        err.should.be.deepEqual(new CustomError(errorMessages.ldapSearchErrorMessage));
       })
       .catch((err) => {
         should.fail('did not expect generic error');
@@ -126,22 +132,26 @@ describe('Testing the async LDAP search ', () => {
   });
 
   it('should reject if the scope doesn\'t exist', () => {
-    return userLDAP
-      .search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
-      .then(() => { should.fail('Didn\'t expect success'); })
+    return userLDAP.search(searchBase, 'notGoodScope', config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('Didn\'t expect success');
+      })
       .catch((err) => {
         err.message.should.be.deepEqual(errorMessages.scopeSearchErrorMessage);
       });
   });
 
   it('should reject if the searchBase is not a string', () => {
-    return userLDAP
-      .search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
-      .then(() => { should.fail('should not have passed'); })
+    return userLDAP.search(1, searchScope.subtree, config.ldapSearch.filterObjAll)
+      .then(() => {
+        should.fail('should not have passed');
+      })
       .catch(TypeError, (err) => {
         err.message.should.be.deepEqual(errorMessages.typeErrorMessage);
       })
-      .catch((err) => { should.fail('did not expect generic error'); });
+      .catch((err) => {
+        should.fail('did not expect generic error');
+      });
   });
 
 
@@ -150,10 +160,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return a single result', () => {
-    return adminLDAP
-      .search(
-        searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjSpecific2)
+    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2)
       .then((result) => {
         result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
@@ -164,8 +171,7 @@ describe('Testing the async LDAP search ', () => {
    *
    * */
   it('should return multiple results located on the same level', () => {
-    return adminLDAP
-      .search(searchBase, searchScope.one, config.ldapSearch.filterObjAll)
+    return adminLDAP.search(searchBase, searchScope.one, config.ldapSearch.filterObjAll)
       .then((result) => {
         result.entries[0].dn.should.be.deepEqual(dnAdmin);
       });
@@ -177,10 +183,8 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return the same result', () => {
 
-    const search1 = adminLDAP.search(
-      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
-    const search2 = adminLDAP.search(
-      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
+    const search1 = adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
+    const search2 = adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
 
     return Promise.all([search1, search2])
       .then((results) => {
@@ -197,31 +201,28 @@ describe('Testing the async LDAP search ', () => {
     let result2;
     let result3;
 
-    return adminLDAP
-      .search(
-        searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjSpecific2)
+    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2)
       .then((res1) => {
         result1 = res1;
-        return adminLDAP.search(
-          searchBase, searchScope.subtree,
-          config.ldapSearch.filterObjSpecific);
+        return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific);
       })
       .then((res2) => {
         result2 = res2;
         should.notDeepEqual(result1, result2);
-        return adminLDAP.search(
-          searchBase, 1, config.ldapSearch.filterObjAll);
+        return adminLDAP.search(searchBase, 1, config.ldapSearch.filterObjAll);
       })
       .then((res3) => {
         result3 = res3;
         should.notDeepEqual(result1, result3);
         should.notDeepEqual(result2, result3);
-        return adminLDAP.search(
-          'dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
+        return adminLDAP.search('dc=wrongBase,dc=err', searchScope.subtree, 'objectClass=errors');
       })
-      .then(() => { should.fail('should not have passed'); })
-      .catch((err) => { err.should.not.be.empty; });
+      .then(() => {
+        should.fail('should not have passed');
+      })
+      .catch((err) => {
+        err.should.not.be.empty;
+      });
   });
 
 
@@ -230,12 +231,9 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return search results done in parallel', () => {
-    const firstResult = adminLDAP.search(
-      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
-    const secondResult = adminLDAP.search(
-      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
-    const thirdResult = adminLDAP.search(
-      searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific);
+    const firstResult = adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
+    const secondResult = adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2);
+    const thirdResult = adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific);
 
     return Promise.all([firstResult, secondResult, thirdResult])
       .then((values) => {
@@ -247,10 +245,7 @@ describe('Testing the async LDAP search ', () => {
 
   it('should return results in entire subtree', function searchTime() {
     this.timeout(0);
-    return adminLDAP
-      .search(
-        searchBase, searchScope.subtree,
-        config.ldapSearch.filterObjAll)
+    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
         result.entries[1].dn.should.be.deepEqual(dnAdmin);
       });

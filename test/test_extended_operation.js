@@ -101,8 +101,8 @@ describe('Testing the async LDAP extended operation', () => {
   it('should change a password of a specific user', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
-        config.ldapChangePassword.oldPasswd,
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.oldPasswd,
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         const successStart = 0;
         result.should.be.deepEqual(successStart);
@@ -114,7 +114,7 @@ describe('Testing the async LDAP extended operation', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
         'Wrong password',
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         should.fail('should not have succeeded');
       })

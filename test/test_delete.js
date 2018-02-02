@@ -21,8 +21,7 @@ describe('Testing the async LDAP delete operation', () => {
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      isCritical:
-        config.ldapControls.ldapModificationControlPostRead.isCritical,
+      isCritical: config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -39,13 +38,17 @@ describe('Testing the async LDAP delete operation', () => {
     clientLDAP = new LDAP(host);
 
     return clientLDAP.initialize()
-      .then(() => { return clientLDAP.bind(dnAdmin, password); })
+      .then(() => {
+        return clientLDAP.bind(dnAdmin, password);
+      })
       .then(() => {
         dnUser =
           `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
       });
   });
-  afterEach(() => { return clientLDAP.unbind(); });
+  afterEach(() => {
+    return clientLDAP.unbind();
+  });
 
   /* trying to delete with an invalid dn syntax => ldap error code 34 */
   it('should reject the request with invalidDn error code', () => {
@@ -136,7 +139,9 @@ describe('Testing the async LDAP delete operation', () => {
 
   it('should reject because BOUND state is required', () => {
     return clientLDAP.unbind()
-      .then(() => { return clientLDAP.delete(dnUser); })
+      .then(() => {
+        return clientLDAP.delete(dnUser);
+      })
       .catch(StateError, (stateError) => {
         should.deepEqual(stateError.message, errorMessages.bindErrorMessage);
       })
@@ -157,8 +162,7 @@ describe('Testing the async LDAP delete operation', () => {
       })
       .catch(CustomError, (err) => {
         personNr += 1;
-        dnUser =
-          `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
+        dnUser = `${config.ldapDelete.rdnUser}${personNr}${config.ldapDelete.dn}`;
         should.deepEqual(err, new CustomError(errorMessages.ldapDeleteErrorMessage));
         return clientLDAP.delete(dnUser);
       })
@@ -194,12 +198,11 @@ describe('Testing the async LDAP delete operation', () => {
       });
   });
 
-  it('should delete an existing entry and return the control',
-    () => {
-      return clientLDAP.delete(dnUser, controlOperation)
-        .then((result) => {
-          should.deepEqual(result.entries[0].dn, dnUser);
-        });
-    });
+  it('should delete an existing entry and return the control', () => {
+    return clientLDAP.delete(dnUser, controlOperation)
+      .then((result) => {
+        should.deepEqual(result.entries[0].dn, dnUser);
+      });
+  });
 
 });

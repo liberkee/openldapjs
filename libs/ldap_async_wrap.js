@@ -265,10 +265,7 @@ class LDAPAsyncWrap {
 
         this._searchID += 1;
         const timeValue = timeVal === undefined ? this._timeVal : timeVal;
-        resolve(
-          new SearchStream(
-            searchBase, scopeObject[scope], searchFilter, pageSize,
-            this._searchID, this._binding, timeValue));
+        resolve(new SearchStream(searchBase, scopeObject[scope], searchFilter, pageSize, this._searchID, this._binding, timeValue));
       }
       reject(new StateError(errorMessages.bindErrorMessage));
     });
@@ -472,8 +469,7 @@ class LDAPAsyncWrap {
           userDn, oldPassword, newPassword, timeValue, (err, result) => {
             if (err) {
               const CustomError = errorHandler(err);
-              reject(
-                new CustomError(errorMessages.ldapChangePasswordErrorMessage));
+              reject(new CustomError(errorMessages.ldapChangePasswordErrorMessage));
             } else {
               resolve();
             }

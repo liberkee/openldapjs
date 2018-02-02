@@ -1,7 +1,7 @@
 'use strict';
 
-const configFile = require('./test/config.json');
-const Client = require('./index.js').Client;
+const configFile = require('../config.json');
+const Client = require('../../index').Client;
 const Promise = require('bluebird');
 
 

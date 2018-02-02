@@ -19,10 +19,14 @@ describe('Testing the objectExists function', () => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
-  afterEach(() => { return ldapAsyncWrap.unbind(); });
+  afterEach(() => {
+    return ldapAsyncWrap.unbind();
+  });
 
 
   it('should return true if the object exists', () => {
@@ -37,9 +41,6 @@ describe('Testing the objectExists function', () => {
     return ldapAsyncWrap.objectExists(wrongDN)
       .then((res) => {
         res.should.be.false();
-      })
-      .catch((err) => {
-        console.log(err);
       });
   });
 
