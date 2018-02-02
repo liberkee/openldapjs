@@ -101,21 +101,19 @@ describe('Testing the Compare function', () => {
   });
 
 
-  it('should not compare with access denied', () => {
-    const noAccessDn = config.ldapAuthentication.dnUser;
-    ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
+  it('should not compare with access denied', function compareTime() {
+    this.timeout(0);
+    const noAccessDn = config.ldapAuthentication.dnUserNoRight;
+    const ldapAsyncWrap2 = new LdapAsyncWrap(hostAddress);
     const CustomError = errorHandler(errorCodes.ldapNoSuchObject);
 
-    ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.bind(noAccessDn, password); })
-      .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
+    ldapAsyncWrap2.initialize()
+      .then(() => { return ldapAsyncWrap2.bind(noAccessDn, password); })
+      .then(() => { return ldapAsyncWrap2.compare(dn, attr, val); })
       .then(() => { should.fail('should not have succeeded'); })
-      .catch(
-        CustomError,
-        (err) => {
-          should.deepEqual(
-            err, new CustomError(errorMessages.ldapCompareErrorMessage));
-        })
+      .catch(CustomError, (err) => {
+        should.deepEqual(err, new CustomError(errorMessages.ldapCompareErrorMessage));
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 

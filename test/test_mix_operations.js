@@ -73,7 +73,6 @@ describe.only('Testing multiple operations functionalities', () => {
 
     ldapAsyncWrap.initialize()
       .then(() => {
-        console.log(dn);
         return ldapAsyncWrap.bind(dn, password);
       });
   });
