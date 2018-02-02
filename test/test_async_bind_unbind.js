@@ -20,7 +20,7 @@ describe('Testing the async LDAP bind/unbind', () => {
     clientLDAP = new LDAPWrap(host);
     return clientLDAP.initialize();
   });
-  afterEach();
+  afterEach(() => { });
 
   it('should not bind to the server using invalid credentials', () => {
 

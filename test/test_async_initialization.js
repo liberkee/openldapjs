@@ -13,7 +13,7 @@ describe('Testing the async initialization', () => {
 
   beforeEach(() => { ldapWrap = new LDAPWrap(host); });
 
-  afterEach();
+  afterEach(() => { });
 
   it('should initialize the connection', () => {
     return ldapWrap.initialize()

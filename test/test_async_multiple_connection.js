@@ -21,7 +21,7 @@ describe('Testing the async LDAP connection', () => {
     clientLDAP2 = new LDAPWrap(hostAddress);
   });
 
-  afterEach();
+  afterEach(() => { });
 
   it('should bind multiple clients at the same time', () => {
     const pathToCert = config.ldapAuthentication.pathFileToCert;
