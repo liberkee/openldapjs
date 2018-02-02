@@ -27,3 +27,4 @@ More examples of error handling can be found in [Tests](../test).
 ## References:
 
 * [LDAP Result Code Reference](https://www.ldap.com/ldap-result-code-reference)
+* [OpenLDAP error codes](https://www.openldap.org/doc/admin24/appendix-ldap-result-codes.html)
