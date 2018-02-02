@@ -48,8 +48,7 @@ class CheckParam {
     changesAttr.forEach((element) => {
       const valid = ajv.validate(changeSchema, element);
       if (!valid) {
-        throw new ValidationError(
-          errorMessages.invalidJSONMessage, ajv.errors);
+        throw new ValidationError(errorMessages.invalidJSONMessage, ajv.errors);
       }
       if (element.op === 'update') {
         const deleteVals = [];
@@ -58,8 +57,7 @@ class CheckParam {
         element.vals.forEach((val) => {
           const validVal = ajv.validate(updateAttrSchema, val);
           if (!validVal) {
-            throw new ValidationError(
-              errorList.invalidJSONMessage, ajv.errors);
+            throw new ValidationError(errorList.invalidJSONMessage, ajv.errors);
           } else {
             deleteVals.push(val.oldVal);
             addVals.push(val.newVal);
@@ -99,8 +97,7 @@ class CheckParam {
       ctrls.forEach((element) => {
         const valid = ajv.validate(controlSchema, element);
         if (!valid) {
-          throw new ValidationError(
-            errorMessages.controlPropError, ajv.errors);
+          throw new ValidationError(errorMessages.controlPropError, ajv.errors);
         }
       });
       return ctrls;
@@ -122,8 +119,7 @@ class CheckParam {
     entryAttr.forEach((element) => {
       const valid = ajv.validate(addEntrySchema, element);
       if (!valid) {
-        throw new ValidationError(
-          errorMessages.entryObjectError, ajv.errors);
+        throw new ValidationError(errorMessages.entryObjectError, ajv.errors);
       }
     });
     return entryAttr;

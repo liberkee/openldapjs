@@ -28,7 +28,9 @@ describe('Testing the ChangePassword operation', () => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
   afterEach(() => { return ldapAsyncWrap.unbind(); });
