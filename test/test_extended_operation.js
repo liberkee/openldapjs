@@ -58,7 +58,7 @@ describe('Testing the async LDAP extended operation', () => {
       });
   });
 
-  xit('should start a TLS communication with LDAP server', () => {
+  it('should start a TLS communication with LDAP server', () => {
     return clientLDAP2.extendedOperation(config.ldapExtendedOperation.oid.startTLS)
       .then((result) => {
         const successStart = 0;
@@ -101,8 +101,8 @@ describe('Testing the async LDAP extended operation', () => {
   it('should change a password of a specific user', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
-        config.ldapChangePassword.oldPasswd,
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.oldPasswd,
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         const successStart = 0;
         result.should.be.deepEqual(successStart);
@@ -114,7 +114,7 @@ describe('Testing the async LDAP extended operation', () => {
     return clientLDAP.extendedOperation(config.ldapExtendedOperation.oid.changePassword,
       [config.ldapChangePassword.user,
         'Wrong password',
-        config.ldapChangePassword.newPasswd])
+      config.ldapChangePassword.newPasswd])
       .then((result) => {
         should.fail('should not have succeeded');
       })

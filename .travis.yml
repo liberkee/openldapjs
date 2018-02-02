@@ -14,6 +14,14 @@ addons:
       - libldap2-dev
 
 before_script:
+  - sudo apt install gnutls-bin ssl-cert
+  - sudo sh -c "certtool --generate-privkey > /etc/ssl/private/cakey.pem"
+  - sudo certtool --generate-self-signed --load-privkey /etc/ssl/private/cakey.pem --template ./test/test_tool/ca.info --outfile /etc/ssl/certs/cacert.pem
+  - sudo certtool --generate-privkey --bits 1024 --outfile /etc/ssl/private/ldap01_slapd_key.pem
+  - sudo certtool --generate-certificate --load-privkey /etc/ssl/private/ldap01_slapd_key.pem --load-ca-certificate /etc/ssl/certs/cacert.pem --load-ca-privkey /etc/ssl/private/cakey.pem --template ./test/test_tool/ldap01.info --outfile /etc/ssl/certs/ldap01_slapd_cert.pem
+  - sudo chgrp openldap /etc/ssl/private/ldap01_slapd_key.pem
+  - sudo chmod 0640 /etc/ssl/private/ldap01_slapd_key.pem
+  - sudo gpasswd -a openldap ssl-cert
   - sudo service slapd stop 
   - sudo rm -R /etc/ldap/slapd.d/
   - sudo mkdir /etc/ldap/slapd.d/
