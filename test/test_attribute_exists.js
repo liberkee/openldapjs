@@ -23,10 +23,14 @@ describe('Testing the attributeExists function', () => {
     ldapAsyncWrap = new LdapAsyncWrap(config.ldapAuthentication.host);
 
     return ldapAsyncWrap.initialize()
-      .then(() => { return ldapAsyncWrap.bind(dn, password); });
+      .then(() => {
+        return ldapAsyncWrap.bind(dn, password);
+      });
   });
 
-  afterEach(() => { return ldapAsyncWrap.unbind(); });
+  afterEach(() => {
+    return ldapAsyncWrap.unbind();
+  });
 
 
   it('should return true if the attribute exists', () => {

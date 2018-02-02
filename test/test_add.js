@@ -26,8 +26,7 @@ describe('Testing the async LDAP add operation', () => {
     {
       oid: config.ldapControls.ldapModificationControlPostRead.oid,
       value: config.ldapControls.ldapModificationControlPostRead.value,
-      isCritical:
-        config.ldapControls.ldapModificationControlPostRead.isCritical,
+      isCritical: config.ldapControls.ldapModificationControlPostRead.isCritical,
     },
     {
       oid: config.ldapControls.ldapModificationControlPreRead.oid,
@@ -50,12 +49,8 @@ describe('Testing the async LDAP add operation', () => {
 
     return Promise.all([init1, init2])
       .then(() => {
-        const bind1 = clientLDAP.bind(
-          config.ldapAuthentication.dnAdmin,
-          config.ldapAuthentication.passwordAdmin);
-        const bind2 = clientLDAP2.bind(
-          config.ldapAuthentication.dnUser,
-          config.ldapAuthentication.passwordUser);
+        const bind1 = clientLDAP.bind(config.ldapAuthentication.dnAdmin, config.ldapAuthentication.passwordAdmin);
+        const bind2 = clientLDAP2.bind(config.ldapAuthentication.dnUser, config.ldapAuthentication.passwordUser);
 
         return Promise.all([bind1, bind2]);
       })
@@ -66,7 +61,9 @@ describe('Testing the async LDAP add operation', () => {
 
   afterEach(() => {
     return clientLDAP.unbind()
-      .then(() => { return clientLDAP2.unbind(); });
+      .then(() => {
+        return clientLDAP2.unbind();
+      });
   });
 
   it('should add a single entry', () => {
@@ -214,8 +211,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should reject requests done from an unbound state', () => {
     return clientLDAP.unbind()
       .then(() => {
-        return clientLDAP.add(
-          `${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
+        return clientLDAP.add(`${rdnUser}${config.ldapAdd.dnNewEntryAdmin}`, validEntry);
       })
       .then(() => {
         should.fail('should not succeed');
@@ -241,7 +237,9 @@ describe('Testing the async LDAP add operation', () => {
 
     return Promise.all([first, second, third])
       .then((values) => {
-        values.forEach((result) => { result.should.be.deepEqual(0); });
+        values.forEach((result) => {
+          result.should.be.deepEqual(0);
+        });
       });
   });
 
