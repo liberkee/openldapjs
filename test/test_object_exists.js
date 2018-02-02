@@ -37,9 +37,6 @@ describe('Testing the objectExists function', () => {
     return ldapAsyncWrap.objectExists(wrongDN)
       .then((res) => {
         res.should.be.false();
-      })
-      .catch((err) => {
-        console.log(err);
       });
   });
 

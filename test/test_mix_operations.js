@@ -71,9 +71,11 @@ describe('Testing multiple operations functionalities', () => {
   beforeEach(() => {
     ldapAsyncWrap = new LdapAsyncWrap(hostAddress);
 
-    ldapAsyncWrap.initialize()
+    return ldapAsyncWrap.initialize()
       .then(() => {
-        console.log(dn);
+        return ldapAsyncWrap.startTLS(pathToCert);
+      })
+      .then(() => {
         return ldapAsyncWrap.bind(dn, password);
       });
   });

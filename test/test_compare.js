@@ -34,10 +34,10 @@ describe('Testing the Compare function', () => {
     return ldapAsyncWrap.compare(1, attr, val)
       .then(() => { should.fail('should not have succeeded'); })
       .catch(
-        TypeError,
-        (error) => {
-          should.deepEqual(error.message, errorMessages.typeErrorMessage);
-        })
+      TypeError,
+      (error) => {
+        should.deepEqual(error.message, errorMessages.typeErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -54,11 +54,11 @@ describe('Testing the Compare function', () => {
     return ldapAsyncWrap.compare(dn, noSuchAttribute, val)
       .then(() => { should.fail('should not have passed'); })
       .catch(
-        CustomError,
-        (err) => {
-          should.deepEqual(
-            err.constructor.description, CustomError.description);
-        })
+      CustomError,
+      (err) => {
+        should.deepEqual(
+          err.constructor.description, CustomError.description);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -77,11 +77,11 @@ describe('Testing the Compare function', () => {
     return ldapAsyncWrap.compare(dn, nonAttr, val)
       .then(() => { should.fail('should not have succeeded'); })
       .catch(
-        CustomError,
-        (err) => {
-          should.deepEqual(
-            err, new CustomError(errorMessages.ldapCompareErrorMessage));
-        })
+      CustomError,
+      (err) => {
+        should.deepEqual(
+          err, new CustomError(errorMessages.ldapCompareErrorMessage));
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -92,11 +92,11 @@ describe('Testing the Compare function', () => {
     return ldapAsyncWrap.compare(nonObj, attr, val)
       .then(() => { should.fail('should not have succeeded'); })
       .catch(
-        CustomError,
-        (err) => {
-          should.deepEqual(
-            err, new CustomError(errorMessages.ldapCompareErrorMessage));
-        })
+      CustomError,
+      (err) => {
+        should.deepEqual(
+          err, new CustomError(errorMessages.ldapCompareErrorMessage));
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -111,12 +111,15 @@ describe('Testing the Compare function', () => {
       .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
       .then(() => { should.fail('should not have succeeded'); })
       .catch(
-        CustomError,
-        (err) => {
-          should.deepEqual(
-            err, new CustomError(errorMessages.ldapCompareErrorMessage));
-        })
-      .catch((err) => { should.fail('did not expect generic error'); });
+      CustomError,
+      (err) => {
+        should.deepEqual(
+          err, new CustomError(errorMessages.ldapCompareErrorMessage));
+      })
+      .catch((err) => {
+        console.log(err);
+        should.fail('did not expect generic error');
+      });
   });
 
   it('should throw an error if the binding was not done before comparing',
@@ -127,10 +130,10 @@ describe('Testing the Compare function', () => {
         .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
         .then(() => { should.fail('should not have succeeded'); })
         .catch(
-          StateError,
-          (err) => {
-            should.deepEqual(err.message, errorMessages.bindErrorMessage);
-          })
+        StateError,
+        (err) => {
+          should.deepEqual(err.message, errorMessages.bindErrorMessage);
+        })
         .catch((err) => { should.fail('did not expect generic error'); });
     });
 
@@ -140,10 +143,10 @@ describe('Testing the Compare function', () => {
       .then(() => { return ldapAsyncWrap.compare(dn, attr, val); })
       .then(() => { should.fail('should not have succeeded'); })
       .catch(
-        StateError,
-        (err) => {
-          should.deepEqual(err.message, errorMessages.bindErrorMessage);
-        })
+      StateError,
+      (err) => {
+        should.deepEqual(err.message, errorMessages.bindErrorMessage);
+      })
       .catch((err) => { should.fail('did not expect generic error'); });
   });
 
@@ -174,12 +177,12 @@ describe('Testing the Compare function', () => {
         })
         .then(() => { should.fail('should not have succeeded'); })
         .catch(
-          CustomError,
-          (err) => {
-            should.deepEqual(
-              err, new CustomError(errorMessages.ldapCompareErrorMessage));
-            return ldapAsyncWrap.compare(dn, attr, nonVal);
-          })
+        CustomError,
+        (err) => {
+          should.deepEqual(
+            err, new CustomError(errorMessages.ldapCompareErrorMessage));
+          return ldapAsyncWrap.compare(dn, attr, nonVal);
+        })
         .catch(() => { should.fail('did not expect generic error'); })
         .then((result3) => { should.deepEqual(result3, false); });
     });
