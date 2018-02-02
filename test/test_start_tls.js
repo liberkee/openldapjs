@@ -8,7 +8,7 @@ const errorHandler = require('../libs/errors/error_dispenser').errorFunction;
 const errorCodes = require('../libs/error_codes');
 const errorMessages = require('../libs/messages.json');
 
-describe.skip('Testing the LDAP start TLS routine', () => {
+describe('Testing the LDAP start TLS routine', () => {
 
   const host = config.ldapAuthentication.host;
   let adminLDAP = new LDAPWrap(host);
