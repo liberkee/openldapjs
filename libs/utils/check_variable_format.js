@@ -125,6 +125,18 @@ class CheckParam {
     return entryAttr;
   }
 
+
+  /**
+   * 
+   * Static method that checks if a string is a proper ldap URI.
+   * @param {String} uri String that represents the ldap server URI
+   */
+  static checkURI(uri) {
+
+   return  uri.startsWith('ldap://') || uri.startsWith('ldaps://');
+
+  }
+
 }
 
 module.exports = CheckParam;
