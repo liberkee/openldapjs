@@ -36,3 +36,17 @@ userPassword: {SSHA}vWDkTc9e+2ojECzkfDWLAYbWmtSGj3Cu
 description: 1Modification
 description: 2Modification
 description: 3Modification
+
+dn: cn=special_de_ä,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: special_de_ä
+sn: Ä Special
+userPassword: {SSHA}vWDkTc9e+2ojECzkfDWLAYbWmtSGj3Cu
+description: Special characters user äÄöÖüÜß
+
+dn: cn=special_ro_ş,ou=users,o=myhost,dc=demoApp,dc=com
+objectClass: person
+cn: special_ro_ş
+sn: Ä Special
+userPassword: {SSHA}vWDkTc9e+2ojECzkfDWLAYbWmtSGj3Cu
+description: Special characters user ţâă

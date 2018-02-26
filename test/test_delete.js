@@ -201,7 +201,7 @@ describe('Testing the async LDAP delete operation', () => {
   it('should delete an existing entry and return the control', () => {
     return clientLDAP.delete(dnUser, controlOperation)
       .then((result) => {
-        should.deepEqual(result.entries[0].dn, dnUser);
+        should.deepEqual(result.entry[0].dn, dnUser);
       });
   });
 

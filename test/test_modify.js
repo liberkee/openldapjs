@@ -166,7 +166,7 @@ describe('Testing the modify functionalities', () => {
     return ldapAsyncWrap
       .modify(config.ldapModify.ldapModificationReplace.change_dn, changeAttributes, control)
       .then((result) => {
-        should.deepEqual(result.entries[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
+        should.deepEqual(result.entry[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 
@@ -331,10 +331,10 @@ describe('Testing the modify functionalities', () => {
     const modify4 = ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn, changeAttributes, controlOperation);
     const modify5 = ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn, changeAttributes, controlOperation);
 
-    return Promise.all([modify1, modify2, modify3, modify4, modify5,])
+    return Promise.all([modify1, modify2, modify3, modify4, modify5])
       .then((results) => {
         results.forEach((element) => {
-          should.deepEqual(element.entries[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
+          should.deepEqual(element.entry[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
         });
       });
   });
@@ -342,7 +342,7 @@ describe('Testing the modify functionalities', () => {
   it('should return a specific attribute from the entry', () => {
     return ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn, changeAttributes, controlOperation)
       .then((result) => {
-        should.deepEqual(result.entries[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
+        should.deepEqual(result.entry[0].dn, config.ldapModify.ldapModificationReplace.change_dn);
       });
   });
 

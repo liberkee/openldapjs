@@ -88,21 +88,21 @@ describe('Testing multiple operations functionalities', () => {
   it('should add, search, compare, modify and delete  multiple times sequentially', () => {
     return ldapAsyncWrap.add(dnUser, validEntry, controlOperation)
       .then((result1) => {
-        should.deepEqual(result1.entries[0].dn, dnUser);
+        should.deepEqual(result1.entry[0].dn, dnUser);
         return ldapAsyncWrap.search(searchBase, searchScope.subtree, newEntry);
       })
       .then((result2) => {
-        should.deepEqual(result2.entries[0].dn, dnUser);
+        should.deepEqual(result2.entry[0].dn, dnUser);
         return ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
           changeAttributes, controlOperation);
       })
       .then((result3) => {
-        should.deepEqual(result3.entries[0].dn,
+        should.deepEqual(result3.entry[0].dn,
           config.ldapModify.ldapModificationReplace.change_dn);
         return ldapAsyncWrap.delete(dnUser, controlOperation);
       })
       .then((result4) => {
-        should.deepEqual(result4.entries[0].dn, dnUser);
+        should.deepEqual(result4.entry[0].dn, dnUser);
         return ldapAsyncWrap.compare(dn, attr, val);
       })
       .then((result5) => {
@@ -110,20 +110,20 @@ describe('Testing multiple operations functionalities', () => {
         return ldapAsyncWrap.add(dnUser, validEntry, controlOperation);
       })
       .then((result6) => {
-        should.deepEqual(result6.entries[0].dn, dnUser);
+        should.deepEqual(result6.entry[0].dn, dnUser);
         return ldapAsyncWrap.search(searchBase, searchScope.subtree, newEntry);
       })
       .then((result7) => {
-        should.deepEqual(result7.entries[0].dn, dnUser);
+        should.deepEqual(result7.entry[0].dn, dnUser);
         return ldapAsyncWrap.delete(dnUser, controlOperation);
       })
       .then((result8) => {
-        should.deepEqual(result8.entries[0].dn, dnUser);
+        should.deepEqual(result8.entry[0].dn, dnUser);
         return ldapAsyncWrap.modify(config.ldapModify.ldapModificationReplace.change_dn,
           changeAttributes, controlOperation);
       })
       .then((result9) => {
-        should.deepEqual(result9.entries[0].dn,
+        should.deepEqual(result9.entry[0].dn,
           config.ldapModify.ldapModificationReplace.change_dn);
         return ldapAsyncWrap.compare(dn, attr, val);
       })
@@ -158,12 +158,12 @@ describe('Testing multiple operations functionalities', () => {
             should.deepEqual(element, errorCodes.alreadyExists);
           } else if (element === true) {
             should.deepEqual(true, element);
-          } else if (element.entries[0].dn === config.ldapAuthentication.dnUserNoRight) {
-            should.deepEqual(element.entries[0].dn, config.ldapAuthentication.dnUserNoRight);
-          } else if (element.entries[0].dn === dnUser) {
-            should.deepEqual(element.entries[0].dn, dnUser);
+          } else if (element.entry[0].dn === config.ldapAuthentication.dnUserNoRight) {
+            should.deepEqual(element.entry[0].dn, config.ldapAuthentication.dnUserNoRight);
+          } else if (element.entry[0].dn === dnUser) {
+            should.deepEqual(element.entry[0].dn, dnUser);
           } else {
-            should.deepEqual(element.entries[0].dn, `${newEntry}1${config.ldapAdd.dnNewEntry}`);
+            should.deepEqual(element.entry[0].dn, `${newEntry}1${config.ldapAdd.dnNewEntry}`);
           }
         });
       });

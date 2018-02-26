@@ -246,7 +246,7 @@ describe('Testing the async LDAP add operation', () => {
   it('should add a new entry and return the attributes that was required in control', () => {
     return clientLDAP.add(dnUser, validEntry, controlOperation)
       .then((result) => {
-        should.deepEqual(result.entries[0].dn, dnUser);
+        should.deepEqual(result.entry[0].dn, dnUser);
       });
   });
 

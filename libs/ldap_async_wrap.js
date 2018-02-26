@@ -10,7 +10,9 @@ const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
 const errorCode = require('./error_codes.json');
 const _ = require('underscore');
-const ldif = require('ldif');
+const LDIF = require('./utils/ldif_parser');
+
+const ldif = new LDIF();
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
@@ -90,8 +92,8 @@ class LDAPAsyncWrap {
   startTLS(pathToCertFile) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        const path = pathToCertFile === undefined ? '' : pathToCertFile;
-        this._binding.startTls(path, (err, res) => {
+        const pathCert = pathToCertFile === undefined ? '' : pathToCertFile;
+        this._binding.startTls(pathCert, (err, res) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapStartTlsErrorMessage));
@@ -225,7 +227,7 @@ class LDAPAsyncWrap {
               const CustomError = errorHandler(err);
               reject(new CustomError(errorMessages.ldapSearchErrorMessage));
             } else {
-              const resJSON = result.length === 0 ? result : ldif.parse(result);
+              const resJSON = result.length === 0 ? result : ldif.stringLDAPtoJSON(result);
               resolve(resJSON);
             }
           });
@@ -265,7 +267,8 @@ class LDAPAsyncWrap {
 
         this._searchID += 1;
         const timeValue = timeVal === undefined ? this._timeVal : timeVal;
-        resolve(new SearchStream(searchBase, scopeObject[scope], searchFilter, pageSize, this._searchID, this._binding, timeValue));
+        resolve(new SearchStream(searchBase, scopeObject[scope], searchFilter, pageSize,
+          this._searchID, this._binding, timeValue));
       }
       reject(new StateError(errorMessages.bindErrorMessage));
     });
@@ -334,7 +337,7 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapModifyErrorMessage));
           } else {
-            const resJSON = result === 0 ? result : ldif.parse(result);
+            const resJSON = result === 0 ? result : ldif.stringLDAPtoJSON(result);
             resolve(resJSON);
           }
         });
@@ -404,7 +407,7 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapRenameErrorMessage));
           } else {
-            const resJSON = result === 0 ? result : ldif.parse(result);
+            const resJSON = result === 0 ? result : ldif.stringLDAPtoJSON(result);
             resolve(resJSON);
           }
         });
@@ -438,7 +441,7 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapDeleteErrorMessage));
           } else {
-            const resJSON = result === 0 ? result : ldif.parse(result);
+            const resJSON = result === 0 ? result : ldif.stringLDAPtoJSON(result);
             resolve(resJSON);
           }
         });
@@ -507,7 +510,7 @@ class LDAPAsyncWrap {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapAddErrorMessage));
           } else {
-            const resJSON = result === 0 ? result : ldif.parse(result);
+            const resJSON = result === 0 ? result : ldif.stringLDAPtoJSON(result);
             resolve(resJSON);
           }
         });
