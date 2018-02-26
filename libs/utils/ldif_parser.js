@@ -34,8 +34,12 @@ function objectLDAPAttribute(type, value) {
     value: [],
   });
 
-  attributeObject.type = type;
-  attributeObject.value.push(value);
+  if (value === undefined || type === undefined) {
+    throw new Error('The string is not a LDAP LDIF structure');
+  }
+
+  attributeObject.type = type.trim();
+  attributeObject.value.push(value.trim());
 
   return attributeObject;
 }
@@ -59,9 +63,7 @@ function objectLDAPEntry(LDAPentry) {
   });
 
   for (i = 0; i < entryElementArrayLenght; i += 1) {
-
     const attributeArray = entryElementArray[i].split(':');
-
     const type = attributeArray[0];
     const value = attributeArray[1];
 
@@ -122,19 +124,21 @@ class stringJSON {
       throw new Error('The string is undefined');
     }
 
-    if (isNaN(LDAPstring) === false) {
+    if (isNaN(LDAPstring) === false || Buffer.isBuffer(LDAPstring) === true) {
       throw new Error('Must be a string');
     }
-
     // If basic test are past interogate to see if is an Ldap structure
-    const entryArray = LDAPstring.split('\ndn');
+    let entryArray = LDAPstring.split('dn');
+    entryArray = entryArray.filter((item) => {
+      return item !== '\n' && item !== '';
+    });
+
     const lengthEntryArray = entryArray.length;
 
-    if (lengthEntryArray <= 1) {
-      throw new Error('The string is not a LDAP structure');
+    if (lengthEntryArray < 1) {
+      throw new Error('The string is not a LDAP LDIF structure');
     }
-
-    for (let i = 1; i < lengthEntryArray; i += 1) {
+    for (let i = 0; i < lengthEntryArray; i += 1) {
       const entryObject = objectLDAPEntry(entryArray[i]);
       this.JSONobject.entry.push(entryObject);
     }

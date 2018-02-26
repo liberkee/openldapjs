@@ -4,10 +4,11 @@ const should = require('should');
 const config = require('./config.json');
 const LDIF = require('../libs/utils/ldif_parser');
 const LDAPWrap = require('../libs/ldap_async_wrap.js');
+const fs = require('fs');
 
 const ldif = new LDIF();
 
-describe.only('Testing the LDIF parser library', () => {
+describe('Testing the LDIF parser library', () => {
 
   const host = config.ldapAuthentication.host;
   const dnAdmin = config.ldapAuthentication.dnAdmin;
@@ -80,12 +81,25 @@ describe.only('Testing the LDIF parser library', () => {
     const wrongString = 'someRandomString';
 
     try {
-      const result = ldif.stringLDAPtoJSON(wrongString);
+      ldif.stringLDAPtoJSON(wrongString);
       should.fail('should not have passed');
     } catch (err) {
-      should.deepEqual(err.message, 'The string is not a LDAP structure');
+      should.deepEqual(err.message, 'The string is not a LDAP LDIF structure');
     }
     next();
+
+  });
+
+  it('Should reject if the ldif is not constructed correctly', (next) => {
+    fs.readFile('./test/test_tool/wrong.ldif', (err, res) => {
+      try {
+        ldif.stringLDAPtoJSON(res.toString());
+      } catch (error) {
+        should.deepEqual(error.message, 'The string is not a LDAP LDIF structure');
+      }
+      next();
+    });
+
 
   });
 

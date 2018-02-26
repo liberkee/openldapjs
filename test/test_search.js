@@ -159,7 +159,7 @@ describe('Testing the async LDAP search ', () => {
    */
 
   it('should return a single result', () => {
-    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2)
+    return adminLDAP.search(searchBase, searchScope.subtree, 'cn=admin')
       .then((result) => {
         result.entry[0].dn.should.be.deepEqual(dnAdmin);
       });
