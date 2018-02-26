@@ -77,12 +77,11 @@ describe('Testing the async LDAP search ', () => {
   /**
    * case for search with non existing search base
    */
-  xit('should return the root node', () => {
-    const ROOT_NODE =
-      '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
-    return adminLDAP.search('', searchScope.base, config.ldapSearch.filterObjAll)
+  it('should return the root node', () => {
+    const rootDn = '';
+    return adminLDAP.search(rootDn, searchScope.base, config.ldapSearch.filterObjAll)
       .then((result) => {
-        should.deepEqual(result, ROOT_NODE);
+        should.deepEqual(result.entry[0].dn, rootDn);
       });
   });
   /**
@@ -162,7 +161,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return a single result', () => {
     return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecific2)
       .then((result) => {
-        result.entries[0].dn.should.be.deepEqual(dnAdmin);
+        result.entry[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -173,7 +172,7 @@ describe('Testing the async LDAP search ', () => {
   it('should return multiple results located on the same level', () => {
     return adminLDAP.search(searchBase, searchScope.one, config.ldapSearch.filterObjAll)
       .then((result) => {
-        result.entries[0].dn.should.be.deepEqual(dnAdmin);
+        result.entry[0].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -247,7 +246,7 @@ describe('Testing the async LDAP search ', () => {
     this.timeout(0);
     return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
-        result.entries[1].dn.should.be.deepEqual(dnAdmin);
+        result.entry[1].dn.should.be.deepEqual(dnAdmin);
       });
   });
 
@@ -259,7 +258,7 @@ describe('Testing the async LDAP search ', () => {
     return adminLDAP
       .search(searchBase, searchScope.subtree, config.ldapSearch.filterObjAll)
       .then((result) => {
-        const count = result.entries.length;
+        const count = result.entry.length;
         count.should.be.above(10000);
       });
   });

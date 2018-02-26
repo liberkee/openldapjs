@@ -2,8 +2,10 @@
 
 const Readable = require('stream').Readable;
 const errorHandler = require('./errors/error_dispenser').errorFunction;
-const ldif = require('ldif');
+const LDIF = require('./utils/ldif_parser');
 const errorMessages = require('./messages.json');
+
+const ldif = new LDIF();
 
 /**
  * @class PagedSearchStream
@@ -40,18 +42,19 @@ class PagedSearchStream extends Readable {
     if (this._lastResult) {
       this.push(null);
     } else {
-      this._binding.pagedSearch(this._base, this._scope, this._filter, this._pageSize, this._searchId, this._timeOut, (err, page, morePages) => {
-        if (err) {
-          const CustomError = errorHandler(err);
-          this.emit('err', new CustomError(errorMessages.ldapSearchErrorMessage));
-          this.push(null);
-        } else {
-          if (!morePages) this._lastResult = true;
-          const resJSON = page.length === 0 ? page : ldif.parse(page);
-          this.push(resJSON);
-        }
+      this._binding.pagedSearch(this._base, this._scope, this._filter, this._pageSize,
+        this._searchId, this._timeOut, (err, page, morePages) => {
+          if (err) {
+            const CustomError = errorHandler(err);
+            this.emit('err', new CustomError(errorMessages.ldapSearchErrorMessage));
+            this.push(null);
+          } else {
+            if (!morePages) this._lastResult = true;
+            const resJSON = page.length === 0 ? page : ldif.stringLDAPtoJSON(page);
+            this.push(resJSON);
+          }
 
-      });
+        });
     }
   }
 

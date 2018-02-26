@@ -80,7 +80,7 @@ describe('Testing the rename functionalities', () => {
   });
 
   it('should reject if control is not a valid control object', () => {
-    return ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn, config.ldapRename.newparent, { test: 'test' })
+    return ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn, config.ldapRename.newparent, {test: 'test'})
       .then(() => {
         should.fail('should not have passed');
       })
@@ -93,7 +93,7 @@ describe('Testing the rename functionalities', () => {
   });
 
   it('should reject if control is not properly defined', () => {
-    return ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn, config.ldapRename.newparent, [{ test: 'test' }])
+    return ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn, config.ldapRename.newparent, [{test: 'test'}])
       .then(() => {
         should.fail('should not have passed');
       })
@@ -205,7 +205,7 @@ describe('Testing the rename functionalities', () => {
 
     ldapAsyncWrap.rename(config.ldapRename.dnChange, config.ldapRename.newrdn, config.ldapRename.newparent, controlOperation)
       .then((result) => {
-        should.deepEqual(result.entries[0].dn, config.ldapRename.dnChange);
+        should.deepEqual(result.entry[0].dn, config.ldapRename.dnChange);
       });
   });
 

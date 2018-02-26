@@ -19,7 +19,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 - Should,  MIT License,  Used as an assertion engine for unit testing
 - Underscore, MIT License, Used as a helper library
 - Bluebird, MIT License, Promise library of choice.
-- ldif, MIT License, Used for proper ldif message formating
 - Nan, MIT License, Used for nodejs addon development
 - Ajv, MIT License, Used for JSON validation
 - istanbul,  BSD 3-clause "New" or "Revised" License, Used for test coverage 

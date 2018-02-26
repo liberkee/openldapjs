@@ -135,6 +135,8 @@
     "filterObjSpecific": "objectclass=aliens",
     "filterObjSpecific2": "objectClass=simpleSecurityObject",
     "filterObjSpecific3": "objectClass=inetOrgPerson",
+    "filterObjSpecialCharRo": "cn=special_ro_ş",
+    "filterObjSpecialCharDe": "cn=special_de_ä",
     "nrOfResults": 10000,
     "pageSize": 10
   },

@@ -1,6 +1,6 @@
 {
   "ldapAuthentication": {
-    "host": "ldap://10.16.0.179:389",
+    "host": "ldap://localhost:389",
     "dnUser": "cn=managerUser,ou=users,o=myhost,dc=demoApp,dc=com",
     "passwordUser": "secret",
     "pathFileToCert": "/etc/ldap/ca_certs.pem"
