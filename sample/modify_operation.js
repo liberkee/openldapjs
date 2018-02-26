@@ -45,11 +45,8 @@ newClient.initialize()
     return newClient.modify(config.ldapModify.secondDNEntry, changes, prePostReadControls);
   })
   .then((result) => {
-    const outputOptions = {};
-
-    const JSONstructure = result.toObject(outputOptions);
-    JSONstructure.entries.forEach((element) => {
-      console.log(element);
+    result.entry.forEach((element) => {
+      console.log(JSON.stringify(element));
     });
   })
   .catch((err) => {

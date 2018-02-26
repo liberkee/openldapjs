@@ -26,12 +26,8 @@ newClient.initialize()
       console.log('-----------------------------------');
       console.log(`The page number is ${pageNumber += 1}`);
       console.log('-----------------------------------');
-      const outputOptions = {};
-
-      const JSONstructure = data.toObject(outputOptions);
-      console.log(`LDIF structure: ${data.toString()}`);
-      JSONstructure.entries.forEach((element) => {
-        console.log(element);
+      data.entry.forEach((element) => {
+        console.log(JSON.stringify(element));
       });
     });
 

@@ -21,12 +21,8 @@ newClient.initialize()
       config.ldapSearch.filter);
   })
   .then((result) => {
-    const outputOptions = {};
-    const JSONstructure = result.toObject(outputOptions);
-    console.log(`LDIF structure: ${result}`);
-    console.log('\n\n');
-    JSONstructure.entries.forEach((element) => {
-      console.log(element);
+    result.entry.forEach((element) => {
+      console.log(JSON.stringify(element));
     });
   })
   .catch((err) => {
