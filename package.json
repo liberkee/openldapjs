@@ -1,6 +1,6 @@
 {
   "name": "openldapjs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A ldap client nodejs",
   "main": "index.js",
   "repository": {
