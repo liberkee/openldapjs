@@ -77,7 +77,7 @@ describe('Testing the async LDAP search ', () => {
   /**
    * case for search with non existing search base
    */
-  xit('should return the root node', () => {
+  it('should return the root node', () => {
     const ROOT_NODE =
       '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
     return adminLDAP.search('', searchScope.base, config.ldapSearch.filterObjAll)
