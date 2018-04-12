@@ -135,6 +135,8 @@
     "filterObjSpecific": "objectclass=aliens",
     "filterObjSpecific2": "objectClass=simpleSecurityObject",
     "filterObjSpecific3": "objectClass=inetOrgPerson",
+    "filterObjSpecialLanguage": "cn=testDeLetterß",
+    "filterObjWithJsonAsValue": "cn=testJson",
     "nrOfResults": 10000,
     "pageSize": 10
   },

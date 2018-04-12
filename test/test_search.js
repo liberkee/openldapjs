@@ -78,11 +78,10 @@ describe('Testing the async LDAP search ', () => {
    * case for search with non existing search base
    */
   it('should return the root node', () => {
-    const ROOT_NODE =
-      '\ndn: \nobjectClass: top\nobjectClass: OpenLDAProotDSE\n';
+    const ROOT_NODE = '';
     return adminLDAP.search('', searchScope.base, config.ldapSearch.filterObjAll)
       .then((result) => {
-        should.deepEqual(result, ROOT_NODE);
+        result.entries[0].dn.should.be.deepEqual(ROOT_NODE);
       });
   });
   /**
@@ -153,6 +152,23 @@ describe('Testing the async LDAP search ', () => {
         should.fail('did not expect generic error');
       });
   });
+
+  it('should return a entry with special language characters', () => {
+    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjSpecialLanguage)
+      .then((result) => {
+        const expectedDN = `${config.ldapSearch.filterObjSpecialLanguage},${config.ldapSearch.searchBaseUser}`;
+        result.entries[0].dn.should.be.deepEqual(expectedDN);
+      });
+  })
+
+
+  it('should return a entry that have a json value to an attribute', () => {
+    return adminLDAP.search(searchBase, searchScope.subtree, config.ldapSearch.filterObjWithJsonAsValue)
+      .then((result) => {
+        const expectedDN = `${config.ldapSearch.filterObjWithJsonAsValue},${config.ldapSearch.searchBaseUser}`;
+        result.entries[0].dn.should.be.deepEqual(expectedDN);
+      });
+  })
 
 
   /**
