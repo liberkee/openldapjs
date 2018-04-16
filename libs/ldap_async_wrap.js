@@ -10,7 +10,7 @@ const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
 const errorCode = require('./error_codes.json');
 const _ = require('underscore');
-const ldif = require('ldif');
+const ldif = require('ldif-hufsm');
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
