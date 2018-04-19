@@ -36,3 +36,20 @@ userPassword: {SSHA}vWDkTc9e+2ojECzkfDWLAYbWmtSGj3Cu
 description: 1Modification
 description: 2Modification
 description: 3Modification
+
+dn: cn=testRoLetterș,ou=users,o=myhost,dc=demoApp,dc=com
+objectclass: person
+cn: testRoLetterș
+sn: RoLetterș
+description: All special Ro letters: ÂăÎîȘșȚț
+
+dn: cn=testDeLetterß,ou=users,o=myhost,dc=demoApp,dc=com
+objectclass: person
+cn: testRoLetterß
+sn: RoLetterこんにちは
+description: All special Ro letters: äÄöÖüÜß
+
+dn: cn=testJson,ou=users,o=myhost,dc=demoApp,dc=com
+objectclass: person
+cn: testJson
+sn: {"JSON":"Testing if work with JSON"}

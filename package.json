@@ -1,6 +1,6 @@
 {
   "name": "openldapjs",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A ldap client nodejs",
   "main": "index.js",
   "repository": {
@@ -10,9 +10,9 @@
   "dependencies": {
     "ajv": "5.3.0",
     "bluebird": "3.4.3",
-    "ldif": "0.5.1",
+    "ldif-hufsm": "0.7.0",
     "nan": "2.6.0",
-    "node-pre-gyp": "^0.6.39",
+    "node-pre-gyp": "0.6.39",
     "underscore": "1.8.3"
   },
   "bundledDependencies": [
@@ -26,14 +26,15 @@
     "host": "https://hufsm-opensource.s3-eu-west-1.amazonaws.com"
   },
   "devDependencies": {
-    "istanbul": "0.4.5",
-    "mocha": "4.0.1",
+    "aws-sdk": "2.201.0",
     "eslint": "4.7.1",
     "eslint-config-airbnb": "15.1.0",
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-jsx-a11y": "5.1.1",
-    "should": "11.2.0",
-    "eslint-plugin-react": "7.3.0"
+    "eslint-plugin-react": "7.3.0",
+    "istanbul": "0.4.5",
+    "mocha": "4.0.1",
+    "should": "11.2.0"
   },
   "scripts": {
     "coverage": "node ./test/pre_post_script/pre_script.js & istanbul cover \"./node_modules/mocha/bin/_mocha\" ./test/*.js",

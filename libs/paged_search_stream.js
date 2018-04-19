@@ -2,7 +2,7 @@
 
 const Readable = require('stream').Readable;
 const errorHandler = require('./errors/error_dispenser').errorFunction;
-const ldif = require('ldif');
+const ldif = require('ldif-hufsm');
 const errorMessages = require('./messages.json');
 
 /**

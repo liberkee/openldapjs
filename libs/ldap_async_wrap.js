@@ -10,7 +10,7 @@ const StateError = require('./errors/state_error');
 const errorMessages = require('./messages.json');
 const errorCode = require('./error_codes.json');
 const _ = require('underscore');
-const ldif = require('ldif');
+const ldif = require('ldif-hufsm');
 
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../package.json')));
 const binding = require(bindingPath);
@@ -62,6 +62,9 @@ class LDAPAsyncWrap {
   initialize() {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.CREATED) {
+        if (!checkParameters.checkURI(this._hostAddress)) {
+          return reject(new Error(`Could not parse LDAP URI(S): ${this._hostAddress}`));
+        }
         this._binding.initialize(this._hostAddress, (err, result) => {
           if (err) {
             const CustomError = errorHandler(err);
@@ -90,8 +93,8 @@ class LDAPAsyncWrap {
   startTLS(pathToCertFile) {
     return new Promise((resolve, reject) => {
       if (this._stateClient === E_STATES.INITIALIZED) {
-        const path = pathToCertFile === undefined ? '' : pathToCertFile;
-        this._binding.startTls(path, (err, res) => {
+        const certificatePath = pathToCertFile === undefined ? '' : pathToCertFile;
+        this._binding.startTls(certificatePath, (err, res) => {
           if (err) {
             const CustomError = errorHandler(err);
             reject(new CustomError(errorMessages.ldapStartTlsErrorMessage));
@@ -265,7 +268,9 @@ class LDAPAsyncWrap {
 
         this._searchID += 1;
         const timeValue = timeVal === undefined ? this._timeVal : timeVal;
-        resolve(new SearchStream(searchBase, scopeObject[scope], searchFilter, pageSize, this._searchID, this._binding, timeValue));
+
+        resolve(new SearchStream(searchBase, scopeObject[scope], searchFilter,
+          pageSize, this._searchID, this._binding, timeValue));
       }
       reject(new StateError(errorMessages.bindErrorMessage));
     });
