@@ -60,7 +60,7 @@ For the tests to run, you'll need some sample test data. In order to do this man
  * __userDn__: LDAP login Dn, this will be used for authentication. E.g: `cn=admin,dc=demoApp,dc=com`
 
  * __userPassword__: Password for your userDn
- 
+
  Also, configure the `ldapTestEntries` section in order to tell it where to put the test data:
 
 * __entryDn__: Entry point for your test data, E.g: `cn=newPoint,o=myhost,dc=demoApp,dc=com`
@@ -90,7 +90,7 @@ Get all required packages with npm and build the addon files :
 
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
 ```javascript
-const LdapClient = require('./libs/ldap_async_wrap.js');
+const LdapClient = require('openldapjs');
 ```
 
 A normal workflow would be :
