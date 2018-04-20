@@ -86,11 +86,9 @@ Get all required packages with npm and build the addon files :
   `npm install `
 
 
-**_This section should be updated as soon as we properly package it_**.
-
 The Node.JS wrapper for the library is libs/ldap_async_wrap.js, require it in your software like :
 ```javascript
-const LdapClient = require('openldapjs');
+const LdapClient = require('openldapjs').Client;
 ```
 
 A normal workflow would be :

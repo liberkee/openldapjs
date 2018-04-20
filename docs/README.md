@@ -2,9 +2,8 @@
 
 ## Usage
 
-TODO : We will  publish it as an npm package and just `npm install openldapjs`  and  
 ```javascript
-const LDAP = require('openldapjs');
+const LDAP = require('openldapjs').Client;
 ```
 After installing it in your project, and assuming that you have access to a functioning LDAP server, the library can be used as following:
 
