@@ -1,6 +1,6 @@
 {
   "name": "openldapjs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A ldap client nodejs",
   "main": "index.js",
   "repository": {
@@ -12,7 +12,7 @@
     "bluebird": "3.4.3",
     "ldif-hufsm": "0.7.0",
     "nan": "2.6.0",
-    "node-pre-gyp": "0.6.39",
+    "node-pre-gyp": "0.10.0",
     "underscore": "1.8.3"
   },
   "bundledDependencies": [
