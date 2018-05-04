@@ -1,5 +1,9 @@
 # Changelog for 6labs/openldapjs
 
+## 1.1.2 [2018-05-4]
+### Changed
+* Updated node-pre-gyp dependency
+
 ## 1.1.1 [2018-04-20] (First 'real'  release)
 ### Changed
 * Fixed some documentation.
